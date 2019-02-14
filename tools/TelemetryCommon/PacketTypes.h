@@ -63,10 +63,16 @@ constexpr tt_size MAX_LOCKS_HELD_PER_THREAD = 16;
 constexpr tt_size COMPRESSION_MAX_INPUT_SIZE = 1024 * 8;
 constexpr tt_size COMPRESSION_RING_BUFFER_SIZE = 1024 * 64;
 
+constexpr tt_size STRING_TABLE_BUF_SIZE = sizeof(void*) * 1024; // TODO: ?
+
 constexpr tt_size BACKGROUND_THREAD_STACK_SIZE_BASE = 1024 * 8; // base size for anything that's not a compression buffer.
 constexpr tt_size BACKGROUND_THREAD_STACK_SIZE = RoundUpToMultiple<tt_size>(
-        COMPRESSION_RING_BUFFER_SIZE + MAX_PACKET_SIZE + BACKGROUND_THREAD_STACK_SIZE_BASE, 1024 * 4);
-
+    COMPRESSION_RING_BUFFER_SIZE + 
+    MAX_PACKET_SIZE + 
+    BACKGROUND_THREAD_STACK_SIZE_BASE + 
+    STRING_TABLE_BUF_SIZE, 
+    1024 * 4
+);
 
 X_PACK_PUSH(1)
 

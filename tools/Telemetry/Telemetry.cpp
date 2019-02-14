@@ -193,11 +193,9 @@ namespace
         TraceThread* pThreadData;
         tt_int32 numThreadData;
 
-        StringTable strTable;
-
         tt_uint64 ticksPerMicro;
 
-        tt_uint8 _lanePad0[6];
+        tt_uint8 _lanePad0[6 + 16];
         X86_PAD(12)
 
         // -- Cace lane boundry --
@@ -439,6 +437,8 @@ namespace
 
         TraceContext* pCtx;
         SocketBuffer* pBuffer;
+
+        StringTable strTable;
 
         tt_int32 writeBegin;
         tt_int32 writeEnd;
@@ -849,9 +849,9 @@ namespace
         packet.threadID = pBuf->threadID;
         packet.start = zone.start;
         packet.end = zone.end;
-        packet.strIdxFile = StringTableGetIndex(pComp->pCtx->strTable, zone.sourceInfo.pFile_);
-        packet.strIdxFunction = StringTableGetIndex(pComp->pCtx->strTable, zone.sourceInfo.pFunction_);
-        packet.strIdxZone = StringTableGetIndex(pComp->pCtx->strTable, zone.pZoneName);
+        packet.strIdxFile = StringTableGetIndex(pComp->strTable, zone.sourceInfo.pFile_);
+        packet.strIdxFunction = StringTableGetIndex(pComp->strTable, zone.sourceInfo.pFunction_);
+        packet.strIdxZone = StringTableGetIndex(pComp->strTable, zone.pZoneName);
 
         // i want to write the string data.
         if (packet.strIdxFile.inserted) {
@@ -883,7 +883,7 @@ namespace
         DataPacketThreadSetName packet;
         packet.type = DataStreamType::ThreadSetName;
         packet.threadID = pBuf->threadID;
-        packet.strIdxName = StringTableGetIndex(pComp->pCtx->strTable, pBuf->pName);
+        packet.strIdxName = StringTableGetIndex(pComp->strTable, pBuf->pName);
 
         if (packet.strIdxName.inserted) {
             writeStringCompressionBuffer(pComp, pBuf->pName);
@@ -897,7 +897,7 @@ namespace
         DataPacketLockSetName packet;
         packet.type = DataStreamType::LockSetName;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
-        packet.strIdxName = StringTableGetIndex(pComp->pCtx->strTable, pBuf->pLockName);
+        packet.strIdxName = StringTableGetIndex(pComp->strTable, pBuf->pLockName);
 
         if (packet.strIdxName.inserted) {
             writeStringCompressionBuffer(pComp, pBuf->pLockName);
@@ -916,7 +916,7 @@ namespace
         packet.start = lock.start;
         packet.end = lock.end;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
-        packet.strIdxDescrption = StringTableGetIndex(pComp->pCtx->strTable, lock.pDescription);
+        packet.strIdxDescrption = StringTableGetIndex(pComp->strTable, lock.pDescription);
 
         if (packet.strIdxDescrption.inserted) {
             writeStringCompressionBuffer(pComp, lock.pDescription);
@@ -974,7 +974,9 @@ namespace
 
         auto* pCtx = reinterpret_cast<TraceContext*>(pParam);
 
+        tt_uint8 stringTableBuf[STRING_TABLE_BUF_SIZE];
         tt_uint8 packetBuff[MAX_PACKET_SIZE];
+
         SocketBuffer buffer = {
             packetBuff,
             0,
@@ -984,6 +986,7 @@ namespace
         PacketCompressor comp;
         comp.pCtx = pCtx;
         comp.pBuffer = &buffer;
+        comp.strTable = CreateStringTable(stringTableBuf, sizeof(stringTableBuf));
 
         {
             // pre fill the header.
@@ -1167,10 +1170,8 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     // send packets this size?
     constexpr tt_size contexSize = sizeof(TraceContext);
     constexpr tt_size threadDataSize = sizeof(TraceThread) * MAX_ZONE_THREADS;
-    constexpr tt_size strTableSize = sizeof(void*) * 1024; // TODO: ?
     constexpr tt_size minBufferSize = 1024 * 10; // 10kb.. enougth?
-
-    constexpr tt_size internalSize = contexSize + threadDataSize + strTableSize;
+    constexpr tt_size internalSize = contexSize + threadDataSize;
     if (bufLen < internalSize + minBufferSize) {
         return TtError::ArenaTooSmall;
     }
@@ -1187,11 +1188,9 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
 
     const tt_size tickBufferSize = RoundDownToMultiple<tt_size>(bytesLeft, 128) / 2;
     
-
     tt_uint8* pBufU8 = reinterpret_cast<tt_uint8*>(pBuf);
     tt_uint8* pThreadDataBuf = pBufU8 + contexSize;
-    tt_uint8* pStrTableBuf = pThreadDataBuf + threadDataSize;
-    tt_uint8* pTickBuffer0 = reinterpret_cast<tt_uint8*>(AlignTop(pStrTableBuf + strTableSize, 64));
+    tt_uint8* pTickBuffer0 = reinterpret_cast<tt_uint8*>(AlignTop(pThreadDataBuf + threadDataSize, 64));
     tt_uint8* pTickBuffer1 = pTickBuffer0 + tickBufferSize;
 
     // retard check.
@@ -1211,7 +1210,6 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     pCtx->socket = INV_SOCKET;
     pCtx->pThreadData = reinterpret_cast<TraceThread*>(pThreadDataBuf);
     pCtx->numThreadData = 0;
-    pCtx->strTable = CreateStringTable(pStrTableBuf, strTableSize);
     pCtx->ticksPerMicro = gTicksPerMicro;
 
     pCtx->activeTickBufIdx = 0;
