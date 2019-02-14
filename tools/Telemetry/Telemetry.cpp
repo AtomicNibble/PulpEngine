@@ -2,6 +2,7 @@
 #include "TelemetryLib.h"
 
 // TODO: get rid of
+#include <memory>
 #include <cstdio>
 #include <stddef.h> // for offsetof rip
 
@@ -522,6 +523,9 @@ namespace
         if (force && bufSize < halfBufferCap) {
             return;
         }
+
+        // trace ourself :D
+        ttZone(contextToHandle(pCtx), "FlipBuffers");
 
         // wait for the background thread to finish process that last buffer.
         // TODO: maybe come up with a fast path for when we don't need to wait.
