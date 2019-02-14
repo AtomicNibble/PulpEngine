@@ -551,15 +551,29 @@ namespace
         }
 
         // trace ourself :D
-        ttZone(contextToHandle(pCtx), "FlipBuffers");
+        // i would like to know about trace stalls.
+        ttZoneFilterd(contextToHandle(pCtx), 100, "FlipBuffers");
 
-        // wait for the background thread to finish process that last buffer.
-        // TODO: maybe come up with a fast path for when we don't need to wait.
-        // check if the signal has a userspace atomic it checks before waiting.
-        DWORD result = WaitForSingleObjectEx(pCtx->hSignalIdle_, INFINITE, false);
-        if (result != WAIT_OBJECT_0) {
-            ::DebugBreak();
-            return;
+        {
+            auto waitStart = getTicks();
+
+            // wait for the background thread to finish process that last buffer.
+            // TODO: maybe come up with a fast path for when we don't need to wait.
+            // check if the signal has a userspace atomic it checks before waiting.
+            DWORD result = WaitForSingleObjectEx(pCtx->hSignalIdle_, INFINITE, false);
+            if (result != WAIT_OBJECT_0) {
+                ::DebugBreak();
+                return;
+            }
+
+            auto waitEnd = getTicks();
+            auto ellapsedMicro = ticksToMicro(pCtx, waitEnd - waitStart);
+
+            // did we have to wait more than 0.1ms?
+            if (ellapsedMicro > 100)
+            {
+                writeLog(pCtx, LogType::Warning, "Flip stalled for: %lluus", ellapsedMicro);
+            }
         }
 
         // the background thread has finished with old buffer.
