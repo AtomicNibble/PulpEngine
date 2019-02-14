@@ -128,6 +128,26 @@ namespace
     }
 
 
+
+    void LogFunc(void* pUserData, LogType type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm)
+    {
+        X_UNUSED(pUserData);
+        X_UNUSED(lenWithoutTerm);
+
+        switch (type)
+        {
+            case LogType::Msg:
+                X_LOG0("Telemetry", pMsgNullTerm);
+                break;
+            case LogType::Warning:
+                X_WARNING("Telemetry", pMsgNullTerm);
+                break;
+            case LogType::Error:
+                X_ERROR("Telemetry", pMsgNullTerm);
+                break;
+       }
+    }
+
 } // namespace
 
 
@@ -182,6 +202,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             if (engine.Init(hInstance, lpCmdLine)) {
                 X_ASSERT_NOT_NULL(gEnv);
                 X_ASSERT_NOT_NULL(gEnv->pCore);
+
+                // now engine logging is init redirect logs here.
+                ttSetContextLogFunc(ctx, LogFunc, nullptr);
 
                 gEnv->pConsoleWnd->redirectSTD();
 

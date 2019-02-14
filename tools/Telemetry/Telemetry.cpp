@@ -182,6 +182,17 @@ namespace
     #define X86_PAD(bytes) tt_uint8 X_TELEMETRY_UNIQUE_NAME(__pad)[bytes];
 #endif // X_64
 
+
+    void defaultLogFunction(void* pUserData, LogType type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm)
+    {
+        X_UNUSED(pUserData);
+        X_UNUSED(lenWithoutTerm);
+        X_UNUSED(type);
+
+        ::OutputDebugStringA(pMsgNullTerm);
+        ::OutputDebugStringA("\n");
+    }
+
     // This is padded to 64bit to make placing TraceThread data on it's own boundy more simple.
     X_ALIGNED_SYMBOL(struct TraceContext, 64)
     {
@@ -231,6 +242,9 @@ namespace
         CriticalSection cs_;
         tt_int32 numStalls;
         tt_int32 totalEvents;
+
+        LogFunction logFunc;
+        void* pUserData;
     };
 
 //    constexpr size_t size0 = sizeof(TraceContext);
@@ -328,7 +342,19 @@ namespace
         return pThreadData;
     }
 
-    bool handleConnectionResponse(tt_uint8* pData, tt_size len)
+    void writeLog(TraceContext* pCtx, LogType type, const char* pFmt, ...)
+    {
+        char buf[MAX_STRING_LEN] = {};
+
+        va_list args;
+        va_start(args, pFmt);
+        tt_int32 len = vsprintf(buf, pFmt, args);
+        va_end(args);
+
+        pCtx->logFunc(pCtx->pUserData, type, buf, len);
+    }
+
+    bool handleConnectionResponse(TraceContext* pCtx, tt_uint8* pData, tt_size len)
     {
         X_UNUSED(len);
 
@@ -341,7 +367,7 @@ namespace
             case PacketType::ConnectionRequestRejected: {
                 auto* pConRej = reinterpret_cast<const ConnectionRequestRejectedHdr*>(pData);
                 auto* pStrData = reinterpret_cast<const char*>(pConRej + 1);
-                printf("Connection rejected: %.*s\n", pConRej->reasonLen, pStrData);
+                writeLog(pCtx, LogType::Error, "Connection rejected: %.*s", pConRej->reasonLen, pStrData);
 
             }
             default:
@@ -355,7 +381,7 @@ namespace
         // TODO: none blocking?
         int res = platform::send(pCtx->socket, reinterpret_cast<const char*>(pData), static_cast<int>(len), 0);
         if (res == SOCKET_ERROR) {
-            printf("send failed with error: %d\n", platform::WSAGetLastError());
+            writeLog(pCtx, LogType::Error, "Socket: send failed with error: %d", platform::WSAGetLastError());
             return;
         }
     }
@@ -951,7 +977,7 @@ namespace
             auto end = gSysTimer.GetMicro();
             auto ellapsed = end - start;
 
-            printf("processed in: %lld\n", ellapsed);
+            writeLog(pCtx, LogType::Msg, "processed in: %lld", ellapsed);
         }
 
         return 0;
@@ -1107,6 +1133,8 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     pCtx->numStalls = 0;
     pCtx->totalEvents = 0;
     
+    pCtx->logFunc = defaultLogFunction;
+    pCtx->pUserData = nullptr;
 
     out = contextToHandle(pCtx);
     return TtError::Ok;
@@ -1137,6 +1165,15 @@ void TelemShutdownContext(TraceContexHandle ctx)
     if (pCtx->hSignalIdle_) {
         ::CloseHandle(pCtx->hSignalIdle_);
     }
+}
+
+void TelemSetContextLogFunc(TraceContexHandle ctx, LogFunction func, void* pUserData)
+{
+    auto* pCtx = handleToContext(ctx);
+    pCtx->pUserData = pUserData;
+    // write this after.
+    _WriteBarrier();
+    pCtx->logFunc = func;
 }
 
 TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
@@ -1194,15 +1231,16 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
         return TtError::Error;
     }
 
+    auto* pCtx = handleToContext(ctx);
+
     // how big?
     tt_int32 sock_opt = 1024 * 32;
     res = platform::setsockopt(connectSocket, SOL_SOCKET, SO_SNDBUF, (char*)&sock_opt, sizeof(sock_opt));
     if (res != 0) {
-        printf("Failed to set sndbuf on socket. Error: %d\n", platform::WSAGetLastError());
+        writeLog(pCtx, LogType::Error, "Failed to set sndbuf on socket. Error: %d", platform::WSAGetLastError());
         return TtError::Error;
     }
-
-    auto* pCtx = handleToContext(ctx);
+   
     pCtx->socket = connectSocket;
 
     ConnectionRequestHdr cr;
@@ -1255,7 +1293,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
         return TtError::Error;
     }
 
-    if (!handleConnectionResponse(reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(recvbuflen))) {
+    if (!handleConnectionResponse(pCtx, reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(recvbuflen))) {
         return TtError::HandeshakeFail;
     }
 
@@ -1269,7 +1307,7 @@ bool TelemClose(TraceContexHandle ctx)
 #if 0 // TODO: needed?
         int res = platform::shutdown(pCtx->socket, SD_BOTH);
         if (res == SOCKET_ERROR) {
-            printf("shutdown failed with error: %d\n", platform::WSAGetLastError());
+            writeLog(pCtx, LogType::Error, "shutdown failed with error: %d", platform::WSAGetLastError());
         }
 #endif
 

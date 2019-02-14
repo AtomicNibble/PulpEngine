@@ -9,7 +9,16 @@
 #define X_TELEMETRY_UNIQUE_NAME_HELPER(_0, _1) X_TELEMETRY_UNIQUE_NAME_HELPER_0(_0, _1)
 #define X_TELEMETRY_UNIQUE_NAME(name) X_TELEMETRY_UNIQUE_NAME_HELPER(name, __LINE__)
 
+enum class LogType
+{
+    Msg,
+    Warning,
+    Error
+};
+
+using LogFunction = void(*)(void* pUserData, LogType type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm);
 using TraceContexHandle = tt_uintptr;
+
 
 inline TraceContexHandle INVALID_TRACE_CONTEX = 0;
 
@@ -17,7 +26,6 @@ enum TtConnectionType
 {
     Tcp
 };
-
 
 enum TtError
 {
@@ -79,6 +87,8 @@ extern "C"
     // Context
     TELEM_API_ERR(TelemInitializeContext, TraceContexHandle& ctx, void* pArena, tt_size bufLen);
     TELEM_API_VOID(TelemShutdownContext, TraceContexHandle ctx);
+
+    TELEM_API_VOID(TelemSetContextLogFunc, TraceContexHandle ctx, LogFunction func, void* pUserData);
 
     TELEM_API_ERR(TelemOpen, TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
         tt_uint16 serverPort, TtConnectionType conType, tt_int32 timeoutMS);
@@ -167,6 +177,7 @@ namespace telem
             TELEM_RESOLVE(TelemShutDown);
             TELEM_RESOLVE(TelemInitializeContext);
             TELEM_RESOLVE(TelemShutdownContext);
+            TELEM_RESOLVE(TelemSetContextLogFunc);
             TELEM_RESOLVE(TelemOpen);
             TELEM_RESOLVE(TelemClose);
             TELEM_RESOLVE(TelemTick);
@@ -197,6 +208,7 @@ namespace telem
             TELEM_SET_BLANK(TelemShutDown);
             TELEM_SET_BLANK(TelemInitializeContext);
             TELEM_SET_BLANK(TelemShutdownContext);
+            TELEM_SET_BLANK(TelemSetContextLogFunc);
             TELEM_SET_BLANK(TelemOpen);
             TELEM_SET_BLANK(TelemClose);
             TELEM_SET_BLANK(TelemTick);
@@ -233,6 +245,7 @@ namespace telem
         TELEM_FUNC_PTR(TelemShutDown);
         TELEM_FUNC_PTR(TelemInitializeContext);
         TELEM_FUNC_PTR(TelemShutdownContext);
+        TELEM_FUNC_PTR(TelemSetContextLogFunc);
         TELEM_FUNC_PTR(TelemOpen);
         TELEM_FUNC_PTR(TelemClose);
         TELEM_FUNC_PTR(TelemTick);
@@ -323,6 +336,8 @@ namespace telem
 #define ttInitializeContext(out, pBuf, bufLen) TELEM_FUNC_NAME(TelemInitializeContext)(out, pBuf, bufLen)
 #define ttShutdownContext(ctx) TELEM_FUNC_NAME(TelemShutdownContext)(ctx)
 
+#define ttSetContextLogFunc(ctx, func, pUserData) TELEM_FUNC_NAME(TelemSetContextLogFunc)(ctx, func, pUserData);
+
 #define ttOpen(ctx, pAppName, pBuildInfo, pServerAddress, serverPort, conType, timeoutMS) \
     TELEM_FUNC_NAME(TelemOpen)(ctx, pAppName, pBuildInfo, pServerAddress, serverPort, conType, timeoutMS)
 
@@ -376,6 +391,8 @@ namespace telem
 
 #define ttInit() true
 #define ttShutDown() 
+
+#define ttSetContextLogFunc(...)
 
 // Context
 #define ttInitializeContext(...)
