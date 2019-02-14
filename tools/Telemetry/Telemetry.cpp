@@ -80,22 +80,21 @@ namespace
         return ((value + offset) % alignment) == 0;
     }
 
-    bool Convert(const wchar_t* pSrc, tt_size srcSize,
-        char* output, tt_size outputBytes, tt_size& lengthOut)
+    bool Convert(const wchar_t* pSrc, tt_int32 srcSize,
+        char* output, tt_int32 outputBytes, tt_int32& lengthOut)
     {
         lengthOut = 0;
         if (!outputBytes) {
             return false;
         }
 
-        const tt_int32 srcLenChars = static_cast<tt_int32>(srcSize);
         const tt_int32 bytesWritten = WideCharToMultiByte(
             CP_UTF8,
             0,
             pSrc,
-            srcLenChars,
+            srcSize,
             output,
-            static_cast<tt_int32>(outputBytes),
+            outputBytes,
             nullptr,
             nullptr
         );
@@ -369,7 +368,7 @@ namespace
         const tt_int32 packetBufCapacity;
     };
 
-    void sendDataToServer(TraceContext* pCtx, const void* pData, tt_size len)
+    void sendDataToServer(TraceContext* pCtx, const void* pData, tt_int32 len)
     {
         if (len > MAX_PACKET_SIZE) {
             ::DebugBreak();
@@ -377,7 +376,7 @@ namespace
 
         // send some data...
         // TODO: none blocking?
-        int res = platform::send(pCtx->socket, reinterpret_cast<const char*>(pData), static_cast<int>(len), 0);
+        int res = platform::send(pCtx->socket, reinterpret_cast<const char*>(pData), len, 0);
         if (res == SOCKET_ERROR) {
             writeLog(pCtx, LogType::Error, "Socket: send failed with error: %d", platform::WSAGetLastError());
             return;
@@ -399,7 +398,7 @@ namespace
         pBuffer->packetBufSize = sizeof(DataStreamHdr);
     }
 
-    void addToPacketBuffer(TraceContext* pCtx, SocketBuffer* pBuffer, const void* pData, tt_size len)
+    void addToPacketBuffer(TraceContext* pCtx, SocketBuffer* pBuffer, const void* pData, tt_int32 len)
     {
         // even fit in a packet?
         if (len > pBuffer->packetBufCapacity - sizeof(DataStreamHdr)) {
@@ -408,9 +407,9 @@ namespace
 
         // can we fit this data?
         const tt_int32 space = pBuffer->packetBufCapacity - pBuffer->packetBufSize;
-        if (space >= static_cast<tt_int32>(len)) {
+        if (space >= len) {
             memcpy(&pBuffer->pPacketBuffer[pBuffer->packetBufSize], pData, len);
-            pBuffer->packetBufSize += static_cast<tt_int32>(len);
+            pBuffer->packetBufSize += len;
             return;
         }
         
@@ -1385,9 +1384,9 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
 
     LPWSTR pCmdLine = GetCommandLineW();
 
-    const auto appNameLen = strlen(pAppName);
-    const auto buildInfoLen = strlen(pBuildInfo);
-    const auto cmdLineLen = wcslen(pCmdLine);
+    const auto appNameLen = static_cast<tt_uint32>(strlen(pAppName));
+    const auto buildInfoLen = static_cast<tt_uint32>(strlen(pBuildInfo));
+    const auto cmdLineLen = static_cast<tt_uint32>(wcslen(pCmdLine));
 
     if (appNameLen > MAX_STRING_LEN) {
         return TtError::InvalidParam;
@@ -1400,7 +1399,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     }
 
     char cmdLine[MAX_CMDLINE_LEN] = {};
-    tt_size cmdLenUtf8;
+    tt_int32 cmdLenUtf8;
     if (!Convert(pCmdLine, cmdLineLen, cmdLine, sizeof(cmdLine), cmdLenUtf8)) {
         return TtError::Error;
     }
