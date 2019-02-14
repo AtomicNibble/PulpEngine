@@ -37,7 +37,7 @@ bool readPacket(platform::SOCKET& socket, char* pBuffer, int& bufLengthInOut)
             }
 
             if (pHdr->dataSize > bufLengthInOut) {
-                printf("Client sent oversied packet...\n");
+                printf("Client sent oversied packet of size %i...\n", static_cast<tt_int32>(pHdr->dataSize));
                 return false;
             }
 
