@@ -46,11 +46,6 @@ namespace
     SysTimer gSysTimer;
     tt_uint64 gTicksPerMicro;
 
-    X_INLINE tt_uint64 TicksToMicro(tt_uint64 tsc) 
-    {
-        return (tsc / gTicksPerMicro);
-    }
-
     X_INLINE tt_uint32 getThreadID(void)
     {
         // TODO: remove function call.
@@ -199,7 +194,9 @@ namespace
 
         StringTable strTable;
 
-        tt_uint8 _lanePad0[14];
+        tt_uint64 ticksPerMicro;
+
+        tt_uint8 _lanePad0[6];
         X86_PAD(12)
 
         // -- Cace lane boundry --
@@ -257,6 +254,11 @@ namespace
     bool isValidContext(TraceContexHandle handle)
     {
         return handle != INVALID_TRACE_CONTEX;
+    }
+
+    X_INLINE tt_uint64 ticksToMicro(TraceContext* pCtx, tt_uint64 tsc)
+    {
+        return (tsc / pCtx->ticksPerMicro);
     }
 
     tt_int32 getActiveTickBufferSize(TraceContext* pCtx)
@@ -1062,6 +1064,7 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     pCtx->pThreadData = reinterpret_cast<TraceThread*>(pThreadDataBuf);
     pCtx->numThreadData = 0;
     pCtx->strTable = CreateStringTable(pStrTableBuf, strTableSize);
+    pCtx->ticksPerMicro = gTicksPerMicro;
     pCtx->pPacketBuffer = pPacketBuffer;
     pCtx->packetBufSize = sizeof(DataStreamHdr);
     pCtx->packetBufCapacity = packetBufSize;
@@ -1101,6 +1104,7 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     pCtx->shutDownFlag = 0;
     pCtx->numStalls = 0;
     pCtx->totalEvents = 0;
+    
 
     out = contextToHandle(pCtx);
     return TtError::Ok;
@@ -1417,7 +1421,7 @@ void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId)
     // work out if we send it.
     auto minMicroSec = matchId;
     auto elpased = zone.end - zone.start;
-    auto elapsedMicro = TicksToMicro(elpased);
+    auto elapsedMicro = ticksToMicro(pCtx, elpased);
 
     if (elapsedMicro > minMicroSec) {
         return;
@@ -1506,7 +1510,7 @@ void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPt
     // work out if we send it.
     auto minMicroSec = matchId;
     auto elpased = pLock->end - pLock->start;
-    auto elapsedMicro = TicksToMicro(elpased);
+    auto elapsedMicro = ticksToMicro(pCtx, elpased);
 
     if (elapsedMicro > minMicroSec) {
         return;
