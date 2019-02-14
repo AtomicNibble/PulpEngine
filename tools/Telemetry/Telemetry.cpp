@@ -407,13 +407,35 @@ namespace
         }
 
         // can we fit this data?
-        const auto space = pBuffer->packetBufCapacity - pBuffer->packetBufSize;
-        if (space < static_cast<tt_int32>(len)) {
-            flushPacketBuffer(pCtx, pBuffer);
+        const tt_int32 space = pBuffer->packetBufCapacity - pBuffer->packetBufSize;
+        if (space >= static_cast<tt_int32>(len)) {
+            memcpy(&pBuffer->pPacketBuffer[pBuffer->packetBufSize], pData, len);
+            pBuffer->packetBufSize += static_cast<tt_int32>(len);
+            return;
         }
+        
+#if X_DEBUG
+        if (len <= space) {
+            ::DebugBreak();
+        }
+#endif // X_DEBUG
 
-        memcpy(&pBuffer->pPacketBuffer[pBuffer->packetBufSize], pData, len);
-        pBuffer->packetBufSize += static_cast<tt_int32>(len);
+        // lets copy what we can flush then copy trailing.
+        const auto trailing = len - space;
+        memcpy(&pBuffer->pPacketBuffer[pBuffer->packetBufSize], pData, space);
+        pBuffer->packetBufSize += space;
+
+        flushPacketBuffer(pCtx, pBuffer);
+
+#if X_DEBUG
+        if (pBuffer->packetBufSize != sizeof(DataStreamHdr)) {
+            ::DebugBreak();
+        }
+#endif // X_DEBUG
+
+
+        memcpy(&pBuffer->pPacketBuffer[pBuffer->packetBufSize], reinterpret_cast<const tt_uint8*>(pData) + space, trailing);
+        pBuffer->packetBufSize += space;
     }
 
     struct PacketCompressor
