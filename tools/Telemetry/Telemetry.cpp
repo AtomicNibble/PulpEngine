@@ -1234,7 +1234,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     auto* pCtx = handleToContext(ctx);
 
     // how big?
-    tt_int32 sock_opt = 1024 * 32;
+    tt_int32 sock_opt = 1024 * 16;
     res = platform::setsockopt(connectSocket, SOL_SOCKET, SO_SNDBUF, (char*)&sock_opt, sizeof(sock_opt));
     if (res != 0) {
         writeLog(pCtx, LogType::Error, "Failed to set sndbuf on socket. Error: %d", platform::WSAGetLastError());
