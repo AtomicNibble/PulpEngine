@@ -242,17 +242,17 @@ namespace
     static_assert(X_OFFSETOF(TraceContext, cs_) == 192, "cache lane boundry changed");
     static_assert(sizeof(TraceContext) == 256, "Size changed");
 
-    TraceContexHandle contextToHandle(TraceContext* pCtx)
+    X_INLINE TraceContexHandle contextToHandle(TraceContext* pCtx)
     {
         return reinterpret_cast<TraceContexHandle>(pCtx);
     }
 
-    TraceContext* handleToContext(TraceContexHandle handle)
+    X_INLINE TraceContext* handleToContext(TraceContexHandle handle)
     {
         return reinterpret_cast<TraceContext*>(handle);
     }
 
-    bool isValidContext(TraceContexHandle handle)
+    X_INLINE bool isValidContext(TraceContexHandle handle)
     {
         return handle != INVALID_TRACE_CONTEX;
     }
@@ -262,7 +262,7 @@ namespace
         return (tsc / pCtx->ticksPerMicro);
     }
 
-    tt_int32 getActiveTickBufferSize(TraceContext* pCtx)
+    X_INLINE tt_int32 getActiveTickBufferSize(TraceContext* pCtx)
     {
         auto& buf = pCtx->tickBuffers[pCtx->activeTickBufIdx];
         return buf.bufOffset;
@@ -613,7 +613,7 @@ namespace
         addToTickBuffer(pCtx, pPtr, size);
     }
 
-    void queueTickInfo(TraceContext* pCtx)
+    X_INLINE void queueTickInfo(TraceContext* pCtx)
     {
         QueueDataTickInfo data;
         data.type = QueueDataType::TickInfo;
@@ -624,7 +624,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    void queueThreadSetName(TraceContext* pCtx, tt_uint32 threadID, const char* pName)
+    X_INLINE void queueThreadSetName(TraceContext* pCtx, tt_uint32 threadID, const char* pName)
     {
         QueueDataThreadSetName data;
         data.type = QueueDataType::ThreadSetName;
@@ -634,7 +634,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    void queueZone(TraceContext* pCtx, TraceThread* pThread, TraceZone& zone)
+    X_INLINE void queueZone(TraceContext* pCtx, TraceThread* pThread, TraceZone& zone)
     {
         QueueDataZone data;
         data.type = QueueDataType::Zone;
@@ -645,7 +645,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    void queueLockSetName(TraceContext* pCtx, const void* pPtr, const char* pLockName)
+    X_INLINE void queueLockSetName(TraceContext* pCtx, const void* pPtr, const char* pLockName)
     {
         QueueDataLockSetName data;
         data.type = QueueDataType::LockSetName;
@@ -655,7 +655,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    void queueLock(TraceContext* pCtx, TraceThread* pThread, TraceLock* pLock)
+    X_INLINE void queueLock(TraceContext* pCtx, TraceThread* pThread, TraceLock* pLock)
     {
         QueueDataLockTry data;
         data.type = QueueDataType::LockTry;
@@ -666,7 +666,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    void queueLockState(TraceContext* pCtx, const void* pPtr, TtLockState state)
+    X_INLINE void queueLockState(TraceContext* pCtx, const void* pPtr, TtLockState state)
     {
         QueueDataLockState data;
         data.type = QueueDataType::LockState;
@@ -677,7 +677,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    void queueLockCount(TraceContext* pCtx, const void* pPtr, tt_int32 count)
+    X_INLINE void queueLockCount(TraceContext* pCtx, const void* pPtr, tt_int32 count)
     {
         QueueDataLockCount data;
         data.type = QueueDataType::LockCount;
@@ -688,7 +688,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    void queueMemAlloc(TraceContext* pCtx, const void* pPtr, tt_size size)
+    X_INLINE void queueMemAlloc(TraceContext* pCtx, const void* pPtr, tt_size size)
     {
         QueueDataMemAlloc data;
         data.type = QueueDataType::MemAlloc;
@@ -699,7 +699,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    void queueMemFree(TraceContext* pCtx, const void* pPtr)
+    X_INLINE void queueMemFree(TraceContext* pCtx, const void* pPtr)
     {
         QueueDataMemFree data;
         data.type = QueueDataType::MemFree;
@@ -708,6 +708,8 @@ namespace
 
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
+
+    // Processing.
 
     void queueProcessZone(TraceContext* pCtx, const QueueDataZone* pBuf)
     {
