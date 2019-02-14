@@ -370,9 +370,11 @@ namespace
 
     void sendDataToServer(TraceContext* pCtx, const void* pData, tt_int32 len)
     {
+#if X_DEBUG
         if (len > MAX_PACKET_SIZE) {
             ::DebugBreak();
         }
+#endif // X_DEBUG
 
         // send some data...
         // TODO: none blocking?
@@ -400,10 +402,16 @@ namespace
 
     void addToPacketBuffer(TraceContext* pCtx, SocketBuffer* pBuffer, const void* pData, tt_int32 len)
     {
+#if X_DEBUG
         // even fit in a packet?
         if (len > pBuffer->packetBufCapacity - sizeof(DataStreamHdr)) {
             ::DebugBreak();
         }
+        if (pBuffer->packetBufSize < sizeof(DataStreamHdr)) {
+            ::DebugBreak();
+        }
+#endif // X_DEBUG
+
 
         // can we fit this data?
         const tt_int32 space = pBuffer->packetBufCapacity - pBuffer->packetBufSize;
