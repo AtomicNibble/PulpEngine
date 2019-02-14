@@ -8,6 +8,7 @@ public:
     TELEMETRY_COMLIB_EXPORT bool StartUp(void);
 
     TELEMETRY_COMLIB_EXPORT tt_int64 GetTicks(void);
+    X_INLINE tt_int64 GetNano(void);
     X_INLINE tt_int64 GetMicro(void);
     X_INLINE float ToSeconds(tt_int64 count);
     X_INLINE float ToMilliSeconds(tt_int64 count);
@@ -19,6 +20,16 @@ private:
     tt_int64 frequencyOverMillion_;
     tt_int64 frequency_;
 };
+
+
+X_INLINE tt_int64 SysTimer::GetNano(void)
+{
+    const auto count = GetTicks();
+    const tt_int64 whole = (count / frequency_) * 1000000000;
+    const tt_int64 part = (count % frequency_) * 1000000000 / frequency_;
+
+    return whole + part;
+}
 
 X_INLINE tt_int64 SysTimer::GetMicro(void)
 {
