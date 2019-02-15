@@ -51,7 +51,7 @@ namespace
         FILE* pFile;
     };
 
-    void sendPacketToClient(Client& client, const void* pData, tt_size len)
+    void sendPacketToClient(Client& client, const void* pData, size_t len)
     {
         // send some data...
         int res = platform::send(client.socket, reinterpret_cast<const char*>(pData), static_cast<int>(len), 0);
@@ -65,8 +65,8 @@ namespace
     {
         X_LOG0("TelemSrv", "ConnectionRejected:");
 
-        tt_size msgLen = strlen(pReason);
-        tt_size datalen = sizeof(ConnectionRequestRejectedHdr) + msgLen;
+        size_t msgLen = strlen(pReason);
+        size_t datalen = sizeof(ConnectionRequestRejectedHdr) + msgLen;
 
         if (msgLen > MAX_STRING_LEN) {
             msgLen = MAX_STRING_LEN;
@@ -82,7 +82,7 @@ namespace
         sendPacketToClient(client, buf, datalen);
     }
 
-    void handleConnectionRequest(Client& client, tt_uint8* pData)
+    void handleConnectionRequest(Client& client, uint8_t* pData)
     {
         auto* pConReq = reinterpret_cast<const ConnectionRequestHdr*>(pData);
         if (pConReq->type != PacketType::ConnectionRequest) {
@@ -109,7 +109,7 @@ namespace
         core::zero_object(client.buildInfo);
         core::zero_object(client.cmdLine);
 
-        auto* pStrData = reinterpret_cast<const tt_uint8*>(pConReq + 1);
+        auto* pStrData = reinterpret_cast<const uint8_t*>(pConReq + 1);
         memcpy(client.appName, pStrData, pConReq->appNameLen);
         pStrData += pConReq->appNameLen;
         memcpy(client.buildInfo, pStrData, pConReq->buildInfoLen);
@@ -132,7 +132,7 @@ namespace
         sendPacketToClient(client, &cra, sizeof(cra));
     }
 
-    void handleDataSream(Client& client, tt_uint8* pData)
+    void handleDataSream(Client& client, uint8_t* pData)
     {
         X_UNUSED(client);
         X_UNUSED(pData);
@@ -140,7 +140,7 @@ namespace
 
     }
 
-    bool processPacket(Client& client, tt_uint8* pData)
+    bool processPacket(Client& client, uint8_t* pData)
     {
         auto* pPacketHdr = reinterpret_cast<const PacketBase*>(pData);
 
@@ -178,7 +178,7 @@ namespace
                 fwrite(recvbuf, recvbuflen, 1, client.pFile);
             }
 
-            if (!processPacket(client, reinterpret_cast<tt_uint8*>(recvbuf))) {
+            if (!processPacket(client, reinterpret_cast<uint8_t*>(recvbuf))) {
                 X_LOG0("TelemSrv", "Failed to process packet");
                 return;
             }
