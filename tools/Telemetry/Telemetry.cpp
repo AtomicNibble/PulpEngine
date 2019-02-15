@@ -572,6 +572,7 @@ namespace
         Zone,
         TickInfo,
         ThreadSetName,
+        CallStack,
         LockSetName,
         LockTry,
         LockState,
@@ -597,6 +598,11 @@ namespace
     {
         TtthreadId threadID;
         const char* pName;
+    };
+
+    X_ALIGNED_SYMBOL(struct QueueDataCallStack, 64) : public QueueDataBase
+    {
+        TtCallStack callstack;
     };
 
     X_ALIGNED_SYMBOL(struct QueueDataZone, 64) : public QueueDataBase
@@ -660,6 +666,7 @@ namespace
     static_assert(64 == sizeof(QueueDataTickInfo));
     static_assert(64 == sizeof(QueueDataZone));
     static_assert(64 == sizeof(QueueDataLockSetName));
+    static_assert(64 == sizeof(QueueDataCallStack));
     static_assert(64 == sizeof(QueueDataLockTry));
     static_assert(64 == sizeof(QueueDataLockState));
     static_assert(64 == sizeof(QueueDataLockCount));
@@ -803,6 +810,15 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
+    X_INLINE void queueCallStack(TraceContext* pCtx, const TtCallStack& stack)
+    {
+        QueueDataCallStack data;
+        data.type = QueueDataType::CallStack;
+        data.callstack = stack;
+
+        addToTickBuffer(pCtx, &data, sizeof(data));
+    }
+
     X_INLINE void queueZone(TraceContext* pCtx, TraceThread* pThread, TraceZone& zone)
     {
         QueueDataZone data;
@@ -931,6 +947,26 @@ namespace
         }
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
+    }
+
+    void queueProcessCallStack(PacketCompressor* pComp, const QueueDataCallStack* pBuf)
+    {
+        DataPacketCallStack packet;
+        packet.type = DataStreamType::CallStack;
+
+        X_UNUSED(pComp);
+        X_UNUSED(pBuf);
+        // so think going todo a callstack cache.
+        // then send a id for it?
+        // one thing is how to i match these callstacks up like what will i do with them.
+        // guess it will just be the current threads zone.
+        // so the zone would need call stack info?
+        // think that makes the most sense.
+        // but how to link them?
+        // maybe just gets push/poped.
+        // but callstack cache should be done in background thread.
+        // meaning
+
     }
 
     void queueProcessLockSetName(PacketCompressor* pComp, const QueueDataLockSetName* pBuf)
@@ -1096,6 +1132,10 @@ namespace
                     case QueueDataType::ThreadSetName:
                         queueProcessThreadSetName(&comp, reinterpret_cast<const QueueDataThreadSetName*>(pBuf));
                         pBuf += sizeof(QueueDataThreadSetName);
+                        break;
+                    case QueueDataType::CallStack:
+                        queueProcessCallStack(&comp, reinterpret_cast<const QueueDataCallStack*>(pBuf));
+                        pBuf += sizeof(QueueDataCallStack);
                         break;
                     case QueueDataType::LockSetName:
                         queueProcessLockSetName(&comp, reinterpret_cast<const QueueDataLockSetName*>(pBuf));
@@ -1548,6 +1588,37 @@ void TelemSetThreadName(TraceContexHandle ctx, tt_uint32 threadID, const char* p
     }
 
     queueThreadSetName(pCtx, threadID, pName);
+}
+
+bool TelemGetCallStack(TraceContexHandle ctx, TtCallStack& stackOut)
+{
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return true;
+    }
+
+    zero_object(stackOut.frames);
+
+    RtlCaptureStackBackTrace(0, TtCallStack::MAX_FRAMES, stackOut.frames, 0);
+    return true;
+}
+
+void TelemSendCallStack(TraceContexHandle ctx, const TtCallStack* pStack)
+{
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    if (pStack) {
+        queueCallStack(pCtx, *pStack);
+        return;
+    }
+
+    TtCallStack stack;
+    TelemGetCallStack(ctx, stack);
+    queueCallStack(pCtx, stack);
+    return;
 }
 
 // ----------- Zones -----------

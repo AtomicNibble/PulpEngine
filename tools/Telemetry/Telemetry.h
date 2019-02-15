@@ -41,7 +41,9 @@ enum TtError
 
 struct TtCallStack
 {
-    // meow
+    static const unsigned int MAX_FRAMES = 7;
+
+    void* frames[MAX_FRAMES];
 };
 
 struct TtSourceInfo
@@ -112,7 +114,7 @@ extern "C"
 
     // Callstack
     TELEM_API_BOOL(TelemGetCallStack, TraceContexHandle ctx, TtCallStack& stackOut);
-    TELEM_API_BOOL(TelemSendCallStack, TraceContexHandle ctx, const TtCallStack& stackOut);
+    TELEM_API_VOID(TelemSendCallStack, TraceContexHandle ctx, const TtCallStack* pStack);
 
     // Zones
     TELEM_API_VOID(TelemEnter, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pZoneName);
@@ -360,7 +362,10 @@ namespace telem
 #define ttIsPaused(ctx) TELEM_FUNC_NAME(TelemIsPaused)(ctx)
 
 // Thread
-#define ttSetThreadName(ctx, threadID, pName);
+#define ttSetThreadName(ctx, threadID, pName) TelemSetThreadName(ctx, threadID, pName);
+
+#define ttGetCallStack(ctx, stackOut) TelemGetCallStack(ctx, stackOut)
+#define ttSendCallStack(ctx, pStack) TelemSendCallStack(ctx, pStack)
 
 // Zones
 #define ttEnter(ctx, pZoneName) TELEM_FUNC_NAME(TelemEnter)(ctx, TT_SOURCE_INFO, pZoneName);
@@ -420,6 +425,9 @@ namespace telem
 
 // Thread
 #define ttSetThreadName(...);
+
+#define ttGetCallStack(...)
+#define ttSendCallStack(...)
 
 // Zones
 #define ttEnter(...);

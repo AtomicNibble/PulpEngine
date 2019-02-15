@@ -126,6 +126,7 @@ struct DataStreamType
         Zone,
         TickInfo,
         ThreadSetName,
+        CallStack,
         LockSetName,
         LockTry,
         LockCount,
@@ -186,6 +187,12 @@ struct DataPacketThreadSetName : public DataPacketBase
 {
     // 2
     StringTableIndex strIdxName;
+    // 4
+    TtthreadId threadID;
+};
+
+struct DataPacketCallStack : public DataPacketBase
+{
     // 4
     TtthreadId threadID;
 };
