@@ -20,13 +20,8 @@ TelemSrvLibArena;
 
 extern TelemSrvLibArena* g_TelemSrvLibArena;
 
-
 #ifdef X_LIB
-#define TELEMETRYSERVERLIB_EXPORT
+#define TELEM_SRV_EXPORT
 #else
-#ifdef TELEMETRYSERVER_LIB_EXPORT
-#define TELEMETRYSERVERLIB_EXPORT X_EXPORT
-#else
-#define TELEMETRYSERVERLIB_EXPORT X_IMPORT
-#endif // !TELEMETRYSERVER_LIB_EXPORT
+#define TELEM_SRV_EXPORT X_EXPORT
 #endif // X_LIB

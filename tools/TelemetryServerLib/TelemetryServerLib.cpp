@@ -1,9 +1,11 @@
 #include "stdafx.h"
+#include "TelemetryServerLib.h"
 
 X_LINK_LIB("engine_TelemetryCommonLib.lib");
 
 
 #include <../TelemetryCommon/TelemetryCommonLib.h>
+// #include <winsock2.h>
 
 namespace
 {
@@ -54,14 +56,14 @@ namespace
         // send some data...
         int res = platform::send(client.socket, reinterpret_cast<const char*>(pData), static_cast<int>(len), 0);
         if (res == SOCKET_ERROR) {
-            printf("send failed with error: %d\n", platform::WSAGetLastError());
+            X_LOG0("TelemSrv", "send failed with error: %d", platform::WSAGetLastError());
             return;
         }
     }
 
     void sendConnectionRejected(Client& client, const char* pReason)
     {
-        printf("ConnectionRejected:\n");
+        X_LOG0("TelemSrv", "ConnectionRejected:");
 
         tt_size msgLen = strlen(pReason);
         tt_size datalen = sizeof(ConnectionRequestRejectedHdr) + msgLen;
@@ -115,10 +117,10 @@ namespace
         memcpy(client.cmdLine, pStrData, pConReq->cmdLineLen);
 
         // Meow...
-        printf("ConnectionAccepted:\n");
-        printf("> AppName: %s\n", client.appName);
-        printf("> BuildInfo: %s\n", client.buildInfo);
-        printf("> CmdLine: %s\n", client.cmdLine);
+        X_LOG0("TelemSrv", "ConnectionAccepted:");
+        X_LOG0("TelemSrv", "> AppName: %s", client.appName);
+        X_LOG0("TelemSrv", "> BuildInfo: %s", client.buildInfo);
+        X_LOG0("TelemSrv", "> CmdLine: %s", client.cmdLine);
 
         // send a packet back!
         ConnectionRequestAcceptedHdr cra;
@@ -151,7 +153,7 @@ namespace
                 handleDataSream(client, pData);
                 break;
             default:
-                printf("Unknow packet type %i\n", static_cast<int>(pPacketHdr->type));
+                X_LOG0("TelemSrv", "Unknow packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
                 return false;
         }
 
@@ -166,133 +168,141 @@ namespace
         {
             int recvbuflen = sizeof(recvbuf);
             if (!readPacket(client.socket, recvbuf, recvbuflen)) {
-                printf("Error reading packet\n");
+                X_LOG0("TelemSrv", "Error reading packet");
                 return;
             }
 
-            printf("Bytes received: %d\n", recvbuflen);
+            X_LOG0("TelemSrv", "Bytes received: %" PRIi32, recvbuflen);
 
             if (client.pFile) {
                 fwrite(recvbuf, recvbuflen, 1, client.pFile);
             }
 
             if (!processPacket(client, reinterpret_cast<tt_uint8*>(recvbuf))) {
-                printf("Failed to process packet\n");
+                X_LOG0("TelemSrv", "Failed to process packet");
                 return;
             }
         }
     }
 
-    bool listen(void)
-    {
-        struct platform::addrinfo hints;
-        struct platform::addrinfo *result = nullptr;
-
-        core::zero_object(hints);
-        hints.ai_family = AF_INET;
-        hints.ai_socktype = SOCK_STREAM;
-        hints.ai_protocol = platform::IPPROTO_TCP;
-        hints.ai_flags = AI_PASSIVE;
-
-        // Resolve the server address and port
-        int res = platform::getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
-        if (res != 0) {
-            return false;
-        }
-
-        platform::SOCKET listenSocket = INV_SOCKET;
-        platform::SOCKET clientSocket = INV_SOCKET;
-
-        // Create a SOCKET for connecting to server
-        listenSocket = platform::socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-        if (listenSocket == INV_SOCKET) {
-            platform::freeaddrinfo(result);
-            return false;
-        }
-
-        tt_int32 sock_opt = 1024 * 256;
-        res = platform::setsockopt(listenSocket, SOL_SOCKET, SO_RCVBUF, (char*)&sock_opt, sizeof(sock_opt));
-        if (res != 0) {
-            printf("Failed to set rcvbuf on socket. Error: %d\n", platform::WSAGetLastError());
-        }
-
-        // Setup the TCP listening socket
-        res = bind(listenSocket, result->ai_addr, (int)result->ai_addrlen);
-        if (res == SOCKET_ERROR) {
-            printf("bind failed with error: %d\n", platform::WSAGetLastError());
-            platform::freeaddrinfo(result);
-            platform::closesocket(listenSocket);
-            return false;
-        }
-
-        platform::freeaddrinfo(result);
-
-        res = platform::listen(listenSocket, SOMAXCONN);
-        if (res == SOCKET_ERROR) {
-            platform::closesocket(listenSocket);
-            return false;
-        }
-
-        while (true)
-        {
-            printf("Waiting for client on port: %s\n", DEFAULT_PORT);
-
-            // Accept a client socket
-            clientSocket = platform::accept(listenSocket, NULL, NULL);
-            if (clientSocket == INV_SOCKET) {
-                platform::closesocket(listenSocket);
-                return false;
-            }
-
-            printf("Client connected\n");
-
-            Client client;
-            client.socket = clientSocket;
-            client.pFile = fopen("stream.dump", "wb");
-
-            handleClient(client);
-
-            if (client.pFile) {
-                fclose(client.pFile);
-            }
-
-            platform::closesocket(clientSocket);
-        }
-
-        // clean up socket.
-        platform::closesocket(listenSocket);
-
-        return true;
-    }
 
 } // namespace
 
-#if 1 // SubSystem /console
-int main() 
-{
-#else
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-    _In_opt_ HINSTANCE hPrevInstance,
-    _In_ LPWSTR lpCmdLine,
-    _In_ int nCmdShow)
-{
-    X_UNUSED(hInstance);
-    X_UNUSED(hPrevInstance);
-    X_UNUSED(lpCmdLine);
-    X_UNUSED(nCmdShow);
-#endif
 
+
+X_NAMESPACE_BEGIN(telemetry)
+
+Server::Server(core::MemoryArenaBase* arena) :
+    arena_(arena)
+{
+
+}
+
+Server::~Server()
+{
+
+}
+
+bool Server::run()
+{
     if (!winSockInit()) {
-        return 1;
+        return false;
     }
 
     // have the server listen...
     if (!listen()) {
-        getchar();
+        return false;
     }
 
     winSockShutDown();
-    return 0;
+    return true;
 }
 
 
+bool Server::listen(void)
+{
+    // completetion port.
+    // auto hIOCP = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
+
+    struct platform::addrinfo hints;
+    struct platform::addrinfo *result = nullptr;
+
+    core::zero_object(hints);
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = platform::IPPROTO_TCP;
+    hints.ai_flags = AI_PASSIVE;
+
+    // Resolve the server address and port
+    int res = platform::getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
+    if (res != 0) {
+        return false;
+    }
+
+    platform::SOCKET listenSocket = INV_SOCKET;
+    platform::SOCKET clientSocket = INV_SOCKET;
+
+    // Create a SOCKET for connecting to server
+    listenSocket = platform::socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    if (listenSocket == INV_SOCKET) {
+        platform::freeaddrinfo(result);
+        return false;
+    }
+
+    tt_int32 sock_opt = 1024 * 256;
+    res = platform::setsockopt(listenSocket, SOL_SOCKET, SO_RCVBUF, (char*)&sock_opt, sizeof(sock_opt));
+    if (res != 0) {
+        X_ERROR("TelemSrv", "Failed to set rcvbuf on socket. Error: %d", platform::WSAGetLastError());
+    }
+
+    // Setup the TCP listening socket
+    res = bind(listenSocket, result->ai_addr, (int)result->ai_addrlen);
+    if (res == SOCKET_ERROR) {
+        X_ERROR("TelemSrv", "bind failed with error: %d", platform::WSAGetLastError());
+        platform::freeaddrinfo(result);
+        platform::closesocket(listenSocket);
+        return false;
+    }
+
+    platform::freeaddrinfo(result);
+
+    res = platform::listen(listenSocket, SOMAXCONN);
+    if (res == SOCKET_ERROR) {
+        platform::closesocket(listenSocket);
+        return false;
+    }
+
+    while (true)
+    {
+        X_LOG0("TelemSrv", "Waiting for client on port: %s", DEFAULT_PORT);
+
+        // Accept a client socket
+        clientSocket = platform::accept(listenSocket, NULL, NULL);
+        if (clientSocket == INV_SOCKET) {
+            platform::closesocket(listenSocket);
+            return false;
+        }
+
+        X_LOG0("TelemSrv", "Client connected");
+
+        Client client;
+        client.socket = clientSocket;
+        client.pFile = fopen("stream.dump", "wb");
+
+        handleClient(client);
+
+        if (client.pFile) {
+            fclose(client.pFile);
+        }
+
+        platform::closesocket(clientSocket);
+    }
+
+    // clean up socket.
+    platform::closesocket(listenSocket);
+
+    return true;
+
+}
+
+X_NAMESPACE_END

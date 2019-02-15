@@ -461,6 +461,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TelemetryServerLib.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Module.cpp" />

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "EngineApp.h"
 
+#include <../TelemetryServerLib/TelemetryServerLib.h>
+
 #define _LAUNCHER
 #include <ModuleExports.h>
 
@@ -56,6 +58,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             return 1;
         }
 
+        // create the server.
+        telemetry::Server srv(&arena);
+
+        if (!srv.run()) {
+            return 1;
+        }
     }
 
     return 0;
