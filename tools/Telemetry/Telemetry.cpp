@@ -1771,3 +1771,53 @@ void TelemFree(TraceContexHandle ctx, void* pPtr)
 
     queueMemFree(pCtx, pPtr);
 }
+
+// ----------- Plot stuff -----------
+
+void tmPlotF32(TraceContexHandle ctx, TtPlotType type, float value, const char* pName)
+{
+    TELEM_UNUSED(ctx);
+    TELEM_UNUSED(type);
+    TELEM_UNUSED(value);
+    TELEM_UNUSED(pName);
+}
+
+void tmPlotF64(TraceContexHandle ctx, TtPlotType type, double value, const char* pName)
+{
+    TELEM_UNUSED(ctx);
+    TELEM_UNUSED(type);
+    TELEM_UNUSED(value);
+    TELEM_UNUSED(pName);
+}
+
+void tmPlotI32(TraceContexHandle ctx, TtPlotType type, tt_int32 value, const char* pName)
+{
+    TELEM_UNUSED(ctx);
+    TELEM_UNUSED(type);
+    TELEM_UNUSED(value);
+    TELEM_UNUSED(pName);
+}
+
+void tmPlotI64(TraceContexHandle ctx, TtPlotType type, tt_int64 value, const char* pName)
+{
+    TELEM_UNUSED(ctx);
+    TELEM_UNUSED(type);
+    TELEM_UNUSED(value);
+    TELEM_UNUSED(pName);
+}
+
+void tmPlotU32(TraceContexHandle ctx, TtPlotType type, tt_uint32 value, const char* pName)
+{
+    TELEM_UNUSED(ctx);
+    TELEM_UNUSED(type);
+    TELEM_UNUSED(value);
+    TELEM_UNUSED(pName);
+}
+
+void tmPlotU64(TraceContexHandle ctx, TtPlotType type, tt_uint64 value, const char* pName)
+{
+    TELEM_UNUSED(ctx);
+    TELEM_UNUSED(type);
+    TELEM_UNUSED(value);
+    TELEM_UNUSED(pName);
+}
