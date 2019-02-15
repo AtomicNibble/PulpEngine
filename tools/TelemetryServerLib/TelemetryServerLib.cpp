@@ -86,8 +86,7 @@ namespace
     {
         auto* pConReq = reinterpret_cast<const ConnectionRequestHdr*>(pData);
         if (pConReq->type != PacketType::ConnectionRequest) {
-            sendConnectionRejected(client, "Packet type is invalid");
-            return;
+            X_ASSERT_UNREACHABLE();
         }
 
         VersionInfo serverVer;
