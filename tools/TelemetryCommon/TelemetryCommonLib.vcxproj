@@ -448,6 +448,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Compiler.h" />
+    <ClInclude Include="Configuration.h" />
     <ClInclude Include="Net.h" />
     <ClInclude Include="PacketTypes.h" />
     <ClInclude Include="StringCompress.h" />
