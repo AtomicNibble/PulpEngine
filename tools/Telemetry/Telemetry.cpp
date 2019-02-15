@@ -1496,10 +1496,10 @@ bool TelemClose(TraceContexHandle ctx)
     auto* pCtx = handleToContext(ctx);
 
 #if 0 // TODO: needed?
-        int res = platform::shutdown(pCtx->socket, SD_BOTH);
-        if (res == SOCKET_ERROR) {
-            writeLog(pCtx, LogType::Error, "shutdown failed with error: %d", platform::WSAGetLastError());
-        }
+    int res = platform::shutdown(pCtx->socket, SD_BOTH);
+    if (res == SOCKET_ERROR) {
+        writeLog(pCtx, LogType::Error, "shutdown failed with error: %d", platform::WSAGetLastError());
+    }
 #endif
 
     if (pCtx->socket != INV_SOCKET) {
