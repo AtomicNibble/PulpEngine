@@ -1116,7 +1116,7 @@ namespace
                         ::DebugBreak();
                         break;
 #else
-                        X_NO_SWITCH_DEFAULT; // jump table me baby!
+                        TELEM_NO_SWITCH_DEFAULT; // jump table me baby!
 #endif
                 }
             }
