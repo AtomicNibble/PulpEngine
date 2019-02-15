@@ -334,29 +334,40 @@ namespace
         }
     }
 
+#define PACKET_COMPRESSION 1
+
+#if PACKET_COMPRESSION 
+    constexpr tt_int32 PACKET_HDR_SIZE = 0;
+#else
+    constexpr tt_int32 PACKET_HDR_SIZE = sizeof(DataStreamHdr);
+#endif // PACKET_COMPRESSION 
+
     void flushPacketBuffer(TraceContext* pCtx, SocketBuffer* pBuffer)
     {
-        if (pBuffer->packetBufSize == sizeof(DataStreamHdr)) {
+        if (pBuffer->packetBufSize == PACKET_HDR_SIZE) {
             return;
         }
 
+#if !PACKET_COMPRESSION 
         // patch the length
         auto* pHdr = reinterpret_cast<DataStreamHdr*>(pBuffer->pPacketBuffer);
         pHdr->dataSize = static_cast<tt_uint16>(pBuffer->packetBufSize);
+#endif // PACKET_COMPRESSION
 
         // flush to socket.
         sendDataToServer(pCtx, pBuffer->pPacketBuffer, pBuffer->packetBufSize);
-        pBuffer->packetBufSize = sizeof(DataStreamHdr);
+        pBuffer->packetBufSize = PACKET_HDR_SIZE;
     }
+
 
     void addToPacketBuffer(TraceContext* pCtx, SocketBuffer* pBuffer, const void* pData, tt_int32 len)
     {
 #if X_DEBUG
         // even fit in a packet?
-        if (len > pBuffer->packetBufCapacity - sizeof(DataStreamHdr)) {
+        if (len > pBuffer->packetBufCapacity - PACKET_HDR_SIZE) {
             ::DebugBreak();
         }
-        if (pBuffer->packetBufSize < sizeof(DataStreamHdr)) {
+        if (pBuffer->packetBufSize < PACKET_HDR_SIZE) {
             ::DebugBreak();
         }
 #endif // X_DEBUG
@@ -384,7 +395,7 @@ namespace
         flushPacketBuffer(pCtx, pBuffer);
 
 #if X_DEBUG
-        if (pBuffer->packetBufSize != sizeof(DataStreamHdr)) {
+        if (pBuffer->packetBufSize != PACKET_HDR_SIZE) {
             ::DebugBreak();
         }
 #endif // X_DEBUG
@@ -393,8 +404,6 @@ namespace
         memcpy(&pBuffer->pPacketBuffer[pBuffer->packetBufSize], reinterpret_cast<const tt_uint8*>(pData) + space, trailing);
         pBuffer->packetBufSize += space;
     }
-
-#define PACKET_COMPRESSION 1
 
     struct PacketCompressor
     {
@@ -1005,7 +1014,7 @@ namespace
 
         SocketBuffer buffer = {
             packetBuff,
-            sizeof(DataStreamHdr),
+            PACKET_HDR_SIZE,
             sizeof(packetBuff),
         };
 
@@ -1014,12 +1023,14 @@ namespace
         comp.pBuffer = &buffer;
         comp.strTable = CreateStringTable(stringTableBuf, sizeof(stringTableBuf));
 
+#if !PACKET_COMPRESSION
         {
             // pre fill the header.
             auto* pDataHeader = reinterpret_cast<DataStreamHdr*>(buffer.pPacketBuffer);
             pDataHeader->dataSize = 0;
             pDataHeader->type = PacketType::DataStream;
         }
+#endif // !PACKET_COMPRESSION
 
         static_assert(sizeof(comp) + BACKGROUND_THREAD_STACK_SIZE_BASE >= BACKGROUND_THREAD_STACK_SIZE,
             "Thread stack is to small");
