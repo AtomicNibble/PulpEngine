@@ -78,7 +78,7 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena, const wc
 
     LinkModule(pICore_, "TelemetryServer");
 
-    if (!pICore_->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "TelemetryServerLib", "Engine_TelemetryServerLib")) {
+    if (!pICore_->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "TelemetryServerLib", "Engine_TelemetryServerLib")) {
         return false;
     }
 

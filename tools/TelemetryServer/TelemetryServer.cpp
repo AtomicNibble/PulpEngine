@@ -49,13 +49,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     TelemetryServerArena::AllocationPolicy allocator;
     TelemetryServerArena arena(&allocator, "TelemetryServerArena");
 
-    EngineApp app;
+    {
+        EngineApp app;
 
-    if (!app.Init(hInstance, &arena, lpCmdLine)) {
-        return 1;
+        if (!app.Init(hInstance, &arena, lpCmdLine)) {
+            return 1;
+        }
+
     }
-
-
 
     return 0;
 }

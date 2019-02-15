@@ -16,7 +16,7 @@ TelemSrvLibArena* g_TelemSrvLibArena = nullptr;
 
 class XTelemSrvLib : public IEngineModule
 {
-    X_ENGINE_INTERFACE_SIMPLE(IConverterModule);
+    X_ENGINE_INTERFACE_SIMPLE(IEngineModule);
 
     X_ENGINE_GENERATE_SINGLETONCLASS(XTelemSrvLib, "Engine_TelemetryServerLib",
         0x21b9630e, 0xdad5, 0x46e7, 0x8b, 0x87, 0x82, 0x8d, 0xd5, 0xb0, 0x76, 0xb9);
