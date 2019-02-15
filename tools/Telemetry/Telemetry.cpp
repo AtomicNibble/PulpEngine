@@ -8,17 +8,16 @@
 
 #include <intrin.h>
 
-#include <../TelemetryCommon/TelemetryCommonLib.h>
 #include <../../3rdparty/source/lz4-1.8.3/lz4_lib.h>
 
-X_LINK_LIB("engine_TelemetryCommonLib.lib");
+TELEM_LINK_LIB("engine_TelemetryCommonLib.lib");
 
-X_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
+TELEM_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
 
 
 namespace
 {
-    X_PACK_PUSH(8)
+    TELEM_PACK_PUSH(8)
     struct THREADNAME_INFO
     {
         DWORD dwType;     // Must be 0x1000.
@@ -26,7 +25,7 @@ namespace
         DWORD dwThreadID; // Thread ID (-1=caller thread).
         DWORD dwFlags;    // Reserved for future use, must be zero.
     };
-    X_PACK_POP;
+    TELEM_PACK_POP;
 
     void setThreadName(DWORD dwThreadID, const char* pThreadName)
     {
@@ -48,18 +47,18 @@ namespace
     SysTimer gSysTimer;
     tt_uint64 gTicksPerMicro;
 
-    X_INLINE tt_uint32 getThreadID(void)
+    TELEM_INLINE tt_uint32 getThreadID(void)
     {
         // TODO: remove function call.
         return ::GetCurrentThreadId();
     }
 
-    X_INLINE tt_uint64 getTicks(void)
+    TELEM_INLINE tt_uint64 getTicks(void)
     {
         return __rdtsc();
     }
 
-    X_INLINE void* AlignTop(void* ptr, tt_size alignment)
+    TELEM_INLINE void* AlignTop(void* ptr, tt_size alignment)
     {
         union
         {
@@ -75,7 +74,7 @@ namespace
     }
 
     template<typename T>
-    X_INLINE constexpr bool IsAligned(T value, unsigned int alignment, unsigned int offset)
+    TELEM_INLINE constexpr bool IsAligned(T value, unsigned int alignment, unsigned int offset)
     {
         return ((value + offset) % alignment) == 0;
     }
@@ -136,7 +135,7 @@ namespace
     };
 
     // some data for each thread!
-    X_ALIGNED_SYMBOL(struct TraceThread, 64)
+    TELEM_ALIGNED_SYMBOL(struct TraceThread, 64)
     {
         TraceThread() {
             id = getThreadID();
@@ -173,16 +172,16 @@ namespace
 
     void defaultLogFunction(void* pUserData, LogType type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm)
     {
-        X_UNUSED(pUserData);
-        X_UNUSED(lenWithoutTerm);
-        X_UNUSED(type);
+        TELEM_UNUSED(pUserData);
+        TELEM_UNUSED(lenWithoutTerm);
+        TELEM_UNUSED(type);
 
         ::OutputDebugStringA(pMsgNullTerm);
         ::OutputDebugStringA("\n");
     }
 
     // This is padded to 64bit to make placing TraceThread data on it's own boundy more simple.
-    X_ALIGNED_SYMBOL(struct TraceContext, 64)
+    TELEM_ALIGNED_SYMBOL(struct TraceContext, 64)
     {
         bool isEnabled;
         bool _pad[3];
@@ -234,35 +233,35 @@ namespace
     };
 
  //   constexpr size_t size0 = sizeof(TraceContext);
- //   constexpr size_t size1 = X_OFFSETOF(TraceContext, threadId_);
- //   constexpr size_t size2 = X_OFFSETOF(TraceContext, cs_);
+ //   constexpr size_t size1 = TELEM_OFFSETOF(TraceContext, threadId_);
+ //   constexpr size_t size2 = TELEM_OFFSETOF(TraceContext, cs_);
 
-    static_assert(X_OFFSETOF(TraceContext, activeTickBufIdx) == 64, "Cold fields not on firstcache lane");
-    static_assert(X_OFFSETOF(TraceContext, threadId_) == 128, "Cold fields not on next cache lane");
-    static_assert(X_OFFSETOF(TraceContext, cs_) == 192, "cache lane boundry changed");
+    static_assert(TELEM_OFFSETOF(TraceContext, activeTickBufIdx) == 64, "Cold fields not on firstcache lane");
+    static_assert(TELEM_OFFSETOF(TraceContext, threadId_) == 128, "Cold fields not on next cache lane");
+    static_assert(TELEM_OFFSETOF(TraceContext, cs_) == 192, "cache lane boundry changed");
     static_assert(sizeof(TraceContext) == 256, "Size changed");
 
-    X_INLINE TraceContexHandle contextToHandle(TraceContext* pCtx)
+    TELEM_INLINE TraceContexHandle contextToHandle(TraceContext* pCtx)
     {
         return reinterpret_cast<TraceContexHandle>(pCtx);
     }
 
-    X_INLINE TraceContext* handleToContext(TraceContexHandle handle)
+    TELEM_INLINE TraceContext* handleToContext(TraceContexHandle handle)
     {
         return reinterpret_cast<TraceContext*>(handle);
     }
 
-    X_INLINE bool isValidContext(TraceContexHandle handle)
+    TELEM_INLINE bool isValidContext(TraceContexHandle handle)
     {
         return handle != INVALID_TRACE_CONTEX;
     }
 
-    X_INLINE tt_uint64 ticksToMicro(TraceContext* pCtx, tt_uint64 tsc)
+    TELEM_INLINE tt_uint64 ticksToMicro(TraceContext* pCtx, tt_uint64 tsc)
     {
         return (tsc / pCtx->ticksPerMicro);
     }
 
-    X_INLINE tt_int32 getActiveTickBufferSize(TraceContext* pCtx)
+    TELEM_INLINE tt_int32 getActiveTickBufferSize(TraceContext* pCtx)
     {
         auto& buf = pCtx->tickBuffers[pCtx->activeTickBufIdx];
         return buf.bufOffset;
@@ -303,7 +302,7 @@ namespace
         return pLock;
     }
 
-    X_NO_INLINE TraceThread* addThreadData(TraceContext* pCtx)
+    TELEM_NO_INLINE TraceThread* addThreadData(TraceContext* pCtx)
     {
         if (pCtx->numThreadData == MAX_ZONE_THREADS) {
             return nullptr;
@@ -318,7 +317,7 @@ namespace
         return pThreadData;
     }
 
-    X_INLINE TraceThread* getThreadData(TraceContext* pCtx)
+    TELEM_INLINE TraceThread* getThreadData(TraceContext* pCtx)
     {
         auto* pThreadData = gThreadData;
         if (!pThreadData) {
@@ -342,7 +341,7 @@ namespace
 
     bool handleConnectionResponse(TraceContext* pCtx, tt_uint8* pData, tt_size len)
     {
-        X_UNUSED(len);
+        TELEM_UNUSED(len);
 
         auto* pPacketHdr = reinterpret_cast<const PacketBase*>(pData);
         switch (pPacketHdr->type)
@@ -456,8 +455,8 @@ namespace
             static_assert(COMPRESSION_MAX_INPUT_SIZE * 2 <= COMPRESSION_RING_BUFFER_SIZE,
                 "Can't even fit two buffers in ring");
 
-            static_assert(X_OFFSETOF(PacketCompressor, cmpBuf) ==
-                X_OFFSETOF(PacketCompressor, packetHdr) + sizeof(DataStreamHdr), "cmdBuf has padding after PacketHdr");
+            static_assert(TELEM_OFFSETOF(PacketCompressor, cmpBuf) ==
+                TELEM_OFFSETOF(PacketCompressor, packetHdr) + sizeof(DataStreamHdr), "cmdBuf has padding after PacketHdr");
 
             pCtx = nullptr;
             pBuffer = nullptr;
@@ -519,7 +518,7 @@ namespace
             pComp->writeEnd = 0;
         }
 #else
-        X_UNUSED(pComp);
+        TELEM_UNUSED(pComp);
 #endif // !PACKET_COMPRESSION
     }
 
@@ -587,25 +586,25 @@ namespace
     };
 
     
-    X_ALIGNED_SYMBOL(struct QueueDataTickInfo, 64) : public QueueDataBase
+    TELEM_ALIGNED_SYMBOL(struct QueueDataTickInfo, 64) : public QueueDataBase
     {
         TtthreadId threadID;
         tt_uint64 ticks;
         tt_uint64 timeMicro;
     };
 
-    X_ALIGNED_SYMBOL(struct QueueDataThreadSetName, 64) : public QueueDataBase
+    TELEM_ALIGNED_SYMBOL(struct QueueDataThreadSetName, 64) : public QueueDataBase
     {
         TtthreadId threadID;
         const char* pName;
     };
 
-    X_ALIGNED_SYMBOL(struct QueueDataCallStack, 64) : public QueueDataBase
+    TELEM_ALIGNED_SYMBOL(struct QueueDataCallStack, 64) : public QueueDataBase
     {
         TtCallStack callstack;
     };
 
-    X_ALIGNED_SYMBOL(struct QueueDataZone, 64) : public QueueDataBase
+    TELEM_ALIGNED_SYMBOL(struct QueueDataZone, 64) : public QueueDataBase
     {
         tt_int8 stackDepth;
         TtthreadId threadID;
@@ -613,41 +612,41 @@ namespace
         TraceZone zone;
     };
 
-    X_ALIGNED_SYMBOL(struct QueueDataLockSetName, 64) : public QueueDataBase
+    TELEM_ALIGNED_SYMBOL(struct QueueDataLockSetName, 64) : public QueueDataBase
     {
         const void* pLockPtr;
         const char* pLockName;
     };
 
-    X_ALIGNED_SYMBOL(struct QueueDataLockTry, 64) : public QueueDataBase
+    TELEM_ALIGNED_SYMBOL(struct QueueDataLockTry, 64) : public QueueDataBase
     {
         TtthreadId threadID;
         TraceLock lock;
         const void* pLockPtr;
     };
 
-    X_ALIGNED_SYMBOL(struct QueueDataLockState, 64) : public QueueDataBase
+    TELEM_ALIGNED_SYMBOL(struct QueueDataLockState, 64) : public QueueDataBase
     {
         TtthreadId threadID;
         TtLockState state;
         const void* pLockPtr;
     };
 
-    X_ALIGNED_SYMBOL(struct QueueDataLockCount, 64) : public QueueDataBase
+    TELEM_ALIGNED_SYMBOL(struct QueueDataLockCount, 64) : public QueueDataBase
     {
         tt_uint16 count;
         TtthreadId threadID;
         const void* pLockPtr;
     };
 
-    X_ALIGNED_SYMBOL(struct QueueDataMemAlloc, 64) : public QueueDataBase
+    TELEM_ALIGNED_SYMBOL(struct QueueDataMemAlloc, 64) : public QueueDataBase
     {
         TtthreadId threadID;
         const void* pPtr;
         tt_uint32 size;
     };
 
-    X_ALIGNED_SYMBOL(struct QueueDataMemFree, 64) : public QueueDataBase
+    TELEM_ALIGNED_SYMBOL(struct QueueDataMemFree, 64) : public QueueDataBase
     {
         TtthreadId threadID;
         const void* pPtr;
@@ -749,7 +748,7 @@ namespace
     }
 
 
-    X_NO_INLINE void tickBufferFull(TraceContext* pCtx)
+    TELEM_NO_INLINE void tickBufferFull(TraceContext* pCtx)
     {
         // we are full.
         // in order to flip we need to make everythread has finished writing to the tick buffer
@@ -789,7 +788,7 @@ namespace
         addToTickBuffer(pCtx, pPtr, size);
     }
 
-    X_INLINE void queueTickInfo(TraceContext* pCtx)
+    TELEM_INLINE void queueTickInfo(TraceContext* pCtx)
     {
         QueueDataTickInfo data;
         data.type = QueueDataType::TickInfo;
@@ -800,7 +799,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    X_INLINE void queueThreadSetName(TraceContext* pCtx, tt_uint32 threadID, const char* pName)
+    TELEM_INLINE void queueThreadSetName(TraceContext* pCtx, tt_uint32 threadID, const char* pName)
     {
         QueueDataThreadSetName data;
         data.type = QueueDataType::ThreadSetName;
@@ -810,7 +809,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    X_INLINE void queueCallStack(TraceContext* pCtx, const TtCallStack& stack)
+    TELEM_INLINE void queueCallStack(TraceContext* pCtx, const TtCallStack& stack)
     {
         QueueDataCallStack data;
         data.type = QueueDataType::CallStack;
@@ -819,7 +818,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    X_INLINE void queueZone(TraceContext* pCtx, TraceThread* pThread, TraceZone& zone)
+    TELEM_INLINE void queueZone(TraceContext* pCtx, TraceThread* pThread, TraceZone& zone)
     {
         QueueDataZone data;
         data.type = QueueDataType::Zone;
@@ -830,7 +829,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    X_INLINE void queueLockSetName(TraceContext* pCtx, const void* pPtr, const char* pLockName)
+    TELEM_INLINE void queueLockSetName(TraceContext* pCtx, const void* pPtr, const char* pLockName)
     {
         QueueDataLockSetName data;
         data.type = QueueDataType::LockSetName;
@@ -840,7 +839,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    X_INLINE void queueLock(TraceContext* pCtx, TraceThread* pThread, TraceLock* pLock)
+    TELEM_INLINE void queueLock(TraceContext* pCtx, TraceThread* pThread, TraceLock* pLock)
     {
         QueueDataLockTry data;
         data.type = QueueDataType::LockTry;
@@ -851,7 +850,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    X_INLINE void queueLockState(TraceContext* pCtx, const void* pPtr, TtLockState state)
+    TELEM_INLINE void queueLockState(TraceContext* pCtx, const void* pPtr, TtLockState state)
     {
         QueueDataLockState data;
         data.type = QueueDataType::LockState;
@@ -862,7 +861,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    X_INLINE void queueLockCount(TraceContext* pCtx, const void* pPtr, tt_int32 count)
+    TELEM_INLINE void queueLockCount(TraceContext* pCtx, const void* pPtr, tt_int32 count)
     {
         QueueDataLockCount data;
         data.type = QueueDataType::LockCount;
@@ -873,7 +872,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    X_INLINE void queueMemAlloc(TraceContext* pCtx, const void* pPtr, tt_size size)
+    TELEM_INLINE void queueMemAlloc(TraceContext* pCtx, const void* pPtr, tt_size size)
     {
         QueueDataMemAlloc data;
         data.type = QueueDataType::MemAlloc;
@@ -884,7 +883,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    X_INLINE void queueMemFree(TraceContext* pCtx, const void* pPtr)
+    TELEM_INLINE void queueMemFree(TraceContext* pCtx, const void* pPtr)
     {
         QueueDataMemFree data;
         data.type = QueueDataType::MemFree;
@@ -954,8 +953,8 @@ namespace
         DataPacketCallStack packet;
         packet.type = DataStreamType::CallStack;
 
-        X_UNUSED(pComp);
-        X_UNUSED(pBuf);
+        TELEM_UNUSED(pComp);
+        TELEM_UNUSED(pBuf);
         // so think going todo a callstack cache.
         // then send a id for it?
         // one thing is how to i match these callstacks up like what will i do with them.
@@ -1378,7 +1377,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
         return TtError::InvalidParam;
     }
 
-    X_UNUSED(timeoutMS);
+    TELEM_UNUSED(timeoutMS);
 
     // need to connect to the server :O
     struct platform::addrinfo hints, *servinfo = nullptr;
@@ -1437,10 +1436,10 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     ConnectionRequestHdr cr;
     zero_object(cr);
     cr.type = PacketType::ConnectionRequest;
-    cr.clientVer.major = X_TELEMETRY_VERSION_MAJOR;
-    cr.clientVer.minor = X_TELEMETRY_VERSION_MINOR;
-    cr.clientVer.patch = X_TELEMETRY_VERSION_PATCH;
-    cr.clientVer.build = X_TELEMETRY_VERSION_BUILD;
+    cr.clientVer.major = TELEM_VERSION_MAJOR;
+    cr.clientVer.minor = TELEM_VERSION_MINOR;
+    cr.clientVer.patch = TELEM_VERSION_PATCH;
+    cr.clientVer.build = TELEM_VERSION_BUILD;
 
     LPWSTR pCmdLine = GetCommandLineW();
 
@@ -1555,7 +1554,7 @@ void TelemFlush(TraceContexHandle ctx)
 
 void TelemUpdateSymbolData(TraceContexHandle ctx)
 {
-    X_UNUSED(ctx);
+    TELEM_UNUSED(ctx);
 
     // So do i actually need todo this?
     // can't i just listen for loader events.

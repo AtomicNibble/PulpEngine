@@ -1,0 +1,37 @@
+
+Runtime:
+
+    ☐ CallStacks
+      ☐ PDB / Symbol for callstacks
+      ☐ Callstack cache
+      ☐ Linking callstacks with zones.
+      ☐ Send callstacks to server
+
+    Misc:
+      ☐ Support dynamic strings
+
+    ✔ Capture and send program command line @done (19-02-15 17:05)
+    ☐ Implement plots
+    ☐ Get rid of the CRT (low priority)
+
+
+ServerLib:
+
+  ☐ Create nice api for the server exe to just run.
+  ☐ Support multiple client connections / data streams
+
+  ☐ Process the incoming data
+    ☐ Use a thread pool for processing data from multiple clients.
+
+  ☐ Have a api for querying data for a given client
+     ☐ Also support a REST like api, so remove viewers can connect.
+
+Server:
+
+  ☐ Ideally just load the ServerLib and bind!
+
+Architecture:
+  - Server that can just run all the time collecting logs from the network.
+  - Multiple viewers can connect to the server and look at traces
+  - Viewer can be started with local server
+  - Both local and remove viewing should support realtime view.

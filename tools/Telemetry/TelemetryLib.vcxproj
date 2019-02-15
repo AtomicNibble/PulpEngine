@@ -447,9 +447,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Configuration.h" />
+    <ClInclude Include="PlatformWin32.h" />
     <ClInclude Include="Telemetry.h" />
     <ClInclude Include="TelemetryLib.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Threading.h" />
+    <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\3rdparty\source\lz4-1.8.3\lz4_lib.c">

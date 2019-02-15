@@ -7,21 +7,18 @@
 
 #ifndef TELEMETRY_COMLIB_EXPORT
 
-#ifdef X_LIB
+#ifdef TELEM_LIB
 #define TELEMETRY_COMLIB_EXPORT
 #else
 #ifdef TELEMETRY_COM_LIB_EXPORT
-#define TELEMETRY_COMLIB_EXPORT X_EXPORT
+#define TELEMETRY_COMLIB_EXPORT TELEM_EXPORT
 #else
-#define TELEMETRY_COMLIB_EXPORT X_IMPORT
+#define TELEMETRY_COMLIB_EXPORT TELEM_IMPORT
 #endif // !TELEMETRY_COM_LIB_EXPORT
-#endif // X_LIB
+#endif // TELEM_LIB
 
 #endif // !TELEMETRY_COMLIB_EXPORT
 
-
-#include "Util.h"
-#include "Threading.h"
 
 #include "Version.h"
 #include "PacketTypes.h"

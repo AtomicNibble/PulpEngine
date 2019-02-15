@@ -53,10 +53,10 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-TELEM_PUSH_WARNING_LEVEL(0)
+X_PUSH_WARNING_LEVEL(0)
 #include <Windows.h>
 #include <malloc.h>
-TELEM_POP_WARNING_LEVEL
+X_POP_WARNING_LEVEL
 
 // undefine global namespace pollution
 #ifdef CopyFile
@@ -114,6 +114,6 @@ namespace platform
 #include <WinSock2.h>
 #include <Ws2tcpip.h>
 
-TELEM_LINK_LIB("Ws2_32.lib");
+X_LINK_LIB("Ws2_32.lib");
 
 } // namespace platform

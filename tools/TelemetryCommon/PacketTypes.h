@@ -1,21 +1,8 @@
 #pragma once
 
 #include "Types.h"
+#include "Compiler.h"
 #include "StringTable.h"
-
-// TODO: move
-template<typename T>
-X_INLINE constexpr T RoundUpToMultiple(T numToRound, T multipleOf)
-{
-    return (numToRound + multipleOf - 1) & ~(multipleOf - 1);
-}
-
-template<typename T>
-X_INLINE constexpr T RoundDownToMultiple(T numToRound, T multipleOf)
-{
-    return numToRound & ~(multipleOf - 1);
-}
-
 
 struct PacketType
 {
@@ -49,6 +36,15 @@ struct VersionInfo
     tt_uint8 build;
 };
 
+namespace Internal
+{
+    template<typename T>
+    inline constexpr T RoundUpToMultiple(T numToRound, T multipleOf)
+    {
+        return (numToRound + multipleOf - 1) & ~(multipleOf - 1);
+    }
+}
+
 // if i set this to datagram size it's too slow.
 // need to tune this with data for a real program.
 constexpr tt_size MAX_PACKET_SIZE = 1024 * 16; 
@@ -66,7 +62,7 @@ constexpr tt_size COMPRESSION_RING_BUFFER_SIZE = 1024 * 64;
 constexpr tt_size STRING_TABLE_BUF_SIZE = sizeof(void*) * 1024; // TODO: ?
 
 constexpr tt_size BACKGROUND_THREAD_STACK_SIZE_BASE = 1024 * 8; // base size for anything that's not a compression buffer.
-constexpr tt_size BACKGROUND_THREAD_STACK_SIZE = RoundUpToMultiple<tt_size>(
+constexpr tt_size BACKGROUND_THREAD_STACK_SIZE = Internal::RoundUpToMultiple<tt_size>(
     COMPRESSION_RING_BUFFER_SIZE + 
     MAX_PACKET_SIZE + 
     BACKGROUND_THREAD_STACK_SIZE_BASE + 
@@ -74,7 +70,7 @@ constexpr tt_size BACKGROUND_THREAD_STACK_SIZE = RoundUpToMultiple<tt_size>(
     1024 * 4
 );
 
-X_PACK_PUSH(1)
+TELEM_PACK_PUSH(1)
 
 struct PacketBase
 {
@@ -105,7 +101,7 @@ struct DataStreamHdr : public PacketBase
 {
 };
 
-X_PACK_POP;
+TELEM_PACK_POP;
 
 static_assert(sizeof(VersionInfo) == 4, "Incorrect size");
 static_assert(sizeof(PacketBase) == 3, "Incorrect size");
@@ -151,7 +147,7 @@ struct DataPacketStringTableAdd : public DataPacketBase
     tt_uint16 length;
 };
 
-X_PACK_PUSH(4)
+TELEM_PACK_PUSH(4)
 
 struct DataPacketZone : public DataPacketBase
 {
@@ -281,4 +277,4 @@ static_assert(sizeof(DataPacketMemAlloc) == 20, "Incorrect size");
 static_assert(sizeof(DataPacketMemFree) == 16, "Incorrect size");
 
 
-X_PACK_POP
+TELEM_PACK_POP

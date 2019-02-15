@@ -1,7 +1,5 @@
 #pragma once
 
-#include <../TelemetryCommon/TelemetryCommonLib.h>
-
-#include <cstdio>
-
+#define _LAUNCHER
+#include <EngineCommon.h>
 

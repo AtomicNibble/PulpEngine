@@ -448,18 +448,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Compiler.h" />
-    <ClInclude Include="Configuration.h" />
     <ClInclude Include="Net.h" />
     <ClInclude Include="PacketTypes.h" />
-    <ClInclude Include="PlatformWin32.h" />
     <ClInclude Include="StringCompress.h" />
     <ClInclude Include="StringTable.h" />
     <ClInclude Include="SysTimer.h" />
     <ClInclude Include="TelemetryCommonLib.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Threading.h" />
     <ClInclude Include="Types.h" />
-    <ClInclude Include="Util.h" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>

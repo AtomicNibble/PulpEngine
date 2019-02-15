@@ -23,7 +23,7 @@ namespace
         tt_uint16 bitLength;
     };
 
-    X_DISABLE_WARNING(4268)
+    TELEM_DISABLE_WARNING(4268)
 
     struct EncodedTable
     {

@@ -2,8 +2,8 @@
 
 #if defined(WIN32)
 #if !defined(X_DLL)
-#ifndef TELEM_LIB
-#define TELEM_LIB
+#ifndef X_LIB
+#define X_LIB
 #endif
 #else
 #ifndef _USRDLL

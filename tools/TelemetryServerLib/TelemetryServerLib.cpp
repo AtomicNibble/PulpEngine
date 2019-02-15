@@ -2,6 +2,9 @@
 
 X_LINK_LIB("engine_TelemetryCommonLib.lib");
 
+
+#include <../TelemetryCommon/TelemetryCommonLib.h>
+
 namespace
 {
     const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
@@ -30,7 +33,7 @@ namespace
     struct Client
     {
         Client() {
-            zero_this(this);
+            core::zero_this(this);
             socket = INV_SOCKET;
         }
 
@@ -86,10 +89,10 @@ namespace
         }
 
         VersionInfo serverVer;
-        serverVer.major = X_TELEMETRY_VERSION_MAJOR;
-        serverVer.minor = X_TELEMETRY_VERSION_MINOR;
-        serverVer.patch = X_TELEMETRY_VERSION_PATCH;
-        serverVer.build = X_TELEMETRY_VERSION_BUILD;
+        serverVer.major = TELEM_VERSION_MAJOR;
+        serverVer.minor = TELEM_VERSION_MINOR;
+        serverVer.patch = TELEM_VERSION_PATCH;
+        serverVer.build = TELEM_VERSION_BUILD;
 
         if (pConReq->clientVer != serverVer) {
             sendConnectionRejected(client, "Client server version incompatible");
@@ -100,9 +103,9 @@ namespace
 
         // now need to read the strings.
 
-        zero_object(client.appName);
-        zero_object(client.buildInfo);
-        zero_object(client.cmdLine);
+        core::zero_object(client.appName);
+        core::zero_object(client.buildInfo);
+        core::zero_object(client.cmdLine);
 
         auto* pStrData = reinterpret_cast<const tt_uint8*>(pConReq + 1);
         memcpy(client.appName, pStrData, pConReq->appNameLen);
@@ -119,7 +122,7 @@ namespace
 
         // send a packet back!
         ConnectionRequestAcceptedHdr cra;
-        zero_object(cra);
+        core::zero_object(cra);
         cra.dataSize = sizeof(cra);
         cra.type = PacketType::ConnectionRequestAccepted;
         cra.serverVer = serverVer;
@@ -185,7 +188,7 @@ namespace
         struct platform::addrinfo hints;
         struct platform::addrinfo *result = nullptr;
 
-        zero_object(hints);
+        core::zero_object(hints);
         hints.ai_family = AF_INET;
         hints.ai_socktype = SOCK_STREAM;
         hints.ai_protocol = platform::IPPROTO_TCP;

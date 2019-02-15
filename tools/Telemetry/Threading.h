@@ -16,8 +16,8 @@ public:
     }
 
 private:
-    X_NO_COPY(ScopedLock);
-    X_NO_ASSIGN(ScopedLock);
+    TELEM_NO_COPY(ScopedLock);
+    TELEM_NO_ASSIGN(ScopedLock);
 
     ThreadPolicy& policy_;
 };
@@ -82,7 +82,7 @@ inline void CriticalSection::Leave(void)
 void CriticalSection::SetSpinCount(tt_int32 count)
 {
     tt_int32 previous = SetCriticalSectionSpinCount(&cs_, count);
-    X_UNUSED(previous);
+    TELEM_UNUSED(previous);
 }
 
 inline CRITICAL_SECTION* CriticalSection::GetNativeObject(void)
