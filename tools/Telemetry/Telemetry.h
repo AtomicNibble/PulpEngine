@@ -145,8 +145,8 @@ extern "C"
     __TELEM_API_VOID(TelemPlotF32, TraceContexHandle ctx, TtPlotType type, float value, const char* pName);
     __TELEM_API_VOID(TelemPlotF64, TraceContexHandle ctx, TtPlotType type, double value, const char* pName);
     __TELEM_API_VOID(TelemPlotI32, TraceContexHandle ctx, TtPlotType type, tt_int32 value, const char* pName);
-    __TELEM_API_VOID(TelemPlotU32, TraceContexHandle ctx, TtPlotType type, tt_int64 value, const char* pName);
-    __TELEM_API_VOID(TelemPlotI64, TraceContexHandle ctx, TtPlotType type, tt_uint32 value, const char* pName);
+    __TELEM_API_VOID(TelemPlotI64, TraceContexHandle ctx, TtPlotType type, tt_int64 value, const char* pName);
+    __TELEM_API_VOID(TelemPlotU32, TraceContexHandle ctx, TtPlotType type, tt_uint32 value, const char* pName);
     __TELEM_API_VOID(TelemPlotU64, TraceContexHandle ctx, TtPlotType type, tt_uint64 value, const char* pName);
 
 #pragma warning( pop )
