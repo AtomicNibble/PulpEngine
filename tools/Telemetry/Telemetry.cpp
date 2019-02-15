@@ -283,7 +283,7 @@ namespace
 
         va_list args;
         va_start(args, pFmt);
-        tt_int32 len = vsprintf(buf, pFmt, args);
+        tt_int32 len = vsprintf(buf, pFmt, args); // TODO: replace
         va_end(args);
 
         pCtx->logFunc(pCtx->pUserData, type, buf, len);
@@ -1337,7 +1337,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     hints.ai_protocol = platform::IPPROTO_TCP;
 
     char portStr[32] = {};
-    sprintf(portStr, "%d", serverPort);
+    sprintf(portStr, "%d", serverPort); // TODO: replace
 
     // Resolve the server address and port
     auto res = platform::getaddrinfo(pServerAddress, portStr, &hints, &servinfo);
