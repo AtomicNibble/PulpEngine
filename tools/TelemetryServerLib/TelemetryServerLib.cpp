@@ -153,7 +153,7 @@ namespace
                 handleDataSream(client, pData);
                 break;
             default:
-                X_LOG0("TelemSrv", "Unknow packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
+                X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
                 return false;
         }
 
