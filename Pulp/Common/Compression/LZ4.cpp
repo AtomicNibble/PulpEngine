@@ -251,11 +251,8 @@ namespace Compression
         char* pDst = reinterpret_cast<char*>(pDstBuf);
         int origSize = safe_static_cast<int, size_t>(originalSize);
 
+        // this is input bytes read
         int res = LZ4_decompress_fast_continue(pStream, pSrc, pDst, origSize);
-
-        if (res != origSize) {
-            X_ERROR("LZ4", "Failed to decompress buffer");
-        }
 
         return res;
     }
