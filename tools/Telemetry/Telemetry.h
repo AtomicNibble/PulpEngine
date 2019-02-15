@@ -1,6 +1,7 @@
 #pragma once
 
 #include <../TelemetryCommon/Types.h>
+#include "../TelemetryCommon/Compiler.h" // for export defs
 
 #define TTELEMETRY_ENABLED 1
 #define TTELEMETRY_LINK 1
