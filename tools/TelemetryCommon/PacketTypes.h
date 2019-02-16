@@ -126,6 +126,7 @@ struct DataStreamType
         CallStack,
         LockSetName,
         LockTry,
+        LockState,
         LockCount,
         MemAlloc,
         MemFree,

@@ -1014,7 +1014,7 @@ namespace
     void queueProcessLockState(PacketCompressor* pComp, const QueueDataLockState* pBuf)
     {
         DataPacketLockState packet;
-        packet.type = DataStreamType::LockTry;
+        packet.type = DataStreamType::LockState;
         packet.threadID = pBuf->threadID;
         packet.state = pBuf->state;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
