@@ -65,6 +65,8 @@ namespace
         sql::SqlLiteCmd cmdInsertLockName;
         sql::SqlLiteCmd cmdInsertMeta;
         sql::SqlLiteCmd cmdInsertMemory;
+
+        core::FixedArray<uint64_t, 256> lockSet;
     };
 
 
@@ -221,6 +223,26 @@ CREATE TABLE "memory" (
         }
         
         return true;
+    }
+
+    void insertLockIfMissing(TraceDB& db, uint64_t lockHandle)
+    {
+        // look up the lock.
+        if (std::binary_search(db.lockSet.begin(), db.lockSet.end(), lockHandle)) {
+            return;
+        }
+
+        db.lockSet.push_back(lockHandle);
+        std::sort(db.lockSet.begin(), db.lockSet.end());
+
+        auto& cmd = db.cmdInsertLock;
+        cmd.bind(1, static_cast<int64_t>(lockHandle));
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
+        }
+
+        cmd.reset();
     }
 
 
@@ -480,6 +502,7 @@ CREATE TABLE "memory" (
 
     void handleDataPacketLockTry(TraceDB& db, const DataPacketLockTry* pData)
     {
+        insertLockIfMissing(db, pData->lockHandle);
 
         auto& cmd = db.cmdInsertLockTry;
         cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
@@ -498,6 +521,7 @@ CREATE TABLE "memory" (
 
     void handleDataPacketLockState(TraceDB& db, const DataPacketLockState* pData)
     {
+        insertLockIfMissing(db, pData->lockHandle);
 
         auto& cmd = db.cmdInsertLockState;
         cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
@@ -515,6 +539,7 @@ CREATE TABLE "memory" (
 
     void handleDataPacketLockSetName(TraceDB& db, const DataPacketLockSetName* pData)
     {
+        insertLockIfMissing(db, pData->lockHandle);
 
         auto& cmd = db.cmdInsertLockName;
         cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
