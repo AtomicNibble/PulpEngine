@@ -219,7 +219,64 @@ namespace
         }
 
         if (client.pFile) {
-            fwrite(pDst, origLen, 1, client.pFile);
+        //    fwrite(pDst, origLen, 1, client.pFile);
+        }
+
+        // process this data?
+        for (int32 i = 0; i < origLen; )
+        {
+            // packet me baby!
+            auto* pPacket = reinterpret_cast<const DataPacketBase*>(&pDst[i]);
+
+            switch (pPacket->type)
+            {
+                case DataStreamType::StringTableAdd:
+                {
+                    auto* pStr = reinterpret_cast<const DataPacketStringTableAdd*>(&pDst[i]);
+                    i += sizeof(DataPacketStringTableAdd);
+                    i += pStr->length;
+                }
+                    break;
+                case DataStreamType::Zone:
+                {
+                    auto* pZone = reinterpret_cast<const DataPacketZone*>(&pDst[i]);
+                    i += sizeof(DataPacketZone);
+
+                    fprintf(client.pFile, "TID: %" PRIu32 " s: %" PRIu64 " e: %" PRIu64 "\n", pZone->threadID, pZone->start, pZone->end);
+                }
+                    break;
+                case DataStreamType::TickInfo:
+                    i += sizeof(DataPacketTickInfo);
+                    break;
+                case DataStreamType::ThreadSetName:
+                    i += sizeof(DataPacketThreadSetName);
+                    break;
+                case DataStreamType::CallStack:
+                    i += sizeof(DataPacketCallStack);
+                    break;
+                case DataStreamType::LockSetName:
+                    i += sizeof(DataPacketLockSetName);
+                    break;
+                case DataStreamType::LockTry:
+                    i += sizeof(DataPacketLockTry);
+                    break;
+                case DataStreamType::LockState:
+                    i += sizeof(DataPacketLockState);
+                    break;
+                case DataStreamType::LockCount:
+                    i += sizeof(DataPacketLockCount);
+                    break;
+                case DataStreamType::MemAlloc:
+                    i += sizeof(DataPacketMemAlloc);
+                    break;
+                case DataStreamType::MemFree:
+                    i += sizeof(DataPacketMemFree);
+                    break;
+                    break;
+
+                default:
+                    X_NO_SWITCH_DEFAULT_ASSERT;
+            }
         }
 
         return true;
@@ -258,7 +315,7 @@ namespace
             X_LOG0("TelemSrv", "Bytes received: %" PRIi32, recvbuflen);
 
             if (client.pFile) {
-                fwrite(recvbuf, recvbuflen, 1, client.pFile);
+            //    fwrite(recvbuf, recvbuflen, 1, client.pFile);
             }
 
             if (!processPacket(client, reinterpret_cast<uint8_t*>(recvbuf))) {
