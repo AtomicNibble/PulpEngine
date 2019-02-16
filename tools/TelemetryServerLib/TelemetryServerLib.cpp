@@ -860,8 +860,11 @@ bool Server::listen(void)
     {
         X_LOG0("TelemSrv", "Waiting for client on port: %s", DEFAULT_PORT);
 
+        struct platform::sockaddr addr;
+        int32_t addrLen = sizeof(addr);
+
         // Accept a client socket
-        clientSocket = platform::accept(listenSocket, NULL, NULL);
+        clientSocket = platform::accept(listenSocket, &addr, &addrLen);
         if (clientSocket == INV_SOCKET) {
             platform::closesocket(listenSocket);
             return false;
