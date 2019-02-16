@@ -289,6 +289,56 @@ namespace
         pCtx->logFunc(pCtx->pUserData, type, buf, len);
     }
 
+    bool readPacket(TraceContext* pCtx, char* pBuffer, int& bufLengthInOut)
+    {
+        // this should return complete packets or error.
+        int bytesRead = 0;
+        int bufLength = sizeof(PacketBase);
+
+        while (1) {
+            int maxReadSize = bufLength - bytesRead;
+            int res = platform::recv(pCtx->socket, &pBuffer[bytesRead], maxReadSize, 0);
+
+            if (res == 0) {
+                writeLog(pCtx, LogType::Error, "Connection closing...");
+                return false;
+            }
+            else if (res < 0) {
+                writeLog(pCtx, LogType::Error, "recv failed with error: %d", platform::WSAGetLastError());
+                return false;
+            }
+
+            bytesRead += res;
+
+            writeLog(pCtx, LogType::Msg, "got: %d bytes\n", res);
+
+            if (bytesRead == sizeof(PacketBase))
+            {
+                auto* pHdr = reinterpret_cast<const PacketBase*>(pBuffer);
+                if (pHdr->dataSize == 0) {
+                    writeLog(pCtx, LogType::Error, "Client sent packet with length zero...");
+                    return false;
+                }
+
+                if (pHdr->dataSize > bufLengthInOut) {
+                    writeLog(pCtx, LogType::Error, "Client sent oversied packet of size %i...", static_cast<tt_int32>(pHdr->dataSize));
+                    return false;
+                }
+
+                bufLength = pHdr->dataSize;
+            }
+
+            if (bytesRead == bufLength) {
+                bufLengthInOut = bytesRead;
+                return true;
+            }
+            else if (bytesRead > bufLength) {
+                writeLog(pCtx, LogType::Error, "Overread packet bytesRead: %d recvbuflen: %d", bytesRead, bufLength);
+                return false;
+            }
+        }
+    }
+
     bool handleConnectionResponse(TraceContext* pCtx, tt_uint8* pData, tt_size len)
     {
         TELEM_UNUSED(len);
@@ -1441,7 +1491,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     int recvbuflen = sizeof(recvbuf);
 
     // TODO: support timeout.
-    if (!readPacket(connectSocket, recvbuf, recvbuflen)) {
+    if (!readPacket(pCtx, recvbuf, recvbuflen)) {
         return TtError::Error;
     }
 

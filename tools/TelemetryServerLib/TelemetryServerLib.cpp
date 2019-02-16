@@ -34,6 +34,58 @@ namespace
         }
     }
 
+
+    bool readPacket(platform::SOCKET& socket, char* pBuffer, int& bufLengthInOut)
+    {
+        // this should return complete packets or error.
+        int bytesRead = 0;
+        int bufLength = sizeof(PacketBase);
+
+        while (1) {
+            int maxReadSize = bufLength - bytesRead;
+            int res = platform::recv(socket, &pBuffer[bytesRead], maxReadSize, 0);
+
+            if (res == 0) {
+                X_ERROR("TelemSrv", "Connection closing...");
+                return false;
+            }
+            else if (res < 0) {
+                X_ERROR("TelemSrv", "recv failed with error: %d", platform::WSAGetLastError());
+                return false;
+            }
+
+            bytesRead += res;
+
+            X_LOG0("TelemSrv", "got: %d bytes", res);
+
+            if (bytesRead == sizeof(PacketBase))
+            {
+                auto* pHdr = reinterpret_cast<const PacketBase*>(pBuffer);
+                if (pHdr->dataSize == 0) {
+                    X_ERROR("TelemSrv", "Client sent packet with length zero...");
+                    return false;
+                }
+
+                if (pHdr->dataSize > bufLengthInOut) {
+                    X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<tt_int32>(pHdr->dataSize));
+                    return false;
+                }
+
+                bufLength = pHdr->dataSize;
+            }
+
+            if (bytesRead == bufLength) {
+                bufLengthInOut = bytesRead;
+                return true;
+            }
+            else if (bytesRead > bufLength) {
+                X_ERROR("TelemSrv", "Overread packet bytesRead: %d recvbuflen: %d", bytesRead, bufLength);
+                return false;
+            }
+        }
+    }
+
+
     struct Client
     {
         Client() {
