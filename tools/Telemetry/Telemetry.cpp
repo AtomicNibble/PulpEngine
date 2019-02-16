@@ -926,6 +926,7 @@ namespace
         packet.strIdxFile = StringTableGetIndex(pComp->strTable, zone.sourceInfo.pFile_);
         packet.strIdxFunction = StringTableGetIndex(pComp->strTable, zone.sourceInfo.pFunction_);
         packet.strIdxZone = StringTableGetIndex(pComp->strTable, zone.pZoneName);
+        packet.lineNo = static_cast<tt_uint16>(zone.sourceInfo.line_);
 
         // i want to write the string data.
         if (packet.strIdxFile.inserted) {

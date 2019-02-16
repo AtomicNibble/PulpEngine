@@ -168,7 +168,7 @@ struct DataPacketZone : public DataPacketBase
     StringTableIndex strIdxFile;
     StringTableIndex strIdxFunction;
     StringTableIndex strIdxZone;
-    tt_int8  _pad1[2];
+    tt_uint16        lineNo;
 };
 
 struct DataPacketTickInfo : public DataPacketBase
