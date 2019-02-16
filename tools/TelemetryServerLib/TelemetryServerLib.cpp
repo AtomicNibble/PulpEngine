@@ -2,6 +2,9 @@
 #include "TelemetryServerLib.h"
 
 #include <Compression/LZ4.h>
+#include <Time/DateTimeStamp.h>
+
+#include <IFileSys.h>
 
 #include <../SqLite/SqlLib.h>
 #include <../TelemetryCommon/TelemetryCommonLib.h>
@@ -34,8 +37,189 @@ namespace
         }
     }
 
+    struct TraceDB
+    {
+        TraceDB() :
+            cmdInsertZone(con),
+            cmdInsertString(con),
+            cmdInsertTickInfo(con),
+            cmdInsertLock(con),
+            cmdInsertLockTry(con),
+            cmdInsertLockState(con),
+            cmdInsertMeta(con)
+        {
+        }
 
-    bool readPacket(platform::SOCKET& socket, char* pBuffer, int& bufLengthInOut)
+        sql::SqlLiteDb con;
+
+        sql::SqlLiteCmd cmdInsertZone;
+        sql::SqlLiteCmd cmdInsertString;
+        sql::SqlLiteCmd cmdInsertTickInfo;
+        sql::SqlLiteCmd cmdInsertLock;
+        sql::SqlLiteCmd cmdInsertLockTry;
+        sql::SqlLiteCmd cmdInsertLockState;
+        sql::SqlLiteCmd cmdInsertMeta;
+    };
+
+
+    bool createTables(TraceDB& db)
+    {
+
+        if (!db.con.execute(R"(
+
+CREATE TABLE IF NOT EXISTS "meta" (
+	"Id"	        INTEGER,
+	"name"	        TEXT NOT NULL UNIQUE,
+	"value"	        TEXT NOT NULL,
+	PRIMARY KEY("Id")
+);
+
+CREATE TABLE IF NOT EXISTS "ticks" (
+	"Id"	        INTEGER,
+	"threadId"	    INTEGER NOT NULL,
+	"time"	        INTEGER NOT NULL,
+	"timeMicro"	    INTEGER NOT NULL,
+	PRIMARY KEY("Id")
+);
+
+CREATE TABLE IF NOT EXISTS "strings" (
+	"Id"	        INTEGER,
+	"value"	        TEXT NOT NULL UNIQUE,
+	PRIMARY KEY("Id")
+);
+
+CREATE TABLE IF NOT EXISTS "names" (
+	"Id"	        INTEGER,
+	"type"	        INTEGER NOT NULL,
+	"time"	        INTEGER NOT NULL,
+	"nameStrId"	    INTEGER NOT NULL,
+	PRIMARY KEY("Id")
+);
+
+CREATE TABLE IF NOT EXISTS "sourceInfo" (
+	"Id"	        INTEGER,
+	"fileStrId"	    INTEGER NOT NULL,
+	"functionStrId"	INTEGER NOT NULL,
+	"lineNo"	    INTEGER NOT NULL,
+	PRIMARY KEY("Id")
+);
+
+CREATE TABLE IF NOT EXISTS "zones" (
+    "id"	        INTEGER,
+    "threadId"	    INTEGER NOT NULL,
+    "start"	        INTEGER NOT NULL,
+    "end"	        INTEGER NOT NULL,
+    "sourceInfoIdx"	INTEGER NOT NULL,
+    "stackDepth"	INTEGER NOT NULL,
+    PRIMARY KEY("id")
+);
+
+CREATE TABLE IF NOT EXISTS "locks" (
+	"Id"	        INTEGER,
+	"handle"	    INTEGER NOT NULL,
+    "name"	        TEXT NOT NULL UNIQUE,
+	PRIMARY KEY("Id")
+);
+
+CREATE TABLE IF NOT EXISTS "lockTry" (
+	"Id"	            INTEGER,
+	"lockId"	        INTEGER NOT NULL,
+    "threadId"	        INTEGER NOT NULL,
+	"start"	            INTEGER NOT NULL,
+	"end"	            INTEGER NOT NULL,
+	"descriptionStrId"	INTEGER,
+	PRIMARY KEY("Id")
+);
+
+CREATE TABLE IF NOT EXISTS "lockStates" (
+	"Id"	        INTEGER,
+	"lockId"	    INTEGER NOT NULL,
+	"threadId"	    INTEGER NOT NULL,
+	"time"	        INTEGER NOT NULL,
+	"state"	        INTEGER NOT NULL,
+	PRIMARY KEY("Id")
+);
+
+
+            )")) {
+            X_ERROR("TelemSrv", "Failed to create tables");
+            return false;
+        }
+
+        return true;
+    }
+
+    bool createDB(TraceDB& db, core::Path<char>& path)
+    {
+        if (!db.con.connect(path.c_str(), sql::OpenFlag::CREATE | sql::OpenFlag::WRITE)) {
+            return false;
+        }
+
+        if (!db.con.execute(R"(
+                PRAGMA synchronous = OFF;
+                PRAGMA page_size = 4096;
+                PRAGMA cache_size = -4000;
+                PRAGMA journal_mode=MEMORY;
+                PRAGMA foreign_keys = ON;
+            )")) {
+            return false;
+        }
+
+        // create all the tables.
+        if (!createTables(db)) {
+            return false;
+        }
+
+
+        db.cmdInsertZone.prepare("INSERT INTO zones (threadID, start, end, sourceInfoIdx, stackDepth) VALUES(?,?,?,?,?)");
+        db.cmdInsertString.prepare("INSERT INTO strings (value) VALUES(?)");
+        db.cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, time, timeMicro) VALUES(?,?,?)");
+        db.cmdInsertLock.prepare("INSERT INTO locks (handle, name) VALUES(?,?)");
+        db.cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, start, end, descriptionStrId) VALUES(?,?,?,?,?)");
+        db.cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, time, state) VALUES(?,?,?,?)");
+        db.cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)");
+
+        return true;
+    }
+
+    struct Client
+    {
+        Client() {
+            connected = false;
+            core::zero_object(clientVer);
+            cmpBufferOffset = 0;
+            pFile = nullptr;
+            socket = INV_SOCKET;
+
+#if X_DEBUG
+            core::zero_object(appName);
+            core::zero_object(buildInfo);
+            core::zero_object(cmdLine);
+            core::zero_object(srcRingBuf);
+#endif // X_DEBUG
+        }
+
+        bool connected;
+        VersionInfo clientVer;
+
+        // TODO: not need nullterm.
+        char appName[MAX_STRING_LEN + 1];
+        char buildInfo[MAX_STRING_LEN + 1];
+        char cmdLine[MAX_CMDLINE_LEN + 1];
+
+        platform::SOCKET socket;
+        
+        TraceDB db;
+
+        int32_t cmpBufferOffset;
+        int8_t srcRingBuf[COMPRESSION_RING_BUFFER_SIZE];
+
+        core::Compression::LZ4StreamDecode lz4Stream;
+
+        FILE* pFile;
+    };
+
+    bool readPacket(Client& client, char* pBuffer, int& bufLengthInOut)
     {
         // this should return complete packets or error.
         int bytesRead = 0;
@@ -43,7 +227,7 @@ namespace
 
         while (1) {
             int maxReadSize = bufLength - bytesRead;
-            int res = platform::recv(socket, &pBuffer[bytesRead], maxReadSize, 0);
+            int res = platform::recv(client.socket, &pBuffer[bytesRead], maxReadSize, 0);
 
             if (res == 0) {
                 X_ERROR("TelemSrv", "Connection closing...");
@@ -84,33 +268,6 @@ namespace
             }
         }
     }
-
-
-    struct Client
-    {
-        Client() {
-            core::zero_this(this);
-            socket = INV_SOCKET;
-        }
-
-        VersionInfo clientVer;
-
-        // TODO: not need nullterm.
-        char appName[MAX_STRING_LEN + 1];
-        char buildInfo[MAX_STRING_LEN + 1];
-        char cmdLine[MAX_CMDLINE_LEN + 1];
-
-        platform::SOCKET socket;
-        
-        sql::SqlLiteDb db;
-
-        int32_t cmpBufferOffset;
-        int8_t srcRingBuf[COMPRESSION_RING_BUFFER_SIZE];
-
-        core::Compression::LZ4StreamDecode lz4Stream;
-
-        FILE* pFile;
-    };
 
     void sendPacketToClient(Client& client, const void* pData, size_t len)
     {
@@ -161,10 +318,10 @@ namespace
             return false;
         }
 
+        client.connected = true;
         client.clientVer = pConReq->clientVer;
 
         // now need to read the strings.
-
         core::zero_object(client.appName);
         core::zero_object(client.buildInfo);
         core::zero_object(client.cmdLine);
@@ -175,6 +332,37 @@ namespace
         memcpy(client.buildInfo, pStrData, pConReq->buildInfoLen);
         pStrData += pConReq->buildInfoLen;
         memcpy(client.cmdLine, pStrData, pConReq->cmdLineLen);
+
+        // make a db for the client.
+        core::Path<char> workingDir;
+        if (!gEnv->pFileSys->getWorkingDirectory(workingDir)) {
+            return false;
+        }
+
+        core::DateTimeStamp date = core::DateTimeStamp::getSystemDateTime();
+        core::DateTimeStamp::Description dateStr;
+
+        core::Path<char> dbPath(workingDir);
+        // want a folder for each app.
+        dbPath.ensureSlash();
+        dbPath.append("traces");
+        dbPath.ensureSlash();
+        dbPath.append(client.appName);
+        dbPath.ensureSlash();
+        // want like hostname or everything in on folder?
+        dbPath.append("telem_");
+        dbPath.append(date.toString(dateStr));
+        dbPath.setExtension("db");
+
+        if (!gEnv->pFileSys->directoryExists(dbPath, core::VirtualDirectory::BASE)) {
+            if (!gEnv->pFileSys->createDirectoryTree(dbPath, core::VirtualDirectory::BASE)) {
+                return false;
+            }
+        }
+
+        if (!createDB(client.db, dbPath)) {
+            return false;
+        }
 
         // Meow...
         X_LOG0("TelemSrv", "ConnectionAccepted:");
@@ -190,6 +378,95 @@ namespace
         cra.serverVer = serverVer;
 
         sendPacketToClient(client, &cra, sizeof(cra));
+        return true;
+    }
+
+    bool handleDataPacketTickInfo(TraceDB& db, const DataPacketTickInfo* pData)
+    {
+        auto& cmd = db.cmdInsertTickInfo;
+        cmd.bind(1, static_cast<int32_t>(pData->threadID));
+        cmd.bind(2, static_cast<int64_t>(pData->ticks));
+        cmd.bind(3, static_cast<int64_t>(pData->timeMicro));
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            return false;
+        }
+
+        cmd.reset();
+        return true;
+    }
+
+    bool handleDataPacketStringTableAdd(TraceDB& db, const DataPacketStringTableAdd* pData)
+    {
+        const char* pString = reinterpret_cast<const char*>(pData + 1);
+
+        auto& cmd = db.cmdInsertString;
+        cmd.bind(1, pString, static_cast<size_t>(pData->length));
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            return false;
+        }
+
+        cmd.reset();
+        return true;
+    }
+
+    bool handleDataPacketZone(TraceDB& db, const DataPacketZone* pData)
+    {
+        auto& cmd = db.cmdInsertZone;
+        cmd.bind(1, static_cast<int32_t>(pData->threadID));
+        cmd.bind(2, static_cast<int64_t>(pData->start));
+        cmd.bind(3, static_cast<int64_t>(pData->end));
+        cmd.bind(4, -1);
+        cmd.bind(5, pData->stackDepth);
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            return false;
+        }
+
+        cmd.reset();
+        return true;
+    }
+
+    bool handleDataPacketLockTry(TraceDB& db, const DataPacketLockTry* pData)
+    {
+        int32_t lockId = -1; // TODO
+
+        auto& cmd = db.cmdInsertLockTry;
+        cmd.bind(1, lockId);
+        cmd.bind(2, static_cast<int32_t>(pData->threadID));
+        cmd.bind(3, static_cast<int64_t>(pData->start));
+        cmd.bind(4, static_cast<int64_t>(pData->end));
+        cmd.bind(5, static_cast<int32_t>(pData->strIdxDescrption.index));
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            return false;
+        }
+
+        cmd.reset();
+        return true;
+    }
+
+    bool handleDataPacketLockState(TraceDB& db, const DataPacketLockState* pData)
+    {
+        int32_t lockId = -1; // TODO
+
+        auto& cmd = db.cmdInsertLockState;
+        cmd.bind(1, lockId);
+        cmd.bind(2, static_cast<int32_t>(pData->threadID));
+        cmd.bind(3, static_cast<int64_t>(pData->time));
+        cmd.bind(4, static_cast<int64_t>(pData->state));
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            return false;
+        }
+
+        cmd.reset();
         return true;
     }
 
@@ -229,9 +506,7 @@ namespace
         //    fwrite(pDst, origLen, 1, client.pFile);
         }
 
-        sql::SqlLiteTransaction trans(client.db);
-
-        sql::SqlLiteCmd cmd(client.db, "INSERT INTO zones (threadID, start, end, sourceInfoIdx, stackDepth) VALUES(?,?,?,?,?)");
+        sql::SqlLiteTransaction trans(client.db.con);
 
         // process this data?
         for (int32 i = 0; i < origLen; )
@@ -244,6 +519,7 @@ namespace
                 case DataStreamType::StringTableAdd:
                 {
                     auto* pStr = reinterpret_cast<const DataPacketStringTableAdd*>(&pDst[i]);
+                    handleDataPacketStringTableAdd(client.db, pStr);
                     i += sizeof(DataPacketStringTableAdd);
                     i += pStr->length;
                 }
@@ -251,29 +527,16 @@ namespace
                 case DataStreamType::Zone:
                 {
                     auto* pZone = reinterpret_cast<const DataPacketZone*>(&pDst[i]);
+                    handleDataPacketZone(client.db, pZone);
                     i += sizeof(DataPacketZone);
-
-#if 1
-
-                    cmd.bind(1, static_cast<int32_t>(pZone->threadID));
-                    cmd.bind(2, static_cast<int64_t>(pZone->start));
-                    cmd.bind(3, static_cast<int64_t>(pZone->end));
-                    cmd.bind(4, -1);
-                    cmd.bind(5, pZone->stackDepth);
-
-                    auto res = cmd.execute();
-                    if (res != sql::Result::OK) {
-                        return false;
-                    }
-
-                    cmd.reset();
-#else
-                        fprintf(client.pFile, "TID: %" PRIu32 " s: %" PRIu64 " e: %" PRIu64 "\n", pZone->threadID, pZone->start, pZone->end);
-#endif
                 }
                     break;
                 case DataStreamType::TickInfo:
+                {
+                    auto* pTick = reinterpret_cast<const DataPacketTickInfo*>(&pDst[i]);
+                    handleDataPacketTickInfo(client.db, pTick);
                     i += sizeof(DataPacketTickInfo);
+                }
                     break;
                 case DataStreamType::ThreadSetName:
                     i += sizeof(DataPacketThreadSetName);
@@ -285,10 +548,18 @@ namespace
                     i += sizeof(DataPacketLockSetName);
                     break;
                 case DataStreamType::LockTry:
+                {
+                    auto* pTick = reinterpret_cast<const DataPacketLockTry*>(&pDst[i]);
+                    handleDataPacketLockTry(client.db, pTick);
                     i += sizeof(DataPacketLockTry);
+                }
                     break;
                 case DataStreamType::LockState:
+                {
+                    auto* pTick = reinterpret_cast<const DataPacketLockState*>(&pDst[i]);
+                    handleDataPacketLockState(client.db, pTick);
                     i += sizeof(DataPacketLockState);
+                }
                     break;
                 case DataStreamType::LockCount:
                     i += sizeof(DataPacketLockCount);
@@ -336,7 +607,7 @@ namespace
         while(1)
         {
             int recvbuflen = sizeof(recvbuf);
-            if (!readPacket(client.socket, recvbuf, recvbuflen)) {
+            if (!readPacket(client, recvbuf, recvbuflen)) {
                 X_LOG0("TelemSrv", "Error reading packet");
                 return;
             }
@@ -458,20 +729,8 @@ bool Server::listen(void)
         client.socket = clientSocket;
         client.pFile = fopen("stream.dump", "wb");
 
-        core::Path<char> dbPath;
-        dbPath.append("telem.db");
-
-        if (!client.db.connect(dbPath.c_str(), sql::OpenFlag::CREATE | sql::OpenFlag::WRITE)) {
-            return false;
-        }
-
-        if (!client.db.execute("PRAGMA synchronous = OFF; PRAGMA page_size = 4096; PRAGMA cache_size = -4000; PRAGMA journal_mode=MEMORY; PRAGMA foreign_keys = ON;")) {
-            return false;
-        }
-
         handleClient(client);
 
-        client.db.disconnect();
 
         if (client.pFile) {
             fclose(client.pFile);
