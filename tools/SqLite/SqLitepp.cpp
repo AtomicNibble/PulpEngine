@@ -431,10 +431,7 @@ SqlLiteStateMnt::SqlLiteStateMnt(SqlLiteDb& db, const char* pStmt) :
     pTail_(nullptr)
 {
     if (pStmt) {
-        auto rc = prepare(pStmt);
-        if (rc != Result::OK) {
-            X_ERROR("SqlDb", "statement prepare failed for \"%s\" err(%i): \"%s\"", pStmt, rc, db.errorMsg());
-        }
+        (void)prepare(pStmt);
     }
 }
 
@@ -454,7 +451,11 @@ Result::Enum SqlLiteStateMnt::prepare(const char* pStmt)
         return rc;
     }
 
-    return prepare_impl(pStmt);
+    rc = prepare_impl(pStmt);
+    if (rc != Result::OK) {
+        X_ERROR("SqlDb", "statement prepare failed for \"%s\" err(%i): \"%s\"", pStmt, rc, db_.errorMsg());
+    }
+    return rc;
 }
 
 Result::Enum SqlLiteStateMnt::prepare_impl(const char* pStmt)
