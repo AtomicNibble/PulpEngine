@@ -46,7 +46,10 @@ namespace
             cmdInsertLock(con),
             cmdInsertLockTry(con),
             cmdInsertLockState(con),
-            cmdInsertMeta(con)
+            cmdInsertThreadName(con),
+            cmdInsertLockName(con),
+            cmdInsertMeta(con),
+            cmdInsertMemory(con)
         {
         }
 
@@ -58,7 +61,10 @@ namespace
         sql::SqlLiteCmd cmdInsertLock;
         sql::SqlLiteCmd cmdInsertLockTry;
         sql::SqlLiteCmd cmdInsertLockState;
+        sql::SqlLiteCmd cmdInsertThreadName;
+        sql::SqlLiteCmd cmdInsertLockName;
         sql::SqlLiteCmd cmdInsertMeta;
+        sql::SqlLiteCmd cmdInsertMemory;
     };
 
 
@@ -82,17 +88,17 @@ CREATE TABLE IF NOT EXISTS "ticks" (
 	PRIMARY KEY("Id")
 );
 
+CREATE TABLE IF NOT EXISTS "threadNames" (
+    "Id"            INTEGER,
+    "threadId"      INTEGER NOT NULL,
+    "time"          INTEGER NOT NULL,
+    "nameStrId"     INTEGER NOT NULL,
+    PRIMARY KEY("Id")
+);
+
 CREATE TABLE IF NOT EXISTS "strings" (
 	"Id"	        INTEGER,
 	"value"	        TEXT NOT NULL UNIQUE,
-	PRIMARY KEY("Id")
-);
-
-CREATE TABLE IF NOT EXISTS "names" (
-	"Id"	        INTEGER,
-	"type"	        INTEGER NOT NULL,
-	"time"	        INTEGER NOT NULL,
-	"nameStrId"	    INTEGER NOT NULL,
 	PRIMARY KEY("Id")
 );
 
@@ -121,6 +127,14 @@ CREATE TABLE IF NOT EXISTS "locks" (
 	PRIMARY KEY("Id")
 );
 
+CREATE TABLE IF NOT EXISTS "lockNames" (
+    "Id"            INTEGER,
+    "lockId"          INTEGER NOT NULL,
+    "time"          INTEGER NOT NULL,
+    "nameStrId"     INTEGER NOT NULL,
+    PRIMARY KEY("Id")
+);
+
 CREATE TABLE IF NOT EXISTS "lockTry" (
 	"Id"	            INTEGER,
 	"lockId"	        INTEGER NOT NULL,
@@ -137,6 +151,16 @@ CREATE TABLE IF NOT EXISTS "lockStates" (
 	"threadId"	    INTEGER NOT NULL,
 	"time"	        INTEGER NOT NULL,
 	"state"	        INTEGER NOT NULL,
+	PRIMARY KEY("Id")
+);
+
+CREATE TABLE "memory" (
+	"Id"	        INTEGER,
+	"allocId"	    INTEGER NOT NULL,
+	"size"	        INTEGER NOT NULL,
+	"threadId"	    INTEGER NOT NULL,
+	"time"	        INTEGER NOT NULL,
+	"operation"	    INTEGER NOT NULL,
 	PRIMARY KEY("Id")
 );
 
@@ -177,7 +201,10 @@ CREATE TABLE IF NOT EXISTS "lockStates" (
         db.cmdInsertLock.prepare("INSERT INTO locks (handle, name) VALUES(?,?)");
         db.cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, start, end, descriptionStrId) VALUES(?,?,?,?,?)");
         db.cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, time, state) VALUES(?,?,?,?)");
+        db.cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, time, nameStrId) VALUES(?,?,?)");
+        db.cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, time, nameStrId) VALUES(?,?,?)");
         db.cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)");
+        db.cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, time, operation) VALUES(?,?,?,?,?)");
 
         return true;
     }
@@ -466,6 +493,93 @@ CREATE TABLE IF NOT EXISTS "lockStates" (
         cmd.reset();
     }
 
+    void handleDataPacketLockSetName(TraceDB& db, const DataPacketLockSetName* pData)
+    {
+        int32_t lockId = -1; // TODO
+
+        auto& cmd = db.cmdInsertLockName;
+        cmd.bind(1, lockId);
+        cmd.bind(2, static_cast<int64_t>(pData->time));
+        cmd.bind(3, static_cast<int32_t>(pData->strIdxName.index));
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
+        }
+
+        cmd.reset();
+    }
+
+    void handleDataPacketThreadSetName(TraceDB& db, const DataPacketThreadSetName* pData)
+    {
+        auto& cmd = db.cmdInsertThreadName;
+        cmd.bind(1, static_cast<int32_t>(pData->threadID));
+        cmd.bind(2, static_cast<int64_t>(pData->time));
+        cmd.bind(3, static_cast<int32_t>(pData->strIdxName.index));
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
+        }
+
+        cmd.reset();
+    }
+
+    void handleDataPacketLockCount(TraceDB& db, const DataPacketLockCount* pData)
+    {
+        X_UNUSED(db, pData);
+        // not sure how best to store this just yet.
+    }
+
+    // maybe drop this and just use -1?
+    enum class MemOp
+    {
+        Alloc,
+        Free
+    };
+
+    void handleDataPacketMemAlloc(TraceDB& db, const DataPacketMemAlloc* pData)
+    {
+        auto& cmd = db.cmdInsertMemory;
+        cmd.bind(1, static_cast<int32_t>(pData->ptr));
+        cmd.bind(2, static_cast<int32_t>(pData->size));
+        cmd.bind(3, static_cast<int32_t>(pData->threadID));
+        cmd.bind(4, static_cast<int64_t>(pData->time));
+        cmd.bind(5, static_cast<int32_t>(MemOp::Alloc));
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
+        }
+
+        cmd.reset();
+    }
+
+    void handleDataPacketMemFree(TraceDB& db, const DataPacketMemFree* pData)
+    {
+        auto& cmd = db.cmdInsertMemory;
+        cmd.bind(1, static_cast<int32_t>(pData->ptr));
+        cmd.bind(2, -1);
+        cmd.bind(3, static_cast<int32_t>(pData->threadID));
+        cmd.bind(4, static_cast<int64_t>(pData->time));
+        cmd.bind(5, static_cast<int32_t>(MemOp::Free));
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
+        }
+
+        cmd.reset();
+    }
+
+    void handleDataPacketCallStack(TraceDB& db, const DataPacketCallStack* pData)
+    {
+        X_UNUSED(db, pData);
+
+        // TODO: ...
+    }
+
+
     bool handleDataSream(Client& client, uint8_t* pData)
     {
         auto* pHdr = reinterpret_cast<const DataStreamHdr*>(pData);
@@ -518,55 +632,68 @@ CREATE TABLE IF NOT EXISTS "lockStates" (
                     handleDataPacketStringTableAdd(client.db, pStr);
                     i += sizeof(DataPacketStringTableAdd);
                     i += pStr->length;
-                }
                     break;
+                }
                 case DataStreamType::Zone:
                 {
-                    auto* pZone = reinterpret_cast<const DataPacketZone*>(&pDst[i]);
-                    handleDataPacketZone(client.db, pZone);
+                    handleDataPacketZone(client.db, reinterpret_cast<const DataPacketZone*>(&pDst[i]));
                     i += sizeof(DataPacketZone);
-                }
                     break;
+                }
                 case DataStreamType::TickInfo:
                 {
-                    auto* pTick = reinterpret_cast<const DataPacketTickInfo*>(&pDst[i]);
-                    handleDataPacketTickInfo(client.db, pTick);
+                    handleDataPacketTickInfo(client.db, reinterpret_cast<const DataPacketTickInfo*>(&pDst[i]));
                     i += sizeof(DataPacketTickInfo);
-                }
                     break;
+                }
                 case DataStreamType::ThreadSetName:
+                {
+                    handleDataPacketThreadSetName(client.db, reinterpret_cast<const DataPacketThreadSetName*>(&pDst[i]));
                     i += sizeof(DataPacketThreadSetName);
                     break;
+                }
                 case DataStreamType::CallStack:
+                {
+                    handleDataPacketCallStack(client.db, reinterpret_cast<const DataPacketCallStack*>(&pDst[i]));
                     i += sizeof(DataPacketCallStack);
                     break;
+                }
                 case DataStreamType::LockSetName:
+                {
+                    handleDataPacketLockSetName(client.db, reinterpret_cast<const DataPacketLockSetName*>(&pDst[i]));
                     i += sizeof(DataPacketLockSetName);
                     break;
+                }
                 case DataStreamType::LockTry:
                 {
-                    auto* pTick = reinterpret_cast<const DataPacketLockTry*>(&pDst[i]);
-                    handleDataPacketLockTry(client.db, pTick);
+                    handleDataPacketLockTry(client.db, reinterpret_cast<const DataPacketLockTry*>(&pDst[i]));
                     i += sizeof(DataPacketLockTry);
-                }
                     break;
+                }
                 case DataStreamType::LockState:
                 {
-                    auto* pTick = reinterpret_cast<const DataPacketLockState*>(&pDst[i]);
-                    handleDataPacketLockState(client.db, pTick);
+                    handleDataPacketLockState(client.db, reinterpret_cast<const DataPacketLockState*>(&pDst[i]));
                     i += sizeof(DataPacketLockState);
-                }
                     break;
+                }
                 case DataStreamType::LockCount:
+                {
+                    handleDataPacketLockCount(client.db, reinterpret_cast<const DataPacketLockCount*>(&pDst[i]));
                     i += sizeof(DataPacketLockCount);
                     break;
+                }
                 case DataStreamType::MemAlloc:
+                {
+                    handleDataPacketMemAlloc(client.db, reinterpret_cast<const DataPacketMemAlloc*>(&pDst[i]));
                     i += sizeof(DataPacketMemAlloc);
                     break;
+                }
                 case DataStreamType::MemFree:
+                {
+                    handleDataPacketMemFree(client.db, reinterpret_cast<const DataPacketMemFree*>(&pDst[i]));
                     i += sizeof(DataPacketMemFree);
                     break;
-                    break;
+                }
 
                 default:
                     X_NO_SWITCH_DEFAULT_ASSERT;
