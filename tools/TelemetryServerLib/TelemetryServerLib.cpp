@@ -212,6 +212,8 @@ namespace
             return false;
         }
 
+        client.cmpBufferOffset += origLen;
+
         if (client.cmpBufferOffset >= (COMPRESSION_RING_BUFFER_SIZE - COMPRESSION_MAX_INPUT_SIZE)) {
             client.cmpBufferOffset = 0;
         }
