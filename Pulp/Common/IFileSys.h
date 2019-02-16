@@ -812,6 +812,8 @@ struct IFileSys
     virtual bool initWorker(void) X_ABSTRACT;
     virtual void shutDown(void) X_ABSTRACT;
 
+    virtual bool getWorkingDirectory(core::Path<char>& pathOut) const X_ABSTRACT;
+    // TODO: remove engine should only deal with utf-8
     virtual bool getWorkingDirectory(core::Path<wchar_t>& pathOut) const X_ABSTRACT;
 
     // folders - there is only one game dirtory.

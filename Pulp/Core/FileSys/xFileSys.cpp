@@ -322,6 +322,19 @@ bool xFileSys::initDirectorys(bool working)
     return true;
 }
 
+bool xFileSys::getWorkingDirectory(PathT& pathOut) const
+{
+    PathWT pathWide;
+    if (!PathUtil::GetCurrentDirectory(pathWide)) {
+        return false;
+    }
+    
+    // send back with engine slashes.
+    pathOut = PathT(pathWide);
+    pathOut.replaceSeprators();
+    return true;
+}
+
 bool xFileSys::getWorkingDirectory(PathWT& pathOut) const
 {
     // TODO: should this be exposed? should we not just expose basepath which may be diffrent than sys working dir.

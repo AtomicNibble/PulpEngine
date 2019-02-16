@@ -249,6 +249,7 @@ public:
 
     bool initDirectorys(bool workingDir);
 
+    bool getWorkingDirectory(PathT& pathOut) const X_FINAL;
     bool getWorkingDirectory(PathWT& pathOut) const X_FINAL;
 
     // Open / Close
