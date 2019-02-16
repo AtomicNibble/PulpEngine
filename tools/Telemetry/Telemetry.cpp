@@ -695,7 +695,7 @@ namespace
 
         // don't flip if not half full and force is false.
         auto halfBufferCap = pCtx->tickBufCapacity / 2;
-        if (force && bufSize < halfBufferCap) {
+        if (!force && bufSize < halfBufferCap) {
             return;
         }
 
