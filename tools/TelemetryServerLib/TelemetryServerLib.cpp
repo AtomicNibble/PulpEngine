@@ -122,8 +122,6 @@ CREATE TABLE IF NOT EXISTS "zones" (
 
 CREATE TABLE IF NOT EXISTS "locks" (
 	"Id"	        INTEGER,
-	"handle"	    INTEGER NOT NULL,
-    "name"	        TEXT NOT NULL UNIQUE,
 	PRIMARY KEY("Id")
 );
 
@@ -198,7 +196,7 @@ CREATE TABLE "memory" (
         db.cmdInsertZone.prepare("INSERT INTO zones (threadID, start, end, sourceInfoIdx, stackDepth) VALUES(?,?,?,?,?)");
         db.cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
         db.cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, time, timeMicro) VALUES(?,?,?)");
-        db.cmdInsertLock.prepare("INSERT INTO locks (handle, name) VALUES(?,?)");
+        db.cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
         db.cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, start, end, descriptionStrId) VALUES(?,?,?,?,?)");
         db.cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, time, state) VALUES(?,?,?,?)");
         db.cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, time, nameStrId) VALUES(?,?,?)");
@@ -482,10 +480,9 @@ CREATE TABLE "memory" (
 
     void handleDataPacketLockTry(TraceDB& db, const DataPacketLockTry* pData)
     {
-        int32_t lockId = -1; // TODO
 
         auto& cmd = db.cmdInsertLockTry;
-        cmd.bind(1, lockId);
+        cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
         cmd.bind(2, static_cast<int32_t>(pData->threadID));
         cmd.bind(3, static_cast<int64_t>(pData->start));
         cmd.bind(4, static_cast<int64_t>(pData->end));
@@ -501,10 +498,9 @@ CREATE TABLE "memory" (
 
     void handleDataPacketLockState(TraceDB& db, const DataPacketLockState* pData)
     {
-        int32_t lockId = -1; // TODO
 
         auto& cmd = db.cmdInsertLockState;
-        cmd.bind(1, lockId);
+        cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
         cmd.bind(2, static_cast<int32_t>(pData->threadID));
         cmd.bind(3, static_cast<int64_t>(pData->time));
         cmd.bind(4, static_cast<int64_t>(pData->state));
@@ -519,10 +515,9 @@ CREATE TABLE "memory" (
 
     void handleDataPacketLockSetName(TraceDB& db, const DataPacketLockSetName* pData)
     {
-        int32_t lockId = -1; // TODO
 
         auto& cmd = db.cmdInsertLockName;
-        cmd.bind(1, lockId);
+        cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
         cmd.bind(2, static_cast<int64_t>(pData->time));
         cmd.bind(3, static_cast<int32_t>(pData->strIdxName.index));
 
