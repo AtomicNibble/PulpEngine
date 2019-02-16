@@ -402,7 +402,7 @@ namespace
 
 
         memcpy(&pBuffer->pPacketBuffer[pBuffer->packetBufSize], reinterpret_cast<const tt_uint8*>(pData) + space, trailing);
-        pBuffer->packetBufSize += space;
+        pBuffer->packetBufSize += trailing;
     }
 
     struct PacketCompressor
