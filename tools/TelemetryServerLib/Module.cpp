@@ -31,9 +31,13 @@ class XTelemSrvLib : public IEngineModule
         X_ASSERT_NOT_NULL(gEnv);
         X_ASSERT_NOT_NULL(gEnv->pArena);
 
-        X_UNUSED(env, initParams);
+        X_UNUSED(initParams);
 
         g_TelemSrvLibArena = X_NEW(TelemSrvLibArena, gEnv->pArena, "TelemetryServerLibArena")(&g_TelemSrvAlloc, "TelemetryServerLibArena");
+
+        if (!env.pCore->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "SqLite", "Engine_SqLite")) {
+            return false;
+        }
 
         return true;
     }
