@@ -209,6 +209,23 @@ CREATE TABLE "memory" (
         return true;
     }
 
+
+    bool setMeta(TraceDB& db, const char* pName, const char* pValue)
+    {
+        auto& cmd = db.cmdInsertMeta;
+        cmd.reset();
+        cmd.bind(1, pName);
+        cmd.bind(2, pValue);
+
+        sql::Result::Enum res = cmd.execute();
+        if (res != sql::Result::OK) {
+            return false;
+        }
+        
+        return true;
+    }
+
+
     struct Client
     {
         Client() {
@@ -390,6 +407,10 @@ CREATE TABLE "memory" (
         if (!createDB(client.db, dbPath)) {
             return false;
         }
+
+        setMeta(client.db, "appName", client.appName);
+        setMeta(client.db, "buildInfo", client.buildInfo);
+        setMeta(client.db, "cmdLine", client.cmdLine);
 
         // Meow...
         X_LOG0("TelemSrv", "ConnectionAccepted:");
