@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "TelemetryServerLib.h"
 
-
+#include <Compression/LZ4.h>
 
 #include <../TelemetryCommon/TelemetryCommonLib.h>
 // #include <winsock2.h>
@@ -102,6 +102,11 @@ namespace
 
         platform::SOCKET socket;
 
+        int32_t cmpBufferOffset;
+        int8_t srcRingBuf[COMPRESSION_RING_BUFFER_SIZE];
+
+        core::Compression::LZ4StreamDecode lz4Stream;
+
         FILE* pFile;
     };
 
@@ -136,7 +141,7 @@ namespace
         sendPacketToClient(client, buf, datalen);
     }
 
-    void handleConnectionRequest(Client& client, uint8_t* pData)
+    bool handleConnectionRequest(Client& client, uint8_t* pData)
     {
         auto* pConReq = reinterpret_cast<const ConnectionRequestHdr*>(pData);
         if (pConReq->type != PacketType::ConnectionRequest) {
@@ -151,7 +156,7 @@ namespace
 
         if (pConReq->clientVer != serverVer) {
             sendConnectionRejected(client, "Client server version incompatible");
-            return;
+            return false;
         }
 
         client.clientVer = pConReq->clientVer;
@@ -183,14 +188,39 @@ namespace
         cra.serverVer = serverVer;
 
         sendPacketToClient(client, &cra, sizeof(cra));
+        return true;
     }
 
-    void handleDataSream(Client& client, uint8_t* pData)
+    bool handleDataSream(Client& client, uint8_t* pData)
     {
-        X_UNUSED(client);
-        X_UNUSED(pData);
-        
+        auto* pHdr = reinterpret_cast<const DataStreamHdr*>(pData);
+        if (pHdr->type != PacketType::DataStream) {
+            X_ASSERT_UNREACHABLE();
+        }
 
+        // the data is compressed.
+        // decompress it..
+        int32_t cmpLen = pHdr->dataSize - sizeof(DataStreamHdr);
+        int32_t origLen = pHdr->origSize - sizeof(DataStreamHdr);
+        X_UNUSED(cmpLen);
+
+        auto* pDst = &client.srcRingBuf[client.cmpBufferOffset];
+
+        auto res = client.lz4Stream.decompressContinue(pHdr + 1, pDst, origLen);
+        if (res != cmpLen) {
+            // TODO: ..
+            return false;
+        }
+
+        if (client.cmpBufferOffset >= (COMPRESSION_RING_BUFFER_SIZE - COMPRESSION_MAX_INPUT_SIZE)) {
+            client.cmpBufferOffset = 0;
+        }
+
+        if (client.pFile) {
+            fwrite(pDst, origLen, 1, client.pFile);
+        }
+
+        return true;
     }
 
     bool processPacket(Client& client, uint8_t* pData)
@@ -200,17 +230,15 @@ namespace
         switch (pPacketHdr->type)
         {
             case PacketType::ConnectionRequest:
-                handleConnectionRequest(client, pData);
+                return handleConnectionRequest(client, pData);
                 break;
             case PacketType::DataStream:
-                handleDataSream(client, pData);
+                return handleDataSream(client, pData);
                 break;
             default:
                 X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
                 return false;
         }
-
-        return true;
     }
 
     void handleClient(Client& client)
