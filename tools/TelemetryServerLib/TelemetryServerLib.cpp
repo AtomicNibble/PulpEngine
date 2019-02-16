@@ -183,7 +183,7 @@ CREATE TABLE "memory" (
                 PRAGMA synchronous = OFF;
                 PRAGMA page_size = 4096;
                 PRAGMA cache_size = -4000;
-                PRAGMA journal_mode=MEMORY;
+                PRAGMA journal_mode = MEMORY;
                 PRAGMA foreign_keys = ON;
             )")) {
             return false;
