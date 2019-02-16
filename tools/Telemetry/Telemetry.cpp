@@ -555,7 +555,7 @@ namespace
 #endif // !PACKET_COMPRESSION
     }
 
-    void writeStringCompressionBuffer(PacketCompressor* pComp, const char* pStr)
+    void writeStringCompressionBuffer(PacketCompressor* pComp, StringTableIndex idx, const char* pStr)
     {
         tt_size strLen = strlen(pStr);
         if (strLen > MAX_STRING_LEN) {
@@ -568,6 +568,7 @@ namespace
         tt_uint8 strDataBuf[sizeof(DataPacketStringTableAdd) + MAX_STRING_LEN];
         auto* pHeader = reinterpret_cast<DataPacketStringTableAdd*>(strDataBuf);
         pHeader->type = DataStreamType::StringTableAdd;
+        pHeader->id = idx.index;
         pHeader->length = static_cast<tt_uint16>(strLen);
 
         memcpy(strDataBuf + sizeof(DataPacketStringTableAdd), pStr, strLen);
@@ -916,6 +917,17 @@ namespace
     }
 
     // Processing.
+    StringTableIndex GetStringId(PacketCompressor* pComp, const char* pStr)
+    {
+        auto idx = StringTableGetIndex(pComp->strTable, pStr);
+
+        if (idx.inserted) {
+            writeStringCompressionBuffer(pComp, idx, pStr);
+        }
+
+        return idx;
+    }
+
 
     void queueProcessZone(PacketCompressor* pComp, const QueueDataZone* pBuf)
     {
@@ -927,21 +939,10 @@ namespace
         packet.threadID = pBuf->threadID;
         packet.start = zone.start;
         packet.end = zone.end;
-        packet.strIdxFile = StringTableGetIndex(pComp->strTable, zone.sourceInfo.pFile_);
-        packet.strIdxFunction = StringTableGetIndex(pComp->strTable, zone.sourceInfo.pFunction_);
-        packet.strIdxZone = StringTableGetIndex(pComp->strTable, zone.pZoneName);
+        packet.strIdxFile = GetStringId(pComp, zone.sourceInfo.pFile_);
+        packet.strIdxFunction = GetStringId(pComp, zone.sourceInfo.pFunction_);
+        packet.strIdxZone = GetStringId(pComp, zone.pZoneName);
         packet.lineNo = static_cast<tt_uint16>(zone.sourceInfo.line_);
-
-        // i want to write the string data.
-        if (packet.strIdxFile.inserted) {
-            writeStringCompressionBuffer(pComp, zone.sourceInfo.pFile_);
-        }
-        if (packet.strIdxFunction.inserted) {
-            writeStringCompressionBuffer(pComp, zone.sourceInfo.pFunction_);
-        }
-        if (packet.strIdxZone.inserted) {
-            writeStringCompressionBuffer(pComp, zone.pZoneName);
-        }
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
     }
@@ -962,12 +963,8 @@ namespace
         DataPacketThreadSetName packet;
         packet.type = DataStreamType::ThreadSetName;
         packet.threadID = pBuf->threadID;
-        packet.strIdxName = StringTableGetIndex(pComp->strTable, pBuf->pName);
+        packet.strIdxName = GetStringId(pComp, pBuf->pName);
         packet.time = pBuf->time;
-
-        if (packet.strIdxName.inserted) {
-            writeStringCompressionBuffer(pComp, pBuf->pName);
-        }
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
     }
@@ -997,12 +994,8 @@ namespace
         DataPacketLockSetName packet;
         packet.type = DataStreamType::LockSetName;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
-        packet.strIdxName = StringTableGetIndex(pComp->strTable, pBuf->pLockName);
+        packet.strIdxName = GetStringId(pComp, pBuf->pLockName);
         packet.time = pBuf->time;
-
-        if (packet.strIdxName.inserted) {
-            writeStringCompressionBuffer(pComp, pBuf->pLockName);
-        }
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
     }
@@ -1017,11 +1010,7 @@ namespace
         packet.start = lock.start;
         packet.end = lock.end;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
-        packet.strIdxDescrption = StringTableGetIndex(pComp->strTable, lock.pDescription);
-
-        if (packet.strIdxDescrption.inserted) {
-            writeStringCompressionBuffer(pComp, lock.pDescription);
-        }
+        packet.strIdxDescrption = GetStringId(pComp, lock.pDescription);
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
     }

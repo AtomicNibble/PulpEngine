@@ -146,6 +146,7 @@ struct DataPacketBase
 
 struct DataPacketStringTableAdd : public DataPacketBase
 {
+    tt_uint16 id;
     tt_uint16 length;
 };
 
@@ -285,7 +286,7 @@ struct DataPacketMemFree : public DataPacketBase
 
 
 static_assert(sizeof(DataPacketBase) == 1, "Incorrect size");
-static_assert(sizeof(DataPacketStringTableAdd) == 4, "Incorrect size");
+static_assert(sizeof(DataPacketStringTableAdd) == 6, "Incorrect size");
 static_assert(sizeof(DataPacketZone) == 32, "Incorrect size");
 static_assert(sizeof(DataPacketThreadSetName) == 16, "Incorrect size");
 static_assert(sizeof(DataPacketLockSetName) == 20, "Incorrect size");

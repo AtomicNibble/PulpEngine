@@ -196,7 +196,7 @@ CREATE TABLE "memory" (
 
 
         db.cmdInsertZone.prepare("INSERT INTO zones (threadID, start, end, sourceInfoIdx, stackDepth) VALUES(?,?,?,?,?)");
-        db.cmdInsertString.prepare("INSERT INTO strings (value) VALUES(?)");
+        db.cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
         db.cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, time, timeMicro) VALUES(?,?,?)");
         db.cmdInsertLock.prepare("INSERT INTO locks (handle, name) VALUES(?,?)");
         db.cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, start, end, descriptionStrId) VALUES(?,?,?,?,?)");
@@ -450,7 +450,8 @@ CREATE TABLE "memory" (
         const char* pString = reinterpret_cast<const char*>(pData + 1);
 
         auto& cmd = db.cmdInsertString;
-        cmd.bind(1, pString, static_cast<size_t>(pData->length));
+        cmd.bind(1, static_cast<int32_t>(pData->id));
+        cmd.bind(2, pString, static_cast<size_t>(pData->length));
 
         auto res = cmd.execute();
         if (res != sql::Result::OK) {
@@ -462,11 +463,13 @@ CREATE TABLE "memory" (
 
     void handleDataPacketZone(TraceDB& db, const DataPacketZone* pData)
     {
+        int32_t sourceInfoIdx = -1;
+
         auto& cmd = db.cmdInsertZone;
         cmd.bind(1, static_cast<int32_t>(pData->threadID));
         cmd.bind(2, static_cast<int64_t>(pData->start));
         cmd.bind(3, static_cast<int64_t>(pData->end));
-        cmd.bind(4, -1);
+        cmd.bind(4, sourceInfoIdx);
         cmd.bind(5, pData->stackDepth);
 
         auto res = cmd.execute();
@@ -874,10 +877,9 @@ bool Server::listen(void)
 
         Client client;
         client.socket = clientSocket;
-        client.pFile = fopen("stream.dump", "wb");
+     //   client.pFile = fopen("stream.dump", "wb");
 
         handleClient(client);
-
 
         if (client.pFile) {
             fclose(client.pFile);
