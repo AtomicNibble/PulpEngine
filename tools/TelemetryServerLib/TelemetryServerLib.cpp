@@ -56,7 +56,7 @@ namespace
 
             bytesRead += res;
 
-            X_LOG0("TelemSrv", "got: %d bytes", res);
+            // X_LOG0("TelemSrv", "got: %d bytes", res);
 
             if (bytesRead == sizeof(PacketBase))
             {
@@ -101,6 +101,8 @@ namespace
         char cmdLine[MAX_CMDLINE_LEN + 1];
 
         platform::SOCKET socket;
+        
+        sql::SqlLiteDb db;
 
         int32_t cmpBufferOffset;
         int8_t srcRingBuf[COMPRESSION_RING_BUFFER_SIZE];
@@ -211,8 +213,8 @@ namespace
 
         auto* pDst = &client.srcRingBuf[client.cmpBufferOffset];
 
-        auto res = client.lz4Stream.decompressContinue(pHdr + 1, pDst, origLen);
-        if (res != cmpLen) {
+        auto cmpLenOut = client.lz4Stream.decompressContinue(pHdr + 1, pDst, origLen);
+        if (cmpLenOut != cmpLen) {
             // TODO: ..
             return false;
         }
@@ -226,6 +228,10 @@ namespace
         if (client.pFile) {
         //    fwrite(pDst, origLen, 1, client.pFile);
         }
+
+        sql::SqlLiteTransaction trans(client.db);
+
+        sql::SqlLiteCmd cmd(client.db, "INSERT INTO zones (threadID, start, end, sourceInfoIdx, stackDepth) VALUES(?,?,?,?,?)");
 
         // process this data?
         for (int32 i = 0; i < origLen; )
@@ -247,7 +253,23 @@ namespace
                     auto* pZone = reinterpret_cast<const DataPacketZone*>(&pDst[i]);
                     i += sizeof(DataPacketZone);
 
-                    fprintf(client.pFile, "TID: %" PRIu32 " s: %" PRIu64 " e: %" PRIu64 "\n", pZone->threadID, pZone->start, pZone->end);
+#if 1
+
+                    cmd.bind(1, static_cast<int32_t>(pZone->threadID));
+                    cmd.bind(2, static_cast<int64_t>(pZone->start));
+                    cmd.bind(3, static_cast<int64_t>(pZone->end));
+                    cmd.bind(4, -1);
+                    cmd.bind(5, pZone->stackDepth);
+
+                    auto res = cmd.execute();
+                    if (res != sql::Result::OK) {
+                        return false;
+                    }
+
+                    cmd.reset();
+#else
+                        fprintf(client.pFile, "TID: %" PRIu32 " s: %" PRIu64 " e: %" PRIu64 "\n", pZone->threadID, pZone->start, pZone->end);
+#endif
                 }
                     break;
                 case DataStreamType::TickInfo:
@@ -284,6 +306,8 @@ namespace
             }
         }
 
+        trans.commit();
+
         return true;
     }
 
@@ -317,7 +341,7 @@ namespace
                 return;
             }
 
-            X_LOG0("TelemSrv", "Bytes received: %" PRIi32, recvbuflen);
+         //   X_LOG0("TelemSrv", "Bytes received: %" PRIi32, recvbuflen);
 
             if (client.pFile) {
             //    fwrite(recvbuf, recvbuflen, 1, client.pFile);
@@ -394,7 +418,7 @@ bool Server::listen(void)
         return false;
     }
 
-    tt_int32 sock_opt = 1024 * 256;
+    tt_int32 sock_opt = 1024 * 512;
     res = platform::setsockopt(listenSocket, SOL_SOCKET, SO_RCVBUF, (char*)&sock_opt, sizeof(sock_opt));
     if (res != 0) {
         X_ERROR("TelemSrv", "Failed to set rcvbuf on socket. Error: %d", platform::WSAGetLastError());
@@ -434,7 +458,20 @@ bool Server::listen(void)
         client.socket = clientSocket;
         client.pFile = fopen("stream.dump", "wb");
 
+        core::Path<char> dbPath;
+        dbPath.append("telem.db");
+
+        if (!client.db.connect(dbPath.c_str(), sql::OpenFlag::CREATE | sql::OpenFlag::WRITE)) {
+            return false;
+        }
+
+        if (!client.db.execute("PRAGMA synchronous = OFF; PRAGMA page_size = 4096; PRAGMA cache_size = -4000; PRAGMA journal_mode=MEMORY; PRAGMA foreign_keys = ON;")) {
+            return false;
+        }
+
         handleClient(client);
+
+        client.db.disconnect();
 
         if (client.pFile) {
             fclose(client.pFile);
