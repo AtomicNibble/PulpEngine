@@ -369,6 +369,7 @@ CREATE TABLE IF NOT EXISTS "lockStates" (
         X_LOG0("TelemSrv", "> AppName: %s", client.appName);
         X_LOG0("TelemSrv", "> BuildInfo: %s", client.buildInfo);
         X_LOG0("TelemSrv", "> CmdLine: %s", client.cmdLine);
+        X_LOG0("TelemSrv", "> DB: %s", dbPath.c_str());
 
         // send a packet back!
         ConnectionRequestAcceptedHdr cra;
