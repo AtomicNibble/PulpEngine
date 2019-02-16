@@ -14,6 +14,15 @@ namespace
 
 TelemSrvLibArena* g_TelemSrvLibArena = nullptr;
 
+X_LINK_ENGINE_LIB("SqLite")
+
+#ifdef X_LIB
+
+X_FORCE_LINK_FACTORY("XEngineModule_SqLite");
+
+#endif // !X_LIB
+
+
 class XTelemSrvLib : public IEngineModule
 {
     X_ENGINE_INTERFACE_SIMPLE(IEngineModule);

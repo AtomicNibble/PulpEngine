@@ -3,11 +3,11 @@
 
 #include <Compression/LZ4.h>
 
+#include <../SqLite/SqlLib.h>
 #include <../TelemetryCommon/TelemetryCommonLib.h>
 // #include <winsock2.h>
 
 X_LINK_LIB("engine_TelemetryCommonLib.lib");
-X_LINK_ENGINE_LIB("SqLite")
 
 namespace
 {
