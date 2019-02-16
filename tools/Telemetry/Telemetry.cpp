@@ -858,13 +858,13 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    TELEM_INLINE void queueLockTry(TraceContext* pCtx, TraceThread* pThread, TraceLock* pLock)
+    TELEM_INLINE void queueLockTry(TraceContext* pCtx, TraceThread* pThread, const void* pPtr, TraceLock* pLock)
     {
         QueueDataLockTry data;
         data.type = QueueDataType::LockTry;
         data.threadID = pThread->id;
         data.lock = *pLock;
-        data.pLockPtr = nullptr;
+        data.pLockPtr = pPtr;
 
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
@@ -1768,7 +1768,7 @@ void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult resul
     pLock->end = getTicks();
     pLock->result = result;
 
-    queueLockTry(pCtx, pThreadData, pLock);
+    queueLockTry(pCtx, pThreadData, pPtr, pLock);
 }
 
 void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPtr, TtLockResult result)
@@ -1797,7 +1797,7 @@ void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPt
         return;
     }
     
-    queueLockTry(pCtx, pThreadData, pLock);
+    queueLockTry(pCtx, pThreadData, pPtr, pLock);
 }
 
 void TelemSetLockState(TraceContexHandle ctx, const void* pPtr, TtLockState state)
