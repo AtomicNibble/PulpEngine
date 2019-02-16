@@ -465,9 +465,10 @@ namespace
 
         const tt_int32 totalLen = cmpBytes + sizeof(DataStreamHdr);
 
-        // patch the length
+        // patch the length 
         pComp->packetHdr.type = PacketType::DataStream;
         pComp->packetHdr.dataSize = static_cast<tt_uint16>(totalLen);
+        pComp->packetHdr.origSize = static_cast<tt_uint16>(inBytes + sizeof(DataStreamHdr));
 
         addToPacketBuffer(pComp->pCtx, pComp->pBuffer, &pComp->packetHdr, totalLen);
 

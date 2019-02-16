@@ -99,6 +99,7 @@ struct ConnectionRequestRejectedHdr : public PacketBase
 
 struct DataStreamHdr : public PacketBase
 {
+    tt_uint16 origSize;
 };
 
 TELEM_PACK_POP;
@@ -108,7 +109,7 @@ static_assert(sizeof(PacketBase) == 3, "Incorrect size");
 static_assert(sizeof(ConnectionRequestHdr) == 13, "Incorrect size");
 static_assert(sizeof(ConnectionRequestAcceptedHdr) == 7, "Incorrect size");
 static_assert(sizeof(ConnectionRequestRejectedHdr) == 5, "Incorrect size");
-static_assert(sizeof(DataStreamHdr) == 3, "Incorrect size");
+static_assert(sizeof(DataStreamHdr) == 5, "Incorrect size");
 
 // Not packet types but part of data
 // TODO: move?
