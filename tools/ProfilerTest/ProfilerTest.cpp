@@ -90,6 +90,9 @@ namespace
 
         core::CriticalSection cs;
 
+        ttSetThreadName(ctx, ::GetCurrentThreadId(), "BackgroundThread");
+        ttSetLockName(ctx, &cs, "Magic lock");
+
         for (int i = 0; i < 15; i++)
         {
             ttTick(ctx);
