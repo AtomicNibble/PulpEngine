@@ -204,6 +204,11 @@ namespace
         int32_t origLen = pHdr->origSize - sizeof(DataStreamHdr);
         X_UNUSED(cmpLen);
 
+        if (cmpLen == origLen) {
+            // uncompressed packets.
+            X_ASSERT_NOT_IMPLEMENTED();
+        }
+
         auto* pDst = &client.srcRingBuf[client.cmpBufferOffset];
 
         auto res = client.lz4Stream.decompressContinue(pHdr + 1, pDst, origLen);
