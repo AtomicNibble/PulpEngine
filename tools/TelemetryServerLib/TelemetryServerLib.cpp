@@ -382,7 +382,7 @@ CREATE TABLE IF NOT EXISTS "lockStates" (
         return true;
     }
 
-    bool handleDataPacketTickInfo(TraceDB& db, const DataPacketTickInfo* pData)
+    void handleDataPacketTickInfo(TraceDB& db, const DataPacketTickInfo* pData)
     {
         auto& cmd = db.cmdInsertTickInfo;
         cmd.bind(1, static_cast<int32_t>(pData->threadID));
@@ -391,14 +391,13 @@ CREATE TABLE IF NOT EXISTS "lockStates" (
 
         auto res = cmd.execute();
         if (res != sql::Result::OK) {
-            return false;
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
         }
 
         cmd.reset();
-        return true;
     }
 
-    bool handleDataPacketStringTableAdd(TraceDB& db, const DataPacketStringTableAdd* pData)
+    void handleDataPacketStringTableAdd(TraceDB& db, const DataPacketStringTableAdd* pData)
     {
         const char* pString = reinterpret_cast<const char*>(pData + 1);
 
@@ -407,14 +406,13 @@ CREATE TABLE IF NOT EXISTS "lockStates" (
 
         auto res = cmd.execute();
         if (res != sql::Result::OK) {
-            return false;
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
         }
 
         cmd.reset();
-        return true;
     }
 
-    bool handleDataPacketZone(TraceDB& db, const DataPacketZone* pData)
+    void handleDataPacketZone(TraceDB& db, const DataPacketZone* pData)
     {
         auto& cmd = db.cmdInsertZone;
         cmd.bind(1, static_cast<int32_t>(pData->threadID));
@@ -425,14 +423,13 @@ CREATE TABLE IF NOT EXISTS "lockStates" (
 
         auto res = cmd.execute();
         if (res != sql::Result::OK) {
-            return false;
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
         }
 
         cmd.reset();
-        return true;
     }
 
-    bool handleDataPacketLockTry(TraceDB& db, const DataPacketLockTry* pData)
+    void handleDataPacketLockTry(TraceDB& db, const DataPacketLockTry* pData)
     {
         int32_t lockId = -1; // TODO
 
@@ -445,14 +442,13 @@ CREATE TABLE IF NOT EXISTS "lockStates" (
 
         auto res = cmd.execute();
         if (res != sql::Result::OK) {
-            return false;
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
         }
 
         cmd.reset();
-        return true;
     }
 
-    bool handleDataPacketLockState(TraceDB& db, const DataPacketLockState* pData)
+    void handleDataPacketLockState(TraceDB& db, const DataPacketLockState* pData)
     {
         int32_t lockId = -1; // TODO
 
@@ -464,11 +460,10 @@ CREATE TABLE IF NOT EXISTS "lockStates" (
 
         auto res = cmd.execute();
         if (res != sql::Result::OK) {
-            return false;
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
         }
 
         cmd.reset();
-        return true;
     }
 
     bool handleDataSream(Client& client, uint8_t* pData)
