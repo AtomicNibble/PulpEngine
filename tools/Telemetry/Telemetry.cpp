@@ -637,8 +637,9 @@ namespace
 
     TELEM_ALIGNED_SYMBOL(struct QueueDataLockState, 64) : public QueueDataBase
     {
-        TtthreadId threadID;
         TtLockState state;
+        TtthreadId threadID;
+        tt_uint64 time;
         const void* pLockPtr;
     };
 
@@ -646,12 +647,14 @@ namespace
     {
         tt_uint16 count;
         TtthreadId threadID;
+        tt_uint64 time;
         const void* pLockPtr;
     };
 
     TELEM_ALIGNED_SYMBOL(struct QueueDataMemAlloc, 64) : public QueueDataBase
     {
         TtthreadId threadID;
+        tt_uint64 time;
         const void* pPtr;
         tt_uint32 size;
     };
@@ -659,6 +662,7 @@ namespace
     TELEM_ALIGNED_SYMBOL(struct QueueDataMemFree, 64) : public QueueDataBase
     {
         TtthreadId threadID;
+        tt_uint64 time;
         const void* pPtr;
     };
 
@@ -864,6 +868,7 @@ namespace
     {
         QueueDataLockState data;
         data.type = QueueDataType::LockState;
+        data.time = getTicks();
         data.pLockPtr = pPtr;
         data.state = state;
         data.threadID = getThreadID();
@@ -875,6 +880,7 @@ namespace
     {
         QueueDataLockCount data;
         data.type = QueueDataType::LockCount;
+        data.time = getTicks();
         data.pLockPtr = pPtr;
         data.count = static_cast<tt_uint16>(count);
         data.threadID = getThreadID();
@@ -886,6 +892,7 @@ namespace
     {
         QueueDataMemAlloc data;
         data.type = QueueDataType::MemAlloc;
+        data.time = getTicks();
         data.pPtr = pPtr;
         data.size = static_cast<tt_uint32>(size);;
         data.threadID = getThreadID();
@@ -897,6 +904,7 @@ namespace
     {
         QueueDataMemFree data;
         data.type = QueueDataType::MemFree;
+        data.time = getTicks();
         data.pPtr = pPtr;
         data.threadID = getThreadID();
 
@@ -1017,6 +1025,7 @@ namespace
         packet.type = DataStreamType::LockState;
         packet.threadID = pBuf->threadID;
         packet.state = pBuf->state;
+        packet.time = pBuf->time;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
@@ -1028,6 +1037,7 @@ namespace
         packet.type = DataStreamType::LockCount;
         packet.threadID = pBuf->threadID;
         packet.count = pBuf->count;
+        packet.time = pBuf->time;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
@@ -1039,6 +1049,7 @@ namespace
         packet.type = DataStreamType::MemAlloc;
         packet.threadID = pBuf->threadID;
         packet.size = pBuf->size;
+        packet.time = pBuf->time;
         packet.ptr = reinterpret_cast<tt_uint64>(pBuf->pPtr);
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
@@ -1049,6 +1060,7 @@ namespace
         DataPacketMemFree packet;
         packet.type = DataStreamType::MemFree;
         packet.threadID = pBuf->threadID;
+        packet.time = pBuf->time;
         packet.ptr = reinterpret_cast<tt_uint64>(pBuf->pPtr);
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
