@@ -606,6 +606,7 @@ namespace
     TELEM_ALIGNED_SYMBOL(struct QueueDataThreadSetName, 64) : public QueueDataBase
     {
         TtthreadId threadID;
+        tt_uint64 time;
         const char* pName;
     };
 
@@ -625,6 +626,7 @@ namespace
     TELEM_ALIGNED_SYMBOL(struct QueueDataLockSetName, 64) : public QueueDataBase
     {
         const void* pLockPtr;
+        tt_uint64 time;
         const char* pLockName;
     };
 
@@ -817,6 +819,7 @@ namespace
     {
         QueueDataThreadSetName data;
         data.type = QueueDataType::ThreadSetName;
+        data.time = getTicks();
         data.threadID = threadID;
         data.pName = pName;
 
@@ -847,6 +850,7 @@ namespace
     {
         QueueDataLockSetName data;
         data.type = QueueDataType::LockSetName;
+        data.time = getTicks();
         data.pLockPtr = pPtr;
         data.pLockName = pLockName;
 
@@ -959,6 +963,7 @@ namespace
         packet.type = DataStreamType::ThreadSetName;
         packet.threadID = pBuf->threadID;
         packet.strIdxName = StringTableGetIndex(pComp->strTable, pBuf->pName);
+        packet.time = pBuf->time;
 
         if (packet.strIdxName.inserted) {
             writeStringCompressionBuffer(pComp, pBuf->pName);
@@ -993,6 +998,7 @@ namespace
         packet.type = DataStreamType::LockSetName;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
         packet.strIdxName = StringTableGetIndex(pComp->strTable, pBuf->pLockName);
+        packet.time = pBuf->time;
 
         if (packet.strIdxName.inserted) {
             writeStringCompressionBuffer(pComp, pBuf->pLockName);

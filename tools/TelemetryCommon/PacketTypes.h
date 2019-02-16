@@ -187,6 +187,8 @@ struct DataPacketThreadSetName : public DataPacketBase
     StringTableIndex strIdxName;
     // 4
     TtthreadId threadID;
+    // 8
+    tt_uint64 time;
 };
 
 struct DataPacketCallStack : public DataPacketBase
@@ -199,6 +201,9 @@ struct DataPacketLockSetName : public DataPacketBase
 {
     // 2
     StringTableIndex strIdxName;
+
+    // 8
+    tt_uint64 time;
 
     // 8
     tt_uint64 lockHandle;
@@ -282,8 +287,8 @@ struct DataPacketMemFree : public DataPacketBase
 static_assert(sizeof(DataPacketBase) == 1, "Incorrect size");
 static_assert(sizeof(DataPacketStringTableAdd) == 4, "Incorrect size");
 static_assert(sizeof(DataPacketZone) == 32, "Incorrect size");
-static_assert(sizeof(DataPacketThreadSetName) == 8, "Incorrect size");
-static_assert(sizeof(DataPacketLockSetName) == 12, "Incorrect size");
+static_assert(sizeof(DataPacketThreadSetName) == 16, "Incorrect size");
+static_assert(sizeof(DataPacketLockSetName) == 20, "Incorrect size");
 static_assert(sizeof(DataPacketLockTry) == 36, "Incorrect size");
 static_assert(sizeof(DataPacketLockState) == 28, "Incorrect size");
 static_assert(sizeof(DataPacketLockCount) == 24, "Incorrect size");
