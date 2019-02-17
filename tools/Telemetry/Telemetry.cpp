@@ -143,8 +143,9 @@ namespace
 
         tt_uint64 ticksPerMicro;
         tt_uint64 baseTicks;
+        tt_uint64 baseMicro;
 
-        tt_uint8 _lanePad0[6 + 8];
+        tt_uint8 _lanePad0[6];
         X86_PAD(12)
 
         // -- Cace lane boundry --
@@ -822,7 +823,7 @@ namespace
         data.type = QueueDataType::TickInfo;
         data.threadID = getThreadID();
         data.ticks = getRelativeTicks(pCtx);
-        data.timeMicro = gSysTimer.GetMicro();
+        data.timeMicro = gSysTimer.GetMicro() - pCtx->baseMicro;
 
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
@@ -1323,6 +1324,7 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     pCtx->numThreadData = 0;
     pCtx->ticksPerMicro = gTicksPerMicro;
     pCtx->baseTicks = getTicks();
+    pCtx->baseMicro = pCtx->lastTick;
 
     pCtx->activeTickBufIdx = 0;
     pCtx->tickBuffers[0].pTickBuf = pTickBuffer0;
