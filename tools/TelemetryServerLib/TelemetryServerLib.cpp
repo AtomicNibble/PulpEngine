@@ -483,13 +483,34 @@ CREATE TABLE "memory" (
 
     void handleDataPacketZone(TraceDB& db, const DataPacketZone* pData)
     {
-        int32_t sourceInfoIdx = -1;
+        struct PacketSourceInfo
+        {
+            union
+            {
+                struct Packed
+                {
+                    uint16_t lineNo;
+                    uint16_t idxFunction;
+                    uint16_t idxFile;
+                    uint16_t __blank;
+                } raw;
+
+                uint64_t packed;
+            };
+        };
+
+        PacketSourceInfo info;
+        info.raw.lineNo = pData->lineNo;
+        info.raw.idxFunction = pData->strIdxFunction.index;
+        info.raw.idxFile = pData->strIdxFile.index;
+
+        uint64_t sourceInfo = info.packed;
 
         auto& cmd = db.cmdInsertZone;
         cmd.bind(1, static_cast<int32_t>(pData->threadID));
         cmd.bind(2, static_cast<int64_t>(pData->start));
         cmd.bind(3, static_cast<int64_t>(pData->end));
-        cmd.bind(4, sourceInfoIdx);
+        cmd.bind(4, static_cast<int64_t>(sourceInfo));
         cmd.bind(5, pData->stackDepth);
 
         auto res = cmd.execute();
