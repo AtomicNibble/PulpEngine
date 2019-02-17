@@ -39,6 +39,15 @@ namespace
 
     struct TraceDB
     {
+        // maybe drop this and just use -1?
+        enum class MemOp
+        {
+            Alloc,
+            Free
+        };
+
+        static constexpr size_t MAX_LOCKS = 256;
+
         TraceDB() :
             cmdInsertZone(con),
             cmdInsertString(con),
@@ -53,8 +62,31 @@ namespace
         {
         }
 
+    public:
+        bool createDB(core::Path<char>& path);
+
+        bool setMeta(const char* pName, const char* pValue);
+        void insertLockIfMissing(uint64_t lockHandle);
+
+        void handleDataPacketTickInfo(const DataPacketTickInfo* pData);
+        void handleDataPacketStringTableAdd(const DataPacketStringTableAdd* pData);
+        void handleDataPacketZone(const DataPacketZone* pData);
+        void handleDataPacketLockTry(const DataPacketLockTry* pData);
+        void handleDataPacketLockState(const DataPacketLockState* pData);
+        void handleDataPacketLockSetName(const DataPacketLockSetName* pData);
+        void handleDataPacketThreadSetName(const DataPacketThreadSetName* pData);
+        void handleDataPacketLockCount(const DataPacketLockCount* pData);
+        void handleDataPacketMemAlloc(const DataPacketMemAlloc* pData);
+        void handleDataPacketMemFree(const DataPacketMemFree* pData);
+        void handleDataPacketCallStack(const DataPacketCallStack* pData);
+
+    private:
+        bool createTables(void);
+
+    public:
         sql::SqlLiteDb con;
 
+    private:
         sql::SqlLiteCmd cmdInsertZone;
         sql::SqlLiteCmd cmdInsertString;
         sql::SqlLiteCmd cmdInsertTickInfo;
@@ -66,14 +98,47 @@ namespace
         sql::SqlLiteCmd cmdInsertMeta;
         sql::SqlLiteCmd cmdInsertMemory;
 
-        core::FixedArray<uint64_t, 256> lockSet;
+        core::FixedArray<uint64_t, MAX_LOCKS> lockSet;
     };
 
-
-    bool createTables(TraceDB& db)
+    bool TraceDB::createDB(core::Path<char>& path)
     {
+        if (!con.connect(path.c_str(), sql::OpenFlag::CREATE | sql::OpenFlag::WRITE)) {
+            return false;
+        }
 
-        if (!db.con.execute(R"(
+        if (!con.execute(R"(
+                PRAGMA synchronous = OFF;
+                PRAGMA page_size = 4096;
+                PRAGMA cache_size = -4000;
+                PRAGMA journal_mode = MEMORY;
+                PRAGMA foreign_keys = ON;
+            )")) {
+            return false;
+        }
+
+        // create all the tables.
+        if (!createTables()) {
+            return false;
+        }
+
+
+        cmdInsertZone.prepare("INSERT INTO zones (threadID, start, end, sourceInfoIdx, stackDepth) VALUES(?,?,?,?,?)");
+        cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
+        cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, time, timeMicro) VALUES(?,?,?)");
+        cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
+        cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, start, end, descriptionStrId) VALUES(?,?,?,?,?)");
+        cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, time, state) VALUES(?,?,?,?)");
+        cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, time, nameStrId) VALUES(?,?,?)");
+        cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, time, nameStrId) VALUES(?,?,?)");
+        cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)");
+        cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, time, operation) VALUES(?,?,?,?,?)");
+        return true;
+    }
+
+    bool TraceDB::createTables(void)
+    {
+        if (!con.execute(R"(
 
 CREATE TABLE IF NOT EXISTS "meta" (
 	"Id"	        INTEGER,
@@ -173,46 +238,9 @@ CREATE TABLE "memory" (
         return true;
     }
 
-    bool createDB(TraceDB& db, core::Path<char>& path)
+    bool TraceDB::setMeta(const char* pName, const char* pValue)
     {
-        if (!db.con.connect(path.c_str(), sql::OpenFlag::CREATE | sql::OpenFlag::WRITE)) {
-            return false;
-        }
-
-        if (!db.con.execute(R"(
-                PRAGMA synchronous = OFF;
-                PRAGMA page_size = 4096;
-                PRAGMA cache_size = -4000;
-                PRAGMA journal_mode = MEMORY;
-                PRAGMA foreign_keys = ON;
-            )")) {
-            return false;
-        }
-
-        // create all the tables.
-        if (!createTables(db)) {
-            return false;
-        }
-
-
-        db.cmdInsertZone.prepare("INSERT INTO zones (threadID, start, end, sourceInfoIdx, stackDepth) VALUES(?,?,?,?,?)");
-        db.cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
-        db.cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, time, timeMicro) VALUES(?,?,?)");
-        db.cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
-        db.cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, start, end, descriptionStrId) VALUES(?,?,?,?,?)");
-        db.cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, time, state) VALUES(?,?,?,?)");
-        db.cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, time, nameStrId) VALUES(?,?,?)");
-        db.cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, time, nameStrId) VALUES(?,?,?)");
-        db.cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)");
-        db.cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, time, operation) VALUES(?,?,?,?,?)");
-
-        return true;
-    }
-
-
-    bool setMeta(TraceDB& db, const char* pName, const char* pValue)
-    {
-        auto& cmd = db.cmdInsertMeta;
+        auto& cmd = cmdInsertMeta;
         cmd.reset();
         cmd.bind(1, pName);
         cmd.bind(2, pValue);
@@ -221,28 +249,215 @@ CREATE TABLE "memory" (
         if (res != sql::Result::OK) {
             return false;
         }
-        
+
         return true;
     }
 
-    void insertLockIfMissing(TraceDB& db, uint64_t lockHandle)
+    void TraceDB::insertLockIfMissing(uint64_t lockHandle)
     {
         // look up the lock.
-        if (std::binary_search(db.lockSet.begin(), db.lockSet.end(), lockHandle)) {
+        if (std::binary_search(lockSet.begin(), lockSet.end(), lockHandle)) {
             return;
         }
 
-        db.lockSet.push_back(lockHandle);
-        std::sort(db.lockSet.begin(), db.lockSet.end());
+        lockSet.push_back(lockHandle);
+        std::sort(lockSet.begin(), lockSet.end());
 
-        auto& cmd = db.cmdInsertLock;
+        auto& cmd = cmdInsertLock;
         cmd.bind(1, static_cast<int64_t>(lockHandle));
         auto res = cmd.execute();
         if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
         }
 
         cmd.reset();
+    }
+
+    void TraceDB::handleDataPacketTickInfo(const DataPacketTickInfo* pData)
+    {
+        auto& cmd = cmdInsertTickInfo;
+        cmd.bind(1, static_cast<int32_t>(pData->threadID));
+        cmd.bind(2, static_cast<int64_t>(pData->ticks));
+        cmd.bind(3, static_cast<int64_t>(pData->timeMicro));
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
+        }
+
+        cmd.reset();
+    }
+
+    void TraceDB::handleDataPacketStringTableAdd(const DataPacketStringTableAdd* pData)
+    {
+        const char* pString = reinterpret_cast<const char*>(pData + 1);
+
+        auto& cmd = cmdInsertString;
+        cmd.bind(1, static_cast<int32_t>(pData->id));
+        cmd.bind(2, pString, static_cast<size_t>(pData->length));
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
+        }
+
+        cmd.reset();
+    }
+
+    void TraceDB::handleDataPacketZone(const DataPacketZone* pData)
+    {
+        struct PacketSourceInfo
+        {
+            union
+            {
+                struct Packed
+                {
+                    uint16_t lineNo;
+                    uint16_t idxFunction;
+                    uint16_t idxFile;
+                    uint16_t __blank;
+                } raw;
+
+                uint64_t packed;
+            };
+        };
+
+        PacketSourceInfo info;
+        info.raw.lineNo = pData->lineNo;
+        info.raw.idxFunction = pData->strIdxFunction.index;
+        info.raw.idxFile = pData->strIdxFile.index;
+
+        uint64_t sourceInfo = info.packed;
+
+        auto& cmd = cmdInsertZone;
+        cmd.bind(1, static_cast<int32_t>(pData->threadID));
+        cmd.bind(2, static_cast<int64_t>(pData->start));
+        cmd.bind(3, static_cast<int64_t>(pData->end));
+        cmd.bind(4, static_cast<int64_t>(sourceInfo));
+        cmd.bind(5, pData->stackDepth);
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
+        }
+
+        cmd.reset();
+    }
+
+    void TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
+    {
+        insertLockIfMissing(pData->lockHandle);
+
+        auto& cmd = cmdInsertLockTry;
+        cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
+        cmd.bind(2, static_cast<int32_t>(pData->threadID));
+        cmd.bind(3, static_cast<int64_t>(pData->start));
+        cmd.bind(4, static_cast<int64_t>(pData->end));
+        cmd.bind(5, static_cast<int32_t>(pData->strIdxDescrption.index));
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
+        }
+
+        cmd.reset();
+    }
+
+    void TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
+    {
+        insertLockIfMissing(pData->lockHandle);
+
+        auto& cmd = cmdInsertLockState;
+        cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
+        cmd.bind(2, static_cast<int32_t>(pData->threadID));
+        cmd.bind(3, static_cast<int64_t>(pData->time));
+        cmd.bind(4, static_cast<int64_t>(pData->state));
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
+        }
+
+        cmd.reset();
+    }
+
+    void TraceDB::handleDataPacketLockSetName(const DataPacketLockSetName* pData)
+    {
+        insertLockIfMissing(pData->lockHandle);
+
+        auto& cmd = cmdInsertLockName;
+        cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
+        cmd.bind(2, static_cast<int64_t>(pData->time));
+        cmd.bind(3, static_cast<int32_t>(pData->strIdxName.index));
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
+        }
+
+        cmd.reset();
+    }
+
+    void TraceDB::handleDataPacketThreadSetName(const DataPacketThreadSetName* pData)
+    {
+        auto& cmd = cmdInsertThreadName;
+        cmd.bind(1, static_cast<int32_t>(pData->threadID));
+        cmd.bind(2, static_cast<int64_t>(pData->time));
+        cmd.bind(3, static_cast<int32_t>(pData->strIdxName.index));
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
+        }
+
+        cmd.reset();
+    }
+
+    void TraceDB::handleDataPacketLockCount(const DataPacketLockCount* pData)
+    {
+        X_UNUSED( pData);
+        // not sure how best to store this just yet.
+    }
+
+    void TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
+    {
+        auto& cmd = cmdInsertMemory;
+        cmd.bind(1, static_cast<int32_t>(pData->ptr));
+        cmd.bind(2, static_cast<int32_t>(pData->size));
+        cmd.bind(3, static_cast<int32_t>(pData->threadID));
+        cmd.bind(4, static_cast<int64_t>(pData->time));
+        cmd.bind(5, static_cast<int32_t>(MemOp::Alloc));
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
+        }
+
+        cmd.reset();
+    }
+
+    void TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
+    {
+        auto& cmd = cmdInsertMemory;
+        cmd.bind(1, static_cast<int32_t>(pData->ptr));
+        cmd.bind(2, -1);
+        cmd.bind(3, static_cast<int32_t>(pData->threadID));
+        cmd.bind(4, static_cast<int64_t>(pData->time));
+        cmd.bind(5, static_cast<int32_t>(MemOp::Free));
+
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
+        }
+
+        cmd.reset();
+    }
+
+    void TraceDB::handleDataPacketCallStack(const DataPacketCallStack* pData)
+    {
+        X_UNUSED(pData);
+
+        // TODO: ...
     }
 
 
@@ -424,13 +639,13 @@ CREATE TABLE "memory" (
             }
         }
 
-        if (!createDB(client.db, dbPath)) {
+        if (!client.db.createDB(dbPath)) {
             return false;
         }
 
-        setMeta(client.db, "appName", client.appName);
-        setMeta(client.db, "buildInfo", client.buildInfo);
-        setMeta(client.db, "cmdLine", client.cmdLine);
+        client.db.setMeta("appName", client.appName);
+        client.db.setMeta("buildInfo", client.buildInfo);
+        client.db.setMeta("cmdLine", client.cmdLine);
 
         // Meow...
         X_LOG0("TelemSrv", "ConnectionAccepted:");
@@ -448,200 +663,6 @@ CREATE TABLE "memory" (
 
         sendPacketToClient(client, &cra, sizeof(cra));
         return true;
-    }
-
-    void handleDataPacketTickInfo(TraceDB& db, const DataPacketTickInfo* pData)
-    {
-        auto& cmd = db.cmdInsertTickInfo;
-        cmd.bind(1, static_cast<int32_t>(pData->threadID));
-        cmd.bind(2, static_cast<int64_t>(pData->ticks));
-        cmd.bind(3, static_cast<int64_t>(pData->timeMicro));
-
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
-        }
-
-        cmd.reset();
-    }
-
-    void handleDataPacketStringTableAdd(TraceDB& db, const DataPacketStringTableAdd* pData)
-    {
-        const char* pString = reinterpret_cast<const char*>(pData + 1);
-
-        auto& cmd = db.cmdInsertString;
-        cmd.bind(1, static_cast<int32_t>(pData->id));
-        cmd.bind(2, pString, static_cast<size_t>(pData->length));
-
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
-        }
-
-        cmd.reset();
-    }
-
-    void handleDataPacketZone(TraceDB& db, const DataPacketZone* pData)
-    {
-        struct PacketSourceInfo
-        {
-            union
-            {
-                struct Packed
-                {
-                    uint16_t lineNo;
-                    uint16_t idxFunction;
-                    uint16_t idxFile;
-                    uint16_t __blank;
-                } raw;
-
-                uint64_t packed;
-            };
-        };
-
-        PacketSourceInfo info;
-        info.raw.lineNo = pData->lineNo;
-        info.raw.idxFunction = pData->strIdxFunction.index;
-        info.raw.idxFile = pData->strIdxFile.index;
-
-        uint64_t sourceInfo = info.packed;
-
-        auto& cmd = db.cmdInsertZone;
-        cmd.bind(1, static_cast<int32_t>(pData->threadID));
-        cmd.bind(2, static_cast<int64_t>(pData->start));
-        cmd.bind(3, static_cast<int64_t>(pData->end));
-        cmd.bind(4, static_cast<int64_t>(sourceInfo));
-        cmd.bind(5, pData->stackDepth);
-
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
-        }
-
-        cmd.reset();
-    }
-
-    void handleDataPacketLockTry(TraceDB& db, const DataPacketLockTry* pData)
-    {
-        insertLockIfMissing(db, pData->lockHandle);
-
-        auto& cmd = db.cmdInsertLockTry;
-        cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
-        cmd.bind(2, static_cast<int32_t>(pData->threadID));
-        cmd.bind(3, static_cast<int64_t>(pData->start));
-        cmd.bind(4, static_cast<int64_t>(pData->end));
-        cmd.bind(5, static_cast<int32_t>(pData->strIdxDescrption.index));
-
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
-        }
-
-        cmd.reset();
-    }
-
-    void handleDataPacketLockState(TraceDB& db, const DataPacketLockState* pData)
-    {
-        insertLockIfMissing(db, pData->lockHandle);
-
-        auto& cmd = db.cmdInsertLockState;
-        cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
-        cmd.bind(2, static_cast<int32_t>(pData->threadID));
-        cmd.bind(3, static_cast<int64_t>(pData->time));
-        cmd.bind(4, static_cast<int64_t>(pData->state));
-
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
-        }
-
-        cmd.reset();
-    }
-
-    void handleDataPacketLockSetName(TraceDB& db, const DataPacketLockSetName* pData)
-    {
-        insertLockIfMissing(db, pData->lockHandle);
-
-        auto& cmd = db.cmdInsertLockName;
-        cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
-        cmd.bind(2, static_cast<int64_t>(pData->time));
-        cmd.bind(3, static_cast<int32_t>(pData->strIdxName.index));
-
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
-        }
-
-        cmd.reset();
-    }
-
-    void handleDataPacketThreadSetName(TraceDB& db, const DataPacketThreadSetName* pData)
-    {
-        auto& cmd = db.cmdInsertThreadName;
-        cmd.bind(1, static_cast<int32_t>(pData->threadID));
-        cmd.bind(2, static_cast<int64_t>(pData->time));
-        cmd.bind(3, static_cast<int32_t>(pData->strIdxName.index));
-
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
-        }
-
-        cmd.reset();
-    }
-
-    void handleDataPacketLockCount(TraceDB& db, const DataPacketLockCount* pData)
-    {
-        X_UNUSED(db, pData);
-        // not sure how best to store this just yet.
-    }
-
-    // maybe drop this and just use -1?
-    enum class MemOp
-    {
-        Alloc,
-        Free
-    };
-
-    void handleDataPacketMemAlloc(TraceDB& db, const DataPacketMemAlloc* pData)
-    {
-        auto& cmd = db.cmdInsertMemory;
-        cmd.bind(1, static_cast<int32_t>(pData->ptr));
-        cmd.bind(2, static_cast<int32_t>(pData->size));
-        cmd.bind(3, static_cast<int32_t>(pData->threadID));
-        cmd.bind(4, static_cast<int64_t>(pData->time));
-        cmd.bind(5, static_cast<int32_t>(MemOp::Alloc));
-
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
-        }
-
-        cmd.reset();
-    }
-
-    void handleDataPacketMemFree(TraceDB& db, const DataPacketMemFree* pData)
-    {
-        auto& cmd = db.cmdInsertMemory;
-        cmd.bind(1, static_cast<int32_t>(pData->ptr));
-        cmd.bind(2, -1);
-        cmd.bind(3, static_cast<int32_t>(pData->threadID));
-        cmd.bind(4, static_cast<int64_t>(pData->time));
-        cmd.bind(5, static_cast<int32_t>(MemOp::Free));
-
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, db.con.errorMsg());
-        }
-
-        cmd.reset();
-    }
-
-    void handleDataPacketCallStack(TraceDB& db, const DataPacketCallStack* pData)
-    {
-        X_UNUSED(db, pData);
-
-        // TODO: ...
     }
 
 
@@ -694,68 +715,68 @@ CREATE TABLE "memory" (
                 case DataStreamType::StringTableAdd:
                 {
                     auto* pStr = reinterpret_cast<const DataPacketStringTableAdd*>(&pDst[i]);
-                    handleDataPacketStringTableAdd(client.db, pStr);
+                    client.db.handleDataPacketStringTableAdd(pStr);
                     i += sizeof(DataPacketStringTableAdd);
                     i += pStr->length;
                     break;
                 }
                 case DataStreamType::Zone:
                 {
-                    handleDataPacketZone(client.db, reinterpret_cast<const DataPacketZone*>(&pDst[i]));
+                    client.db.handleDataPacketZone(reinterpret_cast<const DataPacketZone*>(&pDst[i]));
                     i += sizeof(DataPacketZone);
                     break;
                 }
                 case DataStreamType::TickInfo:
                 {
-                    handleDataPacketTickInfo(client.db, reinterpret_cast<const DataPacketTickInfo*>(&pDst[i]));
+                    client.db.handleDataPacketTickInfo(reinterpret_cast<const DataPacketTickInfo*>(&pDst[i]));
                     i += sizeof(DataPacketTickInfo);
                     break;
                 }
                 case DataStreamType::ThreadSetName:
                 {
-                    handleDataPacketThreadSetName(client.db, reinterpret_cast<const DataPacketThreadSetName*>(&pDst[i]));
+                    client.db.handleDataPacketThreadSetName(reinterpret_cast<const DataPacketThreadSetName*>(&pDst[i]));
                     i += sizeof(DataPacketThreadSetName);
                     break;
                 }
                 case DataStreamType::CallStack:
                 {
-                    handleDataPacketCallStack(client.db, reinterpret_cast<const DataPacketCallStack*>(&pDst[i]));
+                    client.db.handleDataPacketCallStack(reinterpret_cast<const DataPacketCallStack*>(&pDst[i]));
                     i += sizeof(DataPacketCallStack);
                     break;
                 }
                 case DataStreamType::LockSetName:
                 {
-                    handleDataPacketLockSetName(client.db, reinterpret_cast<const DataPacketLockSetName*>(&pDst[i]));
+                    client.db.handleDataPacketLockSetName(reinterpret_cast<const DataPacketLockSetName*>(&pDst[i]));
                     i += sizeof(DataPacketLockSetName);
                     break;
                 }
                 case DataStreamType::LockTry:
                 {
-                    handleDataPacketLockTry(client.db, reinterpret_cast<const DataPacketLockTry*>(&pDst[i]));
+                    client.db.handleDataPacketLockTry(reinterpret_cast<const DataPacketLockTry*>(&pDst[i]));
                     i += sizeof(DataPacketLockTry);
                     break;
                 }
                 case DataStreamType::LockState:
                 {
-                    handleDataPacketLockState(client.db, reinterpret_cast<const DataPacketLockState*>(&pDst[i]));
+                    client.db.handleDataPacketLockState(reinterpret_cast<const DataPacketLockState*>(&pDst[i]));
                     i += sizeof(DataPacketLockState);
                     break;
                 }
                 case DataStreamType::LockCount:
                 {
-                    handleDataPacketLockCount(client.db, reinterpret_cast<const DataPacketLockCount*>(&pDst[i]));
+                    client.db.handleDataPacketLockCount(reinterpret_cast<const DataPacketLockCount*>(&pDst[i]));
                     i += sizeof(DataPacketLockCount);
                     break;
                 }
                 case DataStreamType::MemAlloc:
                 {
-                    handleDataPacketMemAlloc(client.db, reinterpret_cast<const DataPacketMemAlloc*>(&pDst[i]));
+                    client.db.handleDataPacketMemAlloc(reinterpret_cast<const DataPacketMemAlloc*>(&pDst[i]));
                     i += sizeof(DataPacketMemAlloc);
                     break;
                 }
                 case DataStreamType::MemFree:
                 {
-                    handleDataPacketMemFree(client.db, reinterpret_cast<const DataPacketMemFree*>(&pDst[i]));
+                    client.db.handleDataPacketMemFree(reinterpret_cast<const DataPacketMemFree*>(&pDst[i]));
                     i += sizeof(DataPacketMemFree);
                     break;
                 }
