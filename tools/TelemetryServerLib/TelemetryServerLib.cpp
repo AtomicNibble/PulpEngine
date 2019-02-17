@@ -116,9 +116,9 @@ namespace
                 PacketSourceInfo srcInfo;
 
                 DataPacketZone zone;
-                zone.threadID = row.get<int32_t>(0);
-                zone.start = row.get<int64_t>(1);
-                zone.end = row.get<int64_t>(2);
+                zone.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
+                zone.start = static_cast<uint64_t>(row.get<int64_t>(1));
+                zone.end = static_cast<uint64_t>(row.get<int64_t>(2));
                 srcInfo.packed = row.get<int32_t>(3);
                 zone.stackDepth = static_cast<uint8_t>(row.get<int32_t>(4));
 
