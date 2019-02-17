@@ -65,7 +65,8 @@ namespace
     public:
         bool createDB(core::Path<char>& path);
 
-        bool setMeta(const char* pName, const char* pValue);
+        template<typename T>
+        bool setMeta(const char* pName, T value);
         void insertLockIfMissing(uint64_t lockHandle);
 
         void handleDataPacketTickInfo(const DataPacketTickInfo* pData);
@@ -238,12 +239,13 @@ CREATE TABLE "memory" (
         return true;
     }
 
-    bool TraceDB::setMeta(const char* pName, const char* pValue)
+    template<typename T>
+    bool TraceDB::setMeta(const char* pName, T value)
     {
         auto& cmd = cmdInsertMeta;
         cmd.reset();
         cmd.bind(1, pName);
-        cmd.bind(2, pValue);
+        cmd.bind(2, value);
 
         sql::Result::Enum res = cmd.execute();
         if (res != sql::Result::OK) {
@@ -485,6 +487,7 @@ CREATE TABLE "memory" (
         char appName[MAX_STRING_LEN + 1];
         char buildInfo[MAX_STRING_LEN + 1];
         char cmdLine[MAX_CMDLINE_LEN + 1];
+        uint64_t ticksPerMicro;
 
         platform::SOCKET socket;
         
@@ -612,6 +615,8 @@ CREATE TABLE "memory" (
         pStrData += pConReq->buildInfoLen;
         memcpy(client.cmdLine, pStrData, pConReq->cmdLineLen);
 
+        client.ticksPerMicro = pConReq->ticksPerMicro;
+
         // make a db for the client.
         core::Path<char> workingDir;
         if (!gEnv->pFileSys->getWorkingDirectory(workingDir)) {
@@ -646,6 +651,7 @@ CREATE TABLE "memory" (
         client.db.setMeta("appName", client.appName);
         client.db.setMeta("buildInfo", client.buildInfo);
         client.db.setMeta("cmdLine", client.cmdLine);
+        client.db.setMeta<int64_t>("tickPerMicro", static_cast<int64_t>(client.ticksPerMicro));
 
         // Meow...
         X_LOG0("TelemSrv", "ConnectionAccepted:");
