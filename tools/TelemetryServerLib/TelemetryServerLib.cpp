@@ -46,6 +46,22 @@ namespace
             Free
         };
 
+        struct PacketSourceInfo
+        {
+            union
+            {
+                struct Packed
+                {
+                    uint16_t lineNo;
+                    uint16_t idxFunction;
+                    uint16_t idxFile;
+                    uint16_t __blank;
+                } raw;
+
+                uint64_t packed;
+            };
+        };
+
         static constexpr size_t MAX_LOCKS = 256;
 
         TraceDB() :
@@ -80,6 +96,41 @@ namespace
         void handleDataPacketMemAlloc(const DataPacketMemAlloc* pData);
         void handleDataPacketMemFree(const DataPacketMemFree* pData);
         void handleDataPacketCallStack(const DataPacketCallStack* pData);
+
+        bool getZones(core::Array<DataPacketZone>& zones, uint64_t tickBegin, uint64_t tickEnd)
+        {
+            sql::SqlLiteQuery qry(con, "SELECT threadId, start, end, sourceInfoIdx, stackDepth FROM zones WHERE start >= ? AND start < ?");
+            qry.bind(1, static_cast<int64_t>(tickBegin));
+            qry.bind(2, static_cast<int64_t>(tickEnd));
+
+            // how to send this back?
+            // hot like a potato
+            // do want to make new types for query api?
+            // not really but then we have this goaty prefix on all the types
+            // maybe it would be better to split it out :(
+
+            auto it = qry.begin();
+            if (it != qry.end()) {
+                auto row = *it;
+
+                PacketSourceInfo srcInfo;
+
+                DataPacketZone zone;
+                zone.threadID = row.get<int32_t>(0);
+                zone.start = row.get<int64_t>(1);
+                zone.end = row.get<int64_t>(2);
+                srcInfo.packed = row.get<int32_t>(3);
+                zone.stackDepth = static_cast<uint8_t>(row.get<int32_t>(4));
+
+                zone.lineNo = srcInfo.raw.lineNo;
+                zone.strIdxFile.index = srcInfo.raw.idxFile;
+                zone.strIdxZone.index = srcInfo.raw.idxFunction;
+
+                zones.append(zone);
+            }
+
+            return true;
+        }
 
     private:
         bool createTables(void);
@@ -308,22 +359,6 @@ CREATE TABLE "memory" (
 
     void TraceDB::handleDataPacketZone(const DataPacketZone* pData)
     {
-        struct PacketSourceInfo
-        {
-            union
-            {
-                struct Packed
-                {
-                    uint16_t lineNo;
-                    uint16_t idxFunction;
-                    uint16_t idxFile;
-                    uint16_t __blank;
-                } raw;
-
-                uint64_t packed;
-            };
-        };
-
         PacketSourceInfo info;
         info.raw.lineNo = pData->lineNo;
         info.raw.idxFunction = pData->strIdxFunction.index;
