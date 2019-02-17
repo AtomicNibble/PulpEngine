@@ -142,8 +142,9 @@ namespace
         tt_int32 numThreadData;
 
         tt_uint64 ticksPerMicro;
+        tt_uint64 baseTicks;
 
-        tt_uint8 _lanePad0[6 + 16];
+        tt_uint8 _lanePad0[6 + 8];
         X86_PAD(12)
 
         // -- Cace lane boundry --
@@ -209,6 +210,16 @@ namespace
     TELEM_INLINE tt_uint64 ticksToMicro(TraceContext* pCtx, tt_uint64 tsc)
     {
         return (tsc / pCtx->ticksPerMicro);
+    }
+
+    TELEM_INLINE tt_uint64 getRelativeTicks(TraceContext* pCtx)
+    {
+        return __rdtsc() - pCtx->baseTicks;
+    }
+
+    TELEM_INLINE tt_uint64 toRelativeTicks(TraceContext* pCtx, tt_uint64 ticks)
+    {
+        return ticks - pCtx->baseTicks;
     }
 
     TELEM_INLINE tt_int32 getActiveTickBufferSize(TraceContext* pCtx)
@@ -810,7 +821,7 @@ namespace
         QueueDataTickInfo data;
         data.type = QueueDataType::TickInfo;
         data.threadID = getThreadID();
-        data.ticks = getTicks();
+        data.ticks = getRelativeTicks(pCtx);
         data.timeMicro = gSysTimer.GetMicro();
 
         addToTickBuffer(pCtx, &data, sizeof(data));
@@ -820,7 +831,7 @@ namespace
     {
         QueueDataThreadSetName data;
         data.type = QueueDataType::ThreadSetName;
-        data.time = getTicks();
+        data.time = getRelativeTicks(pCtx);
         data.threadID = threadID;
         data.pName = pName;
 
@@ -851,7 +862,7 @@ namespace
     {
         QueueDataLockSetName data;
         data.type = QueueDataType::LockSetName;
-        data.time = getTicks();
+        data.time = getRelativeTicks(pCtx);
         data.pLockPtr = pPtr;
         data.pLockName = pLockName;
 
@@ -873,7 +884,7 @@ namespace
     {
         QueueDataLockState data;
         data.type = QueueDataType::LockState;
-        data.time = getTicks();
+        data.time = getRelativeTicks(pCtx);
         data.pLockPtr = pPtr;
         data.state = state;
         data.threadID = getThreadID();
@@ -885,7 +896,7 @@ namespace
     {
         QueueDataLockCount data;
         data.type = QueueDataType::LockCount;
-        data.time = getTicks();
+        data.time = getRelativeTicks(pCtx);
         data.pLockPtr = pPtr;
         data.count = static_cast<tt_uint16>(count);
         data.threadID = getThreadID();
@@ -897,7 +908,7 @@ namespace
     {
         QueueDataMemAlloc data;
         data.type = QueueDataType::MemAlloc;
-        data.time = getTicks();
+        data.time = getRelativeTicks(pCtx);
         data.pPtr = pPtr;
         data.size = static_cast<tt_uint32>(size);;
         data.threadID = getThreadID();
@@ -909,7 +920,7 @@ namespace
     {
         QueueDataMemFree data;
         data.type = QueueDataType::MemFree;
-        data.time = getTicks();
+        data.time = getRelativeTicks(pCtx);
         data.pPtr = pPtr;
         data.threadID = getThreadID();
 
@@ -937,8 +948,8 @@ namespace
         packet.type = DataStreamType::Zone;
         packet.stackDepth = static_cast<tt_uint8>(pBuf->stackDepth);
         packet.threadID = pBuf->threadID;
-        packet.start = zone.start;
-        packet.end = zone.end;
+        packet.start = toRelativeTicks(pComp->pCtx, zone.start);
+        packet.end = toRelativeTicks(pComp->pCtx, zone.end);
         packet.strIdxFile = GetStringId(pComp, zone.sourceInfo.pFile_);
         packet.strIdxFunction = GetStringId(pComp, zone.sourceInfo.pFunction_);
         packet.strIdxZone = GetStringId(pComp, zone.pZoneName);
@@ -1007,8 +1018,8 @@ namespace
         DataPacketLockTry packet;
         packet.type = DataStreamType::LockTry;
         packet.threadID = pBuf->threadID;
-        packet.start = lock.start;
-        packet.end = lock.end;
+        packet.start = toRelativeTicks(pComp->pCtx, lock.start);
+        packet.end = toRelativeTicks(pComp->pCtx, lock.end);
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
         packet.strIdxDescrption = GetStringId(pComp, lock.pDescription);
 
@@ -1311,6 +1322,7 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     pCtx->pThreadData = reinterpret_cast<TraceThread*>(pThreadDataBuf);
     pCtx->numThreadData = 0;
     pCtx->ticksPerMicro = gTicksPerMicro;
+    pCtx->baseTicks = getTicks();
 
     pCtx->activeTickBufIdx = 0;
     pCtx->tickBuffers[0].pTickBuf = pTickBuffer0;
