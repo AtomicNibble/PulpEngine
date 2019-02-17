@@ -165,11 +165,11 @@ struct DataPacketZone : public DataPacketBase
     tt_uint64 start;
     tt_uint64 end;
 
-    // 6
-    StringTableIndex strIdxFile;
-    StringTableIndex strIdxFunction;
-    StringTableIndex strIdxZone;
+    // 8
     tt_uint16        lineNo;
+    StringTableIndex strIdxFunction;
+    StringTableIndex strIdxFile;
+    StringTableIndex strIdxZone;
 };
 
 struct DataPacketTickInfo : public DataPacketBase
