@@ -97,6 +97,29 @@ namespace
         void handleDataPacketMemFree(const DataPacketMemFree* pData);
         void handleDataPacketCallStack(const DataPacketCallStack* pData);
 
+        bool getTicks(core::Array<DataPacketTickInfo>& ticks, int32_t startIdx, int32_t num)
+        {
+            sql::SqlLiteQuery qry(con, "SELECT * FROM ticks LIMIT ? OFFSET ?");
+            qry.bind(1, num);
+            qry.bind(2, startIdx);
+
+            auto it = qry.begin();
+            if (it != qry.end()) {
+                auto row = *it;
+
+                DataPacketTickInfo tick;
+                auto id = row.get<int32_t>(0);
+                X_UNUSED(id);
+                tick.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
+                tick.ticks = static_cast<uint64_t>(row.get<int32_t>(2));
+                tick.timeMicro = static_cast<uint64_t>(row.get<int32_t>(3));
+
+                ticks.append(tick);
+            }
+
+            return true;
+        }
+
         bool getZones(core::Array<DataPacketZone>& zones, uint64_t tickBegin, uint64_t tickEnd)
         {
             sql::SqlLiteQuery qry(con, "SELECT threadId, start, end, sourceInfoIdx, stackDepth FROM zones WHERE start >= ? AND start < ?");
