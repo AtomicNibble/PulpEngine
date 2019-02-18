@@ -52,5 +52,8 @@
     <ClCompile Include="GL\gl3w.c">
       <Filter>Source Files\GL</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\imgui\imgui_demo.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
