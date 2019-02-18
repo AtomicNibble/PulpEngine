@@ -16,3 +16,9 @@
 [submodule "game_folder/asset_db"]
 	path = game_folder/asset_db
 	url = ../../root/PotatoAssetDB.git
+[submodule "3rdparty/source/imgui"]
+	path = 3rdparty/source/imgui
+	url = ../../misc/imgui.git
+[submodule "3rdparty/source/SDL2"]
+	path = 3rdparty/source/SDL2
+	url = ../../misc/sdl2.git
