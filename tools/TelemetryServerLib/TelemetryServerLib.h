@@ -5,39 +5,12 @@
 #include <../TelemetryCommon/TelemetryCommonLib.h>
 #include <../SqLite/SqlLib.h>
 
-#include <Containers/Array.h>
 #include <Compression/LZ4.h>
 
 X_NAMESPACE_BEGIN(telemetry)
 
-using TelemFixedStr = core::StackString<MAX_STRING_LEN, char>;
-
 const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
 
-struct Trace
-{
-    Trace() :
-        ticksPerMicro(0)
-    {}
-
-    core::Path<> dbPath;
-    core::string name;
-    core::string buildInfo;
-    core::string cmdLine;
-    uint64_t ticksPerMicro;
-};
-
-struct App
-{
-    using TraceArr = core::Array<Trace>;
-
-    App(core::MemoryArenaBase* arena) :
-        traces(arena)
-    {}
-
-    TelemFixedStr appName;
-    TraceArr traces;
-};
 
 struct TraceDB
 {
@@ -161,7 +134,6 @@ struct ClientConnection
 class Server : public ITelemServer
 {
 public:
-    using AppArr = core::Array<App>;
 
 
 public:
@@ -179,10 +151,12 @@ private:
 
     bool handleConnectionRequest(ClientConnection& client, uint8_t* pData);
     bool handleConnectionRequestViewer(ClientConnection& client, uint8_t* pData);
+    bool handleQueryApps(ClientConnection& client, uint8_t* pData);
+    bool handleQueryAppTraces(ClientConnection& client, uint8_t* pData);
 
 private:
     core::MemoryArenaBase* arena_;
-    AppArr apps_;
+    TraceAppArr apps_;
 };
 
 X_NAMESPACE_END

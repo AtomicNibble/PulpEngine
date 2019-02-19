@@ -3,6 +3,8 @@
 
 #include <../TelemetryServerLib/TelemetryServerLib.h>
 
+#include <Compression/LZ4.h>
+
 #define _LAUNCHER
 #include <ModuleExports.h>
 
@@ -49,6 +51,8 @@ namespace
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
     >
         TelemetryViewerArena;
+
+    TelemetryViewerArena* g_arena = nullptr;
 
     bool winSockInit(void)
     {
@@ -218,7 +222,14 @@ namespace
 
     struct Server
     {
+        VersionInfo serverVer;
         platform::SOCKET socket;
+
+        // Server compress it's responses.
+        int32_t cmpBufferOffset;
+        int8_t cmpRingBuf[COMPRESSION_RING_BUFFER_SIZE];
+
+        core::Compression::LZ4StreamDecode lz4Stream;
     };
 
     void sendDataToServer(Server& srv, const void* pData, int32_t len)
@@ -308,7 +319,7 @@ namespace
         }
     }
 
-    bool connectToServer()
+    bool connectToServer(Server& srv)
     {
         const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
 
@@ -360,16 +371,14 @@ namespace
         }
 
         ConnectionRequestViewerHdr cr;
-        core::zero_object(cr);
+        cr.dataSize = sizeof(cr);
         cr.type = PacketType::ConnectionRequestViewer;
         cr.viewerVer.major = TELEM_VERSION_MAJOR;
         cr.viewerVer.minor = TELEM_VERSION_MINOR;
         cr.viewerVer.patch = TELEM_VERSION_PATCH;
         cr.viewerVer.build = TELEM_VERSION_BUILD;
 
-        Server srv;
         srv.socket = connectSocket;
-
         sendDataToServer(srv, &cr, sizeof(cr));
 
         // wait for a response O.O
@@ -388,6 +397,74 @@ namespace
         return true;
     }
 
+    void getAppList(Server& srv)
+    {
+        QueryApps qa;
+        qa.dataSize = sizeof(qa);
+        qa.type = PacketType::QueryApps;
+        qa.offset = 0;
+        qa.max = 64;
+
+        sendDataToServer(srv, &qa, sizeof(qa));
+
+        // get response.
+        char recvbuf[MAX_PACKET_SIZE];
+        int recvbuflen = sizeof(recvbuf);
+
+        if (!readPacket(srv, recvbuf, recvbuflen)) {
+            return;
+        }
+
+        auto* pHdr = reinterpret_cast<const QueryAppsResponseHdr*>(recvbuf);
+        if (pHdr->type != PacketType::QueryAppsResp) {
+            return;
+        }
+
+        auto* pApps = reinterpret_cast<const QueryAppsResponseData*>(pHdr + 1);
+
+        telemetry::TraceAppArr apps(g_arena);
+
+        for (int32_t i = 0; i < pHdr->num; i++)
+        {
+            telemetry::TraceApp app(g_arena);
+            app.appName.set(pApps[i].appName);
+
+            apps.push_back(app);
+        }
+
+        for (auto& app : apps)
+        {
+            QueryAppTraces qat;
+            qat.dataSize = sizeof(qat);
+            qat.type = PacketType::QueryAppTraces;
+
+            sendDataToServer(srv, &qat, sizeof(qat));
+
+            recvbuflen = sizeof(recvbuf);
+            if (!readPacket(srv, recvbuf, recvbuflen)) {
+                return;
+            }
+
+            auto* pTraceHdr = reinterpret_cast<const QueryAppTracesResponseHdr*>(recvbuf);
+            if (pTraceHdr->type != PacketType::QueryAppTracesResp) {
+                return;
+            }
+
+            auto* pTraces = reinterpret_cast<const QueryAppTracesResponseData*>(pHdr + 1);
+
+            for (int32_t i = 0; i < pTraceHdr->num; i++)
+            {
+                telemetry::Trace trace;
+                trace.name.assign(pTraces[i].name);
+                trace.buildInfo.assign(pTraces[i].buildInfo);
+
+                app.traces.push_back(std::move(trace));
+            }
+        }
+    }
+
+
+
 } // namespace
 
 
@@ -402,6 +479,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     TelemetryViewerArena::AllocationPolicy allocator;
     TelemetryViewerArena arena(&allocator, "TelemetryViewerArena");
+
+    g_arena = &arena;
 
     {
         EngineApp app;
@@ -459,7 +538,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
 
         // TEMP: connect to server on start up.
-        connectToServer();
+        Server srv;
+        connectToServer(srv);
+
+        getAppList(srv);
 
         bool done = false;
         while (!done)

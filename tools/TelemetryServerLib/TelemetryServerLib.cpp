@@ -753,7 +753,7 @@ bool Server::loadApps()
 
 bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
 {
-    App app(arena_);
+    TraceApp app(arena_);
     app.appName.set(appName.begin(), appName.end());
 
     core::Path<> dirSearch(dir);
@@ -914,6 +914,12 @@ bool Server::processPacket(ClientConnection& client, uint8_t* pData)
         case PacketType::DataStream:
             return handleDataSream(client, pData);
             break;
+        case PacketType::QueryApps:
+            return handleQueryApps(client, pData);
+            break;
+        case PacketType::QueryAppTraces:
+            return handleQueryAppTraces(client, pData);
+            break;
         default:
             X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
             return false;
@@ -971,11 +977,11 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     TelemFixedStr appName;
     appName.set(pStrData, pStrData + pConReq->appNameLen);
 
-    auto it = std::find_if(apps_.begin(), apps_.end(), [&appName](const App& app) {
+    auto it = std::find_if(apps_.begin(), apps_.end(), [&appName](const TraceApp& app) {
         return app.appName == appName;
     });
 
-    App* pApp = nullptr;
+    TraceApp* pApp = nullptr;
     if (it == apps_.end())
     {
         apps_.emplace_back(arena_);
@@ -1099,5 +1105,62 @@ bool Server::handleConnectionRequestViewer(ClientConnection& client, uint8_t* pD
     sendPacketToClient(client, &cra, sizeof(cra));
     return true;
 }
+
+bool Server::handleQueryApps(ClientConnection& client, uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const DataStreamHdr*>(pData);
+    if (pHdr->type != PacketType::QueryApps) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    auto numApps = static_cast<tt_int32>(apps_.size());
+
+    QueryAppsResponseHdr resHdr;
+    resHdr.dataSize = static_cast<tt_uint16>((sizeof(resHdr) + (sizeof(QueryAppsResponseData) * numApps)));
+    resHdr.type = PacketType::QueryAppsResp;
+    resHdr.num = numApps;
+
+    sendPacketToClient(client, &resHdr, sizeof(resHdr));
+
+    for (const auto& app : apps_)
+    {
+        QueryAppsResponseData qar;
+        qar.numTraces = static_cast<tt_int32>(app.traces.size());
+        strcpy(qar.appName, app.appName.c_str());
+
+        sendPacketToClient(client, &qar, sizeof(qar));
+    }
+
+    return true;
+}
+
+bool Server::handleQueryAppTraces(ClientConnection& client, uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const DataStreamHdr*>(pData);
+    if (pHdr->type != PacketType::QueryAppTraces) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    const auto& app = apps_[0];
+
+    QueryAppsResponseHdr resHdr;
+    resHdr.dataSize = static_cast<tt_uint16>((sizeof(resHdr) + (sizeof(QueryAppTracesResponseData) * app.traces.size())));
+    resHdr.type = PacketType::QueryAppTracesResp;
+    resHdr.num = static_cast<uint32_t>(app.traces.size());
+
+    sendPacketToClient(client, &resHdr, sizeof(resHdr));
+
+    for (const auto& trace : app.traces)
+    {
+        QueryAppTracesResponseData atr;
+        strcpy(atr.name, trace.name.c_str());
+        strcpy(atr.buildInfo, trace.buildInfo.c_str());
+
+        sendPacketToClient(client, &atr, sizeof(atr));
+    }
+
+    return true;
+}
+
 
 X_NAMESPACE_END
