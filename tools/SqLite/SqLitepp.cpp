@@ -583,6 +583,23 @@ Result::Enum SqlLiteStateMnt::bind(int idx, const core::string& value, CopySeman
     return res;
 }
 
+Result::Enum SqlLiteStateMnt::bind(int idx, const core::string_view value, CopySemantic::Enum fcopy)
+{
+    Result::Enum res = static_cast<Result::Enum>(sqlite3_bind_text(
+        pStmt_,
+        idx,
+        value.data(),
+        safe_static_cast<int32, size_t>(value.size()),
+        fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC));
+
+    if (res != Result::OK) {
+        X_ERROR("", "bind(%i)-> \"%.*s\" failed. err(%i): \"%s\"",
+            idx, value.length(), value.data(), res, db_.errorMsg());
+    }
+
+    return res;
+}
+
 Result::Enum SqlLiteStateMnt::bind(int idx)
 {
     return static_cast<Result::Enum>(sqlite3_bind_null(pStmt_, idx));
@@ -630,6 +647,12 @@ Result::Enum SqlLiteStateMnt::bind(const char* pName, void const* value, int n, 
 }
 
 Result::Enum SqlLiteStateMnt::bind(const char* pName, const core::string& value, CopySemantic::Enum fcopy)
+{
+    auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
+    return bind(idx, value, fcopy);
+}
+
+Result::Enum SqlLiteStateMnt::bind(const char* pName, const core::string_view value, CopySemantic::Enum fcopy)
 {
     auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
     return bind(idx, value, fcopy);
