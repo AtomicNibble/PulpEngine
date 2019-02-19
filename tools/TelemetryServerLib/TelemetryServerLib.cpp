@@ -1,20 +1,19 @@
 #include "stdafx.h"
 #include "TelemetryServerLib.h"
 
-#include <Compression/LZ4.h>
 #include <Time/DateTimeStamp.h>
 
 #include <IFileSys.h>
 
-#include <../SqLite/SqlLib.h>
 #include <../TelemetryCommon/TelemetryCommonLib.h>
 // #include <winsock2.h>
 
 X_LINK_LIB("engine_TelemetryCommonLib.lib");
 
+X_NAMESPACE_BEGIN(telemetry)
+
 namespace
 {
-    const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
 
     const char* DEFAULT_PORT = "8001";
 
@@ -37,183 +36,291 @@ namespace
         }
     }
 
-    struct TraceDB
+ 
+    bool readPacket(ClientConnection& client, char* pBuffer, int& bufLengthInOut)
     {
-        // maybe drop this and just use -1?
-        enum class MemOp
-        {
-            Alloc,
-            Free
-        };
+        // this should return complete packets or error.
+        int bytesRead = 0;
+        int bufLength = sizeof(PacketBase);
 
-        struct PacketSourceInfo
-        {
-            union
+        while (1) {
+            int maxReadSize = bufLength - bytesRead;
+            int res = platform::recv(client.socket, &pBuffer[bytesRead], maxReadSize, 0);
+
+            if (res == 0) {
+                X_ERROR("TelemSrv", "Connection closing...");
+                return false;
+            }
+            else if (res < 0) {
+                X_ERROR("TelemSrv", "recv failed with error: %d", platform::WSAGetLastError());
+                return false;
+            }
+
+            bytesRead += res;
+
+            // X_LOG0("TelemSrv", "got: %d bytes", res);
+
+            if (bytesRead == sizeof(PacketBase))
             {
-                struct Packed
-                {
-                    uint16_t lineNo;
-                    uint16_t idxFunction;
-                    uint16_t idxFile;
-                    uint16_t __blank;
-                } raw;
+                auto* pHdr = reinterpret_cast<const PacketBase*>(pBuffer);
+                if (pHdr->dataSize == 0) {
+                    X_ERROR("TelemSrv", "Client sent packet with length zero...");
+                    return false;
+                }
 
-                uint64_t packed;
-            };
-        };
+                if (pHdr->dataSize > bufLengthInOut) {
+                    X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<tt_int32>(pHdr->dataSize));
+                    return false;
+                }
 
-        static constexpr size_t MAX_LOCKS = 256;
-
-        TraceDB() :
-            cmdInsertZone(con),
-            cmdInsertString(con),
-            cmdInsertTickInfo(con),
-            cmdInsertLock(con),
-            cmdInsertLockTry(con),
-            cmdInsertLockState(con),
-            cmdInsertThreadName(con),
-            cmdInsertLockName(con),
-            cmdInsertMeta(con),
-            cmdInsertMemory(con)
-        {
-        }
-
-    public:
-        bool createDB(core::Path<char>& path);
-
-        template<typename T>
-        bool setMeta(const char* pName, T value);
-        void insertLockIfMissing(uint64_t lockHandle);
-
-        void handleDataPacketTickInfo(const DataPacketTickInfo* pData);
-        void handleDataPacketStringTableAdd(const DataPacketStringTableAdd* pData);
-        void handleDataPacketZone(const DataPacketZone* pData);
-        void handleDataPacketLockTry(const DataPacketLockTry* pData);
-        void handleDataPacketLockState(const DataPacketLockState* pData);
-        void handleDataPacketLockSetName(const DataPacketLockSetName* pData);
-        void handleDataPacketThreadSetName(const DataPacketThreadSetName* pData);
-        void handleDataPacketLockCount(const DataPacketLockCount* pData);
-        void handleDataPacketMemAlloc(const DataPacketMemAlloc* pData);
-        void handleDataPacketMemFree(const DataPacketMemFree* pData);
-        void handleDataPacketCallStack(const DataPacketCallStack* pData);
-
-        bool getTicks(core::Array<DataPacketTickInfo>& ticks, int32_t startIdx, int32_t num)
-        {
-            sql::SqlLiteQuery qry(con, "SELECT * FROM ticks LIMIT ? OFFSET ?");
-            qry.bind(1, num);
-            qry.bind(2, startIdx);
-
-            auto it = qry.begin();
-            if (it != qry.end()) {
-                auto row = *it;
-
-                DataPacketTickInfo tick;
-                auto id = row.get<int32_t>(0);
-                X_UNUSED(id);
-                tick.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
-                tick.ticks = static_cast<uint64_t>(row.get<int32_t>(2));
-                tick.timeMicro = static_cast<uint64_t>(row.get<int32_t>(3));
-
-                ticks.append(tick);
+                bufLength = pHdr->dataSize;
             }
 
-            return true;
-        }
-
-        bool getZones(core::Array<DataPacketZone>& zones, uint64_t tickBegin, uint64_t tickEnd)
-        {
-            sql::SqlLiteQuery qry(con, "SELECT threadId, start, end, sourceInfoIdx, stackDepth FROM zones WHERE start >= ? AND start < ?");
-            qry.bind(1, static_cast<int64_t>(tickBegin));
-            qry.bind(2, static_cast<int64_t>(tickEnd));
-
-            // how to send this back?
-            // hot like a potato
-            // do want to make new types for query api?
-            // not really but then we have this goaty prefix on all the types
-            // maybe it would be better to split it out :(
-
-            auto it = qry.begin();
-            if (it != qry.end()) {
-                auto row = *it;
-
-                PacketSourceInfo srcInfo;
-
-                DataPacketZone zone;
-                zone.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
-                zone.start = static_cast<uint64_t>(row.get<int64_t>(1));
-                zone.end = static_cast<uint64_t>(row.get<int64_t>(2));
-                srcInfo.packed = row.get<int32_t>(3);
-                zone.stackDepth = static_cast<uint8_t>(row.get<int32_t>(4));
-
-                zone.lineNo = srcInfo.raw.lineNo;
-                zone.strIdxFile.index = srcInfo.raw.idxFile;
-                zone.strIdxZone.index = srcInfo.raw.idxFunction;
-
-                zones.append(zone);
+            if (bytesRead == bufLength) {
+                bufLengthInOut = bytesRead;
+                return true;
             }
-
-            return true;
+            else if (bytesRead > bufLength) {
+                X_ERROR("TelemSrv", "Overread packet bytesRead: %d recvbuflen: %d", bytesRead, bufLength);
+                return false;
+            }
         }
+    }
 
-    private:
-        bool createTables(void);
-
-    public:
-        sql::SqlLiteDb con;
-
-    private:
-        sql::SqlLiteCmd cmdInsertZone;
-        sql::SqlLiteCmd cmdInsertString;
-        sql::SqlLiteCmd cmdInsertTickInfo;
-        sql::SqlLiteCmd cmdInsertLock;
-        sql::SqlLiteCmd cmdInsertLockTry;
-        sql::SqlLiteCmd cmdInsertLockState;
-        sql::SqlLiteCmd cmdInsertThreadName;
-        sql::SqlLiteCmd cmdInsertLockName;
-        sql::SqlLiteCmd cmdInsertMeta;
-        sql::SqlLiteCmd cmdInsertMemory;
-
-        core::FixedArray<uint64_t, MAX_LOCKS> lockSet;
-    };
-
-    bool TraceDB::createDB(core::Path<char>& path)
+    void sendPacketToClient(ClientConnection& client, const void* pData, size_t len)
     {
-        if (!con.connect(path.c_str(), sql::OpenFlag::CREATE | sql::OpenFlag::WRITE)) {
+        // send some data...
+        int res = platform::send(client.socket, reinterpret_cast<const char*>(pData), static_cast<int>(len), 0);
+        if (res == SOCKET_ERROR) {
+            X_LOG0("TelemSrv", "send failed with error: %d", platform::WSAGetLastError());
+            return;
+        }
+    }
+
+    void sendConnectionRejected(ClientConnection& client, const char* pReason)
+    {
+        X_LOG0("TelemSrv", "ConnectionRejected:");
+
+        size_t msgLen = strlen(pReason);
+        size_t datalen = sizeof(ConnectionRequestRejectedHdr) + msgLen;
+
+        if (msgLen > MAX_STRING_LEN) {
+            msgLen = MAX_STRING_LEN;
+        }
+
+        char buf[sizeof(ConnectionRequestRejectedHdr) + MAX_STRING_LEN];
+
+        auto* pCr = reinterpret_cast<ConnectionRequestRejectedHdr*>(buf);
+        pCr->dataSize = static_cast<tt_uint16>(datalen);
+        pCr->type = PacketType::ConnectionRequestRejected;
+
+        memcpy(pCr + 1, pReason, msgLen);
+        sendPacketToClient(client, buf, datalen);
+    }
+
+    bool handleDataSream(ClientConnection& client, uint8_t* pData)
+    {
+        auto* pHdr = reinterpret_cast<const DataStreamHdr*>(pData);
+        if (pHdr->type != PacketType::DataStream) {
+            X_ASSERT_UNREACHABLE();
+        }
+
+        // the data is compressed.
+        // decompress it..
+        int32_t cmpLen = pHdr->dataSize - sizeof(DataStreamHdr);
+        int32_t origLen = pHdr->origSize - sizeof(DataStreamHdr);
+        X_UNUSED(cmpLen);
+
+        if (cmpLen == origLen) {
+            // uncompressed packets.
+            X_ASSERT_NOT_IMPLEMENTED();
+        }
+
+        auto& strm = client.traceStrm;
+
+        auto* pDst = &strm.cmpRingBuf[strm.cmpBufferOffset];
+
+        auto cmpLenOut = strm.lz4Stream.decompressContinue(pHdr + 1, pDst, origLen);
+        if (cmpLenOut != cmpLen) {
+            // TODO: ..
             return false;
         }
 
-        if (!con.execute(R"(
+        strm.cmpBufferOffset += origLen;
+
+        if (strm.cmpBufferOffset >= (COMPRESSION_RING_BUFFER_SIZE - COMPRESSION_MAX_INPUT_SIZE)) {
+            strm.cmpBufferOffset = 0;
+        }
+
+        sql::SqlLiteTransaction trans(strm.db.con);
+
+        // process this data?
+        for (int32 i = 0; i < origLen; )
+        {
+            // packet me baby!
+            auto* pPacket = reinterpret_cast<const DataPacketBase*>(&pDst[i]);
+
+            switch (pPacket->type)
+            {
+                case DataStreamType::StringTableAdd:
+                {
+                    auto* pStr = reinterpret_cast<const DataPacketStringTableAdd*>(&pDst[i]);
+                    strm.db.handleDataPacketStringTableAdd(pStr);
+                    i += sizeof(DataPacketStringTableAdd);
+                    i += pStr->length;
+                    break;
+                }
+                case DataStreamType::Zone:
+                {
+                    strm.db.handleDataPacketZone(reinterpret_cast<const DataPacketZone*>(&pDst[i]));
+                    i += sizeof(DataPacketZone);
+                    break;
+                }
+                case DataStreamType::TickInfo:
+                {
+                    strm.db.handleDataPacketTickInfo(reinterpret_cast<const DataPacketTickInfo*>(&pDst[i]));
+                    i += sizeof(DataPacketTickInfo);
+                    break;
+                }
+                case DataStreamType::ThreadSetName:
+                {
+                    strm.db.handleDataPacketThreadSetName(reinterpret_cast<const DataPacketThreadSetName*>(&pDst[i]));
+                    i += sizeof(DataPacketThreadSetName);
+                    break;
+                }
+                case DataStreamType::CallStack:
+                {
+                    strm.db.handleDataPacketCallStack(reinterpret_cast<const DataPacketCallStack*>(&pDst[i]));
+                    i += sizeof(DataPacketCallStack);
+                    break;
+                }
+                case DataStreamType::LockSetName:
+                {
+                    strm.db.handleDataPacketLockSetName(reinterpret_cast<const DataPacketLockSetName*>(&pDst[i]));
+                    i += sizeof(DataPacketLockSetName);
+                    break;
+                }
+                case DataStreamType::LockTry:
+                {
+                    strm.db.handleDataPacketLockTry(reinterpret_cast<const DataPacketLockTry*>(&pDst[i]));
+                    i += sizeof(DataPacketLockTry);
+                    break;
+                }
+                case DataStreamType::LockState:
+                {
+                    strm.db.handleDataPacketLockState(reinterpret_cast<const DataPacketLockState*>(&pDst[i]));
+                    i += sizeof(DataPacketLockState);
+                    break;
+                }
+                case DataStreamType::LockCount:
+                {
+                    strm.db.handleDataPacketLockCount(reinterpret_cast<const DataPacketLockCount*>(&pDst[i]));
+                    i += sizeof(DataPacketLockCount);
+                    break;
+                }
+                case DataStreamType::MemAlloc:
+                {
+                    strm.db.handleDataPacketMemAlloc(reinterpret_cast<const DataPacketMemAlloc*>(&pDst[i]));
+                    i += sizeof(DataPacketMemAlloc);
+                    break;
+                }
+                case DataStreamType::MemFree:
+                {
+                    strm.db.handleDataPacketMemFree(reinterpret_cast<const DataPacketMemFree*>(&pDst[i]));
+                    i += sizeof(DataPacketMemFree);
+                    break;
+                }
+
+                default:
+                    X_NO_SWITCH_DEFAULT_ASSERT;
+            }
+        }
+
+        trans.commit();
+
+        return true;
+    }
+
+
+    bool getMetaStr(sql::SqlLiteDb& db, const char* pName, core::string& strOut)
+    {
+        sql::SqlLiteQuery qry(db, "SELECT value FROM meta WHERE name = ?");
+        qry.bind(1, pName);
+
+        auto it = qry.begin();
+        if (it == qry.end()) {
+            X_ERROR("TelemSrv", "Failed to load meta entry \"%s\"", pName);
+            return false;
+        }
+
+        auto row = *it;
+
+        auto* pStr = row.get<const char*>(0);
+        auto strLen = row.columnBytes(0);
+
+        strOut.assign(pStr, strLen);
+        return true;
+    }
+
+    bool getMetaUInt64(sql::SqlLiteDb& db, const char* pName, uint64_t& valOut)
+    {
+        sql::SqlLiteQuery qry(db, "SELECT value FROM meta WHERE name = ?");
+        qry.bind(1, pName);
+
+        auto it = qry.begin();
+        if (it == qry.end()) {
+            X_ERROR("TelemSrv", "Failed to load meta entry \"%s\"", pName);
+            return false;
+        }
+
+        auto row = *it;
+
+        valOut = static_cast<uint64_t>(row.get<int64_t>(0));
+        return true;
+    }
+
+} // namespace
+
+
+
+bool TraceDB::createDB(core::Path<char>& path)
+{
+    if (!con.connect(path.c_str(), sql::OpenFlag::CREATE | sql::OpenFlag::WRITE)) {
+        return false;
+    }
+
+    if (!con.execute(R"(
                 PRAGMA synchronous = OFF;
                 PRAGMA page_size = 4096;
                 PRAGMA cache_size = -4000;
                 PRAGMA journal_mode = MEMORY;
                 PRAGMA foreign_keys = ON;
             )")) {
-            return false;
-        }
-
-        // create all the tables.
-        if (!createTables()) {
-            return false;
-        }
-
-
-        cmdInsertZone.prepare("INSERT INTO zones (threadID, start, end, sourceInfoIdx, stackDepth) VALUES(?,?,?,?,?)");
-        cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
-        cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, time, timeMicro) VALUES(?,?,?)");
-        cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
-        cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, start, end, descriptionStrId) VALUES(?,?,?,?,?)");
-        cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, time, state) VALUES(?,?,?,?)");
-        cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, time, nameStrId) VALUES(?,?,?)");
-        cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, time, nameStrId) VALUES(?,?,?)");
-        cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)");
-        cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, time, operation) VALUES(?,?,?,?,?)");
-        return true;
+        return false;
     }
 
-    bool TraceDB::createTables(void)
-    {
-        if (!con.execute(R"(
+    // create all the tables.
+    if (!createTables()) {
+        return false;
+    }
+
+
+    cmdInsertZone.prepare("INSERT INTO zones (threadID, start, end, sourceInfoIdx, stackDepth) VALUES(?,?,?,?,?)");
+    cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
+    cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, time, timeMicro) VALUES(?,?,?)");
+    cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
+    cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, start, end, descriptionStrId) VALUES(?,?,?,?,?)");
+    cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, time, state) VALUES(?,?,?,?)");
+    cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, time, nameStrId) VALUES(?,?,?)");
+    cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, time, nameStrId) VALUES(?,?,?)");
+    cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)");
+    cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, time, operation) VALUES(?,?,?,?,?)");
+    return true;
+}
+
+bool TraceDB::createTables(void)
+{
+    if (!con.execute(R"(
 
 CREATE TABLE IF NOT EXISTS "meta" (
 	"Id"	        INTEGER,
@@ -306,631 +413,412 @@ CREATE TABLE "memory" (
 
 
             )")) {
-            X_ERROR("TelemSrv", "Failed to create tables");
-            return false;
-        }
-
-        return true;
+        X_ERROR("TelemSrv", "Failed to create tables");
+        return false;
     }
 
-    template<typename T>
-    bool TraceDB::setMeta(const char* pName, T value)
-    {
-        auto& cmd = cmdInsertMeta;
-        cmd.reset();
-        cmd.bind(1, pName);
-        cmd.bind(2, value);
+    return true;
+}
 
-        sql::Result::Enum res = cmd.execute();
-        if (res != sql::Result::OK) {
-            return false;
-        }
+template<typename T>
+bool TraceDB::setMeta(const char* pName, T value)
+{
+    auto& cmd = cmdInsertMeta;
+    cmd.reset();
+    cmd.bind(1, pName);
+    cmd.bind(2, value);
 
-        return true;
+    sql::Result::Enum res = cmd.execute();
+    if (res != sql::Result::OK) {
+        return false;
     }
 
-    void TraceDB::insertLockIfMissing(uint64_t lockHandle)
-    {
-        // look up the lock.
-        if (std::binary_search(lockSet.begin(), lockSet.end(), lockHandle)) {
-            return;
-        }
+    return true;
+}
 
-        lockSet.push_back(lockHandle);
-        std::sort(lockSet.begin(), lockSet.end());
-
-        auto& cmd = cmdInsertLock;
-        cmd.bind(1, static_cast<int64_t>(lockHandle));
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
-        }
-
-        cmd.reset();
+void TraceDB::insertLockIfMissing(uint64_t lockHandle)
+{
+    // look up the lock.
+    if (std::binary_search(lockSet.begin(), lockSet.end(), lockHandle)) {
+        return;
     }
 
-    void TraceDB::handleDataPacketTickInfo(const DataPacketTickInfo* pData)
-    {
-        auto& cmd = cmdInsertTickInfo;
-        cmd.bind(1, static_cast<int32_t>(pData->threadID));
-        cmd.bind(2, static_cast<int64_t>(pData->ticks));
-        cmd.bind(3, static_cast<int64_t>(pData->timeMicro));
+    lockSet.push_back(lockHandle);
+    std::sort(lockSet.begin(), lockSet.end());
 
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
-        }
-
-        cmd.reset();
+    auto& cmd = cmdInsertLock;
+    cmd.bind(1, static_cast<int64_t>(lockHandle));
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
     }
 
-    void TraceDB::handleDataPacketStringTableAdd(const DataPacketStringTableAdd* pData)
-    {
-        const char* pString = reinterpret_cast<const char*>(pData + 1);
+    cmd.reset();
+}
 
-        auto& cmd = cmdInsertString;
-        cmd.bind(1, static_cast<int32_t>(pData->id));
-        cmd.bind(2, pString, static_cast<size_t>(pData->length));
+void TraceDB::handleDataPacketTickInfo(const DataPacketTickInfo* pData)
+{
+    auto& cmd = cmdInsertTickInfo;
+    cmd.bind(1, static_cast<int32_t>(pData->threadID));
+    cmd.bind(2, static_cast<int64_t>(pData->ticks));
+    cmd.bind(3, static_cast<int64_t>(pData->timeMicro));
 
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
-        }
-
-        cmd.reset();
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
     }
 
-    void TraceDB::handleDataPacketZone(const DataPacketZone* pData)
-    {
-        PacketSourceInfo info;
-        info.raw.lineNo = pData->lineNo;
-        info.raw.idxFunction = pData->strIdxFunction.index;
-        info.raw.idxFile = pData->strIdxFile.index;
+    cmd.reset();
+}
 
-        uint64_t sourceInfo = info.packed;
+void TraceDB::handleDataPacketStringTableAdd(const DataPacketStringTableAdd* pData)
+{
+    const char* pString = reinterpret_cast<const char*>(pData + 1);
 
-        auto& cmd = cmdInsertZone;
-        cmd.bind(1, static_cast<int32_t>(pData->threadID));
-        cmd.bind(2, static_cast<int64_t>(pData->start));
-        cmd.bind(3, static_cast<int64_t>(pData->end));
-        cmd.bind(4, static_cast<int64_t>(sourceInfo));
-        cmd.bind(5, pData->stackDepth);
+    auto& cmd = cmdInsertString;
+    cmd.bind(1, static_cast<int32_t>(pData->id));
+    cmd.bind(2, pString, static_cast<size_t>(pData->length));
 
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
-        }
-
-        cmd.reset();
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
     }
 
-    void TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
-    {
-        insertLockIfMissing(pData->lockHandle);
+    cmd.reset();
+}
 
-        auto& cmd = cmdInsertLockTry;
-        cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
-        cmd.bind(2, static_cast<int32_t>(pData->threadID));
-        cmd.bind(3, static_cast<int64_t>(pData->start));
-        cmd.bind(4, static_cast<int64_t>(pData->end));
-        cmd.bind(5, static_cast<int32_t>(pData->strIdxDescrption.index));
+void TraceDB::handleDataPacketZone(const DataPacketZone* pData)
+{
+    PacketSourceInfo info;
+    info.raw.lineNo = pData->lineNo;
+    info.raw.idxFunction = pData->strIdxFunction.index;
+    info.raw.idxFile = pData->strIdxFile.index;
 
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
-        }
+    uint64_t sourceInfo = info.packed;
 
-        cmd.reset();
+    auto& cmd = cmdInsertZone;
+    cmd.bind(1, static_cast<int32_t>(pData->threadID));
+    cmd.bind(2, static_cast<int64_t>(pData->start));
+    cmd.bind(3, static_cast<int64_t>(pData->end));
+    cmd.bind(4, static_cast<int64_t>(sourceInfo));
+    cmd.bind(5, pData->stackDepth);
+
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
     }
 
-    void TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
-    {
-        insertLockIfMissing(pData->lockHandle);
+    cmd.reset();
+}
 
-        auto& cmd = cmdInsertLockState;
-        cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
-        cmd.bind(2, static_cast<int32_t>(pData->threadID));
-        cmd.bind(3, static_cast<int64_t>(pData->time));
-        cmd.bind(4, static_cast<int64_t>(pData->state));
+void TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
+{
+    insertLockIfMissing(pData->lockHandle);
 
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
-        }
+    auto& cmd = cmdInsertLockTry;
+    cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
+    cmd.bind(2, static_cast<int32_t>(pData->threadID));
+    cmd.bind(3, static_cast<int64_t>(pData->start));
+    cmd.bind(4, static_cast<int64_t>(pData->end));
+    cmd.bind(5, static_cast<int32_t>(pData->strIdxDescrption.index));
 
-        cmd.reset();
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
     }
 
-    void TraceDB::handleDataPacketLockSetName(const DataPacketLockSetName* pData)
-    {
-        insertLockIfMissing(pData->lockHandle);
+    cmd.reset();
+}
 
-        auto& cmd = cmdInsertLockName;
-        cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
-        cmd.bind(2, static_cast<int64_t>(pData->time));
-        cmd.bind(3, static_cast<int32_t>(pData->strIdxName.index));
+void TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
+{
+    insertLockIfMissing(pData->lockHandle);
 
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
-        }
+    auto& cmd = cmdInsertLockState;
+    cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
+    cmd.bind(2, static_cast<int32_t>(pData->threadID));
+    cmd.bind(3, static_cast<int64_t>(pData->time));
+    cmd.bind(4, static_cast<int64_t>(pData->state));
 
-        cmd.reset();
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
     }
 
-    void TraceDB::handleDataPacketThreadSetName(const DataPacketThreadSetName* pData)
-    {
-        auto& cmd = cmdInsertThreadName;
-        cmd.bind(1, static_cast<int32_t>(pData->threadID));
-        cmd.bind(2, static_cast<int64_t>(pData->time));
-        cmd.bind(3, static_cast<int32_t>(pData->strIdxName.index));
+    cmd.reset();
+}
 
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
-        }
+void TraceDB::handleDataPacketLockSetName(const DataPacketLockSetName* pData)
+{
+    insertLockIfMissing(pData->lockHandle);
 
-        cmd.reset();
+    auto& cmd = cmdInsertLockName;
+    cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
+    cmd.bind(2, static_cast<int64_t>(pData->time));
+    cmd.bind(3, static_cast<int32_t>(pData->strIdxName.index));
+
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
     }
 
-    void TraceDB::handleDataPacketLockCount(const DataPacketLockCount* pData)
-    {
-        X_UNUSED( pData);
-        // not sure how best to store this just yet.
+    cmd.reset();
+}
+
+void TraceDB::handleDataPacketThreadSetName(const DataPacketThreadSetName* pData)
+{
+    auto& cmd = cmdInsertThreadName;
+    cmd.bind(1, static_cast<int32_t>(pData->threadID));
+    cmd.bind(2, static_cast<int64_t>(pData->time));
+    cmd.bind(3, static_cast<int32_t>(pData->strIdxName.index));
+
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
     }
 
-    void TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
-    {
-        auto& cmd = cmdInsertMemory;
-        cmd.bind(1, static_cast<int32_t>(pData->ptr));
-        cmd.bind(2, static_cast<int32_t>(pData->size));
-        cmd.bind(3, static_cast<int32_t>(pData->threadID));
-        cmd.bind(4, static_cast<int64_t>(pData->time));
-        cmd.bind(5, static_cast<int32_t>(MemOp::Alloc));
+    cmd.reset();
+}
 
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
-        }
+void TraceDB::handleDataPacketLockCount(const DataPacketLockCount* pData)
+{
+    X_UNUSED(pData);
+    // not sure how best to store this just yet.
+}
 
-        cmd.reset();
+void TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
+{
+    auto& cmd = cmdInsertMemory;
+    cmd.bind(1, static_cast<int32_t>(pData->ptr));
+    cmd.bind(2, static_cast<int32_t>(pData->size));
+    cmd.bind(3, static_cast<int32_t>(pData->threadID));
+    cmd.bind(4, static_cast<int64_t>(pData->time));
+    cmd.bind(5, static_cast<int32_t>(MemOp::Alloc));
+
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
     }
 
-    void TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
-    {
-        auto& cmd = cmdInsertMemory;
-        cmd.bind(1, static_cast<int32_t>(pData->ptr));
-        cmd.bind(2, -1);
-        cmd.bind(3, static_cast<int32_t>(pData->threadID));
-        cmd.bind(4, static_cast<int64_t>(pData->time));
-        cmd.bind(5, static_cast<int32_t>(MemOp::Free));
+    cmd.reset();
+}
 
-        auto res = cmd.execute();
-        if (res != sql::Result::OK) {
-            X_ERROR("SqlDb", "insert err(%i): \"%s\"", res, con.errorMsg());
-        }
+void TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
+{
+    auto& cmd = cmdInsertMemory;
+    cmd.bind(1, static_cast<int32_t>(pData->ptr));
+    cmd.bind(2, -1);
+    cmd.bind(3, static_cast<int32_t>(pData->threadID));
+    cmd.bind(4, static_cast<int64_t>(pData->time));
+    cmd.bind(5, static_cast<int32_t>(MemOp::Free));
 
-        cmd.reset();
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
     }
 
-    void TraceDB::handleDataPacketCallStack(const DataPacketCallStack* pData)
-    {
-        X_UNUSED(pData);
+    cmd.reset();
+}
 
-        // TODO: ...
+void TraceDB::handleDataPacketCallStack(const DataPacketCallStack* pData)
+{
+    X_UNUSED(pData);
+
+    // TODO: ...
+}
+
+
+bool TraceDB::getTicks(core::Array<DataPacketTickInfo>& ticks, int32_t startIdx, int32_t num)
+{
+    sql::SqlLiteQuery qry(con, "SELECT * FROM ticks LIMIT ? OFFSET ?");
+    qry.bind(1, num);
+    qry.bind(2, startIdx);
+
+    auto it = qry.begin();
+    if (it != qry.end()) {
+        auto row = *it;
+
+        DataPacketTickInfo tick;
+        auto id = row.get<int32_t>(0);
+        X_UNUSED(id);
+        tick.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
+        tick.ticks = static_cast<uint64_t>(row.get<int32_t>(2));
+        tick.timeMicro = static_cast<uint64_t>(row.get<int32_t>(3));
+
+        ticks.append(tick);
     }
 
+    return true;
+}
 
-    struct Client
-    {
-        Client() {
-            connected = false;
-            core::zero_object(clientVer);
-            cmpBufferOffset = 0;
-            pFile = nullptr;
-            socket = INV_SOCKET;
+bool TraceDB::getZones(core::Array<DataPacketZone>& zones, uint64_t tickBegin, uint64_t tickEnd)
+{
+    sql::SqlLiteQuery qry(con, "SELECT threadId, start, end, sourceInfoIdx, stackDepth FROM zones WHERE start >= ? AND start < ?");
+    qry.bind(1, static_cast<int64_t>(tickBegin));
+    qry.bind(2, static_cast<int64_t>(tickEnd));
 
-#if X_DEBUG
-            core::zero_object(appName);
-            core::zero_object(buildInfo);
-            core::zero_object(cmdLine);
-            core::zero_object(srcRingBuf);
-#endif // X_DEBUG
-        }
+    // how to send this back?
+    // hot like a potato
+    // do want to make new types for query api?
+    // not really but then we have this goaty prefix on all the types
+    // maybe it would be better to split it out :(
 
-        bool connected;
-        VersionInfo clientVer;
+    auto it = qry.begin();
+    if (it != qry.end()) {
+        auto row = *it;
 
-        // TODO: not need nullterm.
-        char appName[MAX_STRING_LEN + 1];
-        char buildInfo[MAX_STRING_LEN + 1];
-        char cmdLine[MAX_CMDLINE_LEN + 1];
-        uint64_t ticksPerMicro;
+        PacketSourceInfo srcInfo;
 
-        platform::SOCKET socket;
-        
-        TraceDB db;
+        DataPacketZone zone;
+        zone.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
+        zone.start = static_cast<uint64_t>(row.get<int64_t>(1));
+        zone.end = static_cast<uint64_t>(row.get<int64_t>(2));
+        srcInfo.packed = row.get<int32_t>(3);
+        zone.stackDepth = static_cast<uint8_t>(row.get<int32_t>(4));
 
-        int32_t cmpBufferOffset;
-        int8_t srcRingBuf[COMPRESSION_RING_BUFFER_SIZE];
+        zone.lineNo = srcInfo.raw.lineNo;
+        zone.strIdxFile.index = srcInfo.raw.idxFile;
+        zone.strIdxZone.index = srcInfo.raw.idxFunction;
 
-        core::Compression::LZ4StreamDecode lz4Stream;
-
-        FILE* pFile;
-    };
-
-    bool readPacket(Client& client, char* pBuffer, int& bufLengthInOut)
-    {
-        // this should return complete packets or error.
-        int bytesRead = 0;
-        int bufLength = sizeof(PacketBase);
-
-        while (1) {
-            int maxReadSize = bufLength - bytesRead;
-            int res = platform::recv(client.socket, &pBuffer[bytesRead], maxReadSize, 0);
-
-            if (res == 0) {
-                X_ERROR("TelemSrv", "Connection closing...");
-                return false;
-            }
-            else if (res < 0) {
-                X_ERROR("TelemSrv", "recv failed with error: %d", platform::WSAGetLastError());
-                return false;
-            }
-
-            bytesRead += res;
-
-            // X_LOG0("TelemSrv", "got: %d bytes", res);
-
-            if (bytesRead == sizeof(PacketBase))
-            {
-                auto* pHdr = reinterpret_cast<const PacketBase*>(pBuffer);
-                if (pHdr->dataSize == 0) {
-                    X_ERROR("TelemSrv", "Client sent packet with length zero...");
-                    return false;
-                }
-
-                if (pHdr->dataSize > bufLengthInOut) {
-                    X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<tt_int32>(pHdr->dataSize));
-                    return false;
-                }
-
-                bufLength = pHdr->dataSize;
-            }
-
-            if (bytesRead == bufLength) {
-                bufLengthInOut = bytesRead;
-                return true;
-            }
-            else if (bytesRead > bufLength) {
-                X_ERROR("TelemSrv", "Overread packet bytesRead: %d recvbuflen: %d", bytesRead, bufLength);
-                return false;
-            }
-        }
+        zones.append(zone);
     }
 
-    void sendPacketToClient(Client& client, const void* pData, size_t len)
-    {
-        // send some data...
-        int res = platform::send(client.socket, reinterpret_cast<const char*>(pData), static_cast<int>(len), 0);
-        if (res == SOCKET_ERROR) {
-            X_LOG0("TelemSrv", "send failed with error: %d", platform::WSAGetLastError());
-            return;
-        }
-    }
-
-    void sendConnectionRejected(Client& client, const char* pReason)
-    {
-        X_LOG0("TelemSrv", "ConnectionRejected:");
-
-        size_t msgLen = strlen(pReason);
-        size_t datalen = sizeof(ConnectionRequestRejectedHdr) + msgLen;
-
-        if (msgLen > MAX_STRING_LEN) {
-            msgLen = MAX_STRING_LEN;
-        }
-
-        char buf[sizeof(ConnectionRequestRejectedHdr) + MAX_STRING_LEN];
-
-        auto* pCr = reinterpret_cast<ConnectionRequestRejectedHdr*>(buf);
-        pCr->dataSize = static_cast<tt_uint16>(datalen);
-        pCr->type = PacketType::ConnectionRequestRejected;
-
-        memcpy(pCr + 1, pReason, msgLen);
-        sendPacketToClient(client, buf, datalen);
-    }
-
-    bool handleConnectionRequest(Client& client, uint8_t* pData)
-    {
-        auto* pConReq = reinterpret_cast<const ConnectionRequestHdr*>(pData);
-        if (pConReq->type != PacketType::ConnectionRequest) {
-            X_ASSERT_UNREACHABLE();
-        }
-
-        VersionInfo serverVer;
-        serverVer.major = TELEM_VERSION_MAJOR;
-        serverVer.minor = TELEM_VERSION_MINOR;
-        serverVer.patch = TELEM_VERSION_PATCH;
-        serverVer.build = TELEM_VERSION_BUILD;
-
-        if (pConReq->clientVer != serverVer) {
-            sendConnectionRejected(client, "Client server version incompatible");
-            return false;
-        }
-
-        client.connected = true;
-        client.clientVer = pConReq->clientVer;
-
-        // now need to read the strings.
-        core::zero_object(client.appName);
-        core::zero_object(client.buildInfo);
-        core::zero_object(client.cmdLine);
-
-        auto* pStrData = reinterpret_cast<const uint8_t*>(pConReq + 1);
-        memcpy(client.appName, pStrData, pConReq->appNameLen);
-        pStrData += pConReq->appNameLen;
-        memcpy(client.buildInfo, pStrData, pConReq->buildInfoLen);
-        pStrData += pConReq->buildInfoLen;
-        memcpy(client.cmdLine, pStrData, pConReq->cmdLineLen);
-
-        client.ticksPerMicro = pConReq->ticksPerMicro;
-
-        // make a db for the client.
-        core::Path<char> workingDir;
-        if (!gEnv->pFileSys->getWorkingDirectory(workingDir)) {
-            return false;
-        }
-
-        core::DateTimeStamp date = core::DateTimeStamp::getSystemDateTime();
-        core::DateTimeStamp::Description dateStr;
-
-        core::Path<char> dbPath(workingDir);
-        // want a folder for each app.
-        dbPath.ensureSlash();
-        dbPath.append("traces");
-        dbPath.ensureSlash();
-        dbPath.append(client.appName);
-        dbPath.ensureSlash();
-        // want like hostname or everything in on folder?
-        dbPath.append("telem_");
-        dbPath.append(date.toString(dateStr));
-        dbPath.setExtension("db");
-
-        if (!gEnv->pFileSys->directoryExists(dbPath, core::VirtualDirectory::BASE)) {
-            if (!gEnv->pFileSys->createDirectoryTree(dbPath, core::VirtualDirectory::BASE)) {
-                return false;
-            }
-        }
-
-        if (!client.db.createDB(dbPath)) {
-            return false;
-        }
-
-        client.db.setMeta("appName", client.appName);
-        client.db.setMeta("buildInfo", client.buildInfo);
-        client.db.setMeta("cmdLine", client.cmdLine);
-        client.db.setMeta<int64_t>("tickPerMicro", static_cast<int64_t>(client.ticksPerMicro));
-
-        // Meow...
-        X_LOG0("TelemSrv", "ConnectionAccepted:");
-        X_LOG0("TelemSrv", "> AppName: %s", client.appName);
-        X_LOG0("TelemSrv", "> BuildInfo: %s", client.buildInfo);
-        X_LOG0("TelemSrv", "> CmdLine: %s", client.cmdLine);
-        X_LOG0("TelemSrv", "> DB: %s", dbPath.c_str());
-
-        // send a packet back!
-        ConnectionRequestAcceptedHdr cra;
-        core::zero_object(cra);
-        cra.dataSize = sizeof(cra);
-        cra.type = PacketType::ConnectionRequestAccepted;
-        cra.serverVer = serverVer;
-
-        sendPacketToClient(client, &cra, sizeof(cra));
-        return true;
-    }
+    return true;
+}
 
 
-    bool handleDataSream(Client& client, uint8_t* pData)
-    {
-        auto* pHdr = reinterpret_cast<const DataStreamHdr*>(pData);
-        if (pHdr->type != PacketType::DataStream) {
-            X_ASSERT_UNREACHABLE();
-        }
+// --------------------------------
 
-        // the data is compressed.
-        // decompress it..
-        int32_t cmpLen = pHdr->dataSize - sizeof(DataStreamHdr);
-        int32_t origLen = pHdr->origSize - sizeof(DataStreamHdr);
-        X_UNUSED(cmpLen);
-
-        if (cmpLen == origLen) {
-            // uncompressed packets.
-            X_ASSERT_NOT_IMPLEMENTED();
-        }
-
-        auto* pDst = &client.srcRingBuf[client.cmpBufferOffset];
-
-        auto cmpLenOut = client.lz4Stream.decompressContinue(pHdr + 1, pDst, origLen);
-        if (cmpLenOut != cmpLen) {
-            // TODO: ..
-            return false;
-        }
-
-        client.cmpBufferOffset += origLen;
-
-        if (client.cmpBufferOffset >= (COMPRESSION_RING_BUFFER_SIZE - COMPRESSION_MAX_INPUT_SIZE)) {
-            client.cmpBufferOffset = 0;
-        }
-
-        if (client.pFile) {
-        //    fwrite(pDst, origLen, 1, client.pFile);
-        }
-
-        sql::SqlLiteTransaction trans(client.db.con);
-
-        // process this data?
-        for (int32 i = 0; i < origLen; )
-        {
-            // packet me baby!
-            auto* pPacket = reinterpret_cast<const DataPacketBase*>(&pDst[i]);
-
-            switch (pPacket->type)
-            {
-                case DataStreamType::StringTableAdd:
-                {
-                    auto* pStr = reinterpret_cast<const DataPacketStringTableAdd*>(&pDst[i]);
-                    client.db.handleDataPacketStringTableAdd(pStr);
-                    i += sizeof(DataPacketStringTableAdd);
-                    i += pStr->length;
-                    break;
-                }
-                case DataStreamType::Zone:
-                {
-                    client.db.handleDataPacketZone(reinterpret_cast<const DataPacketZone*>(&pDst[i]));
-                    i += sizeof(DataPacketZone);
-                    break;
-                }
-                case DataStreamType::TickInfo:
-                {
-                    client.db.handleDataPacketTickInfo(reinterpret_cast<const DataPacketTickInfo*>(&pDst[i]));
-                    i += sizeof(DataPacketTickInfo);
-                    break;
-                }
-                case DataStreamType::ThreadSetName:
-                {
-                    client.db.handleDataPacketThreadSetName(reinterpret_cast<const DataPacketThreadSetName*>(&pDst[i]));
-                    i += sizeof(DataPacketThreadSetName);
-                    break;
-                }
-                case DataStreamType::CallStack:
-                {
-                    client.db.handleDataPacketCallStack(reinterpret_cast<const DataPacketCallStack*>(&pDst[i]));
-                    i += sizeof(DataPacketCallStack);
-                    break;
-                }
-                case DataStreamType::LockSetName:
-                {
-                    client.db.handleDataPacketLockSetName(reinterpret_cast<const DataPacketLockSetName*>(&pDst[i]));
-                    i += sizeof(DataPacketLockSetName);
-                    break;
-                }
-                case DataStreamType::LockTry:
-                {
-                    client.db.handleDataPacketLockTry(reinterpret_cast<const DataPacketLockTry*>(&pDst[i]));
-                    i += sizeof(DataPacketLockTry);
-                    break;
-                }
-                case DataStreamType::LockState:
-                {
-                    client.db.handleDataPacketLockState(reinterpret_cast<const DataPacketLockState*>(&pDst[i]));
-                    i += sizeof(DataPacketLockState);
-                    break;
-                }
-                case DataStreamType::LockCount:
-                {
-                    client.db.handleDataPacketLockCount(reinterpret_cast<const DataPacketLockCount*>(&pDst[i]));
-                    i += sizeof(DataPacketLockCount);
-                    break;
-                }
-                case DataStreamType::MemAlloc:
-                {
-                    client.db.handleDataPacketMemAlloc(reinterpret_cast<const DataPacketMemAlloc*>(&pDst[i]));
-                    i += sizeof(DataPacketMemAlloc);
-                    break;
-                }
-                case DataStreamType::MemFree:
-                {
-                    client.db.handleDataPacketMemFree(reinterpret_cast<const DataPacketMemFree*>(&pDst[i]));
-                    i += sizeof(DataPacketMemFree);
-                    break;
-                }
-
-                default:
-                    X_NO_SWITCH_DEFAULT_ASSERT;
-            }
-        }
-
-        trans.commit();
-
-        return true;
-    }
-
-    bool processPacket(Client& client, uint8_t* pData)
-    {
-        auto* pPacketHdr = reinterpret_cast<const PacketBase*>(pData);
-
-        switch (pPacketHdr->type)
-        {
-            case PacketType::ConnectionRequest:
-                return handleConnectionRequest(client, pData);
-                break;
-            case PacketType::DataStream:
-                return handleDataSream(client, pData);
-                break;
-            default:
-                X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
-                return false;
-        }
-    }
-
-    void handleClient(Client& client)
-    {
-        char recvbuf[MAX_PACKET_SIZE];
-
-        while(1)
-        {
-            int recvbuflen = sizeof(recvbuf);
-            if (!readPacket(client, recvbuf, recvbuflen)) {
-                X_LOG0("TelemSrv", "Error reading packet");
-                return;
-            }
-
-         //   X_LOG0("TelemSrv", "Bytes received: %" PRIi32, recvbuflen);
-
-            if (client.pFile) {
-            //    fwrite(recvbuf, recvbuflen, 1, client.pFile);
-            }
-
-            if (!processPacket(client, reinterpret_cast<uint8_t*>(recvbuf))) {
-                X_LOG0("TelemSrv", "Failed to process packet");
-                return;
-            }
-        }
-    }
-
-
-} // namespace
-
-
-
-X_NAMESPACE_BEGIN(telemetry)
+core::UniquePointer<ITelemServer> createServer(core::MemoryArenaBase* arena)
+{
+    return core::UniquePointer<ITelemServer>(core::makeUnique<Server>(arena, arena));
+}
 
 Server::Server(core::MemoryArenaBase* arena) :
-    arena_(arena)
+    arena_(arena),
+    apps_(arena)
 {
-
+    // TODO: better place?
+    if (!winSockInit()) {
+     
+    }
 }
 
 Server::~Server()
 {
-
+    winSockShutDown();
 }
 
-bool Server::run()
+bool Server::loadApps()
 {
-    if (!winSockInit()) {
+    //core::Path<wchar_t> workingDir;
+    //if (!gEnv->pFileSys->getWorkingDirectory(workingDir)) {
+    //    return false;
+    //}
+
+    // iterator folders for apps.
+    auto* pFileSys = gEnv->pFileSys;
+
+    core::Path<> dirPath("traces");
+
+    core::Path<> dirSearch(dirPath);
+    dirSearch.ensureSlash();
+    dirSearch.append("*");
+
+    core::IFileSys::FindData fd;
+
+    auto findPair = pFileSys->findFirst(dirSearch, fd);
+    if (findPair.handle == core::IFileSys::INVALID_FIND_HANDLE) {
+        if (findPair.valid) {
+            X_WARNING("TelemSrv", "no apps found in: \"%s\"", dirPath.c_str());
+            return true;
+        }
+
+        X_ERROR("TelemSrv", "Failed to iterate dir: \"%s\"", dirPath.c_str());
         return false;
     }
 
-    // have the server listen...
-    if (!listen()) {
-        return false;
-    }
+    do
+    {
+        if (fd.attrib.IsSet(core::FindData::AttrFlag::DIRECTORY)) {
+            core::Path<> subDir(dirPath);
+            subDir /= fd.name;
 
-    winSockShutDown();
+            // it's a app.
+            loadAppTraces(fd.name, subDir);
+
+            continue;
+        }
+
+    } while (pFileSys->findnext(findPair.handle, fd));
+
+    pFileSys->findClose(findPair.handle);
+
     return true;
 }
 
+bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
+{
+    App app(arena_);
+    app.appName.set(appName.begin(), appName.end());
+
+    core::Path<> dirSearch(dir);
+    dirSearch.ensureSlash();
+    dirSearch.append("*.db");
+
+    auto* pFileSys = gEnv->pFileSys;
+    core::IFileSys::FindData fd;
+
+    auto findPair = pFileSys->findFirst(dirSearch, fd);
+    if (findPair.handle == core::IFileSys::INVALID_FIND_HANDLE) {
+        if (findPair.valid) {
+            X_WARNING("TelemSrv", "no traces found for app: \"%s\"", appName.c_str());
+            return true;
+        }
+
+        X_ERROR("TelemSrv", "Failed to iterate dir: \"%s\"", dir.c_str());
+        return false;
+    }
+
+    do
+    {
+        if (fd.attrib.IsSet(core::FindData::AttrFlag::DIRECTORY)) {
+            continue;
+        }
+
+        Trace trace;
+        trace.dbPath = dir / fd.name;
+
+        // load info.
+        // dunno how slow loading all the sql dbs will be probs not that slow.
+        // will see..
+        sql::SqlLiteDb db;
+
+        if (!db.connect(trace.dbPath.c_str(), sql::OpenFlags())) {
+            X_ERROR("TelemSrv", "Failed to openDB: \"%s\"", trace.dbPath.c_str());
+            continue;
+        }
+
+        // load meta?
+        bool loaded = true;
+
+        loaded &= getMetaStr(db, "buildInfo", trace.buildInfo);
+        loaded &= getMetaStr(db, "cmdLine", trace.cmdLine);
+        loaded &= getMetaUInt64(db, "tickPerMicro", trace.ticksPerMicro);
+
+        if (!loaded) {
+            X_ERROR("TelemSrv", "Failed to load meta for: \"%s\"", trace.dbPath.c_str());
+            continue;
+        }
+
+        app.traces.append(trace);
+
+    } while (pFileSys->findnext(findPair.handle, fd));
+
+    pFileSys->findClose(findPair.handle);
+
+    return true;
+}
 
 bool Server::listen(void)
 {
@@ -1001,15 +889,10 @@ bool Server::listen(void)
 
         X_LOG0("TelemSrv", "Client connected");
 
-        Client client;
+        ClientConnection client;
         client.socket = clientSocket;
-     //   client.pFile = fopen("stream.dump", "wb");
-
+ 
         handleClient(client);
-
-        if (client.pFile) {
-            fclose(client.pFile);
-        }
 
         platform::closesocket(clientSocket);
     }
@@ -1018,7 +901,203 @@ bool Server::listen(void)
     platform::closesocket(listenSocket);
 
     return true;
+}
 
+bool Server::processPacket(ClientConnection& client, uint8_t* pData)
+{
+    auto* pPacketHdr = reinterpret_cast<const PacketBase*>(pData);
+
+    switch (pPacketHdr->type)
+    {
+        case PacketType::ConnectionRequest:
+            return handleConnectionRequest(client, pData);
+            break;
+        case PacketType::ConnectionRequestViewer:
+            return handleConnectionRequestViewer(client, pData);
+            break;
+        case PacketType::DataStream:
+            return handleDataSream(client, pData);
+            break;
+        default:
+            X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
+            return false;
+    }
+}
+
+void Server::handleClient(ClientConnection& client)
+{
+    char recvbuf[MAX_PACKET_SIZE];
+
+    while (1)
+    {
+        int recvbuflen = sizeof(recvbuf);
+        if (!readPacket(client, recvbuf, recvbuflen)) {
+            X_LOG0("TelemSrv", "Error reading packet");
+            return;
+        }
+
+        //   X_LOG0("TelemSrv", "Bytes received: %" PRIi32, recvbuflen);
+
+        if (!processPacket(client, reinterpret_cast<uint8_t*>(recvbuf))) {
+            X_LOG0("TelemSrv", "Failed to process packet");
+            return;
+        }
+    }
+}
+
+bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
+{
+    auto* pConReq = reinterpret_cast<const ConnectionRequestHdr*>(pData);
+    if (pConReq->type != PacketType::ConnectionRequest) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    VersionInfo serverVer;
+    serverVer.major = TELEM_VERSION_MAJOR;
+    serverVer.minor = TELEM_VERSION_MINOR;
+    serverVer.patch = TELEM_VERSION_PATCH;
+    serverVer.build = TELEM_VERSION_BUILD;
+
+    if (pConReq->clientVer != serverVer) {
+        sendConnectionRejected(client, "Client server version incompatible");
+        return false;
+    }
+
+    client.clientVer = pConReq->clientVer;
+
+    auto* pStrData = reinterpret_cast<const char*>(pConReq + 1);
+
+    // Get the app name and see if we have it already.
+    TelemFixedStr appName;
+    appName.set(pStrData, pStrData + pConReq->appNameLen);
+
+    auto it = std::find_if(apps_.begin(), apps_.end(), [&appName](const App& app) {
+        return app.appName == appName;
+    });
+
+    App* pApp = nullptr;
+    if (it == apps_.end())
+    {
+        apps_.emplace_back(arena_);
+        pApp = &apps_.back();
+    }
+    else
+    {
+        pApp = it;
+    }
+
+    X_ASSERT_NOT_NULL(pApp);
+
+    // Create a new trace 
+    Trace trace;
+    pStrData += pConReq->appNameLen;
+    trace.buildInfo.assign(pStrData, pConReq->buildInfoLen);
+    pStrData += pConReq->buildInfoLen;
+    trace.cmdLine.assign(pStrData, pConReq->cmdLineLen);
+    trace.ticksPerMicro = pConReq->ticksPerMicro;
+
+    core::Path<> workingDir;
+    if (!gEnv->pFileSys->getWorkingDirectory(workingDir)) {
+        return false;
+    }
+
+    core::DateTimeStamp date = core::DateTimeStamp::getSystemDateTime();
+    core::DateTimeStamp::Description dateStr;
+
+    core::Path<> dbPath(workingDir);
+    // want a folder for each app.
+    dbPath.ensureSlash();
+    dbPath.append("traces");
+    dbPath.ensureSlash();
+    dbPath.append(pApp->appName.begin(), pApp->appName.end());
+    dbPath.ensureSlash();
+    // want like hostname or everything in on folder?
+    dbPath.append("telem_");
+    dbPath.append(date.toString(dateStr));
+    dbPath.setExtension("db");
+
+    if (!gEnv->pFileSys->directoryExists(dbPath, core::VirtualDirectory::BASE)) {
+        if (!gEnv->pFileSys->createDirectoryTree(dbPath, core::VirtualDirectory::BASE)) {
+            return false;
+        }
+    }
+
+    trace.dbPath = dbPath;
+    trace.name = dbPath.fileName();
+
+    // open a trace stream for the conneciton.
+    auto& strm = client.traceStrm;
+    if (!strm.db.createDB(dbPath)) {
+        return false;
+    }
+
+    bool setMeta = true;
+
+    VersionInfo::Description verStr;
+    setMeta &= strm.db.setMeta("appName", core::string_view(pApp->appName));
+    setMeta &= strm.db.setMeta("buildInfo", trace.buildInfo);
+    setMeta &= strm.db.setMeta("cmdLine", trace.cmdLine);
+    setMeta &= strm.db.setMeta("date", dateStr);
+    setMeta &= strm.db.setMeta("clientVer", client.clientVer.toString(verStr));
+    setMeta &= strm.db.setMeta("serverVer", serverVer.toString(verStr));
+    setMeta &= strm.db.setMeta<int64_t>("tickPerMicro", static_cast<int64_t>(trace.ticksPerMicro));
+
+    if (!setMeta) {
+        return false;
+    }
+
+    pApp->traces.push_back(trace);
+
+    // Meow...
+    X_LOG0("TelemSrv", "ConnectionAccepted:");
+    X_LOG0("TelemSrv", "> AppName: %s", pApp->appName.c_str());
+    X_LOG0("TelemSrv", "> BuildInfo: %s", trace.buildInfo.c_str());
+    X_LOG0("TelemSrv", "> CmdLine: %s", trace.cmdLine.c_str());
+    X_LOG0("TelemSrv", "> DB: %s", dbPath.c_str());
+
+    // send a packet back!
+    ConnectionRequestAcceptedHdr cra;
+    core::zero_object(cra);
+    cra.dataSize = sizeof(cra);
+    cra.type = PacketType::ConnectionRequestAccepted;
+    cra.serverVer = serverVer;
+
+    sendPacketToClient(client, &cra, sizeof(cra));
+    return true;
+}
+
+bool Server::handleConnectionRequestViewer(ClientConnection& client, uint8_t* pData)
+{
+    auto* pConReq = reinterpret_cast<const ConnectionRequestViewerHdr*>(pData);
+    if (pConReq->type != PacketType::ConnectionRequestViewer) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    VersionInfo serverVer;
+    serverVer.major = TELEM_VERSION_MAJOR;
+    serverVer.minor = TELEM_VERSION_MINOR;
+    serverVer.patch = TELEM_VERSION_PATCH;
+    serverVer.build = TELEM_VERSION_BUILD;
+
+    if (pConReq->viewerVer != serverVer) {
+        sendConnectionRejected(client, "Viewer version incompatible with server");
+        return false;
+    }
+
+    client.clientVer = pConReq->viewerVer;
+
+    // Meow...
+    X_LOG0("TelemSrv", "ConnectionAccepted(Viewer):");
+
+    // send a packet back!
+    ConnectionRequestAcceptedHdr cra;
+    core::zero_object(cra);
+    cra.dataSize = sizeof(cra);
+    cra.type = PacketType::ConnectionRequestAccepted;
+    cra.serverVer = serverVer;
+
+    sendPacketToClient(client, &cra, sizeof(cra));
+    return true;
 }
 
 X_NAMESPACE_END

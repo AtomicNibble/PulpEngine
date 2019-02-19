@@ -60,9 +60,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
 
         // create the server.
-        telemetry::Server srv(&arena);
+        auto srv = telemetry::createServer(&arena);
 
-        if (!srv.run()) {
+        srv->loadApps();
+
+        if (!srv->listen()) {
             return 1;
         }
     }

@@ -4,11 +4,14 @@
 #include "Compiler.h"
 #include "StringTable.h"
 
+#include <cstdio>
+
 struct PacketType
 {
     enum Enum : tt_uint8
     {
         ConnectionRequest,
+        ConnectionRequestViewer,
         ConnectionRequestAccepted,
         ConnectionRequestRejected,
         DataStream,
@@ -19,6 +22,8 @@ struct PacketType
 
 struct VersionInfo
 {
+    typedef char Description[64];
+
     bool operator==(const VersionInfo& oth) const {
         return major == oth.major &&
             minor == oth.minor &&
@@ -28,6 +33,11 @@ struct VersionInfo
 
     bool operator!=(const VersionInfo& oth) const {
         return !(*this == oth);
+    }
+
+    const char* toString(Description& desc) const {
+        sprintf(desc, "%hhu.%hhu.%hhu.%hhu", major, minor, patch, build);
+        return desc;
     }
 
     tt_uint8 major;
@@ -86,6 +96,11 @@ struct ConnectionRequestHdr : public PacketBase
     tt_uint16 buildInfoLen;
     tt_uint16 cmdLineLen;
     tt_uint64 ticksPerMicro;
+};
+
+struct ConnectionRequestViewerHdr : public PacketBase
+{
+    VersionInfo viewerVer;
 };
 
 struct ConnectionRequestAcceptedHdr : public PacketBase
