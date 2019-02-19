@@ -196,6 +196,177 @@ namespace
         ImGui::PopStyleVar();
     }
 
+    struct Server
+    {
+        platform::SOCKET socket;
+    };
+
+    void sendDataToServer(Server& srv, const void* pData, int32_t len)
+    {
+#if X_DEBUG
+        if (len > MAX_PACKET_SIZE) {
+            ::DebugBreak();
+        }
+#endif // X_DEBUG
+
+        // send some data...
+        // TODO: none blocking?
+        int res = platform::send(srv.socket, reinterpret_cast<const char*>(pData), len, 0);
+        if (res == SOCKET_ERROR) {
+            X_ERROR("Telem", "Socket: send failed with error: %d", platform::WSAGetLastError());
+            return;
+        }
+    }
+
+    bool handleConnectionResponse(Server& srv, tt_uint8* pData, tt_size len)
+    {
+        X_UNUSED(srv, len);
+
+        auto* pPacketHdr = reinterpret_cast<const PacketBase*>(pData);
+        switch (pPacketHdr->type)
+        {
+            case PacketType::ConnectionRequestAccepted:
+                // don't care about response currently.
+                return true;
+            case PacketType::ConnectionRequestRejected: {
+                auto* pConRej = reinterpret_cast<const ConnectionRequestRejectedHdr*>(pData);
+                auto* pStrData = reinterpret_cast<const char*>(pConRej + 1);
+                X_ERROR("Telem", "Connection rejected: %.*s", pConRej->reasonLen, pStrData);
+            }
+            default:
+                return false;
+        }
+    }
+
+    bool readPacket(Server& srv, char* pBuffer, int& bufLengthInOut)
+    {
+        // this should return complete packets or error.
+        int bytesRead = 0;
+        int bufLength = sizeof(PacketBase);
+
+        while (1) {
+            int maxReadSize = bufLength - bytesRead;
+            int res = platform::recv(srv.socket, &pBuffer[bytesRead], maxReadSize, 0);
+
+            if (res == 0) {
+                X_ERROR("Telem", "Connection closing...");
+                return false;
+            }
+            else if (res < 0) {
+                X_ERROR("Telem", "recv failed with error: %d", platform::WSAGetLastError());
+                return false;
+            }
+
+            bytesRead += res;
+
+            X_LOG0("Telem", "got: %d bytes\n", res);
+
+            if (bytesRead == sizeof(PacketBase))
+            {
+                auto* pHdr = reinterpret_cast<const PacketBase*>(pBuffer);
+                if (pHdr->dataSize == 0) {
+                    X_ERROR("Telem", "Client sent packet with length zero...");
+                    return false;
+                }
+
+                if (pHdr->dataSize > bufLengthInOut) {
+                    X_ERROR("Telem", "Client sent oversied packet of size %i...", static_cast<tt_int32>(pHdr->dataSize));
+                    return false;
+                }
+
+                bufLength = pHdr->dataSize;
+            }
+
+            if (bytesRead == bufLength) {
+                bufLengthInOut = bytesRead;
+                return true;
+            }
+            else if (bytesRead > bufLength) {
+                X_ERROR("Telem", "Overread packet bytesRead: %d recvbuflen: %d", bytesRead, bufLength);
+                return false;
+            }
+        }
+    }
+
+    bool connectToServer()
+    {
+        const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
+
+        struct platform::addrinfo hints, *servinfo = nullptr;
+        core::zero_object(hints);
+        hints.ai_family = AF_UNSPEC; // ipv4/6
+        hints.ai_socktype = SOCK_STREAM;
+        hints.ai_protocol = platform::IPPROTO_TCP;
+
+        // Resolve the server address and port
+        auto res = platform::getaddrinfo("127.0.0.1", "8001", &hints, &servinfo);
+        if (res != 0) {
+            return false;
+        }
+
+        platform::SOCKET connectSocket = INV_SOCKET;
+
+        for (auto pPtr = servinfo; pPtr != nullptr; pPtr = pPtr->ai_next) {
+            // Create a SOCKET for connecting to server
+            connectSocket = platform::socket(pPtr->ai_family, pPtr->ai_socktype, pPtr->ai_protocol);
+            if (connectSocket == INV_SOCKET) {
+                return false;
+            }
+
+            // Connect to server.
+            res = connect(connectSocket, pPtr->ai_addr, static_cast<int>(pPtr->ai_addrlen));
+            if (res == SOCKET_ERROR) {
+                platform::closesocket(connectSocket);
+                connectSocket = INV_SOCKET;
+                continue;
+            }
+
+            break;
+        }
+
+        platform::freeaddrinfo(servinfo);
+
+        if (connectSocket == INV_SOCKET) {
+            return false;
+        }
+
+        // how big?
+        tt_int32 sock_opt = 1024 * 16;
+        res = platform::setsockopt(connectSocket, SOL_SOCKET, SO_SNDBUF, (char*)&sock_opt, sizeof(sock_opt));
+        if (res != 0) {
+            X_ERROR("Telem", "Failed to set sndbuf on socket. Error: %d", platform::WSAGetLastError());
+            return false;
+        }
+
+        ConnectionRequestViewerHdr cr;
+        core::zero_object(cr);
+        cr.type = PacketType::ConnectionRequestViewer;
+        cr.viewerVer.major = TELEM_VERSION_MAJOR;
+        cr.viewerVer.minor = TELEM_VERSION_MINOR;
+        cr.viewerVer.patch = TELEM_VERSION_PATCH;
+        cr.viewerVer.build = TELEM_VERSION_BUILD;
+
+        Server srv;
+        srv.socket = connectSocket;
+
+        sendDataToServer(srv, &cr, sizeof(cr));
+
+        // wait for a response O.O
+        char recvbuf[MAX_PACKET_SIZE];
+        int recvbuflen = sizeof(recvbuf);
+
+        // TODO: support timeout.
+        if (!readPacket(srv, recvbuf, recvbuflen)) {
+            return false;
+        }
+
+        if (!handleConnectionResponse(srv, reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(recvbuflen))) {
+            return false;
+        }
+
+        return true;
+    }
+
 } // namespace
 
 
@@ -241,7 +412,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         SDL_GLContext gl_context = SDL_GL_CreateContext(window);
         SDL_GL_SetSwapInterval(1); // Enable vsync
 
-                // Initialize OpenGL loader
+        // Initialize OpenGL loader
         bool err = gl3wInit() != 0;
         if (err) {
             X_ERROR("", "Failed to initialize OpenGL loader!");
@@ -261,6 +432,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         ImGui_ImplOpenGL3_Init(glsl_version);
 
         const ImVec4 clearColor = ImVec4(0.13f, 0.13f, 0.13f, 1.00f);
+
+        // TEMP: connect to server on start up.
+        connectToServer();
 
         bool done = false;
         while (!done)
