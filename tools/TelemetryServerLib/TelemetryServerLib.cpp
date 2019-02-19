@@ -964,6 +964,10 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
         sendConnectionRejected(client, "Client server version incompatible");
         return false;
     }
+    if (pConReq->appNameLen < 1) {
+        sendConnectionRejected(client, "Invalid app name");
+        return false;
+    }
 
     client.clientVer = pConReq->clientVer;
 
