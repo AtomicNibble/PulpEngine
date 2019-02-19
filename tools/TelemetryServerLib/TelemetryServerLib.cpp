@@ -711,11 +711,6 @@ Server::~Server()
 
 bool Server::loadApps()
 {
-    //core::Path<wchar_t> workingDir;
-    //if (!gEnv->pFileSys->getWorkingDirectory(workingDir)) {
-    //    return false;
-    //}
-
     // iterator folders for apps.
     auto* pFileSys = gEnv->pFileSys;
 
@@ -753,7 +748,6 @@ bool Server::loadApps()
     } while (pFileSys->findnext(findPair.handle, fd));
 
     pFileSys->findClose(findPair.handle);
-
     return true;
 }
 
