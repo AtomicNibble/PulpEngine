@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "EngineApp.h"
 
-#include <../TelemetryServerLib/TelemetryServerLib.h>
+#include <../TelemetryServerLib/IServer.h>
 
 #define _LAUNCHER
 #include <ModuleExports.h>
@@ -34,7 +34,6 @@ namespace
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
     >
         TelemetryServerArena;
-
 
 
 } // namespace

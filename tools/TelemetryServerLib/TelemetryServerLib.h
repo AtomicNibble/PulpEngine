@@ -1,24 +1,14 @@
 #pragma once
 
+#include "IServer.h"
+
 #include <../TelemetryCommon/TelemetryCommonLib.h>
 #include <../SqLite/SqlLib.h>
 
 #include <Containers/Array.h>
-#include <Util/UniquePointer.h>
 #include <Compression/LZ4.h>
 
 X_NAMESPACE_BEGIN(telemetry)
-
-
-#if !defined(TELEM_SRV_EXPORT)
-
-#if !defined(X_LIB)
-#define TELEM_SRV_EXPORT X_IMPORT
-#else
-#define TELEM_SRV_EXPORT
-#endif
-
-#endif
 
 using TelemFixedStr = core::StackString<MAX_STRING_LEN, char>;
 
@@ -48,16 +38,6 @@ struct App
     TelemFixedStr appName;
     TraceArr traces;
 };
-
-
-struct ITelemServer
-{
-    virtual ~ITelemServer() = default;
-
-    virtual bool loadApps() X_ABSTRACT;
-    virtual bool listen() X_ABSTRACT;
-};
-
 
 struct TraceDB
 {
@@ -177,7 +157,6 @@ struct ClientConnection
     TraceStream traceStrm;
 };
 
-TELEM_SRV_EXPORT core::UniquePointer<ITelemServer> createServer(core::MemoryArenaBase* arena);
 
 class Server : public ITelemServer
 {
