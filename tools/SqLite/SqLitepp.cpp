@@ -571,7 +571,7 @@ Result::Enum SqlLiteStateMnt::bind(int idx, const core::string& value, CopySeman
     Result::Enum res = static_cast<Result::Enum>(sqlite3_bind_text(
         pStmt_,
         idx,
-        value.c_str(),
+        value.data(),
         safe_static_cast<int32, size_t>(value.size()),
         fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC));
 
