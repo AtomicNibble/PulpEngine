@@ -50,6 +50,26 @@ namespace
     >
         TelemetryViewerArena;
 
+    bool winSockInit(void)
+    {
+        platform::WSADATA winsockInfo;
+
+        if (platform::WSAStartup(MAKEWORD(2, 2), &winsockInfo) != 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    void winSockShutDown(void)
+    {
+        if (platform::WSACleanup() != 0) {
+            // rip
+            return;
+        }
+    }
+
+
     bool Splitter(bool split_vertically, float thickness, float* size1, float* size2,
         float min_size1, float min_size2, float splitter_long_axis_size = -1.0f)
     {
@@ -301,6 +321,7 @@ namespace
         // Resolve the server address and port
         auto res = platform::getaddrinfo("127.0.0.1", "8001", &hints, &servinfo);
         if (res != 0) {
+            X_ERROR("Telem", "Failed to get addre info. Error: %d", platform::WSAGetLastError());
             return false;
         }
 
@@ -433,6 +454,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         const ImVec4 clearColor = ImVec4(0.13f, 0.13f, 0.13f, 1.00f);
 
+        if (!winSockInit()) {
+            return 1;
+        }
+
         // TEMP: connect to server on start up.
         connectToServer();
 
@@ -471,6 +496,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         SDL_GL_DeleteContext(gl_context);
         SDL_DestroyWindow(window);
         SDL_Quit();
+
+        winSockShutDown();
     }
 
     return 0;
