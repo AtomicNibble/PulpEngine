@@ -788,6 +788,7 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
 
         Trace trace;
         trace.dbPath = dir / fd.name;
+        trace.name.assign(fd.name.begin(), fd.name.end());
 
         // load info.
         // dunno how slow loading all the sql dbs will be probs not that slow.
