@@ -817,6 +817,7 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
 
     pFileSys->findClose(findPair.handle);
 
+    apps_.push_back(std::move(app));
     return true;
 }
 
