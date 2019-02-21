@@ -829,6 +829,8 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
 
     pFileSys->findClose(findPair.handle);
 
+    X_LOG0("TelemSrv", "Added App \"%s\" %" PRIuS " Trace(s)", app.appName.c_str(), app.traces.size());
+
     apps_.push_back(std::move(app));
     return true;
 }
