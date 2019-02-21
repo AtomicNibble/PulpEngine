@@ -813,6 +813,7 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
         // load meta?
         bool loaded = true;
 
+        loaded &= getMetaStr(db, "dateStamp", trace.date);
         loaded &= getMetaStr(db, "buildInfo", trace.buildInfo);
         loaded &= getMetaStr(db, "cmdLine", trace.cmdLine);
         loaded &= getMetaUInt64(db, "tickPerMicro", trace.ticksPerMicro);

@@ -30,6 +30,7 @@ struct Trace
 
     core::Path<> dbPath;
     core::string name;
+    core::string date;
     core::string buildInfo;
     core::string cmdLine;
     uint64_t ticksPerMicro;
