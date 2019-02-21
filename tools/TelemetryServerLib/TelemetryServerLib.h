@@ -55,6 +55,7 @@ struct TraceDB
 
 public:
     bool createDB(core::Path<char>& path);
+    bool createIndexes(void);
 
     template<typename T>
     bool setMeta(const char* pName, T value);

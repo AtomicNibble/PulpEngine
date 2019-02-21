@@ -318,6 +318,22 @@ bool TraceDB::createDB(core::Path<char>& path)
     return true;
 }
 
+bool TraceDB::createIndexes(void)
+{
+    sql::SqlLiteCmd cmd(con, R"(CREATE INDEX "zones_start" ON "zones" (
+        "start"	ASC
+    ))");
+
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "Failed to creat indexes");
+        return false;
+    }
+
+    return true;
+}
+
+
 bool TraceDB::createTables(void)
 {
     if (!con.execute(R"(
