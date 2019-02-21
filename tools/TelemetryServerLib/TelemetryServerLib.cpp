@@ -1059,7 +1059,7 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     setMeta &= strm.db.setMeta("appName", core::string_view(pApp->appName));
     setMeta &= strm.db.setMeta("buildInfo", trace.buildInfo);
     setMeta &= strm.db.setMeta("cmdLine", trace.cmdLine);
-    setMeta &= strm.db.setMeta("date", dateStr);
+    setMeta &= strm.db.setMeta("dateStamp", dateStr);
     setMeta &= strm.db.setMeta("clientVer", client.clientVer.toString(verStr));
     setMeta &= strm.db.setMeta("serverVer", serverVer.toString(verStr));
     setMeta &= strm.db.setMeta<int64_t>("tickPerMicro", static_cast<int64_t>(trace.ticksPerMicro));
