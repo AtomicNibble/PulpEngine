@@ -69,7 +69,7 @@ namespace
                 }
 
                 if (pHdr->dataSize > bufLengthInOut) {
-                    X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<tt_int32>(pHdr->dataSize));
+                    X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<int32_t>(pHdr->dataSize));
                     return false;
                 }
 
@@ -871,7 +871,7 @@ bool Server::listen(void)
         return false;
     }
 
-    tt_int32 sock_opt = 1024 * 512;
+    int32_t sock_opt = 1024 * 512;
     res = platform::setsockopt(listenSocket, SOL_SOCKET, SO_RCVBUF, (char*)&sock_opt, sizeof(sock_opt));
     if (res != 0) {
         X_ERROR("TelemSrv", "Failed to set rcvbuf on socket. Error: %d", platform::WSAGetLastError());
