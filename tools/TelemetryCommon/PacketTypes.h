@@ -246,8 +246,10 @@ struct DataPacketTickInfo : public DataPacketBase
     TtthreadId threadID;
 
     // 16
-    tt_uint64 ticks;
-    tt_uint64 timeMicro;
+    tt_uint64 start;
+    tt_uint64 end;
+    tt_uint64 startMicro;
+    tt_uint64 endMicro;
 };
 
 struct DataPacketThreadSetName : public DataPacketBase

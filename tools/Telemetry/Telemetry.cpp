@@ -133,10 +133,8 @@ namespace
     // This is padded to 64bit to make placing TraceThread data on it's own boundy more simple.
     TELEM_ALIGNED_SYMBOL(struct TraceContext, 64)
     {
-        bool isEnabled;
-        bool _pad[3];
-
         tt_uint64 lastTick;
+        tt_uint64 lastTickMicro;
 
         TraceThread* pThreadData;
         tt_int32 numThreadData;
@@ -145,7 +143,10 @@ namespace
         tt_uint64 baseTicks;
         tt_uint64 baseMicro;
 
-        tt_uint8 _lanePad0[6];
+        bool isEnabled;
+        bool _pad[7];
+
+    //    tt_uint8 _lanePad0[6];
         X86_PAD(12)
 
         // -- Cace lane boundry --
@@ -612,8 +613,10 @@ namespace
     TELEM_ALIGNED_SYMBOL(struct QueueDataTickInfo, 64) : public QueueDataBase
     {
         TtthreadId threadID;
-        tt_uint64 ticks;
-        tt_uint64 timeMicro;
+        tt_uint64 start;
+        tt_uint64 end;
+        tt_uint64 startMicro;
+        tt_uint64 endMicro;
     };
 
     TELEM_ALIGNED_SYMBOL(struct QueueDataThreadSetName, 64) : public QueueDataBase
@@ -816,14 +819,16 @@ namespace
         tickBufferFull(pCtx);
         addToTickBuffer(pCtx, pPtr, size);
     }
-
-    TELEM_INLINE void queueTickInfo(TraceContext* pCtx)
+     
+    TELEM_INLINE void queueTickInfo(TraceContext* pCtx, tt_uint64 startTick, tt_uint64 endTick, tt_uint64 startMicro, tt_uint64 endMicro)
     {
         QueueDataTickInfo data;
         data.type = QueueDataType::TickInfo;
         data.threadID = getThreadID();
-        data.ticks = getRelativeTicks(pCtx);
-        data.timeMicro = gSysTimer.GetMicro() - pCtx->baseMicro;
+        data.start = toRelativeTicks(pCtx, startTick);
+        data.end = toRelativeTicks(pCtx, endTick);
+        data.startMicro = startMicro - pCtx->baseMicro;
+        data.endMicro = endMicro - pCtx->baseMicro;
 
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
@@ -964,8 +969,10 @@ namespace
         DataPacketTickInfo packet;
         packet.type = DataStreamType::TickInfo;
         packet.threadID = pBuf->threadID;
-        packet.ticks = pBuf->ticks;
-        packet.timeMicro = pBuf->timeMicro;
+        packet.start = pBuf->start;
+        packet.end = pBuf->end;
+        packet.startMicro = pBuf->startMicro;
+        packet.endMicro = pBuf->endMicro;
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
     }
@@ -1317,14 +1324,15 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     }
 
     TraceContext* pCtx = new (pBuf) TraceContext();
-    pCtx->lastTick = gSysTimer.GetMicro();
+    pCtx->lastTick = getTicks();
+    pCtx->lastTickMicro = gSysTimer.GetMicro();
     pCtx->isEnabled = true;
     pCtx->socket = INV_SOCKET;
     pCtx->pThreadData = reinterpret_cast<TraceThread*>(pThreadDataBuf);
     pCtx->numThreadData = 0;
     pCtx->ticksPerMicro = gTicksPerMicro;
-    pCtx->baseTicks = getTicks();
-    pCtx->baseMicro = pCtx->lastTick;
+    pCtx->baseTicks = pCtx->lastTick;
+    pCtx->baseMicro = pCtx->lastTickMicro;
 
     pCtx->activeTickBufIdx = 0;
     pCtx->tickBuffers[0].pTickBuf = pTickBuffer0;
@@ -1553,13 +1561,20 @@ void TelemTick(TraceContexHandle ctx)
         return;
     }
 
-    auto curTime = gSysTimer.GetMicro();
-    auto sinceLast = curTime - pCtx->lastTick;
+    auto curTick = getTicks();
+    auto curTimeMicro = gSysTimer.GetMicro();
+    auto sinceLastMicro = curTimeMicro - pCtx->lastTickMicro;
 
-    queueTickInfo(pCtx);
+    // we queue a tick even if don't flush.
+    queueTickInfo(pCtx, pCtx->lastTick, curTick, pCtx->lastTickMicro, curTimeMicro);
+
+    // I update these even if we don't flip, so the tick timing is correct.
+    // if want the time to accumlate need another field to track it.
+    pCtx->lastTick = curTick;
+    pCtx->lastTickMicro = curTimeMicro;
 
     // if we are been called at a very high freq don't bother sending unless needed.
-    if (sinceLast < 1000000) {
+    if (sinceLastMicro < 1'000'000) {
         // if the buffer is half full send it!
         auto halfBufferCap = pCtx->tickBufCapacity / 2;
         auto bufSize = getActiveTickBufferSize(pCtx);
@@ -1568,8 +1583,6 @@ void TelemTick(TraceContexHandle ctx)
             return;
         }
     }
-
-    pCtx->lastTick = curTime;
 
     flipBuffer(pCtx, false, true);
     return;

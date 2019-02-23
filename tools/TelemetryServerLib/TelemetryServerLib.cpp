@@ -307,7 +307,7 @@ bool TraceDB::createDB(core::Path<char>& path)
 
     cmdInsertZone.prepare("INSERT INTO zones (threadID, start, end, sourceInfoIdx, stackDepth) VALUES(?,?,?,?,?)");
     cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
-    cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, time, timeMicro) VALUES(?,?,?)");
+    cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, start, end, startMicro, endMicro) VALUES(?,?,?,?,?)");
     cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
     cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, start, end, descriptionStrId) VALUES(?,?,?,?,?)");
     cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, time, state) VALUES(?,?,?,?)");
@@ -348,8 +348,10 @@ CREATE TABLE IF NOT EXISTS "meta" (
 CREATE TABLE IF NOT EXISTS "ticks" (
 	"Id"	        INTEGER,
 	"threadId"	    INTEGER NOT NULL,
-	"time"	        INTEGER NOT NULL,
-	"timeMicro"	    INTEGER NOT NULL,
+	"start"	        INTEGER NOT NULL,
+	"end"	        INTEGER NOT NULL,
+	"startMicro"	INTEGER NOT NULL,
+	"endMicro"	    INTEGER NOT NULL,
 	PRIMARY KEY("Id")
 );
 
@@ -476,8 +478,10 @@ void TraceDB::handleDataPacketTickInfo(const DataPacketTickInfo* pData)
 {
     auto& cmd = cmdInsertTickInfo;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
-    cmd.bind(2, static_cast<int64_t>(pData->ticks));
-    cmd.bind(3, static_cast<int64_t>(pData->timeMicro));
+    cmd.bind(2, static_cast<int64_t>(pData->start));
+    cmd.bind(3, static_cast<int64_t>(pData->end));
+    cmd.bind(4, static_cast<int64_t>(pData->startMicro));
+    cmd.bind(5, static_cast<int64_t>(pData->endMicro));
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -658,8 +662,10 @@ bool TraceDB::getTicks(core::Array<DataPacketTickInfo>& ticks, int32_t startIdx,
         auto id = row.get<int32_t>(0);
         X_UNUSED(id);
         tick.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
-        tick.ticks = static_cast<uint64_t>(row.get<int32_t>(2));
-        tick.timeMicro = static_cast<uint64_t>(row.get<int32_t>(3));
+        tick.start = static_cast<uint64_t>(row.get<int64_t>(2));
+        tick.end = static_cast<uint64_t>(row.get<int64_t>(3));
+        tick.startMicro = static_cast<uint64_t>(row.get<int64_t>(4));
+        tick.endMicro = static_cast<uint64_t>(row.get<int64_t>(5));
 
         ticks.append(tick);
     }
