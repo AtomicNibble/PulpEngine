@@ -298,10 +298,9 @@ bool TraceDB::createDB(core::Path<char>& path)
         return false;
     }
 
-
-    cmdInsertZone.prepare("INSERT INTO zones (threadID, start, end, sourceInfoIdx, stackDepth) VALUES(?,?,?,?,?)");
+    cmdInsertZone.prepare("INSERT INTO zones (threadID, startTick, endTick, sourceInfoIdx, stackDepth) VALUES(?,?,?,?,?)");
     cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
-    cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, start, end, startMicro, endMicro) VALUES(?,?,?,?,?)");
+    cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, startTick, endTick, startMicro, endMicro) VALUES(?,?,?,?,?)");
     cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
     cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, start, end, descriptionStrId) VALUES(?,?,?,?,?)");
     cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, time, state) VALUES(?,?,?,?)");
@@ -366,8 +365,8 @@ CREATE TABLE IF NOT EXISTS "meta" (
 CREATE TABLE IF NOT EXISTS "ticks" (
 	"Id"	        INTEGER,
 	"threadId"	    INTEGER NOT NULL,
-	"start"	        INTEGER NOT NULL,
-	"end"	        INTEGER NOT NULL,
+	"startTick"	    INTEGER NOT NULL,
+	"endTick"       INTEGER NOT NULL,
 	"startMicro"	INTEGER NOT NULL,
 	"endMicro"	    INTEGER NOT NULL,
 	PRIMARY KEY("Id")
@@ -398,8 +397,8 @@ CREATE TABLE IF NOT EXISTS "sourceInfo" (
 CREATE TABLE IF NOT EXISTS "zones" (
     "id"	        INTEGER,
     "threadId"	    INTEGER NOT NULL,
-    "start"	        INTEGER NOT NULL,
-    "end"	        INTEGER NOT NULL,
+    "startTick"	    INTEGER NOT NULL,
+    "endTick"	    INTEGER NOT NULL,
     "sourceInfoIdx"	INTEGER NOT NULL,
     "stackDepth"	INTEGER NOT NULL,
     PRIMARY KEY("id")
