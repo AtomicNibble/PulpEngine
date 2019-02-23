@@ -21,6 +21,13 @@ struct PacketType
         QueryAppTraces,
         QueryAppTracesResp,
 
+        OpenTrace,
+        OpenTraceResp,
+
+        // These just respond with DataStreams.
+        QueryTraceTicks,
+        QueryTraceZones,
+
         QuerySrvStats,
         QuerySrvStatsResp,
 
@@ -87,6 +94,12 @@ constexpr tt_size BACKGROUND_THREAD_STACK_SIZE = Internal::RoundUpToMultiple<tt_
     STRING_TABLE_BUF_SIZE, 
     1024 * 4
 );
+
+constexpr tt_size MAX_TRACES_OPEN_PER_CLIENT = 8;
+
+using TtthreadId = tt_uint32;
+using TtZoneId = tt_uint32;
+
 
 TELEM_PACK_PUSH(1)
 
@@ -157,8 +170,37 @@ struct QueryAppTracesResponseHdr : public PacketBase
 
 struct QueryAppTracesResponseData
 {
+    char date[64];
     char name[MAX_STRING_LEN];
     char buildInfo[MAX_STRING_LEN];
+};
+
+struct OpenTrace : public PacketBase
+{
+    // TEMP
+    char appName[MAX_STRING_LEN];
+    char name[MAX_STRING_LEN];
+};
+
+struct OpenTraceResp : public PacketBase 
+{
+    tt_int8 handle;
+};
+
+struct QueryTraceTicks : public PacketBase
+{
+    tt_int8 handle;
+
+    tt_int32 tickIdx;
+    tt_int32 num;      // -1 for all
+};
+
+struct QueryTraceZones : public PacketBase
+{
+    tt_int8 handle;
+
+    tt_int64 start;
+    tt_int64 end;   // -1 for ubounded
 };
 
 
@@ -202,10 +244,6 @@ struct DataStreamType
         Num
     };
 };
-
-
-using TtthreadId = tt_uint32;
-using TtZoneId = tt_uint32;
 
 struct DataPacketBase
 {
