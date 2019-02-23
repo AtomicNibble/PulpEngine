@@ -289,13 +289,7 @@ bool TraceDB::createDB(core::Path<char>& path)
         return false;
     }
 
-    if (!con.execute(R"(
-                PRAGMA synchronous = OFF;
-                PRAGMA page_size = 4096;
-                PRAGMA cache_size = -4000;
-                PRAGMA journal_mode = MEMORY;
-                PRAGMA foreign_keys = ON;
-            )")) {
+    if (!setPragmas()) {
         return false;
     }
 
@@ -318,9 +312,33 @@ bool TraceDB::createDB(core::Path<char>& path)
     return true;
 }
 
+bool TraceDB::openDB(core::Path<char>& path)
+{
+    if (!con.connect(path.c_str(), sql::OpenFlags())) {
+        return false;
+    }
+
+    if (!createIndexes()) {
+        return false;
+    }
+
+    return true;
+}
+
+bool TraceDB::setPragmas(void)
+{
+    return con.execute(R"(
+        PRAGMA synchronous = OFF;
+        PRAGMA page_size = 4096;
+        PRAGMA cache_size = -4000;
+        PRAGMA journal_mode = MEMORY;
+        PRAGMA foreign_keys = ON;
+    )");
+}
+
 bool TraceDB::createIndexes(void)
 {
-    sql::SqlLiteCmd cmd(con, R"(CREATE INDEX "zones_start" ON "zones" (
+    sql::SqlLiteCmd cmd(con, R"(CREATE INDEX IF NOT EXISTS "zones_start" ON "zones" (
         "start"	ASC
     ))");
 

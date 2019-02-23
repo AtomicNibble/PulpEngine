@@ -55,6 +55,7 @@ struct TraceDB
 
 public:
     bool createDB(core::Path<char>& path);
+    bool openDB(core::Path<char>& path);
     bool createIndexes(void);
 
     template<typename T>
@@ -77,6 +78,7 @@ public:
     bool getZones(core::Array<DataPacketZone>& zones, uint64_t tickBegin, uint64_t tickEnd);
 
 private:
+    bool setPragmas(void);
     bool createTables(void);
 
 public:
