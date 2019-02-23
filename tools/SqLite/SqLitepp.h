@@ -181,6 +181,7 @@ class SQL_EXPORT SqlLiteStateMnt
     X_NO_ASSIGN(SqlLiteStateMnt);
 
 protected:
+    SqlLiteStateMnt(SqlLiteStateMnt&& oth);
     explicit SqlLiteStateMnt(SqlLiteDb& db, const char* pStmt = nullptr);
     virtual ~SqlLiteStateMnt();
 
@@ -264,6 +265,7 @@ public:
     };
 
 public:
+    SqlLiteCmd(SqlLiteCmd&& oth);
     explicit SqlLiteCmd(SqlLiteDb& db, const char* pStmt = nullptr);
     ~SqlLiteCmd() X_OVERRIDE;
 
@@ -355,6 +357,7 @@ public:
     using iterator = query_iterator;
 
 public:
+    SqlLiteQuery(SqlLiteQuery&& oth);
     explicit SqlLiteQuery(SqlLiteDb& db, char const* pStmt = nullptr);
     ~SqlLiteQuery() X_OVERRIDE;
 

@@ -425,6 +425,16 @@ int32_t SqlLiteDb::defaultBusyHandler(int32_t count)
 }
 // ----------------------------------------------------
 
+SqlLiteStateMnt::SqlLiteStateMnt(SqlLiteStateMnt&& oth) :
+    db_(std::move(oth.db_)),
+    pStmt_(std::move(oth.pStmt_)),
+    pTail_(std::move(oth.pTail_))
+{
+    oth.pStmt_ = nullptr;
+    oth.pTail_ = nullptr;
+}
+
+
 SqlLiteStateMnt::SqlLiteStateMnt(SqlLiteDb& db, const char* pStmt) :
     db_(db),
     pStmt_(nullptr),
@@ -677,6 +687,12 @@ SqlLiteCmd::BindStream::BindStream(SqlLiteCmd& cmd, int idx) :
 {
 }
 
+
+SqlLiteCmd::SqlLiteCmd(SqlLiteCmd&& oth) :
+    SqlLiteStateMnt(std::move(oth))
+{
+}
+
 SqlLiteCmd::SqlLiteCmd(SqlLiteDb& db, char const* pStmt) :
     SqlLiteStateMnt(db, pStmt)
 {
@@ -857,6 +873,12 @@ SqlLiteQuery::query_iterator::value_type SqlLiteQuery::query_iterator::operator*
 {
     return rows(pCmd_->pStmt_);
 }
+
+SqlLiteQuery::SqlLiteQuery(SqlLiteQuery&& oth) :
+    SqlLiteStateMnt(std::move(oth))
+{
+}
+
 
 SqlLiteQuery::SqlLiteQuery(SqlLiteDb& db, char const* stmt) :
     SqlLiteStateMnt(db, stmt)
