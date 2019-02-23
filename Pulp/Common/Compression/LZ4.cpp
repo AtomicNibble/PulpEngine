@@ -137,21 +137,16 @@ namespace Compression
     static_assert(LZ4Stream::maxSourceSize() == LZ4_MAX_INPUT_SIZE, "LZ4 max source size helper don't match lib value");
     static_assert(LZ4Stream::requiredDeflateDestBuf(0x1223345) == LZ4_COMPRESSBOUND(0x1223345), "LZ4 compressbound helper don't match lib result");
 
-    LZ4Stream::LZ4Stream(core::MemoryArenaBase* arena) :
-        arena_(arena),
-        stream_(nullptr)
+    LZ4Stream::LZ4Stream() 
     {
-        LZ4_stream_t* pStream = X_NEW(LZ4_stream_t, arena, "LZ4Stream");
-        LZ4_resetStream(pStream);
+        static_assert(sizeof(stream_) == sizeof(LZ4_stream_t));
 
-        stream_ = pStream;
+        LZ4_stream_t* pStream = reinterpret_cast<LZ4_stream_t*>(stream_);
+        LZ4_resetStream(pStream);
     }
 
     LZ4Stream::~LZ4Stream()
     {
-        if (stream_) {
-            X_DELETE(reinterpret_cast<LZ4_stream_t*>(stream_), arena_);
-        }
     }
 
     bool LZ4Stream::loadDict(const uint8_t* pDict, size_t size)

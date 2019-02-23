@@ -101,7 +101,7 @@ namespace Compression
     class LZ4Stream
     {
     public:
-        LZ4Stream(core::MemoryArenaBase* arena);
+        LZ4Stream();
         ~LZ4Stream();
 
         // this are validated by static asset in source file.
@@ -120,8 +120,7 @@ namespace Compression
             CompressLevel::Enum lvl = CompressLevel::NORMAL);
 
     private:
-        core::MemoryArenaBase* arena_;
-        void* stream_;
+        uint8_t stream_[16416];
     };
 
     class LZ4StreamDecode

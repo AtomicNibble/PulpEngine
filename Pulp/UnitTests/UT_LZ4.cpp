@@ -155,7 +155,7 @@ TEST(LZ4, Stream)
         data.resize(BUF_SIZE * NUM);
         FillBufRandDupes<4>(data.ptr(), data.size());
 
-        LZ4Stream stream(g_arena);
+        LZ4Stream stream;
 
         for (size_t i = 0; i < NUM; i++) {
             // simulate streaming it in.
