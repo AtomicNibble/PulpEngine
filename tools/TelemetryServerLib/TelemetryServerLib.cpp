@@ -87,7 +87,7 @@ namespace
         }
     }
 
-    void sendPacketToClient(ClientConnection& client, const void* pData, size_t len)
+    void sendDataToClient(ClientConnection& client, const void* pData, size_t len)
     {
         // send some data...
         int res = platform::send(client.socket, reinterpret_cast<const char*>(pData), static_cast<int>(len), 0);
@@ -115,7 +115,7 @@ namespace
         pCr->type = PacketType::ConnectionRequestRejected;
 
         memcpy(pCr + 1, pReason, msgLen);
-        sendPacketToClient(client, buf, datalen);
+        sendDataToClient(client, buf, datalen);
     }
 
     bool handleDataSream(ClientConnection& client, uint8_t* pData)
@@ -1111,7 +1111,7 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     cra.type = PacketType::ConnectionRequestAccepted;
     cra.serverVer = serverVer;
 
-    sendPacketToClient(client, &cra, sizeof(cra));
+    sendDataToClient(client, &cra, sizeof(cra));
     return true;
 }
 
@@ -1145,7 +1145,7 @@ bool Server::handleConnectionRequestViewer(ClientConnection& client, uint8_t* pD
     cra.type = PacketType::ConnectionRequestAccepted;
     cra.serverVer = serverVer;
 
-    sendPacketToClient(client, &cra, sizeof(cra));
+    sendDataToClient(client, &cra, sizeof(cra));
     return true;
 }
 
@@ -1156,22 +1156,22 @@ bool Server::handleQueryApps(ClientConnection& client, uint8_t* pData)
         X_ASSERT_UNREACHABLE();
     }
 
-    auto numApps = static_cast<tt_int32>(apps_.size());
+    auto numApps = static_cast<int32_t>(apps_.size());
 
     QueryAppsResponseHdr resHdr;
     resHdr.dataSize = static_cast<tt_uint16>((sizeof(resHdr) + (sizeof(QueryAppsResponseData) * numApps)));
     resHdr.type = PacketType::QueryAppsResp;
     resHdr.num = numApps;
 
-    sendPacketToClient(client, &resHdr, sizeof(resHdr));
+    sendDataToClient(client, &resHdr, sizeof(resHdr));
 
     for (const auto& app : apps_)
     {
         QueryAppsResponseData qar;
-        qar.numTraces = static_cast<tt_int32>(app.traces.size());
+        qar.numTraces = static_cast<int32_t>(app.traces.size());
         strcpy(qar.appName, app.appName.c_str());
 
-        sendPacketToClient(client, &qar, sizeof(qar));
+        sendDataToClient(client, &qar, sizeof(qar));
     }
 
     return true;
@@ -1191,7 +1191,7 @@ bool Server::handleQueryAppTraces(ClientConnection& client, uint8_t* pData)
     resHdr.type = PacketType::QueryAppTracesResp;
     resHdr.num = static_cast<uint32_t>(app.traces.size());
 
-    sendPacketToClient(client, &resHdr, sizeof(resHdr));
+    sendDataToClient(client, &resHdr, sizeof(resHdr));
 
     for (const auto& trace : app.traces)
     {
@@ -1199,7 +1199,7 @@ bool Server::handleQueryAppTraces(ClientConnection& client, uint8_t* pData)
         strcpy(atr.name, trace.name.c_str());
         strcpy(atr.buildInfo, trace.buildInfo.c_str());
 
-        sendPacketToClient(client, &atr, sizeof(atr));
+        sendDataToClient(client, &atr, sizeof(atr));
     }
 
     return true;
