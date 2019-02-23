@@ -136,22 +136,20 @@ namespace
             X_ASSERT_NOT_IMPLEMENTED();
         }
 
-        auto& strm = client.traceStrm;
+        auto* pDst = &client.cmpRingBuf[client.cmpBufBegin];
 
-        auto* pDst = &strm.cmpRingBuf[strm.cmpBufferOffset];
-
-        auto cmpLenOut = strm.lz4Stream.decompressContinue(pHdr + 1, pDst, origLen);
+        auto cmpLenOut = client.lz4DecodeStream.decompressContinue(pHdr + 1, pDst, origLen);
         if (cmpLenOut != cmpLen) {
             // TODO: ..
             return false;
         }
 
-        strm.cmpBufferOffset += origLen;
-
-        if (strm.cmpBufferOffset >= (COMPRESSION_RING_BUFFER_SIZE - COMPRESSION_MAX_INPUT_SIZE)) {
-            strm.cmpBufferOffset = 0;
+        client.cmpBufBegin += origLen;
+        if (client.cmpBufBegin >= (COMPRESSION_RING_BUFFER_SIZE - COMPRESSION_MAX_INPUT_SIZE)) {
+            client.cmpBufBegin = 0;
         }
 
+        auto& strm = client.traceStrm;
         sql::SqlLiteTransaction trans(strm.db.con);
 
         // process this data?
@@ -927,7 +925,7 @@ bool Server::listen(void)
 
         X_LOG0("TelemSrv", "Client connected");
 
-        ClientConnection client;
+        ClientConnection client(arena_);
         client.socket = clientSocket;
  
         handleClient(client);
@@ -961,6 +959,15 @@ bool Server::processPacket(ClientConnection& client, uint8_t* pData)
             break;
         case PacketType::QueryAppTraces:
             return handleQueryAppTraces(client, pData);
+            break;
+        case PacketType::OpenTrace:
+            return handleOpenTrace(client, pData);
+            break;
+        case PacketType::QueryTraceTicks:
+            return handleQueryTraceTicks(client, pData);
+            break;
+        case PacketType::QueryTraceZones:
+            return handleQueryTraceZones(client, pData);
             break;
         default:
             X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
@@ -1183,6 +1190,7 @@ bool Server::handleQueryAppTraces(ClientConnection& client, uint8_t* pData)
         X_ASSERT_UNREACHABLE();
     }
 
+    // TODO:
     const auto& app = apps_[0];
 
     QueryAppsResponseHdr resHdr;
@@ -1195,6 +1203,7 @@ bool Server::handleQueryAppTraces(ClientConnection& client, uint8_t* pData)
     for (const auto& trace : app.traces)
     {
         QueryAppTracesResponseData atr;
+        strcpy(atr.date, trace.date.c_str());
         strcpy(atr.name, trace.name.c_str());
         strcpy(atr.buildInfo, trace.buildInfo.c_str());
 
@@ -1203,6 +1212,204 @@ bool Server::handleQueryAppTraces(ClientConnection& client, uint8_t* pData)
 
     return true;
 }
+
+bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const OpenTrace*>(pData);
+    if (pHdr->type != PacketType::OpenTrace) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    // TODO: check we don't have it open already.
+    // TODO: thread safety etc..
+
+    if (client.traces.size() < MAX_TRACES_OPEN_PER_CLIENT)
+    {
+        for (size_t i = 0; i < apps_.size(); i++)
+        {
+            auto& app = apps_[i];
+            if (app.appName.isEqual(pHdr->appName))
+            {
+                for (size_t x = 0; x < app.traces.size(); x++)
+                {
+                    auto& trace = app.traces[x];
+                    if (trace.name == pHdr->name)
+                    {
+                        // we found it !
+                        TraceStream ts;
+                        ts.pTrace = &trace;
+                        if (ts.db.openDB(trace.dbPath))
+                        {
+                            auto id = client.traces.size();
+                            client.traces.emplace_back(std::move(ts));
+
+                            OpenTraceResp otr;
+                            otr.handle = safe_static_cast<int8_t>(id);
+                            sendDataToClient(client, &otr, sizeof(otr));
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    OpenTraceResp otr;
+    otr.handle = -1_ui8;
+    sendDataToClient(client, &otr, sizeof(otr));
+    return true;
+}
+
+
+void flushCompressionBuffer(ClientConnection& client)
+{
+    // compress it.
+    const auto* pInBegin = &client.cmpRingBuf[client.cmpBufBegin];
+    const size_t inBytes = client.cmpBufEnd - client.cmpBufBegin;
+
+#if X_DEBUG
+    if (inBytes > COMPRESSION_MAX_INPUT_SIZE) {
+        ::DebugBreak();
+    }
+#endif // X_DEBUG
+
+    if (inBytes == 0) {
+        return;
+    }
+
+    constexpr size_t cmpBufSize = core::Compression::LZ4Stream::requiredDeflateDestBuf(COMPRESSION_MAX_INPUT_SIZE);
+    char cmpBuf[cmpBufSize + sizeof(DataStreamHdr)];
+
+    const size_t cmpBytes = client.lz4Stream.compressContinue(
+        pInBegin, inBytes,
+        cmpBuf + sizeof(DataStreamHdr), cmpBufSize,
+        core::Compression::CompressLevel::NORMAL
+    );
+
+    if (cmpBytes <= 0) {
+        // TODO: error.
+    }
+
+    const size_t totalLen = cmpBytes + sizeof(DataStreamHdr);
+
+    DataStreamHdr* pHdr = reinterpret_cast<DataStreamHdr*>(cmpBuf);
+
+    // patch the length 
+    pHdr->type = PacketType::DataStream;
+    pHdr->dataSize = static_cast<tt_uint16>(totalLen);
+    pHdr->origSize = static_cast<tt_uint16>(inBytes + sizeof(DataStreamHdr));
+
+    sendDataToClient(client, cmpBuf, totalLen);
+
+    client.cmpBufBegin = client.cmpBufEnd;
+    if ((sizeof(client.cmpRingBuf) - client.cmpBufBegin) < COMPRESSION_MAX_INPUT_SIZE) {
+        client.cmpBufBegin = 0;
+        client.cmpBufEnd = 0;
+    }
+}
+
+
+void addToCompressionBuffer(ClientConnection& client, const void* pData, int32_t len)
+{
+#if X_DEBUG
+    if (len > COMPRESSION_MAX_INPUT_SIZE) {
+        ::DebugBreak();
+    }
+#endif // X_DEBUG
+
+    // can we fit this data?
+    const auto space = COMPRESSION_MAX_INPUT_SIZE - (client.cmpBufEnd - client.cmpBufBegin);
+    if (space < len) {
+        flushCompressionBuffer(client);
+    }
+
+    memcpy(&client.cmpRingBuf[client.cmpBufEnd], pData, len);
+    client.cmpBufEnd += len;
+}
+
+bool Server::handleQueryTraceTicks(ClientConnection& client, uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const QueryTraceTicks*>(pData);
+    if (pHdr->type != PacketType::QueryTraceTicks) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    // MEOW
+    // load me the ticks!
+    int32_t handle = pHdr->handle;
+
+    if (handle <= 0 || handle >= client.traces.size()) {
+        // send some error msg?
+        // return false will disconnect the client.
+        return false;
+    }
+
+    auto& ts = client.traces[pHdr->handle];
+
+    // we just stream the rows to the client.
+    // if there is loads of data we just send multiple compressed packets.
+    const int32_t numToReturn = pHdr->num;
+
+    sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, startMicro, endMicro FROM ticks LIMIT ? OFFSET ?");
+    qry.bind(1, pHdr->tickIdx);
+    qry.bind(2, numToReturn);
+
+    auto it = qry.begin();
+    if (it != qry.end()) {
+        auto row = *it;
+
+        DataPacketTickInfo tick;
+        tick.type = DataStreamType::TickInfo;
+        tick.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
+        tick.start = static_cast<uint64_t>(row.get<int64_t>(1));
+        tick.end = static_cast<uint64_t>(row.get<int64_t>(2));
+        tick.startMicro = static_cast<uint64_t>(row.get<int64_t>(3));
+        tick.endMicro = static_cast<uint64_t>(row.get<int64_t>(4));
+
+        addToCompressionBuffer(client, &tick, sizeof(tick));
+    }
+
+    flushCompressionBuffer(client);
+    return true;
+}
+
+bool Server::handleQueryTraceZones(ClientConnection& client, uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const QueryTraceZones*>(pData);
+    if (pHdr->type != PacketType::QueryTraceZones) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    int32_t handle = pHdr->handle;
+    if (handle <= 0 || handle >= client.traces.size()) {
+        return false;
+    }
+
+    auto& ts = client.traces[pHdr->handle];
+
+    sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, stackDepth FROM zones WHERE start >= ? AND end < ?");
+    qry.bind(1, pHdr->start);
+    qry.bind(2, pHdr->end);
+
+    auto it = qry.begin();
+    if (it != qry.end()) {
+        auto row = *it;
+
+        DataPacketZone zone;
+        zone.type = DataStreamType::Zone;
+        zone.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
+        zone.start = static_cast<uint64_t>(row.get<int64_t>(1));
+        zone.end = static_cast<uint64_t>(row.get<int64_t>(2));
+        zone.stackDepth = static_cast<tt_int8>(row.get<int32_t>(3));
+        // TODO: finish
+
+        addToCompressionBuffer(client, &zone, sizeof(zone));
+    }
+
+    flushCompressionBuffer(client);
+    return true;
+}
+
 
 
 X_NAMESPACE_END

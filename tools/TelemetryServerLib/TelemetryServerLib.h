@@ -101,36 +101,51 @@ private:
 
 struct TraceStream
 {
+    TraceStream(TraceStream&& oth) :
+        pTrace(std::move(oth.pTrace)),
+        db(std::move(oth.db))
+    {
+    }
     TraceStream() {
-        cmpBufferOffset = 0;
-
-#if X_DEBUG
-        core::zero_object(cmpRingBuf);
-#endif // X_DEBUG
     }
 
     const Trace* pTrace;
-
-    // this is used for both incoming and outgoing streams.
-    int32_t cmpBufferOffset;
-    int8_t cmpRingBuf[COMPRESSION_RING_BUFFER_SIZE];
-
-    core::Compression::LZ4StreamDecode lz4Stream;
 
     TraceDB db;
 };
 
 struct ClientConnection
 {
-    ClientConnection() {
+    using TraceStreamArr = core::Array<TraceStream>;
+
+    ClientConnection(core::MemoryArenaBase* arena) :
+        traces(arena)
+    {
         core::zero_object(clientVer);
         socket = INV_SOCKET;
+
+        cmpBufBegin = 0;
+        cmpBufEnd = 0;
+
+#if X_DEBUG
+        core::zero_object(cmpRingBuf);
+#endif // X_DEBUG
     }
 
     VersionInfo clientVer;
     platform::SOCKET socket;
 
+    TraceStreamArr traces;
     TraceStream traceStrm;
+
+    // this is used for both incoming and outgoing streams.
+    // depending on if it'sincoming trace data or a viewer connection.
+    int32_t cmpBufBegin;
+    int32_t cmpBufEnd;
+    int8_t cmpRingBuf[COMPRESSION_RING_BUFFER_SIZE];
+
+    core::Compression::LZ4StreamDecode lz4DecodeStream;
+    core::Compression::LZ4Stream lz4Stream;
 };
 
 
@@ -156,6 +171,9 @@ private:
     bool handleConnectionRequestViewer(ClientConnection& client, uint8_t* pData);
     bool handleQueryApps(ClientConnection& client, uint8_t* pData);
     bool handleQueryAppTraces(ClientConnection& client, uint8_t* pData);
+    bool handleOpenTrace(ClientConnection& client, uint8_t* pData);
+    bool handleQueryTraceTicks(ClientConnection& client, uint8_t* pData);
+    bool handleQueryTraceZones(ClientConnection& client, uint8_t* pData);
 
 private:
     core::MemoryArenaBase* arena_;
