@@ -519,6 +519,10 @@ namespace
         }
 #endif // X_DEBUG
 
+        if (inBytes == 0) {
+            return;
+        }
+
         const tt_int32 cmpBytes = LZ4_compress_fast_continue(&pComp->lz4Stream, pInBegin,
             pComp->cmpBuf, inBytes, sizeof(pComp->cmpBuf), 9);
 
