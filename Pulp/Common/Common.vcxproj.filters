@@ -1366,6 +1366,9 @@
     <ClInclude Include="Core\Version.h">
       <Filter>Headers\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Util\Guid.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -2148,6 +2151,9 @@
     <ClCompile Include="Util\Event.gen" />
     <ClCompile Include="String\StringView.cpp">
       <Filter>SourceFiles\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Guid.cpp">
+      <Filter>SourceFiles\Util\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -434,6 +434,7 @@
     <ClInclude Include="Util\FloatIEEEUtil.h" />
     <ClInclude Include="Util\Function.h" />
     <ClInclude Include="Util\GenericUtil.h" />
+    <ClInclude Include="Util\Guid.h" />
     <ClInclude Include="Util\HashHelper.h" />
     <ClInclude Include="Util\HelperMacros.h" />
     <ClInclude Include="Util\LastError.h" />
@@ -1182,6 +1183,7 @@
     <ClCompile Include="Time\DateStamp.cpp" />
     <ClCompile Include="Time\win32\TimeStamp.cpp" />
     <ClCompile Include="Util\Cpu.cpp" />
+    <ClCompile Include="Util\Guid.cpp" />
     <ClCompile Include="Util\win32\LastError.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
