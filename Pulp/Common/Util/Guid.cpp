@@ -132,7 +132,7 @@ bool Guid::isValid(void) const
 
 const char* Guid::toString(GuidStr& buf) const
 {
-    buf.setFmt("%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02", 
+    buf.setFmt("%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x", 
         bytes_[0],
         bytes_[1],
         bytes_[2],
