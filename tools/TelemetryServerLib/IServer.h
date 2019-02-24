@@ -35,7 +35,7 @@ struct Trace
     core::Guid guid;
     uint64_t ticksPerMicro;
     core::DateTimeStamp date;
-    core::string name;
+    core::string hostName;
     core::string buildInfo;
     core::string cmdLine;
     core::Path<> dbPath;

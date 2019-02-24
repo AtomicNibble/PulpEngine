@@ -127,8 +127,9 @@ struct ClientConnection
 #endif // X_DEBUG
     }
 
-    VersionInfo clientVer;
     platform::SOCKET socket;
+    VersionInfo clientVer;
+    core::string hostName;
 
     TraceStreamArr traces;
     TraceStream traceStrm;

@@ -820,7 +820,6 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
 
         Trace trace;
         trace.dbPath = dir / fd.name;
-        trace.name.assign(fd.name.begin(), fd.name.end());
 
         // load info.
         // dunno how slow loading all the sql dbs will be probs not that slow.
@@ -840,6 +839,7 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
 
         loaded &= getMetaStr(db, "guid", guidStr);
         loaded &= getMetaStr(db, "dateStamp", dateStr);
+        loaded &= getMetaStr(db, "hostName", trace.hostName);
         loaded &= getMetaStr(db, "buildInfo", trace.buildInfo);
         loaded &= getMetaStr(db, "cmdLine", trace.cmdLine);
         loaded &= getMetaUInt64(db, "tickPerMicro", trace.ticksPerMicro);
@@ -937,10 +937,28 @@ bool Server::listen(void)
             return false;
         }
 
-        X_LOG0("TelemSrv", "Client connected");
+        char hostname[NI_MAXHOST] = {};
+        char servInfo[NI_MAXSERV] = {};
+
+        res = platform::getnameinfo(
+            &addr, 
+            addrLen,
+            hostname,
+            NI_MAXHOST, 
+            servInfo, 
+            NI_MAXSERV, 
+            NI_NUMERICSERV
+        );
+
+        if (res != 0) {
+            X_ERROR("TelemSrv", "Error resolving client name: %d", platform::WSAGetLastError());
+        }
+
+        X_LOG0("TelemSrv", "Client connected: %s:%s", hostname, servInfo);
 
         ClientConnection client(arena_);
         client.socket = clientSocket;
+        client.hostName = hostname;
  
         handleClient(client);
 
@@ -1087,7 +1105,7 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     }
 
     trace.dbPath = dbPath;
-    trace.name = dbPath.fileName();
+    trace.hostName = client.hostName;
 
     // open a trace stream for the conneciton.
     auto& strm = client.traceStrm;
@@ -1101,6 +1119,7 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     core::Guid::GuidStr guidStr;
     setMeta &= strm.db.setMeta("guid", trace.guid.toString(guidStr));
     setMeta &= strm.db.setMeta("appName", core::string_view(pApp->appName));
+    setMeta &= strm.db.setMeta("hostName", core::string_view(client.hostName));
     setMeta &= strm.db.setMeta("buildInfo", trace.buildInfo);
     setMeta &= strm.db.setMeta("cmdLine", trace.cmdLine);
     setMeta &= strm.db.setMeta("dateStamp", dateStr);
@@ -1194,7 +1213,7 @@ bool Server::sendAppList(ClientConnection& client)
     {
         AppsListData ald;
         ald.numTraces = static_cast<int32_t>(app.traces.size());
-        strcpy(ald.appName, app.appName.c_str());
+        strcpy_s(ald.appName, app.appName.c_str());
 
         sendDataToClient(client, &ald, sizeof(ald));
 
@@ -1205,8 +1224,8 @@ bool Server::sendAppList(ClientConnection& client)
             tld.guid = trace.guid;
             tld.active = trace.active;
             tld.date = trace.date;
-            strcpy(tld.name, trace.name.c_str());
-            strcpy(tld.buildInfo, trace.buildInfo.c_str());
+            strcpy_s(tld.hostName, trace.hostName.c_str());
+            strcpy_s(tld.buildInfo, trace.buildInfo.c_str());
 
             sendDataToClient(client, &tld, sizeof(tld));
         }

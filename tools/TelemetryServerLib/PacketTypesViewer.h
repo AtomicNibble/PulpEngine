@@ -31,7 +31,7 @@ struct AppTraceListData
     core::Guid guid;
     uint64_t ticksPerMicro;
     core::DateTimeStamp date;
-    char name[MAX_STRING_LEN];
+    char hostName[MAX_STRING_LEN];
     char buildInfo[MAX_STRING_LEN];
 };
 

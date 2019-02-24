@@ -476,7 +476,11 @@ void DrawFrame(Client& client, float ww, float wh)
                             {
                                 const auto& trace = app.traces[i];
 
-                                if (ImGui::Selectable(trace.name.c_str(), selected == i))
+                                // want to build a string like:
+                                // hostname - 6 min ago
+                                // auto timeNow = core::DateTimeStamp::getSystemDateTime();
+
+                                if (ImGui::Selectable(trace.hostName.c_str(), selected == i))
                                 {
                                     selected = i;
                                 }
@@ -645,7 +649,7 @@ bool handleAppList(Client& client, uint8_t* pData)
             trace.guid = srcTrace.guid;
             trace.ticksPerMicro = srcTrace.ticksPerMicro;
             trace.date = srcTrace.date;
-            trace.name = srcTrace.name;
+            trace.hostName = srcTrace.hostName;
             trace.buildInfo = srcTrace.buildInfo;
 
             app.traces.emplace_back(std::move(trace));
