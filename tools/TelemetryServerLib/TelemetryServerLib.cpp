@@ -138,7 +138,7 @@ namespace
 
         auto* pDst = &client.cmpRingBuf[client.cmpBufBegin];
 
-        int32_t cmpLenOut = client.lz4DecodeStream.decompressContinue(pHdr + 1, pDst, origLen);
+        int32_t cmpLenOut = static_cast<int32_t>(client.lz4DecodeStream.decompressContinue(pHdr + 1, pDst, origLen));
         if (cmpLenOut != cmpLen) {
             // TODO: ..
             return false;
