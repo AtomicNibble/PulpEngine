@@ -116,7 +116,7 @@ namespace
 #if X_64
     #define X86_PAD(bytes)
 #else
-    #define X86_PAD(bytes) tt_uint8 X_TELEMETRY_UNIQUE_NAME(__pad)[bytes];
+    #define X86_PAD(bytes) tt_uint8 __TELEMETRY_UNIQUE_NAME(__pad)[bytes];
 #endif // X_64
 
 
@@ -147,7 +147,7 @@ namespace
         bool _pad[7];
 
     //    tt_uint8 _lanePad0[6];
-        X86_PAD(12)
+        X86_PAD(8)
 
         // -- Cace lane boundry --
 
@@ -170,7 +170,7 @@ namespace
 
         tt_uint8 _lanePad2[16];
 
-        X86_PAD(28)
+        X86_PAD(24)
 
         // -- Cace lane boundry --
 
@@ -560,7 +560,7 @@ namespace
 #endif // X_DEBUG
 
         // can we fit this data?
-        const auto space = COMPRESSION_MAX_INPUT_SIZE - (pComp->writeEnd - pComp->writeBegin);
+        const tt_int32 space = COMPRESSION_MAX_INPUT_SIZE - (pComp->writeEnd - pComp->writeBegin);
         if (space < len) {
             flushCompressionBuffer(pComp);
         }

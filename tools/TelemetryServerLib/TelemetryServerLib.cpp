@@ -138,7 +138,7 @@ namespace
 
         auto* pDst = &client.cmpRingBuf[client.cmpBufBegin];
 
-        auto cmpLenOut = client.lz4DecodeStream.decompressContinue(pHdr + 1, pDst, origLen);
+        int32_t cmpLenOut = client.lz4DecodeStream.decompressContinue(pHdr + 1, pDst, origLen);
         if (cmpLenOut != cmpLen) {
             // TODO: ..
             return false;
@@ -1318,7 +1318,7 @@ void addToCompressionBuffer(ClientConnection& client, const void* pData, int32_t
 #endif // X_DEBUG
 
     // can we fit this data?
-    const auto space = COMPRESSION_MAX_INPUT_SIZE - (client.cmpBufEnd - client.cmpBufBegin);
+    const int32_t space = COMPRESSION_MAX_INPUT_SIZE - (client.cmpBufEnd - client.cmpBufBegin);
     if (space < len) {
         flushCompressionBuffer(client);
     }
@@ -1337,12 +1337,10 @@ bool Server::handleQueryTraceTicks(ClientConnection& client, uint8_t* pData)
     // MEOW
     // load me the ticks!
     int32_t handle = pHdr->handle;
-
-    if (handle <= 0 || handle >= client.traces.size()) {
-        // send some error msg?
-        // return false will disconnect the client.
+    if (handle <= 0 || handle >= static_cast<int32_t>(client.traces.size())) {
         return false;
     }
+
 
     auto& ts = client.traces[pHdr->handle];
 
@@ -1381,7 +1379,7 @@ bool Server::handleQueryTraceZones(ClientConnection& client, uint8_t* pData)
     }
 
     int32_t handle = pHdr->handle;
-    if (handle <= 0 || handle >= client.traces.size()) {
+    if (handle <= 0 || handle >= static_cast<int32_t>(client.traces.size())) {
         return false;
     }
 
