@@ -45,7 +45,8 @@ using TraceArr = core::Array<Trace>;
 
 struct TraceApp
 {
-    TraceApp(core::MemoryArenaBase* arena) :
+    TraceApp(const TelemFixedStr& appName, core::MemoryArenaBase* arena) :
+        appName(appName),
         traces(arena)
     {}
 

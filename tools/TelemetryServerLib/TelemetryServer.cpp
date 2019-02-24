@@ -792,8 +792,7 @@ bool Server::loadApps()
 
 bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
 {
-    TraceApp app(arena_);
-    app.appName.set(appName.begin(), appName.end());
+    TraceApp app(TelemFixedStr(appName.begin(), appName.end()), arena_);
 
     core::Path<> dirSearch(dir);
     dirSearch.ensureSlash();
@@ -1043,7 +1042,7 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     TraceApp* pApp = nullptr;
     if (it == apps_.end())
     {
-        apps_.emplace_back(arena_);
+        apps_.emplace_back(appName, arena_);
         pApp = &apps_.back();
     }
     else
@@ -1052,6 +1051,7 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     }
 
     X_ASSERT_NOT_NULL(pApp);
+    X_ASSERT(pApp->appName.isNotEmpty(), "")();
 
     // Create a new trace 
     Trace trace;
