@@ -58,7 +58,10 @@ bool DateTimeStamp::fromString(core::string_view str, DateTimeStamp& stampOut)
 
 DateTimeStamp DateTimeStamp::getSystemDateTime(void)
 {
-    return DateTimeStamp(DateStamp::getSystemDate(), TimeStamp::getSystemTime());
+    _SYSTEMTIME Time;
+    GetLocalTime(&Time);
+
+    return DateTimeStamp(Time.wYear, Time.wMonth, Time.wDay, Time.wHour, Time.wMinute, Time.wSecond, Time.wMilliseconds);
 }
 
 X_NAMESPACE_END
