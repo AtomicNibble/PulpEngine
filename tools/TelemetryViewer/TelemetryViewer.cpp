@@ -611,9 +611,17 @@ bool processPacket(Client& client, uint8_t* pData)
 
     switch (pPacketHdr->type)
     {
+        case PacketType::ConnectionRequestAccepted:
+            // todo mark as connected.
+            return true;
+        case PacketType::ConnectionRequestRejected: {
+            auto* pConRej = reinterpret_cast<const ConnectionRequestRejectedHdr*>(pData);
+            auto* pStrData = reinterpret_cast<const char*>(pConRej + 1);
+            X_ERROR("Telem", "Connection rejected: %.*s", pConRej->reasonLen, pStrData);
+            return false;
+        }
         case PacketType::DataStream:
             return handleDataSream(client, pData);
-            break;
         default:
             X_ERROR("TelemViewer", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
             return false;
@@ -685,26 +693,6 @@ bool readPacket(Client& client, char* pBuffer, int& bufLengthInOut)
             X_ERROR("Telem", "Overread packet bytesRead: %d recvbuflen: %d", bytesRead, bufLength);
             return false;
         }
-    }
-}
-
-bool handleConnectionResponse(Client& client, tt_uint8* pData, tt_size len)
-{
-    X_UNUSED(client, len);
-
-    auto* pPacketHdr = reinterpret_cast<const PacketBase*>(pData);
-    switch (pPacketHdr->type)
-    {
-        case PacketType::ConnectionRequestAccepted:
-            // don't care about response currently.
-            return true;
-        case PacketType::ConnectionRequestRejected: {
-            auto* pConRej = reinterpret_cast<const ConnectionRequestRejectedHdr*>(pData);
-            auto* pStrData = reinterpret_cast<const char*>(pConRej + 1);
-            X_ERROR("Telem", "Connection rejected: %.*s", pConRej->reasonLen, pStrData);
-        }
-        default:
-            return false;
     }
 }
 
@@ -793,7 +781,7 @@ bool connectToServer(Client& client)
         return false;
     }
 
-    if (!handleConnectionResponse(client, reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(recvbuflen))) {
+    if (!processPacket(client, reinterpret_cast<tt_uint8*>(recvbuf))) {
         return false;
     }
 
