@@ -27,6 +27,8 @@ struct PacketType
         // These just respond with DataStreams.
         QueryTraceTicks,
         QueryTraceZones,
+        QueryTraceStrings,
+        QueryTraceThreadNames,
 
         QuerySrvStats,
         QuerySrvStatsResp,
@@ -203,6 +205,12 @@ struct QueryTraceZones : public PacketBase
     tt_int64 end;   // -1 for ubounded
 };
 
+struct QueryTraceStrings : public PacketBase
+{
+    tt_int8 handle;
+
+    // currently just return them all don't think it's every going to be that much data.
+};
 
 struct QueryServerStatsReponse
 {

@@ -969,6 +969,9 @@ bool Server::processPacket(ClientConnection& client, uint8_t* pData)
         case PacketType::QueryTraceZones:
             return handleQueryTraceZones(client, pData);
             break;
+        case PacketType::QueryTraceStrings:
+            return handleQueryTraceStrings(client, pData);
+            break;
         default:
             X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
             return false;
@@ -1407,6 +1410,44 @@ bool Server::handleQueryTraceZones(ClientConnection& client, uint8_t* pData)
     flushCompressionBuffer(client);
     return true;
 }
+
+bool Server::handleQueryTraceStrings(ClientConnection& client, uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const QueryTraceStrings*>(pData);
+    if (pHdr->type != PacketType::QueryTraceZones) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    int32_t handle = pHdr->handle;
+    if (handle <= 0 || handle >= static_cast<int32_t>(client.traces.size())) {
+        return false;
+    }
+
+    auto& ts = client.traces[pHdr->handle];
+
+    sql::SqlLiteQuery qry(ts.db.con, "SELECT id, value FROM strings");
+
+    auto it = qry.begin();
+    if (it != qry.end()) {
+        auto row = *it;
+
+        int32_t id = row.get<int32_t>(0);
+        int32_t strLen = row.columnBytes(1);
+        const char* pStr = row.get<const char*>(1);
+
+        DataPacketStringTableAdd strAdd;
+        strAdd.type = DataStreamType::StringTableAdd;
+        strAdd.id = static_cast<uint16_t>(id);
+        strAdd.length = static_cast<uint16_t>(strLen);
+
+        addToCompressionBuffer(client, &strAdd, sizeof(strAdd));
+        addToCompressionBuffer(client, pStr, strLen);
+    }
+
+    flushCompressionBuffer(client);
+    return true;
+}
+
 
 
 
