@@ -27,13 +27,13 @@ struct PacketType
         OpenTraceResp,
 
         // These just respond with DataStreams.
-        QueryTraceTicks,
-        QueryTraceZones,
-        QueryTraceStrings,
-        QueryTraceThreadNames,
+        ReqTraceTicks,
+        ReqTraceZones,
+        ReqTraceStrings,
+        ReqTraceThreadNames,
 
-        QuerySrvStats,
-        QuerySrvStatsResp,
+        //QuerySrvStats,
+        //QuerySrvStatsResp,
 
         Num
     };

@@ -2,6 +2,7 @@
 #include "TelemetryServer.h"
 
 #include <Time/DateTimeStamp.h>
+#include <Util/Guid.h>
 
 #include <IFileSys.h>
 
@@ -835,8 +836,10 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
         // load meta?
         bool loaded = true;
 
+        core::string guidStr;
         core::string dateStr;
 
+        loaded &= getMetaStr(db, "guid", guidStr);
         loaded &= getMetaStr(db, "dateStamp", dateStr);
         loaded &= getMetaStr(db, "buildInfo", trace.buildInfo);
         loaded &= getMetaStr(db, "cmdLine", trace.cmdLine);
@@ -848,6 +851,11 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
         }
 
         if (!core::DateTimeStamp::fromString(core::string_view(dateStr), trace.date)) {
+            continue;
+        }
+
+        trace.guid = core::Guid(core::string_view(guidStr));
+        if (!trace.guid.isValid()) {
             continue;
         }
 
@@ -958,14 +966,16 @@ bool Server::processPacket(ClientConnection& client, uint8_t* pData)
             return handleConnectionRequestViewer(client, pData);
         case PacketType::DataStream:
             return handleDataSream(client, pData);
+
+        // From viewer clients.
         case PacketType::OpenTrace:
             return handleOpenTrace(client, pData);
-        case PacketType::QueryTraceTicks:
-            return handleQueryTraceTicks(client, pData);
-        case PacketType::QueryTraceZones:
-            return handleQueryTraceZones(client, pData);
-        case PacketType::QueryTraceStrings:
-            return handleQueryTraceStrings(client, pData);
+        case PacketType::ReqTraceTicks:
+            return handleReqTraceTicks(client, pData);
+        case PacketType::ReqTraceZones:
+            return handleReqTraceZones(client, pData);
+        case PacketType::ReqTraceStrings:
+            return handleReqTraceStrings(client, pData);
         default:
             X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
             return false;
@@ -1018,10 +1028,13 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     client.clientVer = pConReq->clientVer;
 
     auto* pStrData = reinterpret_cast<const char*>(pConReq + 1);
+    auto* pAppNameStr = pStrData;
+    auto* pBuildInfoStr = pAppNameStr + pConReq->appNameLen;
+    auto* pCmdLineStr = pBuildInfoStr + pConReq->buildInfoLen;
 
     // Get the app name and see if we have it already.
     TelemFixedStr appName;
-    appName.set(pStrData, pStrData + pConReq->appNameLen);
+    appName.set(pAppNameStr, pAppNameStr + pConReq->appNameLen);
 
     auto it = std::find_if(apps_.begin(), apps_.end(), [&appName](const TraceApp& app) {
         return app.appName == appName;
@@ -1042,10 +1055,9 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
 
     // Create a new trace 
     Trace trace;
-    pStrData += pConReq->appNameLen;
-    trace.buildInfo.assign(pStrData, pConReq->buildInfoLen);
-    pStrData += pConReq->buildInfoLen;
-    trace.cmdLine.assign(pStrData, pConReq->cmdLineLen);
+    trace.guid = core::Guid::newGuid();
+    trace.buildInfo.assign(pBuildInfoStr, pConReq->buildInfoLen);
+    trace.cmdLine.assign(pCmdLineStr, pConReq->cmdLineLen);
     trace.ticksPerMicro = pConReq->ticksPerMicro;
 
     core::Path<> workingDir;
@@ -1086,6 +1098,8 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     bool setMeta = true;
 
     VersionInfo::Description verStr;
+    core::Guid::GuidStr guidStr;
+    setMeta &= strm.db.setMeta("guid", trace.guid.toString(guidStr));
     setMeta &= strm.db.setMeta("appName", core::string_view(pApp->appName));
     setMeta &= strm.db.setMeta("buildInfo", trace.buildInfo);
     setMeta &= strm.db.setMeta("cmdLine", trace.cmdLine);
@@ -1199,6 +1213,8 @@ bool Server::sendAppTraceList(ClientConnection& client)
         for (const auto& trace : app.traces)
         {
             AppTraceListData tld;
+            tld.guid = trace.guid;
+            tld.active = trace.active;
             tld.date = trace.date;
             strcpy(tld.name, trace.name.c_str());
             strcpy(tld.buildInfo, trace.buildInfo.c_str());
@@ -1219,32 +1235,39 @@ bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
 
     // TODO: check we don't have it open already.
     // TODO: thread safety etc..
+    for (size_t i = 0; i < client.traces.size();i++)
+    {
+        auto& trace = client.traces[i];
+        if (trace.pTrace->guid == pHdr->guid)
+        {
+            X_WARNING("TelemSrv", "Client opened a trace they already have open");
+
+            OpenTraceResp otr;
+            otr.handle = safe_static_cast<int8_t>(i);
+            sendDataToClient(client, &otr, sizeof(otr));
+            return true;
+        }
+    }
 
     if (client.traces.size() < MAX_TRACES_OPEN_PER_CLIENT)
     {
-        for (size_t i = 0; i < apps_.size(); i++)
+        for (auto& app : apps_)
         {
-            auto& app = apps_[i];
-            if (app.appName.isEqual(pHdr->appName))
+            for (auto& trace : app.traces)
             {
-                for (size_t x = 0; x < app.traces.size(); x++)
+                if (trace.guid == pHdr->guid) 
                 {
-                    auto& trace = app.traces[x];
-                    if (trace.name == pHdr->name)
-                    {
-                        // we found it !
-                        TraceStream ts;
-                        ts.pTrace = &trace;
-                        if (ts.db.openDB(trace.dbPath))
-                        {
-                            auto id = client.traces.size();
-                            client.traces.emplace_back(std::move(ts));
+                    // we found it !
+                    TraceStream ts;
+                    ts.pTrace = &trace;
+                    if (ts.db.openDB(trace.dbPath)) {
+                        auto id = client.traces.size();
+                        client.traces.emplace_back(std::move(ts));
 
-                            OpenTraceResp otr;
-                            otr.handle = safe_static_cast<int8_t>(id);
-                            sendDataToClient(client, &otr, sizeof(otr));
-                            return true;
-                        }
+                        OpenTraceResp otr;
+                        otr.handle = safe_static_cast<int8_t>(id);
+                        sendDataToClient(client, &otr, sizeof(otr));
+                        return true;
                     }
                 }
             }
@@ -1324,10 +1347,10 @@ void addToCompressionBuffer(ClientConnection& client, const void* pData, int32_t
     client.cmpBufEnd += len;
 }
 
-bool Server::handleQueryTraceTicks(ClientConnection& client, uint8_t* pData)
+bool Server::handleReqTraceTicks(ClientConnection& client, uint8_t* pData)
 {
-    auto* pHdr = reinterpret_cast<const QueryTraceTicks*>(pData);
-    if (pHdr->type != PacketType::QueryTraceTicks) {
+    auto* pHdr = reinterpret_cast<const ReqTraceTicks*>(pData);
+    if (pHdr->type != PacketType::ReqTraceTicks) {
         X_ASSERT_UNREACHABLE();
     }
 
@@ -1368,10 +1391,10 @@ bool Server::handleQueryTraceTicks(ClientConnection& client, uint8_t* pData)
     return true;
 }
 
-bool Server::handleQueryTraceZones(ClientConnection& client, uint8_t* pData)
+bool Server::handleReqTraceZones(ClientConnection& client, uint8_t* pData)
 {
-    auto* pHdr = reinterpret_cast<const QueryTraceZones*>(pData);
-    if (pHdr->type != PacketType::QueryTraceZones) {
+    auto* pHdr = reinterpret_cast<const ReqTraceZones*>(pData);
+    if (pHdr->type != PacketType::ReqTraceZones) {
         X_ASSERT_UNREACHABLE();
     }
 
@@ -1405,10 +1428,10 @@ bool Server::handleQueryTraceZones(ClientConnection& client, uint8_t* pData)
     return true;
 }
 
-bool Server::handleQueryTraceStrings(ClientConnection& client, uint8_t* pData)
+bool Server::handleReqTraceStrings(ClientConnection& client, uint8_t* pData)
 {
-    auto* pHdr = reinterpret_cast<const QueryTraceStrings*>(pData);
-    if (pHdr->type != PacketType::QueryTraceZones) {
+    auto* pHdr = reinterpret_cast<const ReqTraceStrings*>(pData);
+    if (pHdr->type != PacketType::ReqTraceZones) {
         X_ASSERT_UNREACHABLE();
     }
 

@@ -168,9 +168,10 @@ private:
     bool handleConnectionRequest(ClientConnection& client, uint8_t* pData);
     bool handleConnectionRequestViewer(ClientConnection& client, uint8_t* pData);
     bool handleOpenTrace(ClientConnection& client, uint8_t* pData);
-    bool handleQueryTraceTicks(ClientConnection& client, uint8_t* pData);
-    bool handleQueryTraceZones(ClientConnection& client, uint8_t* pData);
-    bool handleQueryTraceStrings(ClientConnection& client, uint8_t* pData);
+
+    bool handleReqTraceTicks(ClientConnection& client, uint8_t* pData);
+    bool handleReqTraceZones(ClientConnection& client, uint8_t* pData);
+    bool handleReqTraceStrings(ClientConnection& client, uint8_t* pData);
 
 private:
     core::MemoryArenaBase* arena_;

@@ -3,6 +3,7 @@
 #include <Containers/Array.h>
 
 #include <Util/UniquePointer.h>
+#include <Util/Guid.h>
 #include <Time/DateTimeStamp.h>
 
 #include <../TelemetryCommon/TelemetryCommonLib.h>
@@ -26,15 +27,18 @@ using TelemFixedStr = core::StackString<MAX_STRING_LEN, char>;
 struct Trace
 {
     Trace() :
-        ticksPerMicro(0)
+        ticksPerMicro(0),
+        active(false)
     {}
 
-    core::Path<> dbPath;
-    core::string name;
+    bool active;
+    core::Guid guid;
+    uint64_t ticksPerMicro;
     core::DateTimeStamp date;
+    core::string name;
     core::string buildInfo;
     core::string cmdLine;
-    uint64_t ticksPerMicro;
+    core::Path<> dbPath;
 };
 
 using TraceArr = core::Array<Trace>;

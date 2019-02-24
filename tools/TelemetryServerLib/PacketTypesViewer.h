@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Time/DateTimeStamp.h>
-
+#include <Util/Guid.h>
 
 X_NAMESPACE_BEGIN(telemetry)
 
@@ -32,7 +32,8 @@ struct AppTraceListHdr : public PacketBase
 
 struct AppTraceListData
 {
-    tt_int32 traceId;
+    core::Guid guid;
+    bool active;
     core::DateTimeStamp date;
     char name[MAX_STRING_LEN];
     char buildInfo[MAX_STRING_LEN];
@@ -40,7 +41,7 @@ struct AppTraceListData
 
 struct TraceInfo : public PacketBase
 {
-    tt_int32 traceId;
+    core::Guid guid;
     tt_int64 numZones;
     tt_int64 numTicks;
     tt_int64 numAllocations;
@@ -49,11 +50,7 @@ struct TraceInfo : public PacketBase
 
 struct OpenTrace : public PacketBase
 {
-    tt_int32 traceId;
-
-    // TEMP
-    char appName[MAX_STRING_LEN];
-    char name[MAX_STRING_LEN];
+    core::Guid guid;
 };
 
 struct OpenTraceResp : public PacketBase
@@ -61,7 +58,7 @@ struct OpenTraceResp : public PacketBase
     tt_int8 handle;
 };
 
-struct QueryTraceTicks : public PacketBase
+struct ReqTraceTicks : public PacketBase
 {
     tt_int8 handle;
 
@@ -69,7 +66,7 @@ struct QueryTraceTicks : public PacketBase
     tt_int32 num;      // -1 for all
 };
 
-struct QueryTraceZones : public PacketBase
+struct ReqTraceZones : public PacketBase
 {
     tt_int8 handle;
 
@@ -77,19 +74,21 @@ struct QueryTraceZones : public PacketBase
     tt_int64 end;   // -1 for ubounded
 };
 
-struct QueryTraceStrings : public PacketBase
+struct ReqTraceStrings : public PacketBase
 {
     tt_int8 handle;
 
     // currently just return them all don't think it's every going to be that much data.
 };
 
+#if 0
 struct QueryServerStatsReponse
 {
     tt_int32 activeTraces;
     tt_int64 bpsIngest;
     tt_int64 storageUsed;
 };
+#endif
 
 
 X_NAMESPACE_END
