@@ -392,9 +392,11 @@ bool TraceDB::setPragmas(void)
 
 bool TraceDB::createIndexes(void)
 {
-    sql::SqlLiteCmd cmd(con, R"(CREATE INDEX IF NOT EXISTS "zones_start" ON "zones" (
-        "start"	ASC
-    ))");
+    sql::SqlLiteCmd cmd(con, R"(
+        CREATE INDEX IF NOT EXISTS "zones_start" ON "zones" (
+            "start"	ASC
+        )
+    )");
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
