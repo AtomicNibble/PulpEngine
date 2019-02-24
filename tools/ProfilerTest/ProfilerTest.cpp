@@ -10,6 +10,7 @@
 
 #include <Platform\Console.h>
 
+#include <Time/StopWatch.h>
 
 #include <../Telemetry/TelemetryLib.h>
 
@@ -88,10 +89,14 @@ namespace
     {
         X_UNUSED(thread);
 
-        core::CriticalSection cs;
+        core::CriticalSection cs0, cs1;
+
+        core::StopWatch timer;
+        int32_t total = 0;
 
         ttSetThreadName(ctx, ::GetCurrentThreadId(), "BackgroundThread");
-        ttSetLockName(ctx, &cs, "Magic lock");
+        ttSetLockName(ctx, &cs0, "Magic lock");
+        ttSetLockName(ctx, &cs1, "Stu's lock");
 
         for (int i = 0; i < 15; i++)
         {
@@ -99,44 +104,63 @@ namespace
 
             ttZone(ctx, "Aint no camel like me!");
 
-            for (int x = 0; x < 500; x++)
+            // alloc me baby.
+            ttAlloc(ctx, (void*)0x12345678, 0x300 * (i + 1))
+            ttFree(ctx, (void*)0x12345678)
+
+            for (int x = 0; x < 10; x++)
             {
                 {
+                    ScopedLockTelemetry lock(cs0);
+
                     ttZone(ctx, "Slap my goat!");
-
+                    total++;
                     core::Thread::sleep(0);
                 }
 
+#if 0
                 {
-                    ttZoneFilterd(ctx, 2, "Sometimes filtered");
-                  
+                   ttZoneFilterd(ctx, 2, "Sometimes filtered");
                     core::Thread::sleep(0);
                 }
+#endif
 
-                for (int y = 0; y < 10; y++)
+                for (int j = 0; j < 50; j++)
                 {
-                    ttEnter(ctx, "Yep")
-                    ttLeave(ctx)
+                    ttTick(ctx);
+                    ttZone(ctx, "Meoooow");
+
+                    for (int y = 0; y < 100; y++)
+                    {
+                        ttEnter(ctx, "Yep")
+                        ttLeave(ctx)
+                    }
+
                 }
             }
 
             // Lock me up like a goat.
-            ScopedLockTelemetry lock(cs);
+            ScopedLockTelemetry lock(cs1);
             core::Thread::sleep(0);
         }
 
         ttFlush(ctx);
 
+        auto ellapsed = timer.GetMilliSeconds();
+        X_LOG0("ProfilerTest", "total %i %fms", total, ellapsed);
+
         return core::Thread::ReturnValue(0);
     }
-
 
 
     void LogFunc(void* pUserData, LogType type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm)
     {
         X_UNUSED(pUserData);
+        X_UNUSED(type);
+        X_UNUSED(pMsgNullTerm);
         X_UNUSED(lenWithoutTerm);
 
+#if 0
         switch (type)
         {
             case LogType::Msg:
@@ -149,6 +173,7 @@ namespace
                 X_ERROR("Telemetry", pMsgNullTerm);
                 break;
        }
+#endif
     }
 
 } // namespace
@@ -177,9 +202,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             return 1;
         }
 
+
 #if TTELEMETRY_ENABLED
 
-        const size_t telemBufSize = 1024 * 1024;
+        const size_t telemBufSize = 1024 * 1024 * 2;
         auto telemBuf = core::makeUnique<uint8_t[]>(&arena, telemBufSize, 64);
 
         ttInitializeContext(ctx, telemBuf.ptr(), telemBufSize);
