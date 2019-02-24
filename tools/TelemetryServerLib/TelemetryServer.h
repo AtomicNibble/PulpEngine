@@ -167,8 +167,9 @@ private:
 
     bool handleConnectionRequest(ClientConnection& client, uint8_t* pData);
     bool handleConnectionRequestViewer(ClientConnection& client, uint8_t* pData);
+    
+    bool handleQueryTraceInfo(ClientConnection& client, uint8_t* pData);
     bool handleOpenTrace(ClientConnection& client, uint8_t* pData);
-
     bool handleReqTraceTicks(ClientConnection& client, uint8_t* pData);
     bool handleReqTraceZones(ClientConnection& client, uint8_t* pData);
     bool handleReqTraceStrings(ClientConnection& client, uint8_t* pData);

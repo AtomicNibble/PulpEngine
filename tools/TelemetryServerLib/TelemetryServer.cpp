@@ -241,6 +241,61 @@ namespace
         return true;
     }
 
+    struct TraceStats
+    {
+        tt_int64 numZones;
+        tt_int64 numTicks;
+        tt_int64 durationMicro;
+        // will either need to store free in seperate table or manually count them.
+        // tt_int64 numAllocations;
+    };
+
+    bool getStats(sql::SqlLiteDb& db, TraceStats& stats)
+    {
+        // These need to be fast even when there is 10 million rows etc..
+        {
+            sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM zones LIMIT 1");
+            auto it = qry.begin();
+            if (it == qry.end()) {
+                X_ERROR("TelemSrv", "Failed to load zone counts");
+                return false;
+            }
+
+            stats.numZones = (*it).get<int64_t>(0);
+        }
+
+        {
+            sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM ticks LIMIT 1");
+            auto it = qry.begin();
+            if (it == qry.end()) {
+                X_ERROR("TelemSrv", "Failed to load tick counts");
+                return false;
+            }
+
+            stats.numTicks = (*it).get<int64_t>(0);
+        }
+
+        {
+            sql::SqlLiteQuery qry(db, "SELECT endMicro FROM ticks WHERE _rowid_ = (SELECT MAX(_rowid_) FROM ticks)");
+            auto it = qry.begin();
+            if (it == qry.end()) {
+                X_ERROR("TelemSrv", "Failed to load tick counts");
+                return false;
+            }
+
+            stats.durationMicro = (*it).get<int64_t>(0);
+        }
+
+        {
+            // simular performance.
+            // SELECT * FROM zones WHERE _rowid_ = (SELECT MAX(_rowid_) FROM zones);
+            // SELECT * FROM zones ORDER BY Id DESC LIMIT 1;
+            //sql::SqlLiteQuery qry(db, "SELECT * FROM zones WHERE _rowid_ = (SELECT MAX(_rowid_) FROM zones)");
+
+        }
+
+        return true;
+    }
 
     bool getMetaStr(sql::SqlLiteDb& db, const char* pName, core::string& strOut)
     {
@@ -985,6 +1040,8 @@ bool Server::processPacket(ClientConnection& client, uint8_t* pData)
             return handleDataSream(client, pData);
 
         // From viewer clients.
+        case PacketType::QueryTraceInfo:
+            return handleQueryTraceInfo(client, pData);
         case PacketType::OpenTrace:
             return handleOpenTrace(client, pData);
         case PacketType::ReqTraceTicks:
@@ -1231,6 +1288,50 @@ bool Server::sendAppList(ClientConnection& client)
         }
     }
 
+    return true;
+}
+
+bool Server::handleQueryTraceInfo(ClientConnection& client, uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const QueryTraceInfo*>(pData);
+    if (pHdr->type != PacketType::QueryTraceInfo) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    for (auto& app : apps_)
+    {
+        for (auto& trace : app.traces)
+        {
+            if (trace.guid == pHdr->guid)
+            {
+                sql::SqlLiteDb db;
+
+                if (!db.connect(trace.dbPath.c_str(), sql::OpenFlags())) {
+                    X_ERROR("TelemSrv", "Failed to openDB: \"%s\"", trace.dbPath.c_str());
+                    continue;
+                }
+
+                TraceStats stats;
+                if (getStats(db, stats))
+                {
+                    QueryTraceInfoResp resp;
+                    resp.type = PacketType::QueryTraceInfoResp;
+                    resp.dataSize = sizeof(resp);
+                    resp.guid = pHdr->guid;
+                    resp.numZones = stats.numZones;
+                    resp.numTicks = stats.numTicks;
+                    resp.numAllocations = 0; // stats.numAllocations;
+                    resp.durationMicro = stats.durationMicro;
+
+                    sendDataToClient(client, &resp, sizeof(resp));
+                }
+
+                return true;
+            }
+        }
+    }
+
+    // you silly goat.
     return true;
 }
 

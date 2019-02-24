@@ -35,7 +35,13 @@ struct AppTraceListData
     char buildInfo[MAX_STRING_LEN];
 };
 
-struct TraceInfo : public PacketBase
+struct QueryTraceInfo : public PacketBase
+{
+    core::Guid guid;
+};
+
+
+struct QueryTraceInfoResp : public PacketBase
 {
     core::Guid guid;
     tt_int64 numZones;
