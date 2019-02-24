@@ -36,6 +36,26 @@ const char* DateTimeStamp::toString(Description& desc) const
     return desc;
 }
 
+bool DateTimeStamp::fromString(core::string_view str, DateTimeStamp& stampOut)
+{
+    // make sure it's null term.
+    core::StackString<sizeof(Description), char> buf(str.begin(), str.end());
+
+    // will be same format as above.
+    int year, month, day, hour, minute, second;
+
+    int num = sscanf_s(buf.c_str(), "%d-%d-%dT%d-%d-%d",
+        &year, &month, &day, &hour, &minute, &second);
+
+    if (num != 6) {
+        X_ERROR("DateTime", "Failed to parse string \"%s\"", buf.c_str());
+        return false;
+    }
+
+    stampOut = DateTimeStamp(year, month, day, hour, minute, second, 0);
+    return true;
+}
+
 DateTimeStamp DateTimeStamp::getSystemDateTime(void)
 {
     return DateTimeStamp(DateStamp::getSystemDate(), TimeStamp::getSystemTime());

@@ -18,6 +18,7 @@ public:
     bool operator<(const DateTimeStamp& rhs) const;
 
     const char* toString(Description& desc) const;
+    static bool fromString(core::string_view str, DateTimeStamp& stampOut);
 
     static DateTimeStamp getSystemDateTime(void);
 
