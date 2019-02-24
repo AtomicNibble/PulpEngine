@@ -424,7 +424,7 @@ void DrawFrame(Client& client, float ww, float wh)
         ImGui::EndMainMenuBar();
     }
 
-    //    float h = wh - menuBarSize.y;
+    const float h = wh - menuBarSize.y;
     const float defauktWorkspaceWidth = 300.f;
     const float minWorkspaceWidth = 128.f;
     const float minTracesWidth = 256.f;
@@ -453,74 +453,107 @@ void DrawFrame(Client& client, float ww, float wh)
 
     Splitter(true, 4.0f, &sz1, &sz2, minWorkspaceWidth, minTracesWidth);
     {
-        ImGui::BeginChild("1", ImVec2(sz1, -1), false);
+        ImGui::BeginChild("##1", ImVec2(sz1, -1), false);
 
         if (ImGui::BeginTabBar("Main Tabs"))
         {
             if (ImGui::BeginTabItem("Traces", nullptr, 0))
             {
-                if (client.isConnected())
+               // float infoHeight = 200.f;
+
+                ImGui::BeginChild("##TraceList", ImVec2(0, h - 200.f));
                 {
-                    // draw me a list like a pickle in the wind.
-                    for (const auto& app : client.apps)
+                    if (client.isConnected())
                     {
-                        if (ImGui::CollapsingHeader(app.appName.c_str()))
+                        // draw me a list like a pickle in the wind.
+                        for (const auto& app : client.apps)
                         {
-                            // ImGui::Text(app.appName.c_str());
-                            // ImGui::Text("Num %" PRIuS, app.traces.size());
-                            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor(0.2f, 0.2f, 0.2f));
-
-                            static int selected = -1;
-
-                            for (int32_t i = 0; i < static_cast<int32_t>(app.traces.size()); i++)
+                            if (ImGui::CollapsingHeader(app.appName.c_str()))
                             {
-                                const auto& trace = app.traces[i];
+                                // ImGui::Text(app.appName.c_str());
+                                // ImGui::Text("Num %" PRIuS, app.traces.size());
+                                ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor(0.2f, 0.2f, 0.2f));
 
-                                // want to build a string like:
-                                // hostname - 6 min ago
-                                // auto timeNow = core::DateTimeStamp::getSystemDateTime();
+                                static int selected = -1;
 
-                                if (ImGui::Selectable(trace.hostName.c_str(), selected == i))
+                                for (int32_t i = 0; i < static_cast<int32_t>(app.traces.size()) * 10; i++)
                                 {
-                                    selected = i;
-                                }
-                            }
+                                    const auto& trace = app.traces[i % 3];
 
-                            ImGui::PopStyleColor(1);
+                                    // want to build a string like:
+                                    // hostname - 6 min ago
+                                    // auto timeNow = core::DateTimeStamp::getSystemDateTime();
+                                    ImGui::PushID(i);
+
+                                    if (ImGui::Selectable(trace.hostName.c_str(), selected == i))
+                                    {
+                                        selected = i;
+                                    }
+
+                                    if (selected == i)
+                                    {
+                                        // meow.
+                                    }
+
+                                    ImGui::PopID();
+                                }
+
+                                ImGui::PopStyleColor(1);
+                            }
                         }
                     }
+                    else
+                    {
+                        // show some connect button.
+                        ImGui::Separator();
+                        ImGui::TextUnformatted("Connect to server");
+
+                        const bool connecting = client.conState == Client::ConnectionState::Connecting;
+
+                        if (connecting)
+                        {
+                            ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+                            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+                        }
+
+                        char addr[256] = { "127.0.0.1" };
+                        bool connectClicked = false;
+                        connectClicked |= ImGui::InputText("", addr, sizeof(addr), ImGuiInputTextFlags_EnterReturnsTrue);
+                        connectClicked |= ImGui::Button("Connect");
+
+                        if (connecting)
+                        {
+                            ImGui::PopItemFlag();
+                            ImGui::PopStyleVar();
+                        }
+                        else if (connectClicked && *addr)
+                        {
+                            client.addr.set(addr);
+
+                            // how to know connecting?
+                            client.connectSignal.raise();
+                        }
+                    }
+
                 }
-                else
+                ImGui::EndChild();
+
+                // stats.
                 {
-                    // show some connect button.
-                    ImGui::Separator();
-                    ImGui::TextUnformatted("Connect to server");
+                    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.15f, 0.15f, 0.15f, 1.f));
+                   // ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0,0));
+                    //ImGui::SetNextWindowPos(ImVec2(0, 0));
+                  //  ImGui::SetNextWindowSize(ImVec2(-1, 100));
 
-                    const bool connecting = client.conState == Client::ConnectionState::Connecting;
 
-                    if (connecting)
-                    {
-                        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-                        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-                    }
+                    ImGui::BeginChild("##TraceInfo", ImVec2(-1, -1), true);
+                    ImGui::Text("Duration: -");
+                    ImGui::Text("Zones: -");
+                    ImGui::Text("Allocations: -");
+                    ImGui::EndChild();
 
-                    char addr[256] = { "127.0.0.1" };
-                    bool connectClicked = false;
-                    connectClicked |= ImGui::InputText("", addr, sizeof(addr), ImGuiInputTextFlags_EnterReturnsTrue);
-                    connectClicked |= ImGui::Button("Connect");
-
-                    if (connecting)
-                    {
-                        ImGui::PopItemFlag();
-                        ImGui::PopStyleVar();
-                    }
-                    else if (connectClicked && *addr)
-                    {
-                        client.addr.set(addr);
-
-                        // how to know connecting?
-                        client.connectSignal.raise();
-                    }
+                    ImGui::PopStyleColor();
+                 //   ImGui::PopStyleVar();
                 }
 
                 ImGui::EndTabItem();
@@ -539,7 +572,7 @@ void DrawFrame(Client& client, float ww, float wh)
     }
     ImGui::SameLine();
     {
-        ImGui::BeginChild("2", ImVec2(sz2, -1), false);
+        ImGui::BeginChild("##2", ImVec2(sz2, -1), false);
 
         if (ImGui::BeginTabBar("View Tabs"))
         {
