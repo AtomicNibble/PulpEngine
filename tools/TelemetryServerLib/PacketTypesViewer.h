@@ -25,15 +25,11 @@ struct AppsListData
     char appName[MAX_STRING_LEN];
 };
 
-struct AppTraceListHdr : public PacketBase
-{
-    tt_int32 num;
-};
-
 struct AppTraceListData
 {
-    core::Guid guid;
     bool active;
+    core::Guid guid;
+    uint64_t ticksPerMicro;
     core::DateTimeStamp date;
     char name[MAX_STRING_LEN];
     char buildInfo[MAX_STRING_LEN];

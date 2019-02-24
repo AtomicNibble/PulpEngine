@@ -1166,11 +1166,7 @@ bool Server::handleConnectionRequestViewer(ClientConnection& client, uint8_t* pD
 
     // send them some data.
     if (!sendAppList(client)) {
-
-    }
-
-    if (!sendAppTraceList(client)) {
-
+        X_LOG0("TelemSrv", "Error sending app list to client");
     }
 
     return true;
@@ -1178,10 +1174,17 @@ bool Server::handleConnectionRequestViewer(ClientConnection& client, uint8_t* pD
 
 bool Server::sendAppList(ClientConnection& client)
 {
-    auto numApps = static_cast<int32_t>(apps_.size());
+    int32_t numApps = static_cast<int32_t>(apps_.size());
+    int32_t numTraces = core::accumulate(apps_.begin(), apps_.end(), 0_i32, [](const TraceApp& app) {
+        return static_cast<int32_t>(app.traces.size());
+    });
 
     AppsListHdr resHdr;
-    resHdr.dataSize = static_cast<tt_uint16>((sizeof(resHdr) + (sizeof(AppsListData) * numApps)));
+    resHdr.dataSize = static_cast<tt_uint16>(
+        sizeof(resHdr) + 
+        (sizeof(AppsListData) * numApps) +
+        (sizeof(AppTraceListData) * numTraces)
+    );
     resHdr.type = PacketType::AppList;
     resHdr.num = numApps;
 
@@ -1194,22 +1197,8 @@ bool Server::sendAppList(ClientConnection& client)
         strcpy(ald.appName, app.appName.c_str());
 
         sendDataToClient(client, &ald, sizeof(ald));
-    }
 
-    return true;
-}
-
-bool Server::sendAppTraceList(ClientConnection& client)
-{
-    for (const auto& app : apps_)
-    {
-        AppTraceListHdr resHdr;
-        resHdr.dataSize = static_cast<tt_uint16>((sizeof(resHdr) + (sizeof(AppTraceListData) * app.traces.size())));
-        resHdr.type = PacketType::AppTraceList;
-        resHdr.num = static_cast<uint32_t>(app.traces.size());
-
-        sendDataToClient(client, &resHdr, sizeof(resHdr));
-
+        // send the traces
         for (const auto& trace : app.traces)
         {
             AppTraceListData tld;

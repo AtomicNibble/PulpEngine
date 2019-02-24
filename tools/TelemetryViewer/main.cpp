@@ -20,23 +20,6 @@ X_DISABLE_WARNING(4505) // unreferenced local function has been removed
 
 namespace
 {
-    typedef core::MemoryArena<
-        core::MallocFreeAllocator,
-        core::SingleThreadPolicy,
-#if X_ENABLE_MEMORY_DEBUG_POLICIES
-        core::SimpleBoundsChecking,
-        core::SimpleMemoryTracking,
-        core::SimpleMemoryTagging
-#else
-        core::NoBoundsChecking,
-        core::NoMemoryTracking,
-        core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-    >
-        TelemetryViewerArena;
-
-    TelemetryViewerArena* g_arena = nullptr;
-
     bool winSockInit(void)
     {
         platform::WSADATA winsockInfo;
@@ -1310,7 +1293,7 @@ namespace
 
 } // namespace
 
-
+TelemetryViewerArena* g_arena = nullptr;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,

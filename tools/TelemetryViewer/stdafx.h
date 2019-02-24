@@ -29,3 +29,20 @@ X_LINK_LIB("SDL2.lib");
 
 
 X_DISABLE_WARNING(4505) // unreferenced local function has been removed
+
+typedef core::MemoryArena<
+    core::MallocFreeAllocator,
+    core::SingleThreadPolicy,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+    core::SimpleBoundsChecking,
+    core::SimpleMemoryTracking,
+    core::SimpleMemoryTagging
+#else
+    core::NoBoundsChecking,
+    core::NoMemoryTracking,
+    core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+>
+TelemetryViewerArena;
+
+extern TelemetryViewerArena* g_arena;

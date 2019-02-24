@@ -362,9 +362,6 @@ namespace
 
 } // namespace
 
-bool connectToServer(Client& client);
-
-
 
 void DrawFrame(Client& client, float ww, float wh)
 {
@@ -495,18 +492,30 @@ void DrawFrame(Client& client, float ww, float wh)
                     ImGui::Separator();
                     ImGui::TextUnformatted("Connect to server");
 
-                    char addr[256] = { "127.0.0.1" };
+                    const bool connecting = client.conState == Client::ConnectionState::Connecting;
 
+                    if (connecting)
+                    {
+                        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+                        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+                    }
+
+                    char addr[256] = { "127.0.0.1" };
                     bool connectClicked = false;
                     connectClicked |= ImGui::InputText("", addr, sizeof(addr), ImGuiInputTextFlags_EnterReturnsTrue);
                     connectClicked |= ImGui::Button("Connect");
 
-                    if (connectClicked && *addr)
+                    if (connecting)
                     {
-                        if (!connectToServer(client))
-                        {
+                        ImGui::PopItemFlag();
+                        ImGui::PopStyleVar();
+                    }
+                    else if (connectClicked && *addr)
+                    {
+                        client.addr.set(addr);
 
-                        }
+                        // how to know connecting?
+                        client.connectSignal.raise();
                     }
                 }
 
@@ -604,6 +613,54 @@ bool handleDataSream(Client& client, uint8_t* pData)
     return true;
 }
 
+bool handleAppList(Client& client, uint8_t* pData)
+{
+    X_UNUSED(client, pData);
+
+    auto* pHdr = reinterpret_cast<const AppsListHdr*>(pData);
+    if (pHdr->type != PacketType::AppList) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+
+    telemetry::TraceAppArr apps(g_arena);
+    apps.reserve(pHdr->num);
+
+    auto* pSrcApp = reinterpret_cast<const AppsListData*>(pHdr + 1);
+
+    for (int32_t i = 0; i < pHdr->num; i++)
+    {
+        TelemFixedStr name(pSrcApp->appName);
+        TraceApp app(name, g_arena);
+        app.traces.reserve(pSrcApp->numTraces);
+
+        auto* pTraceData = reinterpret_cast<const AppTraceListData*>(pSrcApp + 1);
+
+        for (int32_t x = 0; x < pSrcApp->numTraces; x++)
+        {
+            auto& srcTrace = pTraceData[x];
+
+            Trace trace;
+            trace.active = srcTrace.active;
+            trace.guid = srcTrace.guid;
+            trace.ticksPerMicro = srcTrace.ticksPerMicro;
+            trace.date = srcTrace.date;
+            trace.name = srcTrace.name;
+            trace.buildInfo = srcTrace.buildInfo;
+
+            app.traces.emplace_back(std::move(trace));
+        }
+
+        apps.emplace_back(std::move(app));
+
+        pSrcApp = reinterpret_cast<const AppsListData*>(pTraceData + pSrcApp->numTraces);
+    }
+
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+    client.apps = std::move(apps);
+    return true;
+}
+
 
 bool processPacket(Client& client, uint8_t* pData)
 {
@@ -611,9 +668,11 @@ bool processPacket(Client& client, uint8_t* pData)
 
     switch (pPacketHdr->type)
     {
-        case PacketType::ConnectionRequestAccepted:
-            // todo mark as connected.
+        case PacketType::ConnectionRequestAccepted: {
+            auto* pConAccept = reinterpret_cast<const ConnectionRequestAcceptedHdr*>(pData);
+            client.serverVer = pConAccept->serverVer;
             return true;
+        }
         case PacketType::ConnectionRequestRejected: {
             auto* pConRej = reinterpret_cast<const ConnectionRequestRejectedHdr*>(pData);
             auto* pStrData = reinterpret_cast<const char*>(pConRej + 1);
@@ -622,6 +681,10 @@ bool processPacket(Client& client, uint8_t* pData)
         }
         case PacketType::DataStream:
             return handleDataSream(client, pData);
+
+        case PacketType::AppList:
+            return handleAppList(client, pData);
+
         default:
             X_ERROR("TelemViewer", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
             return false;
@@ -697,6 +760,10 @@ bool readPacket(Client& client, char* pBuffer, int& bufLengthInOut)
 }
 
 Client::Client(core::MemoryArenaBase* arena) :
+    addr("127.0.0.1"),
+    port(8001),
+    conState(ConnectionState::Offline),
+    connectSignal(true),
     apps(arena)
 {
     socket = INV_SOCKET;
@@ -721,7 +788,9 @@ bool connectToServer(Client& client)
     hints.ai_protocol = platform::IPPROTO_TCP;
 
     // Resolve the server address and port
-    auto res = platform::getaddrinfo("127.0.0.1", "8001", &hints, &servinfo);
+    core::StackString<16, char> portStr(client.port);
+
+    auto res = platform::getaddrinfo(client.addr.c_str(), portStr.c_str(), &hints, &servinfo);
     if (res != 0) {
         X_ERROR("Telem", "Failed to get addre info. Error: %d", platform::WSAGetLastError());
         return false;
@@ -788,6 +857,44 @@ bool connectToServer(Client& client)
     return true;
 }
 
+core::Thread::ReturnValue threadFunc(const core::Thread& thread)
+{
+    char recvbuf[MAX_PACKET_SIZE];
+
+    Client& client = *reinterpret_cast<Client*>(thread.getData());
+
+    // do work!
+    while (thread.shouldRun())
+    {
+        // we need to wait till we are told to connect.
+        // then try connect.
+        while (!client.isConnected())
+        {
+            client.connectSignal.wait();
+            client.conState = Client::ConnectionState::Connecting;
+
+            if (!connectToServer(client)) {
+                client.conState = Client::ConnectionState::Offline;
+            }
+        }
+
+        client.conState = Client::ConnectionState::Connected;
+
+        // listen for packets.
+        int recvbuflen = sizeof(recvbuf);
+
+        if (!readPacket(client, recvbuf, recvbuflen)) {
+            return false;
+        }
+
+        if (!processPacket(client, reinterpret_cast<tt_uint8*>(recvbuf))) {
+            return false;
+        }
+    }
+
+    return core::Thread::ReturnValue(0);
+}
+
 bool run(Client& client)
 {
     // Setup SDL
@@ -829,8 +936,14 @@ bool run(Client& client)
 
     bool done = false;
 
+    // start a thread for the socket.
+    core::Thread thread;
+    thread.create("Worker", 1024 * 64);
+    thread.setData(&client);
+    thread.start(threadFunc);
+
     // try connect to server
-    (void)connectToServer(client);
+    client.connectSignal.raise();
 
     while (!done)
     {

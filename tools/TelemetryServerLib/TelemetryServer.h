@@ -163,7 +163,6 @@ private:
     void handleClient(ClientConnection& client);
 
     bool sendAppList(ClientConnection& client);
-    bool sendAppTraceList(ClientConnection& client);
 
     bool handleConnectionRequest(ClientConnection& client, uint8_t* pData);
     bool handleConnectionRequestViewer(ClientConnection& client, uint8_t* pData);
