@@ -51,6 +51,7 @@ struct OpenTrace : public PacketBase
 
 struct OpenTraceResp : public PacketBase
 {
+    core::Guid guid;
     tt_int8 handle;
 };
 

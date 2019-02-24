@@ -1222,6 +1222,11 @@ bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
         X_ASSERT_UNREACHABLE();
     }
 
+    OpenTraceResp otr;
+    otr.dataSize = sizeof(otr);
+    otr.type = PacketType::OpenTraceResp;
+    otr.guid = pHdr->guid;
+
     // TODO: check we don't have it open already.
     // TODO: thread safety etc..
     for (size_t i = 0; i < client.traces.size();i++)
@@ -1230,8 +1235,6 @@ bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
         if (trace.pTrace->guid == pHdr->guid)
         {
             X_WARNING("TelemSrv", "Client opened a trace they already have open");
-
-            OpenTraceResp otr;
             otr.handle = safe_static_cast<int8_t>(i);
             sendDataToClient(client, &otr, sizeof(otr));
             return true;
@@ -1253,7 +1256,6 @@ bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
                         auto id = client.traces.size();
                         client.traces.emplace_back(std::move(ts));
 
-                        OpenTraceResp otr;
                         otr.handle = safe_static_cast<int8_t>(id);
                         sendDataToClient(client, &otr, sizeof(otr));
                         return true;
@@ -1263,7 +1265,6 @@ bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
         }
     }
 
-    OpenTraceResp otr;
     otr.handle = -1_ui8;
     sendDataToClient(client, &otr, sizeof(otr));
     return true;
