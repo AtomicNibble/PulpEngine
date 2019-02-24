@@ -954,29 +954,18 @@ bool Server::processPacket(ClientConnection& client, uint8_t* pData)
     {
         case PacketType::ConnectionRequest:
             return handleConnectionRequest(client, pData);
-            break;
         case PacketType::ConnectionRequestViewer:
             return handleConnectionRequestViewer(client, pData);
-            break;
         case PacketType::DataStream:
             return handleDataSream(client, pData);
-            break;
-
-    //    case PacketType::QueryTraceInfo:
-    //        return handleQueryTraceInfo(client, pData);
-    //        break;
         case PacketType::OpenTrace:
             return handleOpenTrace(client, pData);
-            break;
         case PacketType::QueryTraceTicks:
             return handleQueryTraceTicks(client, pData);
-            break;
         case PacketType::QueryTraceZones:
             return handleQueryTraceZones(client, pData);
-            break;
         case PacketType::QueryTraceStrings:
             return handleQueryTraceStrings(client, pData);
-            break;
         default:
             X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
             return false;
