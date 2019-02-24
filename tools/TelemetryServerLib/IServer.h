@@ -1,7 +1,9 @@
 #pragma once
 
-#include <Util/UniquePointer.h>
 #include <Containers/Array.h>
+
+#include <Util/UniquePointer.h>
+#include <Time/DateTimeStamp.h>
 
 #include <../TelemetryCommon/TelemetryCommonLib.h>
 
@@ -21,7 +23,6 @@ X_NAMESPACE_BEGIN(telemetry)
 
 using TelemFixedStr = core::StackString<MAX_STRING_LEN, char>;
 
-
 struct Trace
 {
     Trace() :
@@ -30,7 +31,7 @@ struct Trace
 
     core::Path<> dbPath;
     core::string name;
-    core::string date;
+    core::DateTimeStamp date;
     core::string buildInfo;
     core::string cmdLine;
     uint64_t ticksPerMicro;
@@ -40,7 +41,6 @@ using TraceArr = core::Array<Trace>;
 
 struct TraceApp
 {
-
     TraceApp(core::MemoryArenaBase* arena) :
         traces(arena)
     {}

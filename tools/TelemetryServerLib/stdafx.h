@@ -2,6 +2,11 @@
 
 #include <EngineCommon.h>
 
+#include <Compression/LZ4.h>
+
+#include <../TelemetryCommon/TelemetryCommonLib.h>
+#include <../SqLite/SqlLib.h>
+
 
 typedef core::MemoryArena<
     core::MallocFreeAllocator,

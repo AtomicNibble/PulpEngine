@@ -1,12 +1,13 @@
 #include "stdafx.h"
-#include "TelemetryServerLib.h"
+#include "TelemetryServer.h"
 
 #include <Time/DateTimeStamp.h>
 
 #include <IFileSys.h>
 
 #include <../TelemetryCommon/TelemetryCommonLib.h>
-// #include <winsock2.h>
+
+#include "PacketTypesViewer.h"
 
 X_LINK_LIB("engine_TelemetryCommonLib.lib");
 
@@ -834,13 +835,19 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
         // load meta?
         bool loaded = true;
 
-        loaded &= getMetaStr(db, "dateStamp", trace.date);
+        core::string dateStr;
+
+        loaded &= getMetaStr(db, "dateStamp", dateStr);
         loaded &= getMetaStr(db, "buildInfo", trace.buildInfo);
         loaded &= getMetaStr(db, "cmdLine", trace.cmdLine);
         loaded &= getMetaUInt64(db, "tickPerMicro", trace.ticksPerMicro);
 
         if (!loaded) {
             X_ERROR("TelemSrv", "Failed to load meta for: \"%s\"", trace.dbPath.c_str());
+            continue;
+        }
+
+        if (!core::DateTimeStamp::fromString(core::string_view(dateStr), trace.date)) {
             continue;
         }
 
@@ -954,12 +961,10 @@ bool Server::processPacket(ClientConnection& client, uint8_t* pData)
         case PacketType::DataStream:
             return handleDataSream(client, pData);
             break;
-        case PacketType::QueryApps:
-            return handleQueryApps(client, pData);
-            break;
-        case PacketType::QueryAppTraces:
-            return handleQueryAppTraces(client, pData);
-            break;
+
+    //    case PacketType::QueryTraceInfo:
+    //        return handleQueryTraceInfo(client, pData);
+    //        break;
         case PacketType::OpenTrace:
             return handleOpenTrace(client, pData);
             break;
@@ -1155,62 +1160,62 @@ bool Server::handleConnectionRequestViewer(ClientConnection& client, uint8_t* pD
     cra.serverVer = serverVer;
 
     sendDataToClient(client, &cra, sizeof(cra));
+
+    // send them some data.
+    if (!sendAppList(client)) {
+
+    }
+
+    if (!sendAppTraceList(client)) {
+
+    }
+
     return true;
 }
 
-bool Server::handleQueryApps(ClientConnection& client, uint8_t* pData)
+bool Server::sendAppList(ClientConnection& client)
 {
-    auto* pHdr = reinterpret_cast<const DataStreamHdr*>(pData);
-    if (pHdr->type != PacketType::QueryApps) {
-        X_ASSERT_UNREACHABLE();
-    }
-
     auto numApps = static_cast<int32_t>(apps_.size());
 
-    QueryAppsResponseHdr resHdr;
-    resHdr.dataSize = static_cast<tt_uint16>((sizeof(resHdr) + (sizeof(QueryAppsResponseData) * numApps)));
-    resHdr.type = PacketType::QueryAppsResp;
+    AppsListHdr resHdr;
+    resHdr.dataSize = static_cast<tt_uint16>((sizeof(resHdr) + (sizeof(AppsListData) * numApps)));
+    resHdr.type = PacketType::AppList;
     resHdr.num = numApps;
 
     sendDataToClient(client, &resHdr, sizeof(resHdr));
 
     for (const auto& app : apps_)
     {
-        QueryAppsResponseData qar;
-        qar.numTraces = static_cast<int32_t>(app.traces.size());
-        strcpy(qar.appName, app.appName.c_str());
+        AppsListData ald;
+        ald.numTraces = static_cast<int32_t>(app.traces.size());
+        strcpy(ald.appName, app.appName.c_str());
 
-        sendDataToClient(client, &qar, sizeof(qar));
+        sendDataToClient(client, &ald, sizeof(ald));
     }
 
     return true;
 }
 
-bool Server::handleQueryAppTraces(ClientConnection& client, uint8_t* pData)
+bool Server::sendAppTraceList(ClientConnection& client)
 {
-    auto* pHdr = reinterpret_cast<const DataStreamHdr*>(pData);
-    if (pHdr->type != PacketType::QueryAppTraces) {
-        X_ASSERT_UNREACHABLE();
-    }
-
-    // TODO:
-    const auto& app = apps_[0];
-
-    QueryAppsResponseHdr resHdr;
-    resHdr.dataSize = static_cast<tt_uint16>((sizeof(resHdr) + (sizeof(QueryAppTracesResponseData) * app.traces.size())));
-    resHdr.type = PacketType::QueryAppTracesResp;
-    resHdr.num = static_cast<uint32_t>(app.traces.size());
-
-    sendDataToClient(client, &resHdr, sizeof(resHdr));
-
-    for (const auto& trace : app.traces)
+    for (const auto& app : apps_)
     {
-        QueryAppTracesResponseData atr;
-        strcpy(atr.date, trace.date.c_str());
-        strcpy(atr.name, trace.name.c_str());
-        strcpy(atr.buildInfo, trace.buildInfo.c_str());
+        AppTraceListHdr resHdr;
+        resHdr.dataSize = static_cast<tt_uint16>((sizeof(resHdr) + (sizeof(AppTraceListData) * app.traces.size())));
+        resHdr.type = PacketType::AppTraceList;
+        resHdr.num = static_cast<uint32_t>(app.traces.size());
 
-        sendDataToClient(client, &atr, sizeof(atr));
+        sendDataToClient(client, &resHdr, sizeof(resHdr));
+
+        for (const auto& trace : app.traces)
+        {
+            AppTraceListData tld;
+            tld.date = trace.date;
+            strcpy(tld.name, trace.name.c_str());
+            strcpy(tld.buildInfo, trace.buildInfo.c_str());
+
+            sendDataToClient(client, &tld, sizeof(tld));
+        }
     }
 
     return true;

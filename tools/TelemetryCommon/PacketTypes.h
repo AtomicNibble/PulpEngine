@@ -16,10 +16,12 @@ struct PacketType
         ConnectionRequestRejected,
         DataStream,
 
-        QueryApps,
-        QueryAppsResp,
-        QueryAppTraces,
-        QueryAppTracesResp,
+        // Used by viewer.
+        AppList,
+        AppTraceList,
+        
+        QueryTraceInfo,
+        QueryTraceInfoResp,
 
         OpenTrace,
         OpenTraceResp,
@@ -97,8 +99,6 @@ constexpr tt_size BACKGROUND_THREAD_STACK_SIZE = Internal::RoundUpToMultiple<tt_
     1024 * 4
 );
 
-constexpr tt_size MAX_TRACES_OPEN_PER_CLIENT = 8;
-
 using TtthreadId = tt_uint32;
 using TtZoneId = tt_uint32;
 
@@ -121,11 +121,6 @@ struct ConnectionRequestHdr : public PacketBase
     tt_uint64 ticksPerMicro;
 };
 
-struct ConnectionRequestViewerHdr : public PacketBase
-{
-    VersionInfo viewerVer;
-};
-
 struct ConnectionRequestAcceptedHdr : public PacketBase
 {
     VersionInfo serverVer;
@@ -140,85 +135,6 @@ struct DataStreamHdr : public PacketBase
 {
     tt_uint16 origSize;
 };
-
-struct QueryApps : public PacketBase
-{
-    tt_int32 offset;
-    tt_int32 max;
-};
-
-struct QueryAppsResponseHdr : public PacketBase
-{
-    tt_int32 num;   // how many returned in request
-    tt_int32 total; // total on server.
-};
-
-// TODO: variable length strings, or just compress :P ?
-struct QueryAppsResponseData
-{
-    tt_int32 numTraces;
-    char appName[MAX_STRING_LEN];
-};
-
-struct QueryAppTraces : public PacketBase
-{
-    char appName[MAX_STRING_LEN];
-};
-
-struct QueryAppTracesResponseHdr : public PacketBase
-{
-    tt_int32 num;
-};
-
-struct QueryAppTracesResponseData
-{
-    char date[64];
-    char name[MAX_STRING_LEN];
-    char buildInfo[MAX_STRING_LEN];
-};
-
-struct OpenTrace : public PacketBase
-{
-    // TEMP
-    char appName[MAX_STRING_LEN];
-    char name[MAX_STRING_LEN];
-};
-
-struct OpenTraceResp : public PacketBase 
-{
-    tt_int8 handle;
-};
-
-struct QueryTraceTicks : public PacketBase
-{
-    tt_int8 handle;
-
-    tt_int32 tickIdx;
-    tt_int32 num;      // -1 for all
-};
-
-struct QueryTraceZones : public PacketBase
-{
-    tt_int8 handle;
-
-    tt_int64 start;
-    tt_int64 end;   // -1 for ubounded
-};
-
-struct QueryTraceStrings : public PacketBase
-{
-    tt_int8 handle;
-
-    // currently just return them all don't think it's every going to be that much data.
-};
-
-struct QueryServerStatsReponse
-{
-    tt_int32 activeTraces;
-    tt_int64 bpsIngest;
-    tt_int64 storageUsed;
-};
-
 
 TELEM_PACK_POP;
 

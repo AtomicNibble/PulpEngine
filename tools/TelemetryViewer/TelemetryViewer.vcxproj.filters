@@ -23,12 +23,12 @@
     <ClInclude Include="EngineApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TelemetryViewer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TelemetryViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EngineApp.cpp">
@@ -54,6 +54,12 @@
     </ClCompile>
     <ClCompile Include="..\..\3rdparty\source\imgui\imgui_demo.cpp">
       <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TelemetryViewer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

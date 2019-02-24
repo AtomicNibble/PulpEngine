@@ -461,12 +461,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="IServer.h" />
+    <ClInclude Include="PacketTypesViewer.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TelemetryServer.h" />
     <ClInclude Include="TelemetryServerLib.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Module.cpp" />
-    <ClCompile Include="TelemetryServerLib.cpp" />
+    <ClCompile Include="TelemetryServer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Create</PrecompiledHeader>
