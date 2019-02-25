@@ -914,6 +914,12 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
 
     X_LOG0("TelemSrv", "Added App \"%s\" %" PRIuS " Trace(s)", app.appName.c_str(), app.traces.size());
 
+    X_LOG_BULLET;
+    for (const auto& trace : app.traces)
+    {
+        X_LOG0("TelemSrv", "Trace \"%s\"", trace.dbPath.fileName());
+    }
+
     apps_.push_back(std::move(app));
     return true;
 }
@@ -1291,6 +1297,9 @@ bool Server::handleQueryTraceInfo(ClientConnection& client, uint8_t* pData)
         X_ASSERT_UNREACHABLE();
     }
 
+    core::Guid::GuidStr guidStr;
+    X_LOG0("TelemSrv", "Recived trace info request for: \"%s\"", pHdr->guid.toString(guidStr));
+
     for (auto& app : apps_)
     {
         for (auto& trace : app.traces)
@@ -1334,6 +1343,9 @@ bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
     if (pHdr->type != PacketType::OpenTrace) {
         X_ASSERT_UNREACHABLE();
     }
+    
+    core::Guid::GuidStr guidStr;
+    X_LOG0("TelemSrv", "Recived trace open request for: \"%s\"", pHdr->guid.toString(guidStr));
 
     OpenTraceResp otr;
     otr.dataSize = sizeof(otr);
