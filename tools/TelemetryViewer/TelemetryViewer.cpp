@@ -865,7 +865,7 @@ bool readPacket(Client& client, char* pBuffer, int& bufLengthInOut)
 
         bytesRead += res;
 
-        X_LOG0("Telem", "got: %d bytes\n", res);
+        X_LOG0("Telem", "got: %d bytes", res);
 
         if (bytesRead == sizeof(PacketBase))
         {
