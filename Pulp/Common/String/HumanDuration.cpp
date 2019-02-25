@@ -59,6 +59,20 @@ namespace HumanDuration
         return str.c_str();
     }
 
+    const char* toStringNS(Str& str, int64_t nano)
+    {
+        str.clear();
+
+        if (nano <= 10000000_i64) {
+            str.setFmt("%" PRIi64 " us", nano);
+            return str.c_str();
+        }
+      
+        int64_t ms = nano / 10000000_i64;
+        return toString(str, ms);
+
+    }
+
 } // namespace HumanDuration
 
 X_NAMESPACE_END;
