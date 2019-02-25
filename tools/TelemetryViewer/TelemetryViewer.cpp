@@ -358,7 +358,38 @@ namespace
         return "meow";
     }
 
+    namespace HumanNumber
+    {
+        using Str = core::StackString<96, char>;
 
+        const char* toString(Str& str, int64_t num)
+        {
+            str.clear();
+
+            int64_t n2 = 0;
+            int64_t scale = 1;
+            if (num < 0) {
+                str.append('-', 1);
+                num = -num;
+            }
+            while (num >= 1000) {
+                n2 = n2 + scale * (num % 1000);
+                num /= 1000;
+                scale *= 1000;
+            }
+
+            str.appendFmt("%" PRIi64, num);
+            while (scale != 1) {
+                scale /= 1000;
+                num = n2 / scale;
+                n2 = n2 % scale;
+                str.appendFmt(",%03" PRIi64, num);
+            }
+
+            return str.c_str();
+        }
+
+    }
 
 } // namespace
 
@@ -571,8 +602,10 @@ void DrawFrame(Client& client, float ww, float wh)
                             auto& stats = it->second;
 
                             core::HumanDuration::Str durStr0;
+                            HumanNumber::Str numStr;
+
                             ImGui::Text("Duration: %s", core::HumanDuration::toStringMicro(durStr0, stats.durationMicro));
-                            ImGui::Text("Zones: %" PRId64, stats.numZones);
+                            ImGui::Text("Zones: %s", HumanNumber::toString(numStr, stats.numZones));
                             ImGui::Text("Allocations: %" PRId64, 0_i64);
                         }
                         else
