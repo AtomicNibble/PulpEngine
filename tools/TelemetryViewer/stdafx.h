@@ -5,6 +5,7 @@
 
 #include <Compression/LZ4.h>
 #include <Time/DateTimeStamp.h>
+#include <String/HumanDuration.h>
 
 #include <../TelemetryCommon/TelemetryCommonLib.h>
 #include <../TelemetryServerLib/TelemetryServerLib.h>
