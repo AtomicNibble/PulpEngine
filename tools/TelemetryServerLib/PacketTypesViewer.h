@@ -44,10 +44,7 @@ struct QueryTraceInfo : public PacketBase
 struct QueryTraceInfoResp : public PacketBase
 {
     core::Guid guid;
-    tt_int64 numZones;
-    tt_int64 numTicks;
-    tt_int64 numAllocations;
-    tt_int64 durationMicro;
+    TraceStats stats;
 };
 
 struct OpenTrace : public PacketBase

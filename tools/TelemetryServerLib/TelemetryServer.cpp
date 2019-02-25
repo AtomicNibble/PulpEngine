@@ -241,15 +241,6 @@ namespace
         return true;
     }
 
-    struct TraceStats
-    {
-        tt_int64 numZones;
-        tt_int64 numTicks;
-        tt_int64 durationMicro;
-        // will either need to store free in seperate table or manually count them.
-        // tt_int64 numAllocations;
-    };
-
     bool getStats(sql::SqlLiteDb& db, TraceStats& stats)
     {
         // These need to be fast even when there is 10 million rows etc..
@@ -1320,10 +1311,10 @@ bool Server::handleQueryTraceInfo(ClientConnection& client, uint8_t* pData)
                     resp.type = PacketType::QueryTraceInfoResp;
                     resp.dataSize = sizeof(resp);
                     resp.guid = pHdr->guid;
-                    resp.numZones = stats.numZones;
-                    resp.numTicks = stats.numTicks;
-                    resp.numAllocations = 0; // stats.numAllocations;
-                    resp.durationMicro = stats.durationMicro;
+                    resp.stats.numZones = stats.numZones;
+                    resp.stats.numTicks = stats.numTicks;
+                    // resp.stats.numAllocations = stats.numAllocations;
+                    resp.stats.durationMicro = stats.durationMicro;
 
                     sendDataToClient(client, &resp, sizeof(resp));
                 }
