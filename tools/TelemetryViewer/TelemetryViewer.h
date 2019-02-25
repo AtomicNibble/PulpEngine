@@ -47,7 +47,7 @@ struct TraceView
     bool paused_;
 };
 
-
+using GuidTraceStats = std::pair<core::Guid, TraceStats>;
 
 struct Client
 {
@@ -81,7 +81,9 @@ struct Client
 
     core::CriticalSection dataCS;
 
-    telemetry::TraceAppArr apps;
+    TraceAppArr apps;
+
+    core::Array<GuidTraceStats> traceStats;
 };
 
 

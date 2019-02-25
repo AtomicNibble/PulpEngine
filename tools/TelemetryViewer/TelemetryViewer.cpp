@@ -460,12 +460,16 @@ void DrawFrame(Client& client, float ww, float wh)
             if (ImGui::BeginTabItem("Traces", nullptr, 0))
             {
                // float infoHeight = 200.f;
+                static core::Guid selectGuid;
 
                 ImGui::BeginChild("##TraceList", ImVec2(0, h - 200.f));
                 {
                     if (client.isConnected())
                     {
-                        // draw me a list like a pickle in the wind.
+                        core::CriticalSection::ScopedLock lock(client.dataCS);
+
+                        // need to be able to select one but across many.
+                        // so it should just be guid.
                         for (const auto& app : client.apps)
                         {
                             if (ImGui::CollapsingHeader(app.appName.c_str()))
@@ -474,25 +478,29 @@ void DrawFrame(Client& client, float ww, float wh)
                                 // ImGui::Text("Num %" PRIuS, app.traces.size());
                                 ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor(0.2f, 0.2f, 0.2f));
 
-                                static int selected = -1;
-
                                 for (int32_t i = 0; i < static_cast<int32_t>(app.traces.size()) * 10; i++)
                                 {
-                                    const auto& trace = app.traces[i % 3];
+                                    const auto& trace = app.traces[i % app.traces.size()];
 
                                     // want to build a string like:
                                     // hostname - 6 min ago
                                     // auto timeNow = core::DateTimeStamp::getSystemDateTime();
                                     ImGui::PushID(i);
 
-                                    if (ImGui::Selectable(trace.hostName.c_str(), selected == i))
-                                    {
-                                        selected = i;
-                                    }
+                                    core::StackString256 label(trace.hostName.begin(), trace.hostName.end());
+                                    label.appendFmt(" - %" PRId32, i);
 
-                                    if (selected == i)
+                                    if (ImGui::Selectable(label.c_str(), trace.guid == selectGuid))
                                     {
-                                        // meow.
+                                        selectGuid = trace.guid;
+
+                                        // need to dispatch a request to get the stats.
+                                        QueryTraceInfo qti;
+                                        qti.dataSize = sizeof(qti);
+                                        qti.type = PacketType::QueryTraceInfo;
+                                        qti.guid = trace.guid;
+
+                                        client.sendDataToServer(&qti, sizeof(qti));
                                     }
 
                                     ImGui::PopID();
@@ -547,9 +555,32 @@ void DrawFrame(Client& client, float ww, float wh)
 
 
                     ImGui::BeginChild("##TraceInfo", ImVec2(-1, -1), true);
-                    ImGui::Text("Duration: -");
-                    ImGui::Text("Zones: -");
-                    ImGui::Text("Allocations: -");
+
+                    if (selectGuid.isValid())
+                    {
+                        // need stats for this trace.
+                        core::CriticalSection::ScopedLock lock(client.dataCS);
+
+                        auto& ts = client.traceStats;
+                        auto it = std::find_if(ts.begin(), ts.end(), [](const GuidTraceStats& lhs) {
+                            return selectGuid == lhs.first;
+                        });
+
+                        if (it != ts.end())
+                        {
+                            auto& stats = it->second;
+                            ImGui::Text("Duration: %" PRId64, stats.durationMicro);
+                            ImGui::Text("Zones: %" PRId64, stats.numZones);
+                            ImGui::Text("Allocations: %" PRId64, 0_i64);
+                        }
+                        else
+                        {
+                            ImGui::Text("Duration: -");
+                            ImGui::Text("Zones: -");
+                            ImGui::Text("Allocations: -");
+                        }
+                    }
+                    
                     ImGui::EndChild();
 
                     ImGui::PopStyleColor();
@@ -699,6 +730,36 @@ bool handleAppList(Client& client, uint8_t* pData)
 }
 
 
+bool handleQueryTraceInfoResp(Client& client, uint8_t* pData)
+{
+    X_UNUSED(client, pData);
+
+    auto* pHdr = reinterpret_cast<const QueryTraceInfoResp*>(pData);
+    if (pHdr->type != PacketType::QueryTraceInfoResp) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+    
+    // Insert or update.
+    auto& ts = client.traceStats;
+    auto it = std::find_if(ts.begin(), ts.end(), [pHdr](const GuidTraceStats& lhs) {
+        return pHdr->guid == lhs.first;
+    });
+
+    if (it != ts.end())
+    {
+        it->second = pHdr->stats;
+    }
+    else
+    {
+        ts.emplace_back(pHdr->guid, pHdr->stats);
+    }
+    
+    return true;
+}
+
+
 bool processPacket(Client& client, uint8_t* pData)
 {
     auto* pPacketHdr = reinterpret_cast<const PacketBase*>(pData);
@@ -721,6 +782,8 @@ bool processPacket(Client& client, uint8_t* pData)
 
         case PacketType::AppList:
             return handleAppList(client, pData);
+        case PacketType::QueryTraceInfoResp:
+            return handleQueryTraceInfoResp(client, pData);
 
         default:
             X_ERROR("TelemViewer", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
@@ -801,7 +864,8 @@ Client::Client(core::MemoryArenaBase* arena) :
     port(8001),
     conState(ConnectionState::Offline),
     connectSignal(true),
-    apps(arena)
+    apps(arena),
+    traceStats(arena)
 {
     socket = INV_SOCKET;
 }
