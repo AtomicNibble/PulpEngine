@@ -16,7 +16,8 @@ namespace HumanDuration
 
     const char* toString(Str& str, float ms);
     const char* toString(Str& str, int64_t ms);
-    const char* toStringNS(Str& str, int64_t nano);
+    const char* toStringMicro(Str& str, int64_t micro);
+    const char* toStringNano(Str& str, int64_t nano);
 
 } // namespace HumanDuration
 

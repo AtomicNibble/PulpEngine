@@ -59,17 +59,30 @@ namespace HumanDuration
         return str.c_str();
     }
 
-    const char* toStringNS(Str& str, int64_t nano)
+    const char* toStringMicro(Str& str, int64_t micro)
     {
         str.clear();
 
-        if (nano <= 10000000_i64) {
-            str.setFmt("%" PRIi64 " us", nano);
+        if (micro <= 1000_i64) {
+            str.setFmt("%" PRIi64 " us", micro);
+            return str.c_str();
+        }
+
+        int64_t ms = micro / 1000_i64;
+        return toString(str, ms);
+    }
+
+    const char* toStringNano(Str& str, int64_t nano)
+    {
+        str.clear();
+
+        if (nano <= 1000_i64) {
+            str.setFmt("%" PRIi64 " ns", nano);
             return str.c_str();
         }
       
-        int64_t ms = nano / 10000000_i64;
-        return toString(str, ms);
+        int64_t micro = nano / 1000_i64;
+        return toStringMicro(str, micro);
 
     }
 
