@@ -60,6 +60,7 @@ struct Client
     Client(core::MemoryArenaBase* arena);
 
     bool isConnected(void) const;
+    void sendDataToServer(const void* pData, int32_t len);
 
     core::StackString256 addr;
     uint16_t port;

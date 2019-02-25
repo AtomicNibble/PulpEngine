@@ -729,7 +729,7 @@ bool processPacket(Client& client, uint8_t* pData)
 }
 
 
-void sendDataToServer(Client& client, const void* pData, int32_t len)
+void Client::sendDataToServer(const void* pData, int32_t len)
 {
 #if X_DEBUG
     if (len > MAX_PACKET_SIZE) {
@@ -739,7 +739,7 @@ void sendDataToServer(Client& client, const void* pData, int32_t len)
 
     // send some data...
     // TODO: none blocking?
-    int res = platform::send(client.socket, reinterpret_cast<const char*>(pData), len, 0);
+    int res = platform::send(socket, reinterpret_cast<const char*>(pData), len, 0);
     if (res == SOCKET_ERROR) {
         X_ERROR("Telem", "Socket: send failed with error: %d", platform::WSAGetLastError());
         return;
@@ -876,7 +876,7 @@ bool connectToServer(Client& client)
     cr.viewerVer.build = TELEM_VERSION_BUILD;
 
     client.socket = connectSocket;
-    sendDataToServer(client, &cr, sizeof(cr));
+    client.sendDataToServer(&cr, sizeof(cr));
 
     // wait for a response O.O
     char recvbuf[MAX_PACKET_SIZE];
