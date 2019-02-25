@@ -571,8 +571,7 @@ void DrawFrame(Client& client, float ww, float wh)
                             auto& stats = it->second;
 
                             core::HumanDuration::Str durStr0;
-                            ImGui::Text("Duration: %s", core::HumanDuration::toStringNS(durStr0, stats.durationMicro));
-                            ImGui::Text("Duration: %" PRId64, stats.durationMicro);
+                            ImGui::Text("Duration: %s", core::HumanDuration::toStringMicro(durStr0, stats.durationMicro));
                             ImGui::Text("Zones: %" PRId64, stats.numZones);
                             ImGui::Text("Allocations: %" PRId64, 0_i64);
                         }
