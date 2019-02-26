@@ -608,9 +608,7 @@ void DrawFrame(Client& client, float ww, float wh)
                             ImGui::SameLine();
                             if (ImGui::Button("Open"))
                             {
-                                // oh baby just open that view up.
-                                // right now!
-                                // if the view already exsists then just switch to it.
+                                // TODO: check if exsists  then open / focus.
                                 OpenTrace ot;
                                 ot.dataSize = sizeof(ot);
                                 ot.type = PacketType::OpenTrace;
