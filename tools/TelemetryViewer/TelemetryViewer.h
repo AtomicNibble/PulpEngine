@@ -22,13 +22,33 @@ struct Animation
 
 struct TraceView
 {
-    TraceView() {
-        core::zero_this(this);
+    TraceView(core::Guid guid, tt_int8 handle) :
+        guid(guid),
+        handle(handle)
+    {
+        open_ = true;
 
         numFrames_ = 1024 * 1024;
+        frameStart_ = 0;
         frameScale_ = 0;
+
+        zvStart_ = 0;
         zvEnd_ = 100;
+
+        zvHeight_ = 0;
+        zvScroll_ = 0;
+
+        tabName.set("Trace - Zones");
     }
+
+    core::StackString<64,char> tabName;
+
+    bool paused_;
+    bool open_;
+    bool _pad[2];
+
+    core::Guid guid;
+    tt_int8 handle;
 
     int32_t numFrames_;
     int32_t frameStart_;
@@ -37,20 +57,21 @@ struct TraceView
     int64_t zvStart_;
     int64_t zvEnd_;
 
-    int zvHeight_;
-    int zvScroll_;
+    int32_t zvHeight_;
+    int32_t zvScroll_;
 
     Region highlight_;
     Region highlightZoom_;
     Animation zoomAnim_;
-
-    bool paused_;
 };
 
 using GuidTraceStats = std::pair<core::Guid, TraceStats>;
 
 struct Client
 {
+    using GuidTraceStatsArr = core::Array<GuidTraceStats>;
+    using TraceViewArr = core::Array<TraceView>;
+
     enum class ConnectionState {
         Offline,
         Connecting,
@@ -83,7 +104,8 @@ struct Client
 
     TraceAppArr apps;
 
-    core::Array<GuidTraceStats> traceStats;
+    GuidTraceStatsArr traceStats;
+    TraceViewArr views;
 };
 
 

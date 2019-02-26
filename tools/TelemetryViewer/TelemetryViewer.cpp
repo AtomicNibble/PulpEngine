@@ -530,7 +530,6 @@ void DrawFrame(Client& client, float ww, float wh)
                                         qti.dataSize = sizeof(qti);
                                         qti.type = PacketType::QueryTraceInfo;
                                         qti.guid = trace.guid;
-
                                         client.sendDataToServer(&qti, sizeof(qti));
                                     }
 
@@ -555,7 +554,7 @@ void DrawFrame(Client& client, float ww, float wh)
                             ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
                         }
 
-                        char addr[256] = { "127.0.0.1" };
+                        static char addr[256] = { "127.0.0.1" };
                         bool connectClicked = false;
                         connectClicked |= ImGui::InputText("", addr, sizeof(addr), ImGuiInputTextFlags_EnterReturnsTrue);
                         connectClicked |= ImGui::Button("Connect");
@@ -606,7 +605,22 @@ void DrawFrame(Client& client, float ww, float wh)
 
                             ImGui::Text("Duration: %s", core::HumanDuration::toStringMicro(durStr0, stats.durationMicro));
                             ImGui::Text("Zones: %s", HumanNumber::toString(numStr, stats.numZones));
+                            ImGui::SameLine();
+                            if (ImGui::Button("Open"))
+                            {
+                                // oh baby just open that view up.
+                                // right now!
+                                // if the view already exsists then just switch to it.
+                                OpenTrace ot;
+                                ot.dataSize = sizeof(ot);
+                                ot.type = PacketType::OpenTrace;
+                                ot.guid = it->first;
+                                client.sendDataToServer(&ot, sizeof(ot));
+                            }
+
                             ImGui::Text("Allocations: %" PRId64, 0_i64);
+                            ImGui::SameLine();
+                            ImGui::Button("Open");
                         }
                         else
                         {
@@ -642,12 +656,17 @@ void DrawFrame(Client& client, float ww, float wh)
 
         if (ImGui::BeginTabBar("View Tabs"))
         {
-            if (ImGui::BeginTabItem("Traces", nullptr, 0))
-            {
-            //    DrawFrames();
-            //    DrawZones();
 
-                ImGui::EndTabItem();
+            for (auto& view : client.views)
+            {
+                if (ImGui::BeginTabItem(view.tabName.c_str(), &view.open_, 0))
+                {
+                    ImGui::TextColored(ImVec4(1, 0, 0, 1), "Meoww...");
+                    //    DrawFrames();
+                    //    DrawZones();
+
+                    ImGui::EndTabItem();
+                }
             }
 
             ImGui::EndTabBar();
@@ -794,6 +813,17 @@ bool handleQueryTraceInfoResp(Client& client, uint8_t* pData)
     return true;
 }
 
+bool handleOpenTraceResp(Client& client, uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const OpenTraceResp*>(pData);
+    if (pHdr->type != PacketType::OpenTraceResp) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+    client.views.emplace_back(pHdr->guid, pHdr->handle);
+    return true;
+}
 
 bool processPacket(Client& client, uint8_t* pData)
 {
@@ -819,6 +849,8 @@ bool processPacket(Client& client, uint8_t* pData)
             return handleAppList(client, pData);
         case PacketType::QueryTraceInfoResp:
             return handleQueryTraceInfoResp(client, pData);
+        case PacketType::OpenTraceResp:
+            return handleOpenTraceResp(client, pData);
 
         default:
             X_ERROR("TelemViewer", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
@@ -900,7 +932,8 @@ Client::Client(core::MemoryArenaBase* arena) :
     conState(ConnectionState::Offline),
     connectSignal(true),
     apps(arena),
-    traceStats(arena)
+    traceStats(arena),
+    views(arena)
 {
     socket = INV_SOCKET;
 }
