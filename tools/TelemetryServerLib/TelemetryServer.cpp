@@ -1351,6 +1351,7 @@ bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
     otr.dataSize = sizeof(otr);
     otr.type = PacketType::OpenTraceResp;
     otr.guid = pHdr->guid;
+    otr.handle = -1_ui8;
 
     // TODO: check we don't have it open already.
     // TODO: thread safety etc..
@@ -1381,16 +1382,22 @@ bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
                         auto id = client.traces.size();
                         client.traces.emplace_back(std::move(ts));
 
-                        otr.handle = safe_static_cast<int8_t>(id);
-                        sendDataToClient(client, &otr, sizeof(otr));
-                        return true;
+                        if (getStats(ts.db.con, otr.stats))
+                        {
+                            otr.handle = safe_static_cast<int8_t>(id);
+                            sendDataToClient(client, &otr, sizeof(otr));
+                            return true;
+                        }
+                        else
+                        {
+                            X_ERROR("TelemSrv", "Failed to get stats for openDb request");
+                        }
                     }
                 }
             }
         }
     }
 
-    otr.handle = -1_ui8;
     sendDataToClient(client, &otr, sizeof(otr));
     return true;
 }
