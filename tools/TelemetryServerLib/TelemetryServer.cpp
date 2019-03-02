@@ -1495,7 +1495,7 @@ bool Server::handleReqTraceTicks(ClientConnection& client, uint8_t* pData)
     qry.bind(2, numToReturn);
 
     auto it = qry.begin();
-    if (it != qry.end()) {
+    while (it != qry.end()) {
         auto row = *it;
 
         DataPacketTickInfo tick;
@@ -1532,7 +1532,7 @@ bool Server::handleReqTraceZones(ClientConnection& client, uint8_t* pData)
     qry.bind(2, pHdr->end);
 
     auto it = qry.begin();
-    if (it != qry.end()) {
+    while (it != qry.end()) {
         auto row = *it;
 
         DataPacketZone zone;
