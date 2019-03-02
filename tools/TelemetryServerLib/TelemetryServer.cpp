@@ -1381,20 +1381,20 @@ bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
                     // we found it !
                     TraceStream ts;
                     ts.pTrace = &trace;
-                    if (ts.db.openDB(trace.dbPath)) {
+                    if (ts.db.openDB(trace.dbPath)) 
+                    {
+                        if (!getStats(ts.db.con, otr.stats))
+                        {
+                            X_ERROR("TelemSrv", "Failed to get stats for openDb request");
+                            return true;
+                        }
+
                         auto id = client.traces.size();
                         client.traces.emplace_back(std::move(ts));
 
-                        if (getStats(ts.db.con, otr.stats))
-                        {
-                            otr.handle = safe_static_cast<int8_t>(id);
-                            sendDataToClient(client, &otr, sizeof(otr));
-                            return true;
-                        }
-                        else
-                        {
-                            X_ERROR("TelemSrv", "Failed to get stats for openDb request");
-                        }
+                        otr.handle = safe_static_cast<int8_t>(id);
+                        sendDataToClient(client, &otr, sizeof(otr));
+                        return true;
                     }
                 }
             }
