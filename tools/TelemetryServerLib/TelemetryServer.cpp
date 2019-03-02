@@ -383,6 +383,8 @@ bool TraceDB::setPragmas(void)
 
 bool TraceDB::createIndexes(void)
 {
+    sql::SqlLiteTransaction trans(con);
+
     sql::SqlLiteCmd cmd(con, R"(
         CREATE INDEX IF NOT EXISTS "zones_start" ON "zones" (
             "startTick"	ASC
@@ -395,6 +397,7 @@ bool TraceDB::createIndexes(void)
         return false;
     }
 
+    trans.commit();
     return true;
 }
 
