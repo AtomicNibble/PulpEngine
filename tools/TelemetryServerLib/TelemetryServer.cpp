@@ -359,7 +359,8 @@ bool TraceDB::createDB(core::Path<char>& path)
 
 bool TraceDB::openDB(core::Path<char>& path)
 {
-    if (!con.connect(path.c_str(), sql::OpenFlags())) {
+    // TODO: drop write when not needed
+    if (!con.connect(path.c_str(), sql::OpenFlag::WRITE)) {
         return false;
     }
 
