@@ -42,7 +42,7 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena, const wc
     params.pCoreArena = arena;
     params.bFileSysWorkingDir = true;
     params.bPauseShutdown = false;
-    params.consoleDesc.pTitle = X_ENGINE_NAME " - TelemetryServer";
+    params.consoleDesc.pTitle = X_ENGINE_NAME " - TelemetryViewer";
 
 #ifdef X_LIB
 
