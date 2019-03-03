@@ -20,15 +20,73 @@ struct Animation
     double lenMod;
 };
 
+// --------------------------------
+
+struct ZoneData
+{
+    // 4
+    uint32_t threadID;
+
+    // 16
+    uint64_t start;
+    uint64_t end;
+};
+
+struct TickData
+{
+    uint64_t start;
+    uint64_t end;
+
+    uint64_t startMicro;
+    uint64_t endMicro;
+};
+
+struct ZoneSegmentThread
+{
+    // this is all the zones for this thread.
+    using ZoneDataArr = core::ArrayGrowMultiply<ZoneData>;
+
+public:
+    ZoneSegmentThread(core::MemoryArenaBase* arena) :
+        zones(arena)
+    {}
+
+    ZoneDataArr zones;
+};
+
+struct ZoneSegment
+{
+    using ZoneSegmentThreadArr = core::ArrayGrowMultiply<ZoneSegmentThread>;
+    using TickDataArr = core::ArrayGrowMultiply<TickData>;
+
+public:
+    ZoneSegment(core::MemoryArenaBase* arena) :
+        ticks(arena),
+        threads(arena)
+    {}
+
+    // what is this segment for?
+    // well it has to be for a number of ticks.
+
+    TickDataArr ticks;
+    ZoneSegmentThreadArr threads;
+};
+
+
 struct TraceView
 {
-    TraceView(core::Guid guid, tt_int8 handle) :
+    using ZoneSegmentArr = core::Array<ZoneSegment>;
+
+public:
+    TraceView(core::Guid guid, TraceStats stats, tt_int8 handle, core::MemoryArenaBase* arena) :
         guid(guid),
-        handle(handle)
+        stats(stats),
+        handle(handle),
+        segments(arena)
     {
         open_ = true;
 
-        numFrames_ = 1024 * 1024;
+    //    numFrames_ = 1024 * 1024;
         frameStart_ = 0;
         frameScale_ = 0;
 
@@ -43,14 +101,15 @@ struct TraceView
 
     core::StackString<64,char> tabName;
 
-    bool paused_;
+    bool paused_; // don't auto scroll
     bool open_;
     bool _pad[2];
 
     core::Guid guid;
+    TraceStats stats;
     tt_int8 handle;
 
-    int32_t numFrames_;
+    // int32_t numFrames_;
     int32_t frameStart_;
     int32_t frameScale_;
 
@@ -63,6 +122,8 @@ struct TraceView
     Region highlight_;
     Region highlightZoom_;
     Animation zoomAnim_;
+
+    ZoneSegmentArr segments;
 };
 
 using GuidTraceStats = std::pair<core::Guid, TraceStats>;

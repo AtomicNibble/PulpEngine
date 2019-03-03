@@ -819,7 +819,7 @@ bool handleOpenTraceResp(Client& client, uint8_t* pData)
     }
 
     core::CriticalSection::ScopedLock lock(client.dataCS);
-    client.views.emplace_back(pHdr->guid, pHdr->handle);
+    client.views.emplace_back(pHdr->guid, pHdr->stats, pHdr->handle, g_arena);
     return true;
 }
 
