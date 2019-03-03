@@ -929,11 +929,13 @@ Client::Client(core::MemoryArenaBase* arena) :
     port(8001),
     conState(ConnectionState::Offline),
     connectSignal(true),
+    socket(INV_SOCKET),
+    cmpBufferOffset(0),
     apps(arena),
     traceStats(arena),
     views(arena)
 {
-    socket = INV_SOCKET;
+    
 }
 
 bool Client::isConnected(void) const 
