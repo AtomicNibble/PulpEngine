@@ -654,6 +654,7 @@ void DrawFrame(Client& client, float ww, float wh)
 
         if (ImGui::BeginTabBar("View Tabs"))
         {
+            core::CriticalSection::ScopedLock lock(client.dataCS);
 
             for (auto& view : client.views)
             {
@@ -683,6 +684,87 @@ void DrawFrame(Client& client, float ww, float wh)
 }
 
 
+bool handleTraceZoneSegmentTicks(Client& client, const DataPacketBaseViewer* pBase)
+{
+    auto* pHdr = static_cast<const ReqTraceZoneSegmentRespTicks*>(pBase);
+    if (pHdr->type != DataStreamTypeViewer::TraceZoneSegmentTicks) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    // TODO: fix.
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+
+    TraceView* pView = nullptr;
+
+    for (auto& view : client.views)
+    {
+        if (view.handle == pHdr->handle)
+        {
+            pView = &view;
+            break;
+        }
+    }
+
+    if (!pView) {
+        return false;
+    }
+
+    auto& view = *pView;
+
+    if (view.segments.isEmpty()) {
+        view.segments.emplace_back(g_arena);
+    }
+
+    auto& segment = view.segments.front();
+
+    // meow.
+    // so i need to find out what segment to add this to.
+    // i think segments where going to be based on camels in the north?
+    // think for now it's just oging to be be tick ranges
+    // so a segment will cover a number of ticks
+    // but that make predition hard? since i need to preload zones based on time not ticks.
+    // for now lets make single segment rip.
+
+
+    // so this is tick info for a zone segment request.
+    // it might not be all the data for the request. 
+    // but should they all be in order? think so.
+    auto* pTicks = reinterpret_cast<const DataPacketTickInfo*>(pHdr + 1);
+
+    auto& ticks = segment.ticks;
+    ticks.reserve(ticks.size() + pHdr->num);
+
+    for (int32 i = 0; i < pHdr->num; i++)
+    {
+        auto& tick = pTicks[i];
+
+        TickData td;
+        td.start = tick.start;
+        td.end = tick.end;
+        td.startMicro = tick.startMicro;
+        td.endMicro = tick.endMicro;
+
+        ticks.push_back(td);
+    }
+
+    return true;
+}
+
+bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBase)
+{
+    auto* pHdr = static_cast<const ReqTraceZoneSegmentRespTicks*>(pBase);
+    if (pHdr->type != DataStreamTypeViewer::TraceZoneSegmentZones) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    X_UNUSED(client);
+
+    pHdr->handle;
+    return true;
+}
+
+
+
 bool handleDataSream(Client& client, uint8_t* pData)
 {
     auto* pHdr = reinterpret_cast<const DataStreamHdr*>(pData);
@@ -697,7 +779,7 @@ bool handleDataSream(Client& client, uint8_t* pData)
     X_UNUSED(cmpLen);
 
     if (cmpLen == origLen) {
-        // uncompressed packets.
+        // uncompressed packets. 
         X_ASSERT_NOT_IMPLEMENTED();
     }
 
@@ -714,16 +796,17 @@ bool handleDataSream(Client& client, uint8_t* pData)
         client.cmpBufferOffset = 0;
     }
 
-    for (int32 i = 0; i < origLen; )
+    for (int32 i = 0; i < origLen; i = origLen) // TODO: handle multiple packets per buf.
     {
-        auto* pPacket = reinterpret_cast<const DataPacketBase*>(&pDst[i]);
+        auto* pPacket = reinterpret_cast<const DataPacketBaseViewer*>(&pDst[i]);
 
         switch (pPacket->type)
         {
-            case DataStreamType::StringTableAdd:
-            case DataStreamType::Zone:
-            case DataStreamType::TickInfo:
-                break;
+
+            case DataStreamTypeViewer::TraceZoneSegmentTicks:
+                return handleTraceZoneSegmentTicks(client, pPacket);
+            case DataStreamTypeViewer::TraceZoneSegmentZones:
+                return handleTraceZoneSegmentZones(client, pPacket);
 
             default:
                 X_NO_SWITCH_DEFAULT_ASSERT;
@@ -825,8 +908,49 @@ bool handleOpenTraceResp(Client& client, uint8_t* pData)
 
     core::CriticalSection::ScopedLock lock(client.dataCS);
     client.views.emplace_back(pHdr->guid, pHdr->stats, pHdr->handle, g_arena);
+
+    // ask for some data?
+    // do i want zones and ticks seperate?
+    // think not, we know the total time of the trace.
+    // but we only show ticks for current window.
+    // so we kinda want data at same time.
+    // should i index the zone data based on ticks?
+
+    // in terms of getting the data back i just kinda wanna build a zone so having all the ticks and zones for a 
+    // egment would be nice.
+    // and the segment size is ajustable.
+    // oh but i was gonna support the sserver just sending you data.
+    // so i would need to build segments for that.
+    // can i just put data in to segemts?
+    // would mean i have to process every block check it's time and place it in a zone.
+    // if the zones are out of order could be messy.
+    // i was going to get the server to sort zones before insert.
+    // so maybe the server should do that and send the data as a segment.
+    // acutally the server just relaying you data is probs not a great idea
+    // since if you want to look at stuff we don't want anymore data other than new total time to update scroll bar.
+    ReqTraceZoneSegment rzs;
+    rzs.type = PacketType::ReqTraceZoneSegment;
+    rzs.dataSize = sizeof(rzs);
+    rzs.handle = pHdr->handle;
+    // so what should i request here?
+    // time segments?
+    auto start = 0;
+    auto mid = pHdr->stats.numTicks / 2;
+    auto trailing = pHdr->stats.numTicks - mid;
+
+    rzs.tickIdx = start;
+    rzs.max = mid;
+    client.sendDataToServer(&rzs, sizeof(rzs));
+
+    // humm maybe do this based on ticks?
+    // but i dunno how big a tick will be
+    rzs.tickIdx = mid;
+    rzs.max = trailing;
+    client.sendDataToServer(&rzs, sizeof(rzs));
+
     return true;
 }
+
 
 bool processPacket(Client& client, uint8_t* pData)
 {

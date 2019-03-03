@@ -172,6 +172,7 @@ private:
     bool handleOpenTrace(ClientConnection& client, uint8_t* pData);
     bool handleReqTraceTicks(ClientConnection& client, uint8_t* pData);
     bool handleReqTraceZones(ClientConnection& client, uint8_t* pData);
+    bool handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData);
     bool handleReqTraceStrings(ClientConnection& client, uint8_t* pData);
 
 private:

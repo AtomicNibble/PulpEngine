@@ -8,6 +8,15 @@ X_NAMESPACE_BEGIN(telemetry)
 constexpr size_t MAX_TRACES_OPEN_PER_CLIENT = 8;
 
 
+struct DataStreamTypeViewer
+{
+    enum Enum : tt_uint8
+    {
+        TraceZoneSegmentTicks = DataStreamType::Num,
+        TraceZoneSegmentZones,
+    };
+};
+
 struct ConnectionRequestViewerHdr : public PacketBase
 {
     VersionInfo viewerVer;
@@ -81,6 +90,35 @@ struct ReqTraceStrings : public PacketBase
 
     // currently just return them all don't think it's every going to be that much data.
 };
+
+struct ReqTraceZoneSegment : public PacketBase
+{
+    tt_int8 handle;
+
+    tt_int32 tickIdx;
+    tt_int32 max;      // -1 for all
+    // tt_int64 startMicro;
+    // tt_int64 endMicro;
+};
+
+struct DataPacketBaseViewer
+{
+    DataStreamTypeViewer::Enum type;
+};
+
+struct ReqTraceZoneSegmentRespTicks : public DataPacketBaseViewer
+{
+    tt_int8 handle;
+    tt_int32 num;
+};
+
+struct ReqTraceZoneSegmentRespZones : public DataPacketBaseViewer
+{
+    tt_int8 handle;
+    tt_int32 num;
+};
+
+
 
 #if 0
 struct QueryServerStatsReponse

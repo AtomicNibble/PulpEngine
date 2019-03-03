@@ -1060,6 +1060,8 @@ bool Server::processPacket(ClientConnection& client, uint8_t* pData)
             return handleReqTraceTicks(client, pData);
         case PacketType::ReqTraceZones:
             return handleReqTraceZones(client, pData);
+        case PacketType::ReqTraceZoneSegment:
+            return handleReqTraceZoneSegment(client, pData);
         case PacketType::ReqTraceStrings:
             return handleReqTraceStrings(client, pData);
         default:
@@ -1590,6 +1592,150 @@ bool Server::handleReqTraceZones(ClientConnection& client, uint8_t* pData)
     flushCompressionBuffer(client);
     return true;
 }
+
+X_DISABLE_WARNING(4701) // potentially uninitialized local variable 'tick' used
+
+
+bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const ReqTraceZoneSegment*>(pData);
+    if (pHdr->type != PacketType::ReqTraceZoneSegment) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    // MEOW
+    // load me the ticks!
+    int32_t handle = pHdr->handle;
+    if (handle < 0 || handle >= static_cast<int32_t>(client.traces.size())) {
+        return false;
+    }
+
+    auto& ts = client.traces[pHdr->handle];
+
+    DataPacketTickInfo startTick;
+    DataPacketTickInfo endTick;
+
+    {
+        auto* pTickHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespTicks>(client);
+        pTickHdr->type = DataStreamTypeViewer::TraceZoneSegmentTicks;
+        pTickHdr->num = 0;
+        pTickHdr->handle = pHdr->handle;
+
+        sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, startMicro, endMicro FROM ticks LIMIT ? OFFSET ?");
+        qry.bind(1, pHdr->max);
+        qry.bind(2, pHdr->tickIdx);
+
+        auto it = qry.begin();
+        if (it == qry.end()) {
+            // none
+        }
+
+        DataPacketTickInfo tick;
+        int32_t numTicks = 0;
+        
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            tick.type = DataStreamType::TickInfo;
+            tick.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
+            tick.start = static_cast<uint64_t>(row.get<int64_t>(1));
+            tick.end = static_cast<uint64_t>(row.get<int64_t>(2));
+            tick.startMicro = static_cast<uint64_t>(row.get<int64_t>(3));
+            tick.endMicro = static_cast<uint64_t>(row.get<int64_t>(4));
+
+            if (getCompressionBufferSpace(client) < sizeof(tick))
+            {
+                // flush etc and add new block header.
+                pTickHdr->num = numTicks;
+                flushCompressionBuffer(client);
+
+                pTickHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespTicks>(client);
+                pTickHdr->type = DataStreamTypeViewer::TraceZoneSegmentTicks;
+                pTickHdr->num = 0;
+                pTickHdr->handle = pHdr->handle;
+
+                numTicks = 0;
+            }
+
+            addToCompressionBuffer(client, &tick, sizeof(tick));
+
+            if (numTicks == 0) {
+                startTick = tick;
+            }
+
+            ++numTicks;
+        }
+
+        if (numTicks == 0)
+        {
+            X_ASSERT_NOT_IMPLEMENTED();
+        }
+
+        // if startTick == endTick it don't matter
+        endTick = tick;
+
+        // flush the tick headers.
+        pTickHdr->num = numTicks;
+        flushCompressionBuffer(client);
+    }
+
+
+    auto start = startTick.start;
+    auto end = endTick.end;
+
+    {
+
+        // so on the client i need to handle overlapping zones.
+        // if we just take every zone that starts in the tick and draw it should be okay even if it overlaps.
+        // we should still be able to pick it.
+        auto* pZonesHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespZones>(client);
+        pZonesHdr->type = DataStreamTypeViewer::TraceZoneSegmentZones;
+        pZonesHdr->num = 0;
+        pZonesHdr->handle = pHdr->handle;
+
+        int32_t numZones = 0;
+
+        sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, stackDepth FROM zones WHERE startTick >= ? AND startTick < ?");
+        qry.bind(1, static_cast<int64_t>(start));
+        qry.bind(2, static_cast<int64_t>(end));
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            DataPacketZone zone;
+            zone.type = DataStreamType::Zone;
+            zone.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
+            zone.start = static_cast<uint64_t>(row.get<int64_t>(1));
+            zone.end = static_cast<uint64_t>(row.get<int64_t>(2));
+            zone.stackDepth = static_cast<tt_int8>(row.get<int32_t>(3));
+            // TODO: finish
+
+            if (getCompressionBufferSpace(client) < sizeof(zone))
+            {
+                // flush etc and add new block header.
+                pZonesHdr->num = numZones;
+                flushCompressionBuffer(client);
+
+                pZonesHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespZones>(client);
+                pZonesHdr->type = DataStreamTypeViewer::TraceZoneSegmentZones;
+                pZonesHdr->num = 0;
+                pZonesHdr->handle = pHdr->handle;
+
+                numZones = 0;
+            }
+
+            addToCompressionBuffer(client, &zone, sizeof(zone));
+
+            ++numZones;
+        }
+    }
+
+    flushCompressionBuffer(client);
+    return true;
+}
+
+X_ENABLE_WARNING(4701)
 
 bool Server::handleReqTraceStrings(ClientConnection& client, uint8_t* pData)
 {

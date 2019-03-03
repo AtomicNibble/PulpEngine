@@ -26,6 +26,8 @@ struct PacketType
         OpenTrace,
         OpenTraceResp,
 
+        ReqTraceZoneSegment,
+
         // These just respond with DataStreams.
         ReqTraceTicks,
         ReqTraceZones,
