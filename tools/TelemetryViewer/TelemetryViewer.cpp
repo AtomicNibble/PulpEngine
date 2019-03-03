@@ -818,6 +818,11 @@ bool handleOpenTraceResp(Client& client, uint8_t* pData)
         X_ASSERT_UNREACHABLE();
     }
 
+    if (pHdr->handle < 0) {
+        X_ERROR("TelemViewer", "Failed to open trace");
+        return true;
+    }
+
     core::CriticalSection::ScopedLock lock(client.dataCS);
     client.views.emplace_back(pHdr->guid, pHdr->stats, pHdr->handle, g_arena);
     return true;
