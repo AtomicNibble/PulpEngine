@@ -1453,6 +1453,12 @@ void flushCompressionBuffer(ClientConnection& client)
     }
 }
 
+X_INLINE int32_t getCompressionBufferSpace(ClientConnection& client)
+{
+    const int32_t space = COMPRESSION_MAX_INPUT_SIZE - (client.cmpBufEnd - client.cmpBufBegin);
+
+    return space;
+}
 
 void addToCompressionBuffer(ClientConnection& client, const void* pData, int32_t len)
 {
@@ -1463,13 +1469,35 @@ void addToCompressionBuffer(ClientConnection& client, const void* pData, int32_t
 #endif // X_DEBUG
 
     // can we fit this data?
-    const int32_t space = COMPRESSION_MAX_INPUT_SIZE - (client.cmpBufEnd - client.cmpBufBegin);
+    const int32_t space = getCompressionBufferSpace(client);
     if (space < len) {
         flushCompressionBuffer(client);
     }
 
     memcpy(&client.cmpRingBuf[client.cmpBufEnd], pData, len);
     client.cmpBufEnd += len;
+}
+
+template<typename T>
+T* addToCompressionBufferT(ClientConnection& client)
+{
+#if X_DEBUG
+    if constexpr (sizeof(T) > COMPRESSION_MAX_INPUT_SIZE) {
+        ::DebugBreak();
+    }
+#endif // X_DEBUG
+
+    // can we fit this data?
+    const int32_t space = getCompressionBufferSpace(client);
+    if (space < sizeof(T)) {
+        flushCompressionBuffer(client);
+    }
+
+    static_assert(std::is_trivially_copyable_v<T>, "T is not trivially copyable");
+
+    T* pPtr = reinterpret_cast<T*>(&client.cmpRingBuf[client.cmpBufEnd]);
+    client.cmpBufEnd += sizeof(T);
+    return pPtr;
 }
 
 bool Server::handleReqTraceTicks(ClientConnection& client, uint8_t* pData)
