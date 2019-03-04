@@ -22,64 +22,65 @@ namespace
 
     X_DISABLE_WARNING(4244)
 
-    inline void PrintTinyInt(char*& buf, uint64_t v)
+    using StringBuf = core::StackString<64,char>;
+
+
+    inline void PrintTinyInt(StringBuf& buf, uint64_t v)
     {
         if (v >= 10)
         {
-            *buf++ = '0' + v / 10;
+            buf.append('0' + v / 10, 1);
         }
-        *buf++ = '0' + v % 10;
+        buf.append('0' + v % 10, 1);
     }
 
-    inline void PrintTinyInt0(char*& buf, uint64_t v)
+    inline void PrintTinyInt0(StringBuf& buf, uint64_t v)
     {
         if (v >= 10)
         {
-            *buf++ = '0' + v / 10;
+            buf.append('0' + v / 10, 1);
         }
         else
         {
-            *buf++ = '0';
+            buf.append('0', 1);
         }
-        *buf++ = '0' + v % 10;
+        buf.append('0' + v % 10, 1);
     }
 
-    inline void PrintSmallInt(char*& buf, uint64_t v)
+    inline void PrintSmallInt(StringBuf& buf, uint64_t v)
     {
         if (v >= 100)
         {
-            memcpy(buf, IntTable100 + v / 10 * 2, 2);
-            buf += 2;
+            buf.append(IntTable100 + v / 10 * 2, 2);
         }
         else if (v >= 10)
         {
-            *buf++ = '0' + v / 10;
+            buf.append('0' + v / 10, 1);
         }
-        *buf++ = '0' + v % 10;
+        buf.append('0' + v % 10, 1);
     }
 
-    inline void PrintFrac00(char*& buf, uint64_t v)
+    inline void PrintFrac00(StringBuf& buf, uint64_t v)
     {
-        *buf++ = '.';
+        buf.append('.', 1);
         v += 5;
         if (v / 10 % 10 == 0)
         {
-            *buf++ = '0' + v / 100;
+            buf.append('0' + v / 100, 1);
         }
         else
         {
-            memcpy(buf, IntTable100 + v / 10 * 2, 2);
-            buf += 2;
+            buf.append(IntTable100 + v / 10 * 2, 2);
         }
     }
 
-    inline void PrintFrac0(char*& buf, uint64_t v)
+    inline void PrintFrac0(StringBuf& buf, uint64_t v)
     {
-        *buf++ = '.';
-        *buf++ = '0' + (v + 50) / 100;
+        buf.append('.', 1);
+        buf.append('0' + (v + 50) / 100, 1);
     }
 
-    inline void PrintSmallIntFrac(char*& buf, uint64_t v)
+    inline void PrintSmallIntFrac(StringBuf& buf, uint64_t v)
     {
         uint64_t in = v / 1000;
         uint64_t fr = v % 1000;
@@ -97,7 +98,7 @@ namespace
         }
     }
 
-    inline void PrintSecondsFrac(char*& buf, uint64_t v)
+    inline void PrintSecondsFrac(StringBuf& buf, uint64_t v)
     {
         uint64_t in = v / 1000;
         uint64_t fr = v % 1000;
@@ -115,20 +116,14 @@ namespace
         }
     }
 
-    const char* TimeToString(int64_t _ns)
+    const char* TimeToString(StringBuf& buf, int64_t _ns)
     {
-        enum { Pool = 8 };
-        static char bufpool[Pool][64];
-        static int bufsel = 0;
-        char* buf = bufpool[bufsel];
-        char* bufstart = buf;
-        bufsel = (bufsel + 1) % Pool;
+        buf.clear();
 
         uint64_t ns;
         if (_ns < 0)
         {
-            *buf = '-';
-            buf++;
+            buf.append('-', 1);
             ns = -_ns;
         }
         else
@@ -139,35 +134,34 @@ namespace
         if (ns < 1000)
         {
             PrintSmallInt(buf, ns);
-            memcpy(buf, " ns", 4);
+            buf.append(" ns");
         }
         else if (ns < 1000ll * 1000)
         {
             PrintSmallIntFrac(buf, ns);
 #ifdef TRACY_EXTENDED_FONT
-            memcpy(buf, " \xce\xbcs", 5);
+            buf.append(" \xce\xbcs");
 #else
-            memcpy(buf, " us", 4);
+            buf.append(" us");
 #endif
         }
         else if (ns < 1000ll * 1000 * 1000)
         {
             PrintSmallIntFrac(buf, ns / 1000);
-            memcpy(buf, " ms", 4);
+            buf.append(" ms");
         }
         else if (ns < 1000ll * 1000 * 1000 * 60)
         {
             PrintSmallIntFrac(buf, ns / (1000ll * 1000));
-            memcpy(buf, " s", 3);
+            buf.append(" s");
         }
         else if (ns < 1000ll * 1000 * 1000 * 60 * 60)
         {
             const auto m = int64_t(ns / (1000ll * 1000 * 1000 * 60));
             const auto s = int64_t(ns - m * (1000ll * 1000 * 1000 * 60)) / (1000ll * 1000);
             PrintTinyInt(buf, m);
-            *buf++ = ':';
+            buf.append(':', 1);
             PrintSecondsFrac(buf, s);
-            *buf++ = '\0';
         }
         else if (ns < 1000ll * 1000 * 1000 * 60 * 60 * 24)
         {
@@ -175,11 +169,10 @@ namespace
             const auto m = int64_t(ns / (1000ll * 1000 * 1000 * 60) - h * 60);
             const auto s = int64_t(ns / (1000ll * 1000 * 1000) - h * (60 * 60) - m * 60);
             PrintTinyInt(buf, h);
-            *buf++ = ':';
+            buf.append(':', 1);
             PrintTinyInt0(buf, m);
-            *buf++ = ':';
+            buf.append(':', 1);
             PrintTinyInt0(buf, s);
-            *buf++ = '\0';
         }
         else
         {
@@ -190,20 +183,21 @@ namespace
             if (d < 1000)
             {
                 PrintSmallInt(buf, d);
-                *buf++ = 'd';
+                buf.append('d', 1);
             }
             else
             {
-                buf += sprintf(buf, "%" PRIi64 "d", d);
+                buf.appendFmt("%" PRIi64 "d", d);
             }
+
             PrintTinyInt0(buf, h);
-            *buf++ = ':';
+            buf.append(':', 1);
             PrintTinyInt0(buf, m);
-            *buf++ = ':';
+            buf.append(':', 1);
             PrintTinyInt0(buf, s);
-            *buf++ = '\0';
         }
-        return bufstart;
+
+        return buf.c_str();
     }
 
     const char* RealToString(double val, bool separator)
