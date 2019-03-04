@@ -90,14 +90,31 @@ public:
         frameStart_ = 0;
         frameScale_ = 0;
 
-        zvStart_ = 0;
-        zvEnd_ = 100;
+        zvStart_ = 1000 * 1;
+        zvEnd_ = 1000 * 10;
 
         zvHeight_ = 0;
         zvScroll_ = 0;
 
         tabName.set("Trace - Zones");
     }
+
+    int64_t GetTimeBegin(void) const 
+    {
+        // we always start from zero?
+        return 0;
+    }
+
+    int64_t GetVisiableNS(void) const
+    {
+        return zvEnd_ - zvStart_;
+    }
+
+    int64_t GetVisibleStartNS(void) const
+    {
+        return zvStart_ - GetTimeBegin();
+    }
+
 
     core::StackString<64,char> tabName;
 

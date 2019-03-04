@@ -388,6 +388,356 @@ namespace
 } // namespace
 
 
+void DrawFrames(TraceView& view)
+{
+    const auto height = 30 * ImGui::GetTextLineHeight() / 15.f;
+
+
+    ImGuiWindow* window = ImGui::GetCurrentWindow();
+    if (window->SkipItems) {
+        return;
+    }
+
+    auto& io = ImGui::GetIO();
+
+    const auto wpos = ImGui::GetCursorScreenPos();
+    const auto wspace = ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin();
+    const auto w = wspace.x;
+    auto draw = ImGui::GetWindowDrawList();
+
+    ImGui::InvisibleButton("##frames", ImVec2(w, height));
+    bool frameRectHover = ImGui::IsItemHovered();
+
+    // Background
+    draw->AddRectFilled(wpos, wpos + ImVec2(w, height), 0x33FFFFFF);
+
+    const auto wheel = io.MouseWheel;
+    const auto prevScale = view.frameScale_;
+    if (frameRectHover)
+    {
+        if (wheel > 0)
+        {
+            if (view.frameScale_ >= 0) {
+                view.frameScale_--;
+            }
+        }
+        else if (wheel < 0)
+        {
+            // we want to zoom out.
+            // we just scale hte time range.
+            // ideally we take into account the cursor position for zooming
+            // or just for zoom in?
+            auto visible = view.GetVisiableNS();
+            auto add = visible / 2;
+
+            view.zvStart_ -= core::Min(view.zvStart_, add);
+            view.zvEnd_  += add;
+
+            if (view.frameScale_ < 10) {
+                view.frameScale_++;
+            }
+        }
+    }
+
+    const int32_t fwidth = GetFrameWidth(view.frameScale_);
+    // this is how many frames per group.
+    // don't think i want it to work that way
+    // i also want to support single run apps like converters.
+    // which don't really have a frame.
+    // i want to do it based on time.
+    // so there will be a timescale.
+    // i dunno what the default should be like you open a trace and the first 1 second is visible?
+    // and you can zoom either in or out?
+    // should it be based on width.
+    // so if you resize you see same data but bigger.
+    // 
+
+    const int32_t group = GetFrameGroup(view.frameScale_);
+    const int32_t total = view.stats.numZones;
+    const int32_t onScreen = static_cast<int32_t>((w - 2) / fwidth);
+
+    // need to draw the ticks.
+    // the viewer is a sliding window.
+    // so we need to know out timeoffset in the trace.
+    // then find the various segments for drawing.
+    // so first thing is to work out what the visible time range is.
+    // lets just make it 5 seconds?
+    // i also need to show tick info tho.
+    // they should just appear on the timeline.
+    // so lets just draw a fucking timeline
+    // and put in the tick info on top.
+
+
+    // Draw the time bar
+    {
+        const auto ty = ImGui::GetFontSize();
+
+        auto timespan = view.GetVisiableNS();
+        auto pxns = w / double(timespan);
+
+
+        {
+            const auto nspx = 1.0 / pxns;
+            const auto scale = std::max(0.0, math<double>::round(log10(nspx) + 2));
+            const auto step = pow(10, scale);
+
+            const auto dx = step * pxns;
+            double x = 0;
+            int32_t tw = 0;
+            int32_t tx = 0;
+            int64_t tt = 0;
+
+            StringBuf strBuf;
+
+            while (x < w)
+            {
+                draw->AddLine(wpos + ImVec2(x, 0), wpos + ImVec2(x, math<double>::round(ty * 0.5)), 0x66FFFFFF);
+                if (tw == 0)
+                {
+                    const auto t = view.GetVisibleStartNS();
+                    TimeToString(strBuf, t);
+
+                    if (t >= 0) // prefix the shit.
+                    {
+                        StringBuf strBuf1;
+                        strBuf1.setFmt("+%s", strBuf.c_str());
+                        strBuf = strBuf1;
+                    }
+
+                    draw->AddText(wpos + ImVec2(x, math<double>::round(ty * 0.5)), 0x66FFFFFF, strBuf.begin(), strBuf.end());
+                    tw = ImGui::CalcTextSize(strBuf.begin(), strBuf.end()).x;
+                }
+                else if (x > tx + tw + ty * 2)
+                {
+                    tx = x;
+                    TimeToString(strBuf, tt);
+                    draw->AddText(wpos + ImVec2(x, math<double>::round(ty * 0.5)), 0x66FFFFFF, strBuf.begin(), strBuf.end());
+                    tw = ImGui::CalcTextSize(strBuf.begin(), strBuf.end()).x;
+                }
+
+                if (scale != 0)
+                {
+                    for (int32_t i = 1; i < 5; i++)
+                    {
+                        draw->AddLine(wpos + ImVec2(x + i * dx / 10, 0), wpos + ImVec2(x + i * dx / 10, round(ty * 0.25)), 0x33FFFFFF);
+                    }
+
+                    draw->AddLine(wpos + ImVec2(x + 5 * dx / 10, 0), wpos + ImVec2(x + 5 * dx / 10, round(ty * 0.375)), 0x33FFFFFF);
+                    
+                    for (int32_t i = 6; i < 10; i++)
+                    {
+                        draw->AddLine(wpos + ImVec2(x + i * dx / 10, 0), wpos + ImVec2(x + i * dx / 10, round(ty * 0.25)), 0x33FFFFFF);
+                    }
+                }
+
+                x += dx;
+                tt += step;
+            }
+        }
+    }
+
+    // i want to draw frame markers.
+    {
+        draw->AddRectFilled(wpos, wpos + ImVec2(w, height), 0x33FFFFFF);
+
+
+    }
+
+    bool drawMouseLine = true;
+
+    if (drawMouseLine)
+    {
+        const auto linepos = ImGui::GetCursorScreenPos();
+        const auto lineh = ImGui::GetContentRegionAvail().y;
+
+        draw->AddLine(ImVec2(io.MousePos.x, linepos.y), ImVec2(io.MousePos.x, linepos.y + lineh), 0x33FFFFFF);
+    }
+
+#if 0
+    if (!view.paused_)
+    {
+        view.frameStart_ = (total < onScreen * group) ? 0 : total - onScreen * group;
+        SetViewToLastFrames();
+    }
+#endif
+
+#if 0
+    if (hover)
+    {
+        if (ImGui::IsMouseDragging(1, 0))
+        {
+            view.paused_ = true;
+            const auto delta = ImGui::GetMouseDragDelta(1, 0).x;
+            if (abs(delta) >= fwidth)
+            {
+                const auto d = (int)delta / fwidth;
+                view.frameStart_ = std::max(0, view.frameStart_ - d * group);
+                io.MouseClickedPos[1].x = io.MousePos.x + d * fwidth - delta;
+            }
+        }
+
+        const auto mx = io.MousePos.x;
+        if (mx > wpos.x && mx < wpos.x + w - 1)
+        {
+            const auto mo = mx - (wpos.x + 1);
+            const auto off = mo * group / fwidth;
+
+            const int sel = view.frameStart_ + off;
+            if (sel < total)
+            {
+                ImGui::BeginTooltip();
+                if (group > 1)
+                {
+                    auto f = GetFrameTime(sel);
+                    auto g = std::min(group, total - sel);
+                    for (int j = 1; j < g; j++)
+                    {
+                        f = std::max(f, GetFrameTime(sel + j));
+                    }
+
+                    TextDisabledUnformatted("Frames:");
+                    ImGui::SameLine();
+                    ImGui::Text("%s - %s (%s)", RealToString(sel, true), RealToString(sel + g - 1, true), RealToString(g, true));
+                    ImGui::Separator();
+                    TextFocused("Max frame time:", TimeToString(f));
+                }
+                else
+                {
+                    // TODO:
+                    // if (m_frames->name == 0)
+                    if (true)
+                    {
+                        const auto offset = GetFrameOffset();
+                        if (sel == 0)
+                        {
+                            ImGui::TextUnformatted("Tracy initialization");
+                            ImGui::Separator();
+                            TextFocused("Time:", TimeToString(GetFrameTime(sel)));
+                        }
+                        else if (offset == 0)
+                        {
+                            TextDisabledUnformatted("Frame:");
+                            ImGui::SameLine();
+                            ImGui::TextUnformatted(RealToString(sel, true));
+                            ImGui::Separator();
+                            TextFocused("Frame time:", TimeToString(GetFrameTime(sel)));
+                        }
+                        else if (sel == 1)
+                        {
+                            ImGui::TextUnformatted("Missed frames");
+                            ImGui::Separator();
+                            TextFocused("Time:", TimeToString(GetFrameTime(1)));
+                        }
+                        else
+                        {
+                            TextDisabledUnformatted("Frame:");
+                            ImGui::SameLine();
+                            ImGui::TextUnformatted(RealToString(sel + offset - 1, true));
+                            ImGui::Separator();
+                            TextFocused("Frame time:", TimeToString(GetFrameTime(sel)));
+                        }
+                    }
+                    else
+                    {
+                        //   ImGui::TextDisabled("%s:", GetString(m_frames->name));
+                        ImGui::SameLine();
+                        ImGui::TextUnformatted(RealToString(sel + 1, true));
+                        ImGui::Separator();
+                        TextFocused("Frame time:", TimeToString(GetFrameTime(sel)));
+                    }
+                }
+                TextFocused("Time from start of program:", TimeToString(GetFrameBegin(sel) - GetTimeBegin()));
+                ImGui::EndTooltip();
+
+                if (ImGui::IsMouseClicked(0))
+                {
+                    view.paused_ = true;
+                    view.zvStart_ = GetFrameBegin(sel);
+                    view.zvEnd_ = GetFrameEnd(sel + group - 1);
+                    if (view.zvStart_ == view.zvEnd_) {
+                        view.zvStart_--;
+                    }
+                }
+                else if (ImGui::IsMouseDragging(0))
+                {
+                    view.zvStart_ = std::min(view.zvStart_, GetFrameBegin(sel));
+                    view.zvEnd_ = std::max(view.zvEnd_, GetFrameEnd(sel + group - 1));
+                }
+            }
+
+            if (view.paused_ && wheel != 0)
+            {
+                const int pfwidth = GetFrameWidth(prevScale);
+                const int pgroup = GetFrameGroup(prevScale);
+
+                const auto oldoff = mo * pgroup / pfwidth;
+                view.frameStart_ = std::min(total, std::max(0, view.frameStart_ - int(off - oldoff)));
+            }
+        }
+    }
+
+#endif
+
+#if 0
+    // this draws the zones.
+    // but i need to be able to work in segments.
+    // and we don't really want segment start / end.
+    // so it should be like segment + segment offset.
+
+    int32_t i = 0;
+    int32_t idx = 0;
+    while (i < onScreen && view.frameStart_ + idx < total)
+    {
+        auto f = GetFrameTime(view.frameStart_ + idx);
+
+        int32_t g;
+        if (group > 1)
+        {
+            g = std::min(group, total - (view.frameStart_ + idx));
+            for (int32_t j = 1; j < g; j++)
+            {
+                f = std::max(f, GetFrameTime(view.frameStart_ + idx + j));
+            }
+        }
+
+        X_DISABLE_WARNING(4244)
+
+        const auto h = float(std::min<uint64_t>(MaxFrameTime, f)) / MaxFrameTime * (Height - 2);
+        if (fwidth != 1)
+        {
+            draw->AddRectFilled(
+                wpos + ImVec2(1 + i * fwidth, Height - 1 - h),
+                wpos + ImVec2(fwidth + i * fwidth, Height - 1),
+                GetFrameColor(f)
+            );
+        }
+        else
+        {
+            draw->AddLine(wpos + ImVec2(1 + i, Height - 2 - h), wpos + ImVec2(1 + i, Height - 2), GetFrameColor(f));
+        }
+
+        i++;
+        idx += group;
+    }
+#endif
+
+#if 0
+    const std::pair<int, int> zrange = GetFrameRange(view.zvStart_, view.zvEnd_);
+
+    if (zrange.second > view.frameStart_ && zrange.first < view.frameStart_ + onScreen * group)
+    {
+        auto x1 = std::min(onScreen * fwidth, (zrange.second - view.frameStart_) * fwidth / group);
+        auto x0 = std::max(0, (zrange.first - view.frameStart_) * fwidth / group);
+
+        if (x0 == x1) {
+            x1 = x0 + 1;
+        }
+
+        draw->AddRectFilled(wpos + ImVec2(1 + x0, 0), wpos + ImVec2(1 + x1, Height), 0x55DD22DD);
+    }
+#endif
+}
+
 void DrawFrame(Client& client, float ww, float wh)
 {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -654,8 +1004,7 @@ void DrawFrame(Client& client, float ww, float wh)
             {
                 if (ImGui::BeginTabItem(view.tabName.c_str(), &view.open_, 0))
                 {
-                    ImGui::TextColored(ImVec4(1, 0, 0, 1), "Meoww...");
-                    //    DrawFrames();
+                    DrawFrames(view);
                     //    DrawZones();
 
                     ImGui::EndTabItem();
