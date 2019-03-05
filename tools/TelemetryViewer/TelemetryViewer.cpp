@@ -947,7 +947,7 @@ void DrawFrame(Client& client, float ww, float wh)
                             core::HumanDuration::Str durStr0;
                             HumanNumber::Str numStr;
 
-                            ImGui::Text("Duration: %s", core::HumanDuration::toStringMicro(durStr0, stats.durationMicro));
+                            ImGui::Text("Duration: %s", core::HumanDuration::toStringNano(durStr0, stats.durationNano));
                             ImGui::Text("Zones: %s", HumanNumber::toString(numStr, stats.numZones));
                             ImGui::SameLine();
                             if (ImGui::Button("Open"))
@@ -1084,8 +1084,8 @@ bool handleTraceZoneSegmentTicks(Client& client, const DataPacketBaseViewer* pBa
         TickData td;
         td.start = tick.start;
         td.end = tick.end;
-        td.startMicro = tick.startMicro;
-        td.endMicro = tick.endMicro;
+        td.startNano = tick.startNano;
+        td.endNano = tick.endNano;
 
         ticks.push_back(td);
     }

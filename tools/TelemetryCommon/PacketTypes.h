@@ -121,6 +121,7 @@ struct ConnectionRequestHdr : public PacketBase
     tt_uint16 buildInfoLen;
     tt_uint16 cmdLineLen;
     tt_uint64 ticksPerMicro;
+    tt_uint64 ticksPerNano;
 };
 
 struct ConnectionRequestAcceptedHdr : public PacketBase
@@ -142,7 +143,7 @@ TELEM_PACK_POP;
 
 static_assert(sizeof(VersionInfo) == 4, "Incorrect size");
 static_assert(sizeof(PacketBase) == 3, "Incorrect size");
-static_assert(sizeof(ConnectionRequestHdr) == 21, "Incorrect size");
+static_assert(sizeof(ConnectionRequestHdr) == 29, "Incorrect size");
 static_assert(sizeof(ConnectionRequestAcceptedHdr) == 7, "Incorrect size");
 static_assert(sizeof(ConnectionRequestRejectedHdr) == 5, "Incorrect size");
 static_assert(sizeof(DataStreamHdr) == 5, "Incorrect size");
@@ -212,8 +213,8 @@ struct DataPacketTickInfo : public DataPacketBase
     // 16
     tt_uint64 start;
     tt_uint64 end;
-    tt_uint64 startMicro;
-    tt_uint64 endMicro;
+    tt_uint64 startNano;
+    tt_uint64 endNano;
 };
 
 struct DataPacketThreadSetName : public DataPacketBase

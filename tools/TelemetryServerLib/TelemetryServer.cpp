@@ -267,14 +267,14 @@ namespace
         }
 
         {
-            sql::SqlLiteQuery qry(db, "SELECT endMicro FROM ticks WHERE _rowid_ = (SELECT MAX(_rowid_) FROM ticks)");
+            sql::SqlLiteQuery qry(db, "SELECT endNano FROM ticks WHERE _rowid_ = (SELECT MAX(_rowid_) FROM ticks)");
             auto it = qry.begin();
             if (it == qry.end()) {
                 X_ERROR("TelemSrv", "Failed to load tick counts");
                 return false;
             }
 
-            stats.durationMicro = (*it).get<int64_t>(0);
+            stats.durationNano = (*it).get<int64_t>(0);
         }
 
         {
@@ -346,7 +346,7 @@ bool TraceDB::createDB(core::Path<char>& path)
 
     cmdInsertZone.prepare("INSERT INTO zones (threadID, startTick, endTick, sourceInfoIdx, stackDepth) VALUES(?,?,?,?,?)");
     cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
-    cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, startTick, endTick, startMicro, endMicro) VALUES(?,?,?,?,?)");
+    cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, startTick, endTick, startNano, endNano) VALUES(?,?,?,?,?)");
     cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
     cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, start, end, descriptionStrId) VALUES(?,?,?,?,?)");
     cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, time, state) VALUES(?,?,?,?)");
@@ -390,8 +390,8 @@ bool TraceDB::createIndexes(void)
         CREATE INDEX IF NOT EXISTS "zones_start" ON "zones" (
             "startTick"	ASC
         );
-        CREATE INDEX IF NOT EXISTS "ticks_startMicro" ON "ticks" (
-            "startMicro"	ASC
+        CREATE INDEX IF NOT EXISTS "ticks_startNano" ON "ticks" (
+            "startNano"	ASC
         );
     )");
 
@@ -422,8 +422,8 @@ CREATE TABLE IF NOT EXISTS "ticks" (
 	"threadId"	    INTEGER NOT NULL,
 	"startTick"	    INTEGER NOT NULL,
 	"endTick"       INTEGER NOT NULL,
-	"startMicro"	INTEGER NOT NULL,
-	"endMicro"	    INTEGER NOT NULL,
+	"startNano"	    INTEGER NOT NULL,
+	"endNano"	    INTEGER NOT NULL,
 	PRIMARY KEY("Id")
 );
 
@@ -562,8 +562,8 @@ void TraceDB::handleDataPacketTickInfo(const DataPacketTickInfo* pData)
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
     cmd.bind(2, static_cast<int64_t>(pData->start));
     cmd.bind(3, static_cast<int64_t>(pData->end));
-    cmd.bind(4, static_cast<int64_t>(pData->startMicro));
-    cmd.bind(5, static_cast<int64_t>(pData->endMicro));
+    cmd.bind(4, static_cast<int64_t>(pData->startNano));
+    cmd.bind(5, static_cast<int64_t>(pData->endNano));
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -746,8 +746,8 @@ bool TraceDB::getTicks(core::Array<DataPacketTickInfo>& ticks, int32_t startIdx,
         tick.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
         tick.start = static_cast<uint64_t>(row.get<int64_t>(2));
         tick.end = static_cast<uint64_t>(row.get<int64_t>(3));
-        tick.startMicro = static_cast<uint64_t>(row.get<int64_t>(4));
-        tick.endMicro = static_cast<uint64_t>(row.get<int64_t>(5));
+        tick.startNano = static_cast<uint64_t>(row.get<int64_t>(4));
+        tick.endNano = static_cast<uint64_t>(row.get<int64_t>(5));
 
         ticks.append(tick);
     }
@@ -908,6 +908,7 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
         loaded &= getMetaStr(db, "buildInfo", trace.buildInfo);
         loaded &= getMetaStr(db, "cmdLine", trace.cmdLine);
         loaded &= getMetaUInt64(db, "tickPerMicro", trace.ticksPerMicro);
+        loaded &= getMetaUInt64(db, "tickPerNano", trace.ticksPerNano);
 
         if (!loaded) {
             X_ERROR("TelemSrv", "Failed to load meta for: \"%s\"", trace.dbPath.c_str());
@@ -1152,6 +1153,7 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     trace.buildInfo.assign(pBuildInfoStr, pConReq->buildInfoLen);
     trace.cmdLine.assign(pCmdLineStr, pConReq->cmdLineLen);
     trace.ticksPerMicro = pConReq->ticksPerMicro;
+    trace.ticksPerNano = pConReq->ticksPerNano;
 
     core::Path<> workingDir;
     if (!gEnv->pFileSys->getWorkingDirectory(workingDir)) {
@@ -1201,6 +1203,7 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     setMeta &= strm.db.setMeta("clientVer", client.clientVer.toString(verStr));
     setMeta &= strm.db.setMeta("serverVer", serverVer.toString(verStr));
     setMeta &= strm.db.setMeta<int64_t>("tickPerMicro", static_cast<int64_t>(trace.ticksPerMicro));
+    setMeta &= strm.db.setMeta<int64_t>("tickPerNano", static_cast<int64_t>(trace.ticksPerNano));
 
     if (!setMeta) {
         return false;
@@ -1339,10 +1342,7 @@ bool Server::handleQueryTraceInfo(ClientConnection& client, uint8_t* pData)
                     resp.type = PacketType::QueryTraceInfoResp;
                     resp.dataSize = sizeof(resp);
                     resp.guid = pHdr->guid;
-                    resp.stats.numZones = stats.numZones;
-                    resp.stats.numTicks = stats.numTicks;
-                    // resp.stats.numAllocations = stats.numAllocations;
-                    resp.stats.durationMicro = stats.durationMicro;
+                    resp.stats = stats;
 
                     sendDataToClient(client, &resp, sizeof(resp));
                 }
@@ -1380,6 +1380,13 @@ bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
         if (trace.pTrace->guid == pHdr->guid)
         {
             X_WARNING("TelemSrv", "Client opened a trace they already have open");
+
+            if (!getStats(trace.db.con, otr.stats))
+            {
+                X_ERROR("TelemSrv", "Failed to get stats for openDb request");
+                return true;
+            }
+
             otr.handle = safe_static_cast<int8_t>(i);
             sendDataToClient(client, &otr, sizeof(otr));
             return true;
@@ -1537,7 +1544,7 @@ bool Server::handleReqTraceTicks(ClientConnection& client, uint8_t* pData)
     // if there is loads of data we just send multiple compressed packets.
     const int32_t numToReturn = pHdr->num;
 
-    sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, startMicro, endMicro FROM ticks LIMIT ? OFFSET ?");
+    sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, startNano, endNano FROM ticks LIMIT ? OFFSET ?");
     qry.bind(1, pHdr->tickIdx);
     qry.bind(2, numToReturn);
 
@@ -1550,8 +1557,8 @@ bool Server::handleReqTraceTicks(ClientConnection& client, uint8_t* pData)
         tick.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
         tick.start = static_cast<uint64_t>(row.get<int64_t>(1));
         tick.end = static_cast<uint64_t>(row.get<int64_t>(2));
-        tick.startMicro = static_cast<uint64_t>(row.get<int64_t>(3));
-        tick.endMicro = static_cast<uint64_t>(row.get<int64_t>(4));
+        tick.startNano = static_cast<uint64_t>(row.get<int64_t>(3));
+        tick.endNano = static_cast<uint64_t>(row.get<int64_t>(4));
 
         addToCompressionBuffer(client, &tick, sizeof(tick));
     }
@@ -1625,7 +1632,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
         pTickHdr->num = 0;
         pTickHdr->handle = pHdr->handle;
 
-        sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, startMicro, endMicro FROM ticks LIMIT ? OFFSET ?");
+        sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, startNano, endNano FROM ticks LIMIT ? OFFSET ?");
         qry.bind(1, pHdr->max);
         qry.bind(2, pHdr->tickIdx);
 
@@ -1644,8 +1651,8 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
             tick.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
             tick.start = static_cast<uint64_t>(row.get<int64_t>(1));
             tick.end = static_cast<uint64_t>(row.get<int64_t>(2));
-            tick.startMicro = static_cast<uint64_t>(row.get<int64_t>(3));
-            tick.endMicro = static_cast<uint64_t>(row.get<int64_t>(4));
+            tick.startNano = static_cast<uint64_t>(row.get<int64_t>(3));
+            tick.endNano = static_cast<uint64_t>(row.get<int64_t>(4));
 
             if (getCompressionBufferSpace(client) < sizeof(tick))
             {

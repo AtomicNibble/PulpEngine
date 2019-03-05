@@ -29,7 +29,7 @@ struct TraceStats
     core::Guid guid;
     tt_int64 numZones;
     tt_int64 numTicks;
-    tt_int64 durationMicro;
+    tt_int64 durationNano;
     // will either need to store free in seperate table or manually count them.
     // tt_int64 numAllocations;
 };
@@ -38,12 +38,14 @@ struct Trace
 {
     Trace() :
         ticksPerMicro(0),
+        ticksPerNano(0),
         active(false)
     {}
 
     bool active;
     core::Guid guid;
     uint64_t ticksPerMicro;
+    uint64_t ticksPerNano;
     core::DateTimeStamp date;
     core::string hostName;
     core::string buildInfo;

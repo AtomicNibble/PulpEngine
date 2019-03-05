@@ -34,11 +34,11 @@ struct ZoneData
 
 struct TickData
 {
-    uint64_t start;
-    uint64_t end;
+    int64_t start;
+    int64_t end;
 
-    uint64_t startMicro;
-    uint64_t endMicro;
+    int64_t startNano;
+    int64_t endNano;
 };
 
 struct ZoneSegmentThread

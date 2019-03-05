@@ -45,6 +45,7 @@ namespace
     }
 
     SysTimer gSysTimer;
+    tt_uint64 gTicksPerNano;
     tt_uint64 gTicksPerMicro;
 
     TELEM_INLINE tt_uint32 getThreadID(void)
@@ -134,14 +135,14 @@ namespace
     TELEM_ALIGNED_SYMBOL(struct TraceContext, 64)
     {
         tt_uint64 lastTick;
-        tt_uint64 lastTickMicro;
+        tt_uint64 lastTickNano;
 
         TraceThread* pThreadData;
         tt_int32 numThreadData;
 
-        tt_uint64 ticksPerMicro;
+        tt_uint64 ticksPerNano;
         tt_uint64 baseTicks;
-        tt_uint64 baseMicro;
+        tt_uint64 baseNano;
 
         bool isEnabled;
         bool _pad[7];
@@ -209,9 +210,9 @@ namespace
         return handle != INVALID_TRACE_CONTEX;
     }
 
-    TELEM_INLINE tt_uint64 ticksToMicro(TraceContext* pCtx, tt_uint64 tsc)
+    TELEM_INLINE tt_uint64 ticksToNano(TraceContext* pCtx, tt_uint64 tsc)
     {
-        return (tsc / pCtx->ticksPerMicro);
+        return (tsc / pCtx->ticksPerNano);
     }
 
     TELEM_INLINE tt_uint64 getRelativeTicks(TraceContext* pCtx)
@@ -619,8 +620,8 @@ namespace
         TtthreadId threadID;
         tt_uint64 start;
         tt_uint64 end;
-        tt_uint64 startMicro;
-        tt_uint64 endMicro;
+        tt_uint64 startNano;
+        tt_uint64 endNano;
     };
 
     TELEM_ALIGNED_SYMBOL(struct QueueDataThreadSetName, 64) : public QueueDataBase
@@ -738,12 +739,12 @@ namespace
             }
 
             auto waitEnd = getTicks();
-            auto ellapsedMicro = ticksToMicro(pCtx, waitEnd - waitStart);
+            auto ellapsedNano = ticksToNano(pCtx, waitEnd - waitStart);
 
             // did we have to wait more than 0.1ms?
-            if (ellapsedMicro > 100)
+            if (ellapsedNano > 100'000)
             {
-                writeLog(pCtx, LogType::Warning, "Flip stalled for: %lluus", ellapsedMicro);
+                writeLog(pCtx, LogType::Warning, "Flip stalled for: %lluns", ellapsedNano);
             }
         }
 
@@ -824,15 +825,15 @@ namespace
         addToTickBuffer(pCtx, pPtr, size);
     }
      
-    TELEM_INLINE void queueTickInfo(TraceContext* pCtx, tt_uint64 startTick, tt_uint64 endTick, tt_uint64 startMicro, tt_uint64 endMicro)
+    TELEM_INLINE void queueTickInfo(TraceContext* pCtx, tt_uint64 startTick, tt_uint64 endTick, tt_uint64 startNano, tt_uint64 endNano)
     {
         QueueDataTickInfo data;
         data.type = QueueDataType::TickInfo;
         data.threadID = getThreadID();
         data.start = toRelativeTicks(pCtx, startTick);
         data.end = toRelativeTicks(pCtx, endTick);
-        data.startMicro = startMicro - pCtx->baseMicro;
-        data.endMicro = endMicro - pCtx->baseMicro;
+        data.startNano = startNano - pCtx->baseNano;
+        data.endNano = endNano - pCtx->baseNano;
 
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
@@ -975,8 +976,8 @@ namespace
         packet.threadID = pBuf->threadID;
         packet.start = pBuf->start;
         packet.end = pBuf->end;
-        packet.startMicro = pBuf->startMicro;
-        packet.endMicro = pBuf->endMicro;
+        packet.startNano = pBuf->startNano;
+        packet.endNano = pBuf->endNano;
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
     }
@@ -1252,21 +1253,25 @@ bool TelemInit(void)
     }
 
     // want to work out ticks per micro.
-    const auto micro_start = gSysTimer.GetMicro();
-    const auto tsc_start = getTicks();
+    {
+        const auto micro_start = gSysTimer.GetMicro();
+        const auto tsc_start = getTicks();
 
-    tt_uint64 micro_end;
-    tt_uint64 tsc_end;
+        tt_uint64 micro_end;
+        tt_uint64 tsc_end;
 
-    for (;;) {
-        tsc_end = getTicks();
-        micro_end = gSysTimer.GetMicro();
-        if ((micro_end - micro_start) > 100000) {
-            break;
+        for (;;) {
+            tsc_end = getTicks();
+            micro_end = gSysTimer.GetMicro();
+            if ((micro_end - micro_start) > 100000) {
+                break;
+            }
         }
+
+        gTicksPerMicro = (tsc_end - tsc_start) / (micro_end - micro_start);
+        gTicksPerNano = gTicksPerMicro / 1000;
     }
 
-    gTicksPerMicro = (tsc_end - tsc_start) / (micro_end - micro_start);
     return true;
 }
 
@@ -1329,14 +1334,14 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
 
     TraceContext* pCtx = new (pBuf) TraceContext();
     pCtx->lastTick = getTicks();
-    pCtx->lastTickMicro = gSysTimer.GetMicro();
+    pCtx->lastTickNano = gSysTimer.GetNano();
     pCtx->isEnabled = true;
     pCtx->socket = INV_SOCKET;
     pCtx->pThreadData = reinterpret_cast<TraceThread*>(pThreadDataBuf);
     pCtx->numThreadData = 0;
-    pCtx->ticksPerMicro = gTicksPerMicro;
+    pCtx->ticksPerNano = gTicksPerNano;
     pCtx->baseTicks = pCtx->lastTick;
-    pCtx->baseMicro = pCtx->lastTickMicro;
+    pCtx->baseNano = pCtx->lastTickNano;
 
     pCtx->activeTickBufIdx = 0;
     pCtx->tickBuffers[0].pTickBuf = pTickBuffer0;
@@ -1513,6 +1518,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     cr.buildInfoLen = static_cast<tt_uint16>(buildInfoLen);
     cr.cmdLineLen = static_cast<tt_uint16>(cmdLenUtf8);
     cr.ticksPerMicro = gTicksPerMicro;
+    cr.ticksPerNano = gTicksPerNano;
     cr.dataSize = sizeof(cr) + cr.appNameLen + cr.buildInfoLen + cr.cmdLineLen;
 
     sendDataToServer(pCtx, &cr, sizeof(cr));
@@ -1566,19 +1572,19 @@ void TelemTick(TraceContexHandle ctx)
     }
 
     auto curTick = getTicks();
-    auto curTimeMicro = gSysTimer.GetMicro();
-    auto sinceLastMicro = curTimeMicro - pCtx->lastTickMicro;
+    auto curTimeNano = gSysTimer.GetNano();
+    auto sinceLastNano = curTimeNano - pCtx->lastTickNano;
 
     // we queue a tick even if don't flush.
-    queueTickInfo(pCtx, pCtx->lastTick, curTick, pCtx->lastTickMicro, curTimeMicro);
+    queueTickInfo(pCtx, pCtx->lastTick, curTick, pCtx->lastTickNano, curTimeNano);
 
     // I update these even if we don't flip, so the tick timing is correct.
     // if want the time to accumlate need another field to track it.
     pCtx->lastTick = curTick;
-    pCtx->lastTickMicro = curTimeMicro;
+    pCtx->lastTickNano = curTimeNano;
 
     // if we are been called at a very high freq don't bother sending unless needed.
-    if (sinceLastMicro < 1'000'000) {
+    if (sinceLastNano < 100'000'000) {
         // if the buffer is half full send it!
         auto halfBufferCap = pCtx->tickBufCapacity / 2;
         auto bufSize = getActiveTickBufferSize(pCtx);
@@ -1734,9 +1740,9 @@ void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId)
     // work out if we send it.
     auto minMicroSec = matchId;
     auto elpased = zone.end - zone.start;
-    auto elapsedMicro = ticksToMicro(pCtx, elpased);
+    auto elapsedNano = ticksToNano(pCtx, elpased);
 
-    if (elapsedMicro > minMicroSec) {
+    if (elapsedNano > minMicroSec * 1000) {
         return;
     }
 
@@ -1823,9 +1829,9 @@ void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPt
     // work out if we send it.
     auto minMicroSec = matchId;
     auto elpased = pLock->end - pLock->start;
-    auto elapsedMicro = ticksToMicro(pCtx, elpased);
+    auto elapsedNano = ticksToNano(pCtx, elpased);
 
-    if (elapsedMicro > minMicroSec) {
+    if (elapsedNano > minMicroSec * 1000) {
         return;
     }
     
