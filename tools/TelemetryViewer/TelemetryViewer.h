@@ -61,12 +61,16 @@ struct ZoneSegment
 
 public:
     ZoneSegment(core::MemoryArenaBase* arena) :
+        startNano(0),
+        endNano(0),
         ticks(arena),
         threads(arena)
     {}
 
-    // what is this segment for?
-    // well it has to be for a number of ticks.
+    // this should just be for a range of time.
+    // it may have no ticks, should probs move ticks out of this then.
+    int64_t startNano;
+    int64_t endNano;
 
     TickDataArr ticks;
     ZoneSegmentThreadArr threads;
@@ -91,7 +95,7 @@ public:
         frameScale_ = 0;
 
         zvStart_ = 1000 * 1;
-        zvEnd_ = 1000 * 10;
+        zvEnd_ = 1000 * 1000 * 500;
 
         zvHeight_ = 0;
         zvScroll_ = 0;

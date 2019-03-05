@@ -417,6 +417,16 @@ void DrawFrames(TraceView& view)
     {
         if (wheel > 0)
         {
+            auto visible = view.GetVisiableNS();
+            auto remove = visible / 8;
+
+            view.zvStart_ += remove;
+            view.zvEnd_ -= remove;
+
+            if (view.zvStart_ >= view.zvEnd_) {
+                view.zvStart_ = view.zvEnd_ - 1;
+            }
+
             if (view.frameScale_ >= 0) {
                 view.frameScale_--;
             }
@@ -467,15 +477,13 @@ void DrawFrames(TraceView& view)
     // so lets just draw a fucking timeline
     // and put in the tick info on top.
 
+    auto timespan = view.GetVisiableNS();
+    auto pxns = w / double(timespan);
+
+    const auto ty = ImGui::GetFontSize();
 
     // Draw the time bar
     {
-        const auto ty = ImGui::GetFontSize();
-
-        auto timespan = view.GetVisiableNS();
-        auto pxns = w / double(timespan);
-
-
         {
             const auto nspx = 1.0 / pxns;
             const auto scale = std::max(0.0, math<double>::round(log10(nspx) + 2));
@@ -537,10 +545,42 @@ void DrawFrames(TraceView& view)
     }
 
     // i want to draw frame markers.
+    // we need to just look that what ticks we have and draw them :D
+    // i need to come up with a nice structure for storing these linked list maybe?
+    // basically want to be able to add to tail and end.
+    // but lets just deal with single range for now.
+    if(view.segments.isNotEmpty())
     {
-        draw->AddRectFilled(wpos, wpos + ImVec2(w, height), 0x33FFFFFF);
+        auto& segment = view.segments.front();
 
+        // the ticks should be sorted.
+        auto& ticks = segment.ticks;
 
+        auto it = std::lower_bound(ticks.begin(), ticks.end(), view.GetVisibleStartNS(), [](const TickData& tick, int64_t val) {
+            return tick.endNano < val;
+        });
+
+        if (it != ticks.end())
+        {
+            // draw them?
+            // 1000000
+            // 246125553
+            while (it != ticks.end() && it->endNano < view.zvEnd_)
+            {
+                auto& tick = *it;
+
+                // need to find out offset to draw this bitch.
+                auto offset = tick.endNano - view.zvStart_;
+                auto width = pxns * double(offset);
+
+                draw->AddLine(wpos + ImVec2(width, 0), wpos + ImVec2(width, math<double>::round(ty * 0.5)), 0x66FF00FF);
+
+                ++it;
+            }
+
+            // draw->AddRectFilled(wpos, wpos + ImVec2(w, height), 0x33FFFFFF);
+
+        }
     }
 
     bool drawMouseLine = true;
@@ -1059,6 +1099,7 @@ bool handleTraceZoneSegmentTicks(Client& client, const DataPacketBaseViewer* pBa
     }
 
     auto& segment = view.segments.front();
+    segment.endNano = view.stats.durationNano; // TODO: HACK!
 
     // meow.
     // so i need to find out what segment to add this to.
@@ -1607,7 +1648,7 @@ bool run(Client& client)
         ImGui::NewFrame();
 
         DrawFrame(client, io.DisplaySize.x, io.DisplaySize.y);
-        ImGui::ShowDemoWindow();
+     //   ImGui::ShowDemoWindow();
 
         ImGui::Render();
         SDL_GL_MakeCurrent(pWindow, gl_context);
