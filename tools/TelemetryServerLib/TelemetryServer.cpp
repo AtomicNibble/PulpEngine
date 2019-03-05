@@ -389,7 +389,10 @@ bool TraceDB::createIndexes(void)
     sql::SqlLiteCmd cmd(con, R"(
         CREATE INDEX IF NOT EXISTS "zones_start" ON "zones" (
             "startTick"	ASC
-        )
+        );
+        CREATE INDEX IF NOT EXISTS "ticks_startMicro" ON "ticks" (
+            "startMicro"	ASC
+        );
     )");
 
     auto res = cmd.execute();
