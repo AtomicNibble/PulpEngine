@@ -98,7 +98,7 @@ namespace
         ttSetLockName(ctx, &cs0, "Magic lock");
         ttSetLockName(ctx, &cs1, "Stu's lock");
 
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < 200; i++)
         {
             ttTick(ctx);
 
@@ -127,10 +127,9 @@ namespace
 
                 for (int j = 0; j < 50; j++)
                 {
-                    ttTick(ctx);
                     ttZone(ctx, "Meoooow");
 
-                    for (int y = 0; y < 100; y++)
+                    for (int y = 0; y < 2; y++)
                     {
                         ttEnter(ctx, "Yep")
                         ttLeave(ctx)
@@ -141,7 +140,7 @@ namespace
 
             // Lock me up like a goat.
             ScopedLockTelemetry lock(cs1);
-            core::Thread::sleep(0);
+            core::Thread::sleep(1);
         }
 
         ttFlush(ctx);
