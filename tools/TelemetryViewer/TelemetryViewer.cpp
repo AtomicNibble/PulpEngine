@@ -608,6 +608,8 @@ bool DrawZoneFramesHeader(TraceView& view)
 
                 auto col = 0x66FFFFFF;
 
+                // TODO: add some animation to this text so it gets brighter when value is changing.
+
                 if (t >= 0) // prefix the shit.
                 {
                     StringBuf strBuf1;
