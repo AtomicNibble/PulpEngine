@@ -40,20 +40,20 @@ namespace HumanDuration
             str.appendFmt("%" PRIi64 " ms", ms);
         }
         else if (ms <= 300000_i64) {
-            const int64_t sec = (ms / 1000);
-            str.appendFmt("%" PRIi64 " sec", sec);
+            const float sec = static_cast<float>(ms) / 1000.f;
+            str.appendFmt("%.2f sec", sec);
         }
         else if (ms <= 16777216_i64) {
-            const int64_t sec = (ms / 1000);
-            const int64_t min = (sec / 60);
+            const float sec = static_cast<float>(ms) / 1000.f;
+            const float min = (sec / 60.f);
 
-            str.appendFmt("%" PRIi64 " min", min);
+            str.appendFmt("%.2f min", min);
         }
         else {
-            const int64_t sec = (ms / 1000);
-            const int64_t min = (sec / 60);
+            const float sec = static_cast<float>(ms) / 1000.f;
+            const float min = (sec / 60.f);
 
-            str.appendFmt("%" PRIi64 " min", min);
+            str.appendFmt("%.2f min", min);
         }
 
         return str.c_str();
