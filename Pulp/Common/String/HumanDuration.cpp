@@ -12,19 +12,19 @@ namespace HumanDuration
         if (ms <= 1000.f) {
             str.appendFmt("%.3f ms", ms);
         }
-        else if (ms <= 300000) {
-            const float sec = (ms / 1000);
+        else if (ms <= 300000.f) {
+            const float sec = (ms / 1000.f);
             str.appendFmt("%.2f sec", sec);
         }
-        else if (ms <= 16777216) {
-            const float sec = (ms / 1000);
-            const float min = (sec / 60);
+        else if (ms <= 16777216.f) {
+            const float sec = (ms / 1000.f);
+            const float min = (sec / 60.f);
 
             str.appendFmt("%.2f min", min);
         }
         else {
-            const float sec = (ms / 1000);
-            const float min = (sec / 60);
+            const float sec = (ms / 1000.f);
+            const float min = (sec / 60.f);
 
             str.appendFmt("%.2f min", min);
         }
