@@ -94,8 +94,8 @@ public:
         frameStart_ = 0;
         frameScale_ = 0;
 
-        zvStart_ = 1000 * 1;
-        zvEnd_ = 1000 * 1000 * 500;
+        zvStart_ = 1000 * 1000 * 800;
+        zvEnd_ = 1000 * 1000 * 1500;
 
         zvHeight_ = 0;
         zvScroll_ = 0;

@@ -200,15 +200,13 @@ namespace
         return buf.c_str();
     }
 
-    const char* RealToString(double val, bool separator)
+    const char* RealToString(StringBuf& buf, double val, bool separator)
     {
-        enum { Pool = 8 };
-        static char bufpool[Pool][64];
-        static int bufsel = 0;
-        char* buf = bufpool[bufsel];
-        bufsel = (bufsel + 1) % Pool;
+        X_UNUSED(separator);
 
-        sprintf(buf, "%f", val);
+        buf.setFmt("%f", val);
+        
+#if false
         auto ptr = buf;
         if (*ptr == '-') ptr++;
 
@@ -238,7 +236,9 @@ namespace
         while (*ptr == '0') ptr--;
         if (*ptr != '.' && *ptr != ',') ptr++;
         *ptr = '\0';
-        return buf;
+#endif
+
+        return buf.c_str();
     }
 
     void TextDisabledUnformatted(const char* begin, const char* end = nullptr)
@@ -385,20 +385,494 @@ namespace
 
     }
 
+    void DrawZigZag(ImDrawList* draw, const ImVec2& wpos, double start, double end, double h, uint32_t color)
+    {
+        int mode = 0;
+        while (start < end)
+        {
+            double step = std::min(end - start, mode == 0 ? h / 2 : h);
+            switch (mode)
+            {
+                case 0:
+                    draw->AddLine(wpos + ImVec2(start, 0), wpos + ImVec2(start + step, round(-step)), color);
+                    mode = 1;
+                    break;
+                case 1:
+                    draw->AddLine(wpos + ImVec2(start, round(-h / 2)), wpos + ImVec2(start + step, round(step - h / 2)), color);
+                    mode = 2;
+                    break;
+                case 2:
+                    draw->AddLine(wpos + ImVec2(start, round(h / 2)), wpos + ImVec2(start + step, round(h / 2 - step)), color);
+                    mode = 1;
+                    break;
+                default:
+                    X_ASSERT_UNREACHABLE();
+                    break;
+            };
+            start += step;
+        }
+    }
+
+    uint32_t GetColorMuted(uint32_t color, bool active)
+    {
+        if (active) {
+            return 0xFF000000 | color;
+        }
+    
+        return 0x66000000 | color;
+    }
+
+    using FrameTextStrBuf = core::StackString<64, char>;
+
+    const char* GetFrameText(FrameTextStrBuf& buf, int64_t durationNS, int64_t frameNum)
+    {
+        StringBuf strBuf;
+        buf.setFmt("Frame %" PRIi64 " (%s)", frameNum, TimeToString(strBuf, durationNS));
+        return buf.c_str();
+    }
+
+
 } // namespace
 
 
+void ZoomToRange(TraceView& view, int64_t start, int64_t end)
+{
+    if (start == end)
+    {
+        end = start + 1;
+    }
+
+    // view.pause_ = true;
+    view.highlightZoom_.active = false;
+    view.zoomAnim_.active = true;
+    view.zoomAnim_.start0 = view.zvStart_;
+    view.zoomAnim_.start1 = start;
+    view.zoomAnim_.end0 = view.zvEnd_;
+    view.zoomAnim_.end1 = end;
+    view.zoomAnim_.progress = 0;
+
+    const auto d0 = double(view.zoomAnim_.end0 - view.zoomAnim_.start0);
+    const auto d1 = double(view.zoomAnim_.end1 - view.zoomAnim_.start1);
+    const auto diff = d0 > d1 ? d0 / d1 : d1 / d0;
+    view.zoomAnim_.lenMod = 5.0 / log10(diff);
+}
+
+void HandleZoneViewMouse(TraceView& view, int64_t timespan, const ImVec2& wpos, float w, double& pxns)
+{
+    auto& io = ImGui::GetIO();
+
+    const auto nspx = double(timespan) / w;
+
+    if (ImGui::IsMouseClicked(0))
+    {
+        view.highlight_.active = true;
+        view.highlight_.start = view.highlight_.end = view.zvStart_ + (io.MousePos.x - wpos.x) * nspx;
+    }
+    else if (ImGui::IsMouseDragging(0, 0))
+    {
+        view.highlight_.end = view.zvStart_ + (io.MousePos.x - wpos.x) * nspx;
+    }
+    else
+    {
+        view.highlight_.active = false;
+    }
+
+    if (ImGui::IsMouseClicked(2))
+    {
+        view.highlightZoom_.active = true;
+        view.highlightZoom_.start = view.highlightZoom_.end = view.zvStart_ + (io.MousePos.x - wpos.x) * nspx;
+    }
+    else if (ImGui::IsMouseDragging(2, 0))
+    {
+        view.highlightZoom_.end = view.zvStart_ + (io.MousePos.x - wpos.x) * nspx;
+    }
+    else if (view.highlightZoom_.active)
+    {
+        if (view.highlightZoom_.start != view.highlightZoom_.end)
+        {
+            const auto s = std::min(view.highlightZoom_.start, view.highlightZoom_.end);
+            const auto e = std::max(view.highlightZoom_.start, view.highlightZoom_.end);
+
+            // ZoomToRange disables view.highlightZoom_.active
+            if (io.KeyCtrl)
+            {
+                const auto tsOld = view.zvEnd_ - view.zvStart_;
+                const auto tsNew = e - s;
+                const auto mul = double(tsOld) / tsNew;
+                const auto left = s - view.zvStart_;
+                const auto right = view.zvEnd_ - e;
+
+                ZoomToRange(view, view.zvStart_ - left * mul, view.zvEnd_ + right * mul);
+            }
+            else
+            {
+                ZoomToRange(view, s, e);
+            }
+        }
+        else
+        {
+            view.highlightZoom_.active = false;
+        }
+    }
+
+    if (ImGui::IsMouseDragging(1, 0))
+    {
+        view.zoomAnim_.active = false;
+        // view.pause = true;
+        const auto delta = ImGui::GetMouseDragDelta(1, 0);
+        const auto dpx = int64_t(delta.x * nspx);
+        if (dpx != 0)
+        {
+            view.zvStart_ -= dpx;
+            view.zvEnd_ -= dpx;
+            io.MouseClickedPos[1].x = io.MousePos.x;
+        }
+        if (delta.y != 0)
+        {
+            auto y = ImGui::GetScrollY();
+            ImGui::SetScrollY(y - delta.y);
+            io.MouseClickedPos[1].y = io.MousePos.y;
+        }
+    }
+
+    const auto wheel = io.MouseWheel;
+    if (wheel != 0)
+    {
+        view.zoomAnim_.active = false;
+        // view.pause_ = true;
+        const double mouse = io.MousePos.x - wpos.x;
+        const auto p = mouse / w;
+        const auto p1 = timespan * p;
+        const auto p2 = timespan - p1;
+        if (wheel > 0)
+        {
+            view.zvStart_ += int64_t(p1 * 0.25);
+            view.zvEnd_ -= int64_t(p2 * 0.25);
+        }
+        else if (timespan < 1000ll * 1000 * 1000 * 60 * 60)
+        {
+            view.zvStart_ -= std::max(int64_t(1), int64_t(p1 * 0.25));
+            view.zvEnd_ += std::max(int64_t(1), int64_t(p2 * 0.25));
+        }
+        timespan = view.zvEnd_ - view.zvStart_;
+        pxns = w / double(timespan);
+    }
+}
+
+
+// Draws like a overview of all the frames, so easy to find peaks.
 void DrawFrames(TraceView& view)
 {
-    const auto height = 30 * ImGui::GetTextLineHeight() / 15.f;
+    X_UNUSED(view);
+
+}
+
+bool DrawZoneFramesHeader(TraceView& view)
+{
+    const auto wpos = ImGui::GetCursorScreenPos();
+    const auto w = ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ScrollbarSize;
+    auto* draw = ImGui::GetWindowDrawList();
+    const auto ty = ImGui::GetFontSize();
+
+    ImGui::InvisibleButton("##zoneFrames", ImVec2(w, ty * 1.5));
+    bool hover = ImGui::IsItemHovered();
+
+    auto timespan = view.GetVisiableNS();
+    auto pxns = w / double(timespan);
 
 
+    if (hover) {
+       HandleZoneViewMouse(view, timespan, wpos, w, pxns);
+    }
+
+    {
+        const auto nspx = 1.0 / pxns;
+        const auto scale = std::max(0.0, math<double>::round(log10(nspx) + 2));
+        const auto step = pow(10, scale);
+
+        const auto dx = step * pxns;
+        double x = 0;
+        int32_t tw = 0;
+        int32_t tx = 0;
+        int64_t tt = 0;
+
+        StringBuf strBuf;
+
+        while (x < w)
+        {
+            draw->AddLine(wpos + ImVec2(x, 0), wpos + ImVec2(x, math<double>::round(ty * 0.5)), 0x66FFFFFF);
+            if (tw == 0)
+            {
+                const auto t = view.GetVisibleStartNS();
+                TimeToString(strBuf, t);
+
+                auto col = 0x66FFFFFF;
+
+                if (t >= 0) // prefix the shit.
+                {
+                    StringBuf strBuf1;
+                    strBuf1.setFmt("+%s", strBuf.c_str());
+                    strBuf = strBuf1;
+                    col = 0xaaFFFFFF;
+                }
+                else
+                {
+                    col = 0xaa2020FF;
+                }
+
+                draw->AddText(wpos + ImVec2(x, math<double>::round(ty * 0.5)), col, strBuf.begin(), strBuf.end());
+                tw = ImGui::CalcTextSize(strBuf.begin(), strBuf.end()).x;
+            }
+            else if (x > tx + tw + ty * 2)
+            {
+                tx = x;
+                TimeToString(strBuf, tt);
+                draw->AddText(wpos + ImVec2(x, math<double>::round(ty * 0.5)), 0x66FFFFFF, strBuf.begin(), strBuf.end());
+                tw = ImGui::CalcTextSize(strBuf.begin(), strBuf.end()).x;
+            }
+
+            if (scale != 0)
+            {
+                for (int32_t i = 1; i < 5; i++)
+                {
+                    draw->AddLine(wpos + ImVec2(x + i * dx / 10, 0), wpos + ImVec2(x + i * dx / 10, round(ty * 0.25)), 0x33FFFFFF);
+                }
+
+                draw->AddLine(wpos + ImVec2(x + 5 * dx / 10, 0), wpos + ImVec2(x + 5 * dx / 10, round(ty * 0.375)), 0x33FFFFFF);
+
+                for (int32_t i = 6; i < 10; i++)
+                {
+                    draw->AddLine(wpos + ImVec2(x + i * dx / 10, 0), wpos + ImVec2(x + i * dx / 10, round(ty * 0.25)), 0x33FFFFFF);
+                }
+            }
+
+            x += dx;
+            tt += step;
+        }
+    }
+
+    return hover;
+}
+
+bool DrawZoneFrames(TraceView& view)
+{
+    const auto wpos = ImGui::GetCursorScreenPos();
+    const auto w = ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ScrollbarSize;
+    const auto wh = ImGui::GetContentRegionAvail().y;
+    const auto ty = ImGui::GetFontSize();
+    auto draw = ImGui::GetWindowDrawList();
+
+    ImGui::InvisibleButton("##zoneFrames", ImVec2(w, ty));
+    bool hover = ImGui::IsItemHovered();
+
+    auto timespan = view.GetVisiableNS();
+    auto pxns = w / double(timespan);
+
+    if (hover)
+    {
+        HandleZoneViewMouse(view, timespan, wpos, w, pxns);
+    }
+
+    const auto nspx = 1.0 / pxns;
+
+    enum { MinVisSize = 3 };
+    enum { MinFrameSize = 5 };
+
+    int64_t prev = -1;
+    int64_t prevEnd = -1;
+    int64_t endPos = -1;
+
+    StringBuf strBuf;
+    FrameTextStrBuf frameStrBuf;
+
+    bool tooltipDisplayed = false;
+    const bool activeFrameSet = false;
+    const bool continuous = true; // TODO: ?
+
+    const auto inactiveColor = GetColorMuted(0x888888, activeFrameSet);
+    const auto activeColor = GetColorMuted(0xFFFFFF, activeFrameSet);
+    const auto redColor = GetColorMuted(0x4444FF, activeFrameSet);
+
+    X_DISABLE_WARNING(4127) // conditional expression is constant
+
+    // draw the ticks / frames.
+    if (view.segments.isNotEmpty())
+    {
+        auto& segment = view.segments.front();
+
+        // the ticks should be sorted.
+        auto& ticks = segment.ticks;
+
+        auto it = std::lower_bound(ticks.begin(), ticks.end(), view.GetVisibleStartNS(), [](const TickData& tick, int64_t val) {
+            return tick.endNano < val;
+        });
+
+        if (it != ticks.end())
+        {
+            // draw them?
+            // 1000000
+            // 246125553
+            while (it != ticks.end() && it->startNano < view.zvEnd_)
+            {
+                auto& tick = *it;
+                ++it;
+
+                const auto ftime = tick.endNano - tick.startNano;
+                const auto fbegin = tick.startNano;
+                const auto fend = tick.endNano;
+                const auto fsz = pxns * ftime;
+
+                auto offset = std::distance(ticks.begin(), it);
+
+                {
+                    if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2((fbegin - view.zvStart_) * pxns, 0), wpos + ImVec2((fend - view.zvStart_) * pxns, ty)))
+                    {
+                        tooltipDisplayed = true;
+
+
+                        ImGui::BeginTooltip();
+                        ImGui::TextUnformatted(GetFrameText(frameStrBuf, ftime, offset));
+                        ImGui::Separator();
+                        TextFocused("Duration:", TimeToString(strBuf, ftime));
+                        TextFocused("Offset:", TimeToString(strBuf, fbegin));
+                        ImGui::EndTooltip();
+
+                        if (ImGui::IsMouseClicked(2))
+                        {
+                            ZoomToRange(view, fbegin, fend);
+                        }
+                    }
+
+                    if (fsz < MinFrameSize)
+                    {
+                        if (!continuous && prev != -1)
+                        {
+                            if ((fbegin - prevEnd) * pxns >= MinFrameSize)
+                            {
+                                DrawZigZag(draw, wpos + ImVec2(0, round(ty / 2)), (prev - view.zvStart_) * pxns, (prevEnd - view.zvStart_) * pxns, ty / 4, inactiveColor);
+                                prev = -1;
+                            }
+                            else
+                            {
+                                prevEnd = std::max<int64_t>(fend, fbegin + MinFrameSize * nspx);
+                            }
+                        }
+
+                        if (prev == -1)
+                        {
+                            prev = fbegin;
+                            prevEnd = std::max<int64_t>(fend, fbegin + MinFrameSize * nspx);
+                        }
+
+                        continue;
+                    }
+
+                    if (prev != -1)
+                    {
+                        if (continuous)
+                        {
+                            DrawZigZag(draw, wpos + ImVec2(0, round(ty / 2)), (prev - view.zvStart_) * pxns, (fbegin - view.zvStart_) * pxns, ty / 4, inactiveColor);
+                        }
+                        else
+                        {
+                            DrawZigZag(draw, wpos + ImVec2(0, round(ty / 2)), (prev - view.zvStart_) * pxns, (prevEnd - view.zvStart_) * pxns, ty / 4, inactiveColor);
+                        }
+                        prev = -1;
+                    }
+
+                    if (activeFrameSet)
+                    {
+                        if (fbegin >= view.zvStart_ && endPos != fbegin)
+                        {
+                            draw->AddLine(wpos + ImVec2((fbegin - view.zvStart_) * pxns, 0), wpos + ImVec2((fbegin - view.zvStart_) * pxns, wh), 0x22FFFFFF);
+                        }
+                        if (fend <= view.zvEnd_)
+                        {
+                            draw->AddLine(wpos + ImVec2((fend - view.zvStart_) * pxns, 0), wpos + ImVec2((fend - view.zvStart_) * pxns, wh), 0x22FFFFFF);
+                        }
+                        endPos = fend;
+                    }
+
+                    auto buf = GetFrameText(frameStrBuf, ftime, offset);
+                    auto tx = ImGui::CalcTextSize(frameStrBuf.begin(), frameStrBuf.end()).x;
+                    uint32_t color = redColor; // (frames.name == 0 && i == 0) ? redColor : activeColor;
+
+                    if (fsz - 5 <= tx)
+                    {
+                        buf = TimeToString(strBuf, ftime);
+                        tx = ImGui::CalcTextSize(strBuf.begin(), strBuf.end()).x;
+                    }
+
+                    if (fbegin >= view.zvStart_)
+                    {
+                        draw->AddLine(wpos + ImVec2((fbegin - view.zvStart_) * pxns + 2, 1), wpos + ImVec2((fbegin - view.zvStart_) * pxns + 2, ty - 1), color);
+                    }
+                    if (fend <= view.zvEnd_)
+                    {
+                        draw->AddLine(wpos + ImVec2((fend - view.zvStart_) * pxns - 2, 1), wpos + ImVec2((fend - view.zvStart_) * pxns - 2, ty - 1), color);
+                    }
+                    if (fsz - 5 > tx)
+                    {
+                        const auto part = (fsz - 5 - tx) / 2;
+                        draw->AddLine(wpos + ImVec2(std::max(-10.0, (fbegin - view.zvStart_) * pxns + 2), round(ty / 2)), wpos + ImVec2(std::min(w + 20.0, (fbegin - view.zvStart_) * pxns + part), round(ty / 2)), color);
+                        draw->AddText(wpos + ImVec2((fbegin - view.zvStart_) * pxns + 2 + part, 0), color, buf);
+                        draw->AddLine(wpos + ImVec2(std::max(-10.0, (fbegin - view.zvStart_) * pxns + 2 + part + tx), round(ty / 2)), wpos + ImVec2(std::min(w + 20.0, (fend - view.zvStart_) * pxns - 2), round(ty / 2)), color);
+                    }
+                    else
+                    {
+                        draw->AddLine(wpos + ImVec2(std::max(-10.0, (fbegin - view.zvStart_) * pxns + 2), round(ty / 2)), wpos + ImVec2(std::min(w + 20.0, (fend - view.zvStart_) * pxns - 2), round(ty / 2)), color);
+                    }
+                }
+            }
+        }
+    }
+
+
+    return hover;
+}
+
+// This draws the timeline frame info and zones.
+void DrawZones(TraceView& view)
+{
     ImGuiWindow* window = ImGui::GetCurrentWindow();
     if (window->SkipItems) {
         return;
     }
 
     auto& io = ImGui::GetIO();
+
+
+    const auto linepos = ImGui::GetCursorScreenPos();
+    const auto lineh = ImGui::GetContentRegionAvail().y;
+
+    bool drawMouseLine = DrawZoneFramesHeader(view);
+
+    drawMouseLine |= DrawZoneFrames(view);
+
+    ImGui::BeginChild("##zoneWin", ImVec2(ImGui::GetWindowContentRegionWidth(), ImGui::GetContentRegionAvail().y), false, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+    const auto wpos = ImGui::GetCursorScreenPos();
+    const auto w = ImGui::GetWindowContentRegionWidth() - 1;
+    const auto h = std::max<float>(view.zvHeight_, ImGui::GetContentRegionAvail().y - 4); // magic border value
+    auto draw = ImGui::GetWindowDrawList();
+
+    ImGui::InvisibleButton("##zones", ImVec2(w, h));
+    bool hover = ImGui::IsItemHovered();
+
+    auto timespan = view.GetVisiableNS();
+    auto pxns = w / double(timespan);
+    int offset = 0;
+
+
+    if (hover)
+    {
+        drawMouseLine = true;
+        HandleZoneViewMouse(view, timespan, wpos, w, pxns);
+    }
+
+#if 0
+
+#if false
 
     const auto wpos = ImGui::GetCursorScreenPos();
     const auto wspace = ImGui::GetWindowContentRegionMax() - ImGui::GetWindowContentRegionMin();
@@ -482,68 +956,26 @@ void DrawFrames(TraceView& view)
 
     const auto ty = ImGui::GetFontSize();
 
-    // Draw the time bar
+    if (frameRectHover)
     {
+        if (ImGui::IsMouseDragging(1, 0))
         {
-            const auto nspx = 1.0 / pxns;
-            const auto scale = std::max(0.0, math<double>::round(log10(nspx) + 2));
-            const auto step = pow(10, scale);
-
-            const auto dx = step * pxns;
-            double x = 0;
-            int32_t tw = 0;
-            int32_t tx = 0;
-            int64_t tt = 0;
-
-            StringBuf strBuf;
-
-            while (x < w)
+            const auto delta = ImGui::GetMouseDragDelta(1, 0).x;
+            if (math<float>::abs(delta) >= fwidth)
             {
-                draw->AddLine(wpos + ImVec2(x, 0), wpos + ImVec2(x, math<double>::round(ty * 0.5)), 0x66FFFFFF);
-                if (tw == 0)
-                {
-                    const auto t = view.GetVisibleStartNS();
-                    TimeToString(strBuf, t);
-
-                    if (t >= 0) // prefix the shit.
-                    {
-                        StringBuf strBuf1;
-                        strBuf1.setFmt("+%s", strBuf.c_str());
-                        strBuf = strBuf1;
-                    }
-
-                    draw->AddText(wpos + ImVec2(x, math<double>::round(ty * 0.5)), 0x66FFFFFF, strBuf.begin(), strBuf.end());
-                    tw = ImGui::CalcTextSize(strBuf.begin(), strBuf.end()).x;
-                }
-                else if (x > tx + tw + ty * 2)
-                {
-                    tx = x;
-                    TimeToString(strBuf, tt);
-                    draw->AddText(wpos + ImVec2(x, math<double>::round(ty * 0.5)), 0x66FFFFFF, strBuf.begin(), strBuf.end());
-                    tw = ImGui::CalcTextSize(strBuf.begin(), strBuf.end()).x;
-                }
-
-                if (scale != 0)
-                {
-                    for (int32_t i = 1; i < 5; i++)
-                    {
-                        draw->AddLine(wpos + ImVec2(x + i * dx / 10, 0), wpos + ImVec2(x + i * dx / 10, round(ty * 0.25)), 0x33FFFFFF);
-                    }
-
-                    draw->AddLine(wpos + ImVec2(x + 5 * dx / 10, 0), wpos + ImVec2(x + 5 * dx / 10, round(ty * 0.375)), 0x33FFFFFF);
-                    
-                    for (int32_t i = 6; i < 10; i++)
-                    {
-                        draw->AddLine(wpos + ImVec2(x + i * dx / 10, 0), wpos + ImVec2(x + i * dx / 10, round(ty * 0.25)), 0x33FFFFFF);
-                    }
-                }
-
-                x += dx;
-                tt += step;
+                // just want to drag.
+                const auto d = (int)delta / fwidth;
+                view.frameStart_ = std::max(0, view.frameStart_ - d * group);
+                io.MouseClickedPos[1].x = io.MousePos.x + d * fwidth - delta;
             }
         }
+
     }
 
+#endif
+
+
+#if false
     // i want to draw frame markers.
     // we need to just look that what ticks we have and draw them :D
     // i need to come up with a nice structure for storing these linked list maybe?
@@ -573,25 +1005,19 @@ void DrawFrames(TraceView& view)
                 auto offset = tick.endNano - view.zvStart_;
                 auto width = pxns * double(offset);
 
-                draw->AddLine(wpos + ImVec2(width, 0), wpos + ImVec2(width, math<double>::round(ty * 0.5)), 0x66FF00FF);
+                // there needs to be a line right down the middle for the frames.
+                // but we need to handle when there are too many.
+                draw->AddLine(wpos + ImVec2(width, 0), wpos + ImVec2(width, height), 0x300000FF);
 
                 ++it;
             }
-
-            // draw->AddRectFilled(wpos, wpos + ImVec2(w, height), 0x33FFFFFF);
-
         }
     }
 
     bool drawMouseLine = true;
 
-    if (drawMouseLine)
-    {
-        const auto linepos = ImGui::GetCursorScreenPos();
-        const auto lineh = ImGui::GetContentRegionAvail().y;
 
-        draw->AddLine(ImVec2(io.MousePos.x, linepos.y), ImVec2(io.MousePos.x, linepos.y + lineh), 0x33FFFFFF);
-    }
+#endif
 
 #if 0
     if (!view.paused_)
@@ -776,6 +1202,64 @@ void DrawFrames(TraceView& view)
         draw->AddRectFilled(wpos + ImVec2(1 + x0, 0), wpos + ImVec2(1 + x1, Height), 0x55DD22DD);
     }
 #endif
+#endif
+
+
+
+    const auto scrollPos = ImGui::GetScrollY();
+    if (scrollPos == 0 && view.zvScroll_ != 0)
+    {
+        view.zvHeight_ = 0;
+    }
+    else
+    {
+        if (offset > view.zvHeight_) {
+            view.zvHeight_ = offset;
+        }
+    }
+
+    view.zvScroll_ = scrollPos;
+
+
+    ImGui::EndChild();
+
+    if (view.highlight_.active && view.highlight_.start != view.highlight_.end)
+    {
+        const auto s = std::min(view.highlight_.start, view.highlight_.end);
+        const auto e = std::max(view.highlight_.start, view.highlight_.end);
+        draw->AddRectFilled(
+            ImVec2(wpos.x + (s - view.zvStart_) * pxns, linepos.y), 
+            ImVec2(wpos.x + (e - view.zvStart_) * pxns, linepos.y + lineh),
+            0x228888DD);
+        draw->AddRect(
+            ImVec2(wpos.x + (s - view.zvStart_) * pxns, linepos.y), 
+            ImVec2(wpos.x + (e - view.zvStart_) * pxns, linepos.y + lineh), 
+            0x448888DD);
+
+        StringBuf strBuf;
+        ImGui::BeginTooltip();
+        ImGui::TextUnformatted(TimeToString(strBuf, e - s));
+        ImGui::EndTooltip();
+    }
+    else if (drawMouseLine)
+    {
+        draw->AddLine(ImVec2(io.MousePos.x, linepos.y), ImVec2(io.MousePos.x, linepos.y + lineh), 0x33FFFFFF);
+    }
+
+    if (view.highlightZoom_.active && view.highlightZoom_.start != view.highlightZoom_.end)
+    {
+        const auto s = std::min(view.highlightZoom_.start, view.highlightZoom_.end);
+        const auto e = std::max(view.highlightZoom_.start, view.highlightZoom_.end);
+        draw->AddRectFilled(
+            ImVec2(wpos.x + (s - view.zvStart_) * pxns, linepos.y), 
+            ImVec2(wpos.x + (e - view.zvStart_) * pxns, linepos.y + lineh), 
+            0x1688DD88);
+        draw->AddRect(
+            ImVec2(wpos.x + (s - view.zvStart_) * pxns, linepos.y), 
+            ImVec2(wpos.x + (e - view.zvStart_) * pxns, linepos.y + lineh), 
+            0x2C88DD88);
+    }
+
 }
 
 void DrawFrame(Client& client, float ww, float wh)
@@ -893,7 +1377,7 @@ void DrawFrame(Client& client, float ww, float wh)
                                 // ImGui::Text("Num %" PRIuS, app.traces.size());
                                 ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor(0.2f, 0.2f, 0.2f));
 
-                                for (int32_t i = 0; i < static_cast<int32_t>(app.traces.size()) * 10; i++)
+                                for (int32_t i = 0; i < static_cast<int32_t>(app.traces.size()); i++)
                                 {
                                     const auto& trace = app.traces[i % app.traces.size()];
 
@@ -1045,7 +1529,28 @@ void DrawFrame(Client& client, float ww, float wh)
                 if (ImGui::BeginTabItem(view.tabName.c_str(), &view.open_, 0))
                 {
                     DrawFrames(view);
+                    DrawZones(view);
                     //    DrawZones();
+
+                    if (view.zoomAnim_.active)
+                    {
+                        const auto& io = ImGui::GetIO();
+
+                        view.zoomAnim_.progress += io.DeltaTime * view.zoomAnim_.lenMod;
+                        if (view.zoomAnim_.progress >= 1.f)
+                        {
+                            view.zoomAnim_.active = false;
+                            view.zvStart_ = view.zoomAnim_.start1;
+                            view.zvEnd_ = view.zoomAnim_.end1;
+                        }
+                        else
+                        {
+                            const auto v = sqrt(sin(math<double>::HALF_PI * view.zoomAnim_.progress));
+                            view.zvStart_ = int64_t(view.zoomAnim_.start0 + (view.zoomAnim_.start1 - view.zoomAnim_.start0) * v);
+                            view.zvEnd_ = int64_t(view.zoomAnim_.end0 + (view.zoomAnim_.end1 - view.zoomAnim_.end0) * v);
+                        }
+                    }
+
 
                     ImGui::EndTabItem();
                 }
@@ -1587,11 +2092,11 @@ bool run(Client& client)
     }
 
     // GL 3.0 + GLSL 130
-    const char* glsl_version = "#version 130";
+    const char* glsl_version = "#version 150";
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
     SDL_DisplayMode current;
     SDL_GetCurrentDisplayMode(0, &current);
@@ -1609,6 +2114,7 @@ bool run(Client& client)
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
     ImGui::StyleColorsDark();
     ImGui_ImplSDL2_InitForOpenGL(pWindow, gl_context);
