@@ -431,6 +431,8 @@ namespace
         return buf.c_str();
     }
 
+    enum { MinVisSize = 3 };
+    enum { MinFrameSize = 5 };
 
 } // namespace
 
@@ -677,9 +679,6 @@ bool DrawZoneFrames(TraceView& view)
 
     const auto nspx = 1.0 / pxns;
 
-    enum { MinVisSize = 3 };
-    enum { MinFrameSize = 5 };
-
     int64_t prev = -1;
     int64_t prevEnd = -1;
     int64_t endPos = -1;
@@ -829,9 +828,321 @@ bool DrawZoneFrames(TraceView& view)
         }
     }
 
-
     return hover;
 }
+
+const char* ShortenNamespace(const char* name)
+{
+    return name;
+}
+
+uint32_t GetZoneColor(const telemetry::ZoneData& ev)
+{
+    X_UNUSED(ev);
+    return 0xFFCC5555;
+}
+
+uint32_t GetZoneHighlight(const telemetry::ZoneData& ev)
+{
+    const auto color = GetZoneColor(ev);
+    return 0xFF000000 |
+        (std::min<int>(0xFF, (((color & 0x00FF0000) >> 16) + 25)) << 16) |
+        (std::min<int>(0xFF, (((color & 0x0000FF00) >> 8) + 25)) << 8) |
+        (std::min<int>(0xFF, (((color & 0x000000FF)) + 25)));
+}
+
+int64_t GetZoneEnd(const telemetry::ZoneData& ev)
+{
+    auto ptr = &ev;
+    for (;;)
+    {
+        if (ptr->end >= 0) {
+            return ptr->end;
+        }
+        // TODO
+       // if (ptr->child < 0) {
+            return ptr->start;
+        //}
+
+//        X_ASSERT_UNREACHABLE();
+//        return 0;
+    }
+}
+
+float GetZoneThickness(const telemetry::ZoneData& ev)
+{
+    X_UNUSED(ev);
+    return 1.f;
+}
+
+const char* GetZoneName(const telemetry::ZoneData& ev)
+{
+    X_UNUSED(ev);
+    return "meooow!";
+}
+
+
+uint32_t DarkenColor(uint32_t color)
+{
+    return 0xFF000000 |
+        (std::min<int>(0xFF, (((color & 0x00FF0000) >> 16) * 2 / 3)) << 16) |
+        (std::min<int>(0xFF, (((color & 0x0000FF00) >> 8) * 2 / 3)) << 8) |
+        (std::min<int>(0xFF, (((color & 0x000000FF)) * 2 / 3)));
+}
+
+int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double pxns, const ImVec2& wpos, 
+    int _offset, int depth, float yMin, float yMax)
+{
+
+    X_UNUSED(yMin, yMax, hover);
+
+    // const auto delay = m_worker.GetDelay();
+    // const auto resolution = m_worker.GetResolution();
+
+    auto& zones = thread.zones;
+
+    // cast to uint64_t, so that unended zones (end = -1) are still drawn
+    auto it = std::lower_bound(zones.begin(), zones.end(), (uint64_t)view.zvStart_, [](const auto& l, const auto& r) { return l.end < r; });
+    if (it == zones.end()) {
+        return depth;
+    }
+
+    const auto zitend = std::lower_bound(it, zones.end(), (uint64_t)view.zvEnd_, [](const auto& l, const auto& r) { return l.start < r; });
+    if (it == zitend) {
+        return depth;
+    }
+    
+#if false
+    if ((*it)->end < 0 && m_worker.GetZoneEnd(**it) < view.zvStart_) {
+        return depth;
+    }
+#endif
+
+    const auto w = ImGui::GetWindowContentRegionWidth() - 1;
+    const auto ty = ImGui::GetFontSize();
+    const auto ostep = ty + 1;
+    const auto offset = _offset + ostep * depth;
+    auto draw = ImGui::GetWindowDrawList();
+    const auto dsz = pxns;
+    const auto rsz = pxns;
+
+    depth++;
+    int maxdepth = depth;
+
+    while (it < zitend)
+    {
+        auto& zone = *it;
+        const auto color = GetZoneColor(zone);
+        const auto end = GetZoneEnd(zone);
+        const auto zsz = std::max((end - zone.start) * pxns, pxns * 0.5);
+
+        if (zsz < MinVisSize)
+        {
+            int num = 1;
+            const auto px0 = (zone.start - view.zvStart_) * pxns;
+            auto px1 = (end - view.zvStart_) * pxns;
+            auto rend = end;
+            for (;;)
+            {
+                ++it;
+                if (it == zitend) {
+                    break;
+                }
+
+                const auto nend = GetZoneEnd(*it);
+                const auto pxnext = (nend - view.zvStart_) * pxns;
+                if (pxnext - px1 >= MinVisSize * 2) break;
+                px1 = pxnext;
+                rend = nend;
+                num++;
+            }
+            
+            draw->AddRectFilled(
+                wpos + ImVec2(std::max(px0, -10.0), offset), 
+                wpos + ImVec2(std::min(std::max(px1, px0 + MinVisSize), double(w + 10)), offset + ty), 
+                color);
+
+            DrawZigZag(
+                draw, 
+                wpos + ImVec2(0, offset + ty / 2), std::max(px0, -10.0), 
+                std::min(std::max(px1, px0 + MinVisSize), double(w + 10)), ty / 4, 
+                DarkenColor(color));
+            
+#if 0
+            if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2(std::max(px0, -10.0), offset), wpos + ImVec2(std::min(std::max(px1, px0 + MinVisSize), double(w + 10)), offset + ty)))
+            {
+                if (num > 1)
+                {
+                    ImGui::BeginTooltip();
+                    TextFocused("Zones too small to display:", RealToString(num, true));
+                    ImGui::Separator();
+                    TextFocused("Execution time:", TimeToString(rend - zone.start));
+                    ImGui::EndTooltip();
+
+                    if (ImGui::IsMouseClicked(2) && rend - zone.start > 0)
+                    {
+                        ZoomToRange(zone.start, rend);
+                    }
+                }
+                else
+                {
+#if 0
+                    ZoneTooltip(zone);
+
+                    if (ImGui::IsMouseClicked(2) && rend - zone.start > 0)
+                    {
+                        ZoomToZone(zone);
+                    }
+                    if (ImGui::IsMouseClicked(0))
+                    {
+                        ShowZoneInfo(zone);
+                    }
+
+                    m_zoneSrcLocHighlight = zone.srcloc;
+#endif
+                }
+            }
+            char tmp[64];
+            sprintf(tmp, "%s", RealToString(num, true));
+            const auto tsz = ImGui::CalcTextSize(tmp);
+            if (tsz.x < px1 - px0)
+            {
+                const auto x = px0 + (px1 - px0 - tsz.x) / 2;
+                DrawTextContrast(draw, wpos + ImVec2(x, offset), 0xFF4488DD, tmp);
+            }
+#endif
+
+        }
+        else
+        {
+            const char* zoneName = GetZoneName(zone);
+            // TODO: 
+            int dmul = 1; // zone.text.active ? 2 : 1;
+
+//            bool migration = false;
+
+#if 0
+
+            if (m_lastCpu != zone.cpu_start)
+            {
+                if (m_lastCpu >= 0)
+                {
+                    migration = true;
+                }
+                m_lastCpu = zone.cpu_start;
+            }
+
+            if (zone.child >= 0)
+            {
+                const auto d = DispatchZoneLevel(m_worker.GetZoneChildren(zone.child), hover, pxns, wpos, _offset, depth, yMin, yMax);
+                if (d > maxdepth) maxdepth = d;
+            }
+
+            if (zone.end >= 0 && m_lastCpu != zone.cpu_end)
+            {
+                m_lastCpu = zone.cpu_end;
+                migration = true;
+            }
+#endif
+
+            auto tsz = ImGui::CalcTextSize(zoneName);
+            if (tsz.x > zsz)
+            {
+                zoneName = ShortenNamespace(zoneName);
+                tsz = ImGui::CalcTextSize(zoneName);
+            }
+
+            const auto pr0 = (zone.start - view.zvStart_) * pxns;
+            const auto pr1 = (end - view.zvStart_) * pxns;
+            const auto px0 = std::max(pr0, -10.0);
+            const auto px1 = std::max({ std::min(pr1, double(w + 10)), px0 + pxns * 0.5, px0 + MinVisSize });
+            
+            draw->AddRectFilled(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y), color);
+            draw->AddRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y), GetZoneHighlight(zone), 0.f, -1, GetZoneThickness(zone));
+            
+            if (dsz * dmul >= MinVisSize)
+            {
+                draw->AddRectFilled(wpos + ImVec2(pr0, offset), wpos + ImVec2(std::min(pr0 + dsz * dmul, pr1), offset + tsz.y), 0x882222DD);
+                draw->AddRectFilled(wpos + ImVec2(pr1, offset), wpos + ImVec2(pr1 + dsz, offset + tsz.y), 0x882222DD);
+            }
+            if (rsz >= MinVisSize)
+            {
+                draw->AddLine(wpos + ImVec2(pr0 + rsz, offset + round(tsz.y / 2)), wpos + ImVec2(pr0 - rsz, offset + round(tsz.y / 2)), 0xAAFFFFFF);
+                draw->AddLine(wpos + ImVec2(pr0 + rsz, offset + round(tsz.y / 4)), wpos + ImVec2(pr0 + rsz, offset + round(3 * tsz.y / 4)), 0xAAFFFFFF);
+                draw->AddLine(wpos + ImVec2(pr0 - rsz, offset + round(tsz.y / 4)), wpos + ImVec2(pr0 - rsz, offset + round(3 * tsz.y / 4)), 0xAAFFFFFF);
+
+                draw->AddLine(wpos + ImVec2(pr1 + rsz, offset + round(tsz.y / 2)), wpos + ImVec2(pr1 - rsz, offset + round(tsz.y / 2)), 0xAAFFFFFF);
+                draw->AddLine(wpos + ImVec2(pr1 + rsz, offset + round(tsz.y / 4)), wpos + ImVec2(pr1 + rsz, offset + round(3 * tsz.y / 4)), 0xAAFFFFFF);
+                draw->AddLine(wpos + ImVec2(pr1 - rsz, offset + round(tsz.y / 4)), wpos + ImVec2(pr1 - rsz, offset + round(3 * tsz.y / 4)), 0xAAFFFFFF);
+            }
+            if (tsz.x < zsz)
+            {
+                const auto x = (zone.start - view.zvStart_) * pxns + ((end - zone.start) * pxns - tsz.x) / 2;
+                if (x < 0 || x > w - tsz.x)
+                {
+                    ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
+                    DrawTextContrast(draw, wpos + ImVec2(std::max(std::max(0., px0), std::min(double(w - tsz.x), x)), offset), 0xFFFFFFFF, zoneName);
+                    ImGui::PopClipRect();
+                }
+                else if (zone.start == zone.end)
+                {
+                    DrawTextContrast(draw, wpos + ImVec2(px0 + (px1 - px0 - tsz.x) * 0.5, offset), 0xFFFFFFFF, zoneName);
+                }
+                else
+                {
+                    DrawTextContrast(draw, wpos + ImVec2(x, offset), 0xFFFFFFFF, zoneName);
+                }
+            }
+            else
+            {
+                ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
+                DrawTextContrast(draw, wpos + ImVec2((zone.start - view.zvStart_) * pxns, offset), 0xFFFFFFFF, zoneName);
+                ImGui::PopClipRect();
+            }
+
+#if 0
+            if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y)))
+            {
+                ZoneTooltip(zone);
+
+                if (!m_zoomAnim.active && ImGui::IsMouseClicked(2))
+                {
+                    ZoomToZone(zone);
+                }
+                if (ImGui::IsMouseClicked(0))
+                {
+                    ShowZoneInfo(zone);
+                }
+
+                m_zoneSrcLocHighlight = zone.srcloc;
+            }
+#endif
+
+            ++it;
+        }
+    }
+    return maxdepth;
+}
+
+int DispatchZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double pxns, const ImVec2& wpos, 
+    int _offset, int depth, float yMin, float yMax)
+{
+    const auto ty = ImGui::GetFontSize();
+    const auto ostep = ty + 1;
+    const auto offset = _offset + ostep * depth;
+
+    const auto yPos = wpos.y + offset;
+    if (yPos + ostep >= yMin && yPos <= yMax)
+    {
+        return DrawZoneLevel(view, thread, hover, pxns, wpos, _offset, depth, yMin, yMax);
+    }
+    else
+    {
+        return 0;
+    //    return SkipZoneLevel(view, thread, hover, pxns, wpos, _offset, depth, yMin, yMax);
+    }
+}
+
 
 // This draws the timeline frame info and zones.
 void DrawZones(TraceView& view)
@@ -858,13 +1169,16 @@ void DrawZones(TraceView& view)
     const auto h = std::max<float>(view.zvHeight_, ImGui::GetContentRegionAvail().y - 4); // magic border value
     auto draw = ImGui::GetWindowDrawList();
 
+    if (h == 0) {
+        ImGui::EndChild();
+        return;
+    }
+
     ImGui::InvisibleButton("##zones", ImVec2(w, h));
     bool hover = ImGui::IsItemHovered();
 
     auto timespan = view.GetVisiableNS();
     auto pxns = w / double(timespan);
-    int offset = 0;
-
 
     if (hover)
     {
@@ -872,6 +1186,102 @@ void DrawZones(TraceView& view)
         HandleZoneViewMouse(view, timespan, wpos, w, pxns);
     }
 
+    const auto ty = ImGui::GetFontSize();
+    const auto ostep = ty + 1;
+    int offset = 0;
+    const auto to = 9.f;
+    const auto th = (ty - to) * sqrt(3) * 0.5;
+
+    const auto yMin = linepos.y;
+    const auto yMax = yMin + lineh;
+
+    // Draw the threads
+    if (view.segments.isNotEmpty())
+    {
+        auto& segment = view.segments.front();
+
+        for (auto& thread : segment.threads)
+        {
+            X_UNUSED(thread);
+
+            bool expanded = true;
+
+            const auto yPos = wpos.y + offset;
+            if (yPos + ostep >= yMin && yPos <= yMax)
+            {
+                draw->AddLine(wpos + ImVec2(0, offset + ostep - 1), wpos + ImVec2(w, offset + ostep - 1), 0x33FFFFFF);
+
+                const auto labelColor = (expanded ? 0xFFFFFFFF : 0xFF888888);
+
+                if (expanded)
+                {
+                    draw->AddTriangleFilled(wpos + ImVec2(to / 2, offset + to / 2), wpos + ImVec2(ty - to / 2, offset + to / 2), wpos + ImVec2(ty * 0.5, offset + to / 2 + th), labelColor);
+                }
+                else
+                {
+                    draw->AddTriangle(wpos + ImVec2(to / 2, offset + to / 2), wpos + ImVec2(to / 2, offset + ty - to / 2), wpos + ImVec2(to / 2 + th, offset + ty * 0.5), labelColor, 2.0f);
+
+                }
+
+                const char* txt = "Thread";
+                const auto txtsz = ImGui::CalcTextSize(txt);
+
+                draw->AddText(wpos + ImVec2(ty, offset), labelColor, txt);
+
+                if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2(0, offset), wpos + ImVec2(ty + txtsz.x, offset + ty)))
+                {
+                    if (ImGui::IsMouseClicked(0))
+                    {
+                        expanded = !expanded;
+                    }
+
+                    ImGui::BeginTooltip();
+#if true
+                    ImGui::TextUnformatted("hi :)");
+                    ImGui::SameLine();
+                    ImGui::TextDisabled("(0x%" PRIx64 ")", thread.id);
+#else
+                    ImGui::TextUnformatted(m_worker.GetThreadString(v->id));
+                    ImGui::SameLine();
+                    ImGui::TextDisabled("(0x%" PRIx64 ")", thread.id);
+                 
+                    if (!v->timeline.empty())
+                    {
+                        ImGui::Separator();
+                        TextFocused("Appeared at", TimeToString(v->timeline.front()->start - m_worker.GetTimeBegin()));
+                        TextFocused("Zone count:", RealToString(v->count, true));
+                        TextFocused("Top-level zones:", RealToString(v->timeline.size(), true));
+                    }
+#endif
+                    ImGui::EndTooltip();
+                }
+            }
+
+            offset += ostep;
+
+            if (expanded)
+            {
+            //    m_lastCpu = -1;
+
+#if 1
+                // if (m_drawZones)
+                {
+                    const auto depth = DispatchZoneLevel(view, thread, hover, pxns, wpos, offset, 0, yMin, yMax);
+                    offset += ostep * depth;
+                }
+#endif
+
+#if 0
+                if (m_drawLocks)
+                {
+                    const auto depth = DrawLocks(v->id, hover, pxns, wpos, offset, nextLockHighlight, yMin, yMax);
+                    offset += ostep * depth;
+                }
+#endif
+            }
+            offset += ostep * 0.2f;
+        }
+    }
 
     const auto scrollPos = ImGui::GetScrollY();
     if (scrollPos == 0 && view.zvScroll_ != 0)
@@ -1308,12 +1718,72 @@ bool handleTraceZoneSegmentTicks(Client& client, const DataPacketBaseViewer* pBa
 
 bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBase)
 {
-    auto* pHdr = static_cast<const ReqTraceZoneSegmentRespTicks*>(pBase);
+    auto* pHdr = static_cast<const ReqTraceZoneSegmentRespZones*>(pBase);
     if (pHdr->type != DataStreamTypeViewer::TraceZoneSegmentZones) {
         X_ASSERT_UNREACHABLE();
     }
 
-    X_UNUSED(client);
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+
+    TraceView* pView = nullptr;
+
+    for (auto& view : client.views)
+    {
+        if (view.handle == pHdr->handle)
+        {
+            pView = &view;
+            break;
+        }
+    }
+
+    if (!pView) {
+        return false;
+    }
+
+    auto& view = *pView;
+
+    if (view.segments.isEmpty()) {
+        view.segments.emplace_back(g_arena);
+    }
+
+    auto& segment = view.segments.front();
+    auto& threads = segment.threads;
+
+    core::FixedArray<uint32_t, 16> threadIDs;
+
+    for (auto& thread : threads)
+    {
+        threadIDs.push_back(thread.id);
+    }
+
+    auto* pZones = reinterpret_cast<const DataPacketZone*>(pHdr + 1);
+    for (int32 i = 0; i < pHdr->num; i++)
+    {
+        auto& zone = pZones[i];
+
+        ZoneData zd;
+        zd.start = zone.start;
+        zd.end = zone.end;
+        
+        // want a thread
+        int32_t t;
+        for(t =0; t < threadIDs.size(); t++)
+        {
+            if (threadIDs[t] == zone.threadID)
+            {
+                break;
+            }
+        }
+
+        if (t == threadIDs.size()) {
+            threads.emplace_back(zone.threadID, g_arena);
+            threadIDs.push_back(zone.threadID);
+        }
+
+        auto& thread = threads[t];
+        thread.zones.push_back(zd);
+    }
+
 
     pHdr->handle;
     return true;

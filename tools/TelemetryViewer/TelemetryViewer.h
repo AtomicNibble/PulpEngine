@@ -24,9 +24,6 @@ struct Animation
 
 struct ZoneData
 {
-    // 4
-    uint32_t threadID;
-
     // 16
     uint64_t start;
     uint64_t end;
@@ -47,9 +44,12 @@ struct ZoneSegmentThread
     using ZoneDataArr = core::ArrayGrowMultiply<ZoneData>;
 
 public:
-    ZoneSegmentThread(core::MemoryArenaBase* arena) :
+    ZoneSegmentThread(uint32_t id, core::MemoryArenaBase* arena) :
+        id(id),
         zones(arena)
     {}
+
+    uint32_t id;
 
     ZoneDataArr zones;
 };
