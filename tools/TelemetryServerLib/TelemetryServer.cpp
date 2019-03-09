@@ -172,7 +172,7 @@ namespace
                 }
                 case DataStreamType::Zone:
                 {
-                    strm.db.handleDataPacketZone(strm.pTrace, reinterpret_cast<const DataPacketZone*>(&pDst[i]));
+                    strm.db.handleDataPacketZone(reinterpret_cast<const DataPacketZone*>(&pDst[i]));
                     i += sizeof(DataPacketZone);
                     break;
                 }
@@ -344,7 +344,7 @@ bool TraceDB::createDB(core::Path<char>& path)
         return false;
     }
 
-    cmdInsertZone.prepare("INSERT INTO zones (threadID, startNano, endNano, sourceInfoIdx, stackDepth) VALUES(?,?,?,?,?)");
+    cmdInsertZone.prepare("INSERT INTO zones (threadID, startTick, endTick, sourceInfoIdx, stackDepth) VALUES(?,?,?,?,?)");
     cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
     cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, startTick, endTick, startNano, endNano) VALUES(?,?,?,?,?)");
     cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
@@ -388,7 +388,7 @@ bool TraceDB::createIndexes(void)
 
     sql::SqlLiteCmd cmd(con, R"(
         CREATE INDEX IF NOT EXISTS "zones_start" ON "zones" (
-            "startNano"	ASC
+            "startTick"	ASC
         );
         CREATE INDEX IF NOT EXISTS "ticks_startNano" ON "ticks" (
             "startNano"	ASC
@@ -461,8 +461,8 @@ CREATE TABLE IF NOT EXISTS "zones" (
     "id"	        INTEGER,
     "zoneId"	    INTEGER,
     "threadId"	    INTEGER NOT NULL,
-    "startNano"	    INTEGER NOT NULL,
-    "endNano"	    INTEGER NOT NULL,
+    "startTick"	    INTEGER NOT NULL,
+    "endTick"	    INTEGER NOT NULL,
     "sourceInfoIdx"	INTEGER NOT NULL,
     "stackDepth"	INTEGER NOT NULL,
     PRIMARY KEY("id"),
@@ -589,7 +589,7 @@ void TraceDB::handleDataPacketStringTableAdd(const DataPacketStringTableAdd* pDa
     cmd.reset();
 }
 
-void TraceDB::handleDataPacketZone(const Trace* pTrace, const DataPacketZone* pData)
+void TraceDB::handleDataPacketZone(const DataPacketZone* pData)
 {
     PacketSourceInfo info;
     info.raw.lineNo = pData->lineNo;
@@ -600,8 +600,8 @@ void TraceDB::handleDataPacketZone(const Trace* pTrace, const DataPacketZone* pD
 
     auto& cmd = cmdInsertZone;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
-    cmd.bind(2, static_cast<int64_t>(pData->start / pTrace->ticksPerNano));
-    cmd.bind(3, static_cast<int64_t>(pData->end / pTrace->ticksPerNano));
+    cmd.bind(2, static_cast<int64_t>(pData->start));
+    cmd.bind(3, static_cast<int64_t>(pData->end));
     cmd.bind(4, static_cast<int64_t>(sourceInfo));
     cmd.bind(5, pData->stackDepth);
 
@@ -757,7 +757,7 @@ bool TraceDB::getTicks(core::Array<DataPacketTickInfo>& ticks, int32_t startIdx,
 
 bool TraceDB::getZones(core::Array<DataPacketZone>& zones, uint64_t tickBegin, uint64_t tickEnd)
 {
-    sql::SqlLiteQuery qry(con, "SELECT threadId, startNano, endNano, sourceInfoIdx, stackDepth FROM zones WHERE startNano >= ? AND startNano < ?");
+    sql::SqlLiteQuery qry(con, "SELECT threadId, start, end, sourceInfoIdx, stackDepth FROM zones WHERE start >= ? AND start < ?");
     qry.bind(1, static_cast<int64_t>(tickBegin));
     qry.bind(2, static_cast<int64_t>(tickEnd));
 
@@ -1210,7 +1210,6 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     }
 
     pApp->traces.push_back(trace);
-    strm.pTrace = &pApp->traces.back();
 
     // Meow...
     X_LOG0("TelemSrv", "ConnectionAccepted:");
@@ -1582,7 +1581,7 @@ bool Server::handleReqTraceZones(ClientConnection& client, uint8_t* pData)
 
     auto& ts = client.traces[pHdr->handle];
 
-    sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startNano, endNano, stackDepth FROM zones WHERE startNano >= ? AND endNano < ?");
+    sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, stackDepth FROM zones WHERE start >= ? AND end < ?");
     qry.bind(1, pHdr->start);
     qry.bind(2, pHdr->end);
 
@@ -1707,7 +1706,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
 
         int32_t numZones = 0;
 
-        sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startNano, endNano, stackDepth FROM zones WHERE startNano >= ? AND startNano < ?");
+        sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, stackDepth FROM zones WHERE startTick >= ? AND startTick < ?");
         qry.bind(1, static_cast<int64_t>(start));
         qry.bind(2, static_cast<int64_t>(end));
 
