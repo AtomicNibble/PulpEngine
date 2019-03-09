@@ -59,7 +59,7 @@ public:
 
     void handleDataPacketTickInfo(const DataPacketTickInfo* pData);
     void handleDataPacketStringTableAdd(const DataPacketStringTableAdd* pData);
-    void handleDataPacketZone(const DataPacketZone* pData);
+    void handleDataPacketZone(const Trace* pTrace, const DataPacketZone* pData);
     void handleDataPacketLockTry(const DataPacketLockTry* pData);
     void handleDataPacketLockState(const DataPacketLockState* pData);
     void handleDataPacketLockSetName(const DataPacketLockSetName* pData);
@@ -101,7 +101,9 @@ struct TraceStream
         db(std::move(oth.db))
     {
     }
-    TraceStream() {
+    TraceStream() :
+        pTrace(nullptr)
+    {
     }
 
     const Trace* pTrace;
