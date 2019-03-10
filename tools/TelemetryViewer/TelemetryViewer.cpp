@@ -444,12 +444,12 @@ void ZoomToRange(TraceView& view, int64_t start, int64_t end)
         end = start + 1;
     }
 
-    // view.pause_ = true;
+    view.paused_ = true;
     view.highlightZoom_.active = false;
     view.zoomAnim_.active = true;
-    view.zoomAnim_.start0 = view.zvStart_;
+    view.zoomAnim_.start0 = view.zvStartNS_;
     view.zoomAnim_.start1 = start;
-    view.zoomAnim_.end0 = view.zvEnd_;
+    view.zoomAnim_.end0 = view.zvEndNS_;
     view.zoomAnim_.end1 = end;
     view.zoomAnim_.progress = 0;
 
@@ -468,11 +468,11 @@ void HandleZoneViewMouse(TraceView& view, int64_t timespan, const ImVec2& wpos, 
     if (ImGui::IsMouseClicked(0))
     {
         view.highlight_.active = true;
-        view.highlight_.start = view.highlight_.end = view.zvStart_ + (io.MousePos.x - wpos.x) * nspx;
+        view.highlight_.start = view.highlight_.end = view.zvStartNS_ + (io.MousePos.x - wpos.x) * nspx;
     }
     else if (ImGui::IsMouseDragging(0, 0))
     {
-        view.highlight_.end = view.zvStart_ + (io.MousePos.x - wpos.x) * nspx;
+        view.highlight_.end = view.zvStartNS_ + (io.MousePos.x - wpos.x) * nspx;
     }
     else
     {
@@ -482,11 +482,11 @@ void HandleZoneViewMouse(TraceView& view, int64_t timespan, const ImVec2& wpos, 
     if (ImGui::IsMouseClicked(2))
     {
         view.highlightZoom_.active = true;
-        view.highlightZoom_.start = view.highlightZoom_.end = view.zvStart_ + (io.MousePos.x - wpos.x) * nspx;
+        view.highlightZoom_.start = view.highlightZoom_.end = view.zvStartNS_ + (io.MousePos.x - wpos.x) * nspx;
     }
     else if (ImGui::IsMouseDragging(2, 0))
     {
-        view.highlightZoom_.end = view.zvStart_ + (io.MousePos.x - wpos.x) * nspx;
+        view.highlightZoom_.end = view.zvStartNS_ + (io.MousePos.x - wpos.x) * nspx;
     }
     else if (view.highlightZoom_.active)
     {
@@ -498,13 +498,13 @@ void HandleZoneViewMouse(TraceView& view, int64_t timespan, const ImVec2& wpos, 
             // ZoomToRange disables view.highlightZoom_.active
             if (io.KeyCtrl)
             {
-                const auto tsOld = view.zvEnd_ - view.zvStart_;
+                const auto tsOld = view.zvEndNS_ - view.zvStartNS_;
                 const auto tsNew = e - s;
                 const auto mul = double(tsOld) / tsNew;
-                const auto left = s - view.zvStart_;
-                const auto right = view.zvEnd_ - e;
+                const auto left = s - view.zvStartNS_;
+                const auto right = view.zvEndNS_ - e;
 
-                ZoomToRange(view, view.zvStart_ - left * mul, view.zvEnd_ + right * mul);
+                ZoomToRange(view, view.zvStartNS_ - left * mul, view.zvEndNS_ + right * mul);
             }
             else
             {
@@ -520,13 +520,13 @@ void HandleZoneViewMouse(TraceView& view, int64_t timespan, const ImVec2& wpos, 
     if (ImGui::IsMouseDragging(1, 0))
     {
         view.zoomAnim_.active = false;
-        // view.pause = true;
+        view.paused_ = true;
         const auto delta = ImGui::GetMouseDragDelta(1, 0);
         const auto dpx = int64_t(delta.x * nspx);
         if (dpx != 0)
         {
-            view.zvStart_ -= dpx;
-            view.zvEnd_ -= dpx;
+            view.zvStartNS_ -= dpx;
+            view.zvEndNS_ -= dpx;
             io.MouseClickedPos[1].x = io.MousePos.x;
         }
         if (delta.y != 0)
@@ -541,22 +541,22 @@ void HandleZoneViewMouse(TraceView& view, int64_t timespan, const ImVec2& wpos, 
     if (wheel != 0)
     {
         view.zoomAnim_.active = false;
-        // view.pause_ = true;
+        view.paused_ = true;
         const double mouse = io.MousePos.x - wpos.x;
         const auto p = mouse / w;
         const auto p1 = timespan * p;
         const auto p2 = timespan - p1;
         if (wheel > 0)
         {
-            view.zvStart_ += int64_t(p1 * 0.25);
-            view.zvEnd_ -= int64_t(p2 * 0.25);
+            view.zvStartNS_ += int64_t(p1 * 0.25);
+            view.zvEndNS_ -= int64_t(p2 * 0.25);
         }
         else if (timespan < 1000ll * 1000 * 1000 * 60 * 60)
         {
-            view.zvStart_ -= std::max(int64_t(1), int64_t(p1 * 0.25));
-            view.zvEnd_ += std::max(int64_t(1), int64_t(p2 * 0.25));
+            view.zvStartNS_ -= std::max(int64_t(1), int64_t(p1 * 0.25));
+            view.zvEndNS_ += std::max(int64_t(1), int64_t(p2 * 0.25));
         }
-        timespan = view.zvEnd_ - view.zvStart_;
+        timespan = view.zvEndNS_ - view.zvStartNS_;
         pxns = w / double(timespan);
     }
 }
@@ -713,7 +713,7 @@ bool DrawZoneFrames(TraceView& view)
             // draw them?
             // 1000000
             // 246125553
-            while (it != ticks.end() && it->startNano < view.zvEnd_)
+            while (it != ticks.end() && it->startNano < view.zvEndNS_)
             {
                 auto& tick = *it;
                 ++it;
@@ -726,7 +726,7 @@ bool DrawZoneFrames(TraceView& view)
                 auto offset = std::distance(ticks.begin(), it);
 
                 {
-                    if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2((fbegin - view.zvStart_) * pxns, 0), wpos + ImVec2((fend - view.zvStart_) * pxns, ty)))
+                    if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2((fbegin - view.zvStartNS_) * pxns, 0), wpos + ImVec2((fend - view.zvStartNS_) * pxns, ty)))
                     {
                         tooltipDisplayed = true;
 
@@ -750,7 +750,7 @@ bool DrawZoneFrames(TraceView& view)
                         {
                             if ((fbegin - prevEnd) * pxns >= MinFrameSize)
                             {
-                                DrawZigZag(draw, wpos + ImVec2(0, round(ty / 2)), (prev - view.zvStart_) * pxns, (prevEnd - view.zvStart_) * pxns, ty / 4, inactiveColor);
+                                DrawZigZag(draw, wpos + ImVec2(0, round(ty / 2)), (prev - view.zvStartNS_) * pxns, (prevEnd - view.zvStartNS_) * pxns, ty / 4, inactiveColor);
                                 prev = -1;
                             }
                             else
@@ -772,24 +772,24 @@ bool DrawZoneFrames(TraceView& view)
                     {
                         if (continuous)
                         {
-                            DrawZigZag(draw, wpos + ImVec2(0, round(ty / 2)), (prev - view.zvStart_) * pxns, (fbegin - view.zvStart_) * pxns, ty / 4, inactiveColor);
+                            DrawZigZag(draw, wpos + ImVec2(0, round(ty / 2)), (prev - view.zvStartNS_) * pxns, (fbegin - view.zvStartNS_) * pxns, ty / 4, inactiveColor);
                         }
                         else
                         {
-                            DrawZigZag(draw, wpos + ImVec2(0, round(ty / 2)), (prev - view.zvStart_) * pxns, (prevEnd - view.zvStart_) * pxns, ty / 4, inactiveColor);
+                            DrawZigZag(draw, wpos + ImVec2(0, round(ty / 2)), (prev - view.zvStartNS_) * pxns, (prevEnd - view.zvStartNS_) * pxns, ty / 4, inactiveColor);
                         }
                         prev = -1;
                     }
 
                     if (activeFrameSet)
                     {
-                        if (fbegin >= view.zvStart_ && endPos != fbegin)
+                        if (fbegin >= view.zvStartNS_ && endPos != fbegin)
                         {
-                            draw->AddLine(wpos + ImVec2((fbegin - view.zvStart_) * pxns, 0), wpos + ImVec2((fbegin - view.zvStart_) * pxns, wh), 0x22FFFFFF);
+                            draw->AddLine(wpos + ImVec2((fbegin - view.zvStartNS_) * pxns, 0), wpos + ImVec2((fbegin - view.zvStartNS_) * pxns, wh), 0x22FFFFFF);
                         }
-                        if (fend <= view.zvEnd_)
+                        if (fend <= view.zvEndNS_)
                         {
-                            draw->AddLine(wpos + ImVec2((fend - view.zvStart_) * pxns, 0), wpos + ImVec2((fend - view.zvStart_) * pxns, wh), 0x22FFFFFF);
+                            draw->AddLine(wpos + ImVec2((fend - view.zvStartNS_) * pxns, 0), wpos + ImVec2((fend - view.zvStartNS_) * pxns, wh), 0x22FFFFFF);
                         }
                         endPos = fend;
                     }
@@ -804,24 +804,24 @@ bool DrawZoneFrames(TraceView& view)
                         tx = ImGui::CalcTextSize(strBuf.begin(), strBuf.end()).x;
                     }
 
-                    if (fbegin >= view.zvStart_)
+                    if (fbegin >= view.zvStartNS_)
                     {
-                        draw->AddLine(wpos + ImVec2((fbegin - view.zvStart_) * pxns + 2, 1), wpos + ImVec2((fbegin - view.zvStart_) * pxns + 2, ty - 1), color);
+                        draw->AddLine(wpos + ImVec2((fbegin - view.zvStartNS_) * pxns + 2, 1), wpos + ImVec2((fbegin - view.zvStartNS_) * pxns + 2, ty - 1), color);
                     }
-                    if (fend <= view.zvEnd_)
+                    if (fend <= view.zvEndNS_)
                     {
-                        draw->AddLine(wpos + ImVec2((fend - view.zvStart_) * pxns - 2, 1), wpos + ImVec2((fend - view.zvStart_) * pxns - 2, ty - 1), color);
+                        draw->AddLine(wpos + ImVec2((fend - view.zvStartNS_) * pxns - 2, 1), wpos + ImVec2((fend - view.zvStartNS_) * pxns - 2, ty - 1), color);
                     }
                     if (fsz - 5 > tx)
                     {
                         const auto part = (fsz - 5 - tx) / 2;
-                        draw->AddLine(wpos + ImVec2(std::max(-10.0, (fbegin - view.zvStart_) * pxns + 2), round(ty / 2)), wpos + ImVec2(std::min(w + 20.0, (fbegin - view.zvStart_) * pxns + part), round(ty / 2)), color);
-                        draw->AddText(wpos + ImVec2((fbegin - view.zvStart_) * pxns + 2 + part, 0), color, buf);
-                        draw->AddLine(wpos + ImVec2(std::max(-10.0, (fbegin - view.zvStart_) * pxns + 2 + part + tx), round(ty / 2)), wpos + ImVec2(std::min(w + 20.0, (fend - view.zvStart_) * pxns - 2), round(ty / 2)), color);
+                        draw->AddLine(wpos + ImVec2(std::max(-10.0, (fbegin - view.zvStartNS_) * pxns + 2), round(ty / 2)), wpos + ImVec2(std::min(w + 20.0, (fbegin - view.zvStartNS_) * pxns + part), round(ty / 2)), color);
+                        draw->AddText(wpos + ImVec2((fbegin - view.zvStartNS_) * pxns + 2 + part, 0), color, buf);
+                        draw->AddLine(wpos + ImVec2(std::max(-10.0, (fbegin - view.zvStartNS_) * pxns + 2 + part + tx), round(ty / 2)), wpos + ImVec2(std::min(w + 20.0, (fend - view.zvStartNS_) * pxns - 2), round(ty / 2)), color);
                     }
                     else
                     {
-                        draw->AddLine(wpos + ImVec2(std::max(-10.0, (fbegin - view.zvStart_) * pxns + 2), round(ty / 2)), wpos + ImVec2(std::min(w + 20.0, (fend - view.zvStart_) * pxns - 2), round(ty / 2)), color);
+                        draw->AddLine(wpos + ImVec2(std::max(-10.0, (fbegin - view.zvStartNS_) * pxns + 2), round(ty / 2)), wpos + ImVec2(std::min(w + 20.0, (fend - view.zvStartNS_) * pxns - 2), round(ty / 2)), color);
                     }
                 }
             }
@@ -902,18 +902,18 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
     auto& zones = thread.zones;
 
     // cast to uint64_t, so that unended zones (end = -1) are still drawn
-    auto it = std::lower_bound(zones.begin(), zones.end(), (uint64_t)view.zvStart_, [](const auto& l, const auto& r) { return l.end < r; });
+    auto it = std::lower_bound(zones.begin(), zones.end(), (uint64_t)view.zvStartNS_, [](const auto& l, const auto& r) { return l.end < r; });
     if (it == zones.end()) {
         return depth;
     }
 
-    const auto zitend = std::lower_bound(it, zones.end(), (uint64_t)view.zvEnd_, [](const auto& l, const auto& r) { return l.start < r; });
+    const auto zitend = std::lower_bound(it, zones.end(), (uint64_t)view.zvEndNS_, [](const auto& l, const auto& r) { return l.start < r; });
     if (it == zitend) {
         return depth;
     }
     
 #if false
-    if ((*it)->end < 0 && m_worker.GetZoneEnd(**it) < view.zvStart_) {
+    if ((*it)->end < 0 && m_worker.GetZoneEnd(**it) < view.zvStartNS_) {
         return depth;
     }
 #endif
@@ -939,8 +939,8 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
         if (zsz < MinVisSize)
         {
             int num = 1;
-            const auto px0 = (zone.start - view.zvStart_) * pxns;
-            auto px1 = (end - view.zvStart_) * pxns;
+            const auto px0 = (zone.start - view.zvStartNS_) * pxns;
+            auto px1 = (end - view.zvStartNS_) * pxns;
             auto rend = end;
             for (;;)
             {
@@ -950,7 +950,7 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
                 }
 
                 const auto nend = GetZoneEnd(*it);
-                const auto pxnext = (nend - view.zvStart_) * pxns;
+                const auto pxnext = (nend - view.zvStartNS_) * pxns;
                 if (pxnext - px1 >= MinVisSize * 2) break;
                 px1 = pxnext;
                 rend = nend;
@@ -1052,8 +1052,8 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
                 tsz = ImGui::CalcTextSize(zoneName);
             }
 
-            const auto pr0 = (zone.start - view.zvStart_) * pxns;
-            const auto pr1 = (end - view.zvStart_) * pxns;
+            const auto pr0 = (zone.start - view.zvStartNS_) * pxns;
+            const auto pr1 = (end - view.zvStartNS_) * pxns;
             const auto px0 = std::max(pr0, -10.0);
             const auto px1 = std::max({ std::min(pr1, double(w + 10)), px0 + pxns * 0.5, px0 + MinVisSize });
             
@@ -1077,7 +1077,7 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
             }
             if (tsz.x < zsz)
             {
-                const auto x = (zone.start - view.zvStart_) * pxns + ((end - zone.start) * pxns - tsz.x) / 2;
+                const auto x = (zone.start - view.zvStartNS_) * pxns + ((end - zone.start) * pxns - tsz.x) / 2;
                 if (x < 0 || x > w - tsz.x)
                 {
                     ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
@@ -1096,7 +1096,7 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
             else
             {
                 ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
-                DrawTextContrast(draw, wpos + ImVec2((zone.start - view.zvStart_) * pxns, offset), 0xFFFFFFFF, zoneName);
+                DrawTextContrast(draw, wpos + ImVec2((zone.start - view.zvStartNS_) * pxns, offset), 0xFFFFFFFF, zoneName);
                 ImGui::PopClipRect();
             }
 
@@ -1305,12 +1305,12 @@ void DrawZones(TraceView& view)
         const auto s = std::min(view.highlight_.start, view.highlight_.end);
         const auto e = std::max(view.highlight_.start, view.highlight_.end);
         draw->AddRectFilled(
-            ImVec2(wpos.x + (s - view.zvStart_) * pxns, linepos.y), 
-            ImVec2(wpos.x + (e - view.zvStart_) * pxns, linepos.y + lineh),
+            ImVec2(wpos.x + (s - view.zvStartNS_) * pxns, linepos.y), 
+            ImVec2(wpos.x + (e - view.zvStartNS_) * pxns, linepos.y + lineh),
             0x228888DD);
         draw->AddRect(
-            ImVec2(wpos.x + (s - view.zvStart_) * pxns, linepos.y), 
-            ImVec2(wpos.x + (e - view.zvStart_) * pxns, linepos.y + lineh), 
+            ImVec2(wpos.x + (s - view.zvStartNS_) * pxns, linepos.y), 
+            ImVec2(wpos.x + (e - view.zvStartNS_) * pxns, linepos.y + lineh), 
             0x448888DD);
 
         StringBuf strBuf;
@@ -1328,12 +1328,12 @@ void DrawZones(TraceView& view)
         const auto s = std::min(view.highlightZoom_.start, view.highlightZoom_.end);
         const auto e = std::max(view.highlightZoom_.start, view.highlightZoom_.end);
         draw->AddRectFilled(
-            ImVec2(wpos.x + (s - view.zvStart_) * pxns, linepos.y), 
-            ImVec2(wpos.x + (e - view.zvStart_) * pxns, linepos.y + lineh), 
+            ImVec2(wpos.x + (s - view.zvStartNS_) * pxns, linepos.y), 
+            ImVec2(wpos.x + (e - view.zvStartNS_) * pxns, linepos.y + lineh), 
             0x1688DD88);
         draw->AddRect(
-            ImVec2(wpos.x + (s - view.zvStart_) * pxns, linepos.y), 
-            ImVec2(wpos.x + (e - view.zvStart_) * pxns, linepos.y + lineh), 
+            ImVec2(wpos.x + (s - view.zvStartNS_) * pxns, linepos.y), 
+            ImVec2(wpos.x + (e - view.zvStartNS_) * pxns, linepos.y + lineh), 
             0x2C88DD88);
     }
 
@@ -1617,14 +1617,14 @@ void DrawFrame(Client& client, float ww, float wh)
                         if (view.zoomAnim_.progress >= 1.f)
                         {
                             view.zoomAnim_.active = false;
-                            view.zvStart_ = view.zoomAnim_.start1;
-                            view.zvEnd_ = view.zoomAnim_.end1;
+                            view.zvStartNS_ = view.zoomAnim_.start1;
+                            view.zvEndNS_ = view.zoomAnim_.end1;
                         }
                         else
                         {
                             const auto v = sqrt(sin(math<double>::HALF_PI * view.zoomAnim_.progress));
-                            view.zvStart_ = int64_t(view.zoomAnim_.start0 + (view.zoomAnim_.start1 - view.zoomAnim_.start0) * v);
-                            view.zvEnd_ = int64_t(view.zoomAnim_.end0 + (view.zoomAnim_.end1 - view.zoomAnim_.end0) * v);
+                            view.zvStartNS_ = int64_t(view.zoomAnim_.start0 + (view.zoomAnim_.start1 - view.zoomAnim_.start0) * v);
+                            view.zvEndNS_ = int64_t(view.zoomAnim_.end0 + (view.zoomAnim_.end1 - view.zoomAnim_.end0) * v);
                         }
                     }
 

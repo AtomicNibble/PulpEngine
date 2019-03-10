@@ -91,11 +91,11 @@ public:
         open_ = true;
 
     //    numFrames_ = 1024 * 1024;
-        frameStart_ = 0;
-        frameScale_ = 0;
+    //    frameStart_ = 0;
+    //    frameScale_ = 0;
 
-        zvStart_ = 1000 * 1000 * 800;
-        zvEnd_ = 1000 * 1000 * 1500;
+        zvStartNS_ = 1000 * 1000 * 800;
+        zvEndNS_ = 1000 * 1000 * 1500;
 
         zvHeight_ = 0;
         zvScroll_ = 0;
@@ -111,12 +111,12 @@ public:
 
     int64_t GetVisiableNS(void) const
     {
-        return zvEnd_ - zvStart_;
+        return zvEndNS_ - zvStartNS_;
     }
 
     int64_t GetVisibleStartNS(void) const
     {
-        return zvStart_ - GetTimeBegin();
+        return zvStartNS_ - GetTimeBegin();
     }
 
 
@@ -131,11 +131,11 @@ public:
     tt_int8 handle;
 
     // int32_t numFrames_;
-    int32_t frameStart_;
-    int32_t frameScale_;
+    // int32_t frameStart_;
+    // int32_t frameScale_;
 
-    int64_t zvStart_;
-    int64_t zvEnd_;
+    int64_t zvStartNS_;
+    int64_t zvEndNS_;
 
     int32_t zvHeight_;
     int32_t zvScroll_;
