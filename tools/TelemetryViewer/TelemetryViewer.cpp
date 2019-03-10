@@ -200,6 +200,13 @@ namespace
         return buf.c_str();
     }
 
+    
+    const char* IntToString(StringBuf& buf, int32_t val)
+    {
+        buf.setFmt("%" PRIi32, val);
+        return buf.c_str();
+    }
+
     const char* RealToString(StringBuf& buf, double val, bool separator)
     {
         X_UNUSED(separator);
@@ -253,6 +260,20 @@ namespace
         TextDisabledUnformatted(label);
         ImGui::SameLine();
         ImGui::TextUnformatted(value);
+    }
+
+    void TextFocusedFmt(const char* label, const char* pFmt, ...)
+    {
+        TextDisabledUnformatted(label);
+        ImGui::SameLine();
+
+        core::StackString256 str;
+        va_list args;
+        va_start(args, pFmt);
+        str.setFmt(pFmt, args);
+        va_end(args);
+
+        ImGui::TextUnformatted(str.c_str(), str.end());
     }
 
     void DrawHelpMarker(const char* desc)
@@ -434,8 +455,9 @@ namespace
     enum { MinVisSize = 3 };
     enum { MinFrameSize = 5 };
 
-} // namespace
 
+
+} // namespace
 
 void ZoomToRange(TraceView& view, int64_t start, int64_t end)
 {
@@ -458,6 +480,16 @@ void ZoomToRange(TraceView& view, int64_t start, int64_t end)
     const auto diff = d0 > d1 ? d0 / d1 : d1 / d0;
     view.zoomAnim_.lenMod = 5.0 / log10(diff);
 }
+
+void ZoomToZone(TraceView& view, const ZoneData& zone)
+{
+    if (zone.endNano - zone.startNano <= 0) {
+        return;
+    }
+
+    ZoomToRange(view, zone.startNano, zone.endNano);
+}
+
 
 void HandleZoneViewMouse(TraceView& view, int64_t timespan, const ImVec2& wpos, float w, double& pxns)
 {
@@ -559,6 +591,38 @@ void HandleZoneViewMouse(TraceView& view, int64_t timespan, const ImVec2& wpos, 
         timespan = view.zvEndNS_ - view.zvStartNS_;
         pxns = w / double(timespan);
     }
+}
+
+void ZoneTooltip(TraceView& view, const ZoneData& ev)
+{
+    X_UNUSED(view);
+
+    const int64_t cycles = ev.endTicks - ev.startTicks;
+
+    const int64_t end = ev.endNano;
+    const int64_t time = end - ev.startNano;
+    const int64_t childTime = 0;
+    const int64_t selftime = time - childTime;
+
+    StringBuf strBuf;
+
+    ImGui::BeginTooltip();
+  
+        ImGui::TextUnformatted("Function name");
+        ImGui::Separator();
+        ImGui::Text("%s:%i", "FlyingGoat\\stu.cpp", 1337);
+        TextFocused("Thread:", "Goat Thread");
+        ImGui::SameLine();
+        ImGui::TextDisabled("(0x%" PRIX32 ")", 0x12345);
+        ImGui::Separator();
+        TextFocused("Execution time:", TimeToString(strBuf, time));
+        ImGui::SameLine();
+        TextFocusedFmt("Cycles:", "%" PRId64, cycles);
+        TextFocused("Self time:", TimeToString(strBuf, selftime));
+        ImGui::SameLine();
+        ImGui::TextDisabled("(%.2f%%)", 100.f * selftime / time);
+    
+    ImGui::EndTooltip();
 }
 
 
@@ -930,6 +994,8 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
     depth++;
     int maxdepth = depth;
 
+    StringBuf strBuf;
+
     while (it < zitend)
     {
         auto& zone = *it;
@@ -952,7 +1018,10 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
 
                 const auto nend = GetZoneEnd(*it);
                 const auto pxnext = (nend - view.zvStartNS_) * pxns;
-                if (pxnext - px1 >= MinVisSize * 2) break;
+                if (pxnext - px1 >= MinVisSize * 2) {
+                    break;
+                }
+
                 px1 = pxnext;
                 rend = nend;
                 num++;
@@ -968,51 +1037,44 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
                 wpos + ImVec2(0, offset + ty / 2), std::max(px0, -10.0), 
                 std::min(std::max(px1, px0 + MinVisSize), double(w + 10)), ty / 4, 
                 DarkenColor(color));
-            
-#if 0
+     
             if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2(std::max(px0, -10.0), offset), wpos + ImVec2(std::min(std::max(px1, px0 + MinVisSize), double(w + 10)), offset + ty)))
             {
                 if (num > 1)
                 {
                     ImGui::BeginTooltip();
-                    TextFocused("Zones too small to display:", RealToString(num, true));
+                    TextFocused("Zones too small to display:", IntToString(strBuf, num));
                     ImGui::Separator();
-                    TextFocused("Execution time:", TimeToString(rend - zone.start));
+                    TextFocused("Execution time:", TimeToString(strBuf, rend - zone.startNano));
                     ImGui::EndTooltip();
 
-                    if (ImGui::IsMouseClicked(2) && rend - zone.start > 0)
+                    if (ImGui::IsMouseClicked(2) && rend - zone.startNano > 0)
                     {
-                        ZoomToRange(zone.start, rend);
+                        ZoomToRange(view, zone.startNano, rend);
                     }
                 }
                 else
                 {
-#if 0
-                    ZoneTooltip(zone);
+                    ZoneTooltip(view, zone);
 
-                    if (ImGui::IsMouseClicked(2) && rend - zone.start > 0)
+                    if (ImGui::IsMouseClicked(2) && rend - zone.startNano > 0)
                     {
-                        ZoomToZone(zone);
+                        ZoomToZone(view, zone);
                     }
                     if (ImGui::IsMouseClicked(0))
                     {
-                        ShowZoneInfo(zone);
+                    //    ShowZoneInfo(zone);
                     }
-
-                    m_zoneSrcLocHighlight = zone.srcloc;
-#endif
                 }
             }
-            char tmp[64];
-            sprintf(tmp, "%s", RealToString(num, true));
-            const auto tsz = ImGui::CalcTextSize(tmp);
+
+            IntToString(strBuf, num);
+            const auto tsz = ImGui::CalcTextSize(strBuf.begin(), strBuf.end());
             if (tsz.x < px1 - px0)
             {
                 const auto x = px0 + (px1 - px0 - tsz.x) / 2;
-                DrawTextContrast(draw, wpos + ImVec2(x, offset), 0xFF4488DD, tmp);
+                DrawTextContrast(draw, wpos + ImVec2(x, offset), 0xFF4488DD, strBuf.c_str());
             }
-#endif
-
         }
         else
         {
@@ -1101,23 +1163,20 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
                 ImGui::PopClipRect();
             }
 
-#if 0
             if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y)))
             {
-                ZoneTooltip(zone);
+                ZoneTooltip(view, zone);
 
-                if (!m_zoomAnim.active && ImGui::IsMouseClicked(2))
+                if (!view.zoomAnim_.active && ImGui::IsMouseClicked(2))
                 {
-                    ZoomToZone(zone);
+                    ZoomToZone(view, zone);
                 }
                 if (ImGui::IsMouseClicked(0))
                 {
-                    ShowZoneInfo(zone);
+                // open window with more info, like how many goats are in the pen.
+                //    ShowZoneInfo(zone);
                 }
-
-                m_zoneSrcLocHighlight = zone.srcloc;
             }
-#endif
 
             ++it;
         }
