@@ -136,8 +136,20 @@ public:
     }
 
     core::string_view getString(int16_t id) const {
+
+        using namespace core::string_view_literals;
+
+        // TODO: check in debug builds only?
+        if (id < idxOffset) {
+            return "???"_sv;
+        }
+
         auto idx = id - idxOffset;
         auto offset = lookUp[idx];
+
+        if (offset < 0) {
+            return "???"_sv;
+        }
 
         auto* pHdr = reinterpret_cast<const StringHdr*>(data.data() + offset);
         auto* pStr = reinterpret_cast<const char*>(pHdr + 1);
