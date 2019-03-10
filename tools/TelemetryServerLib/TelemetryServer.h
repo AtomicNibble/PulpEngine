@@ -16,7 +16,7 @@ struct TraceDB
         Free
     };
 
-    struct PacketSourceInfo
+    struct PackedSourceInfo
     {
         union
         {

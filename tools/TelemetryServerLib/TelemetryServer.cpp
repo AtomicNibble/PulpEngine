@@ -591,7 +591,7 @@ void TraceDB::handleDataPacketStringTableAdd(const DataPacketStringTableAdd* pDa
 
 void TraceDB::handleDataPacketZone(const DataPacketZone* pData)
 {
-    PacketSourceInfo info;
+    PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
     info.raw.idxFunction = pData->strIdxFunction.index;
     info.raw.idxFile = pData->strIdxFile.index;
