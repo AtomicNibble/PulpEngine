@@ -1720,36 +1720,91 @@ X_ENABLE_WARNING(4701)
 bool Server::handleReqTraceStrings(ClientConnection& client, uint8_t* pData)
 {
     auto* pHdr = reinterpret_cast<const ReqTraceStrings*>(pData);
-    if (pHdr->type != PacketType::ReqTraceZones) {
+    if (pHdr->type != PacketType::ReqTraceStrings) {
         X_ASSERT_UNREACHABLE();
     }
 
     int32_t handle = pHdr->handle;
-    if (handle <= 0 || handle >= static_cast<int32_t>(client.traces.size())) {
+    if (handle < 0 || handle >= static_cast<int32_t>(client.traces.size())) {
         return false;
     }
 
     auto& ts = client.traces[pHdr->handle];
 
-    sql::SqlLiteQuery qry(ts.db.con, "SELECT id, value FROM strings");
+    ReqTraceStringsRespInfo info;
+    info.type = DataStreamTypeViewer::TraceStringsInfo;
+    info.handle = pHdr->handle;
 
-    auto it = qry.begin();
-    if (it != qry.end()) {
-        auto row = *it;
+    {
+        // lets just count it will be cheap.    
+        // TODO: pretty easy to calculate this in ingest if it becomes slow.
+        sql::SqlLiteQuery qry(ts.db.con, "SELECT COUNT(_rowid_), SUM(LENGTH(value)), MIN(Id), MAX(Id) FROM strings");
+        auto it = qry.begin();
+        if (it == qry.end()) {
+            X_ERROR("TelemSrv", "Failed to load string count");
+            return false;
+        }
 
-        int32_t id = row.get<int32_t>(0);
-        int32_t strLen = row.columnBytes(1);
-        const char* pStr = row.get<const char*>(1);
-
-        DataPacketStringTableAdd strAdd;
-        strAdd.type = DataStreamType::StringTableAdd;
-        strAdd.id = static_cast<uint16_t>(id);
-        strAdd.length = static_cast<uint16_t>(strLen);
-
-        addToCompressionBuffer(client, &strAdd, sizeof(strAdd));
-        addToCompressionBuffer(client, pStr, strLen);
+        info.num = (*it).get<int32_t>(0);
+        info.strDataSize = (*it).get<int32_t>(1);
+        info.minId = (*it).get<int32_t>(2);
+        info.maxId = (*it).get<int32_t>(3);
     }
 
+    addToCompressionBuffer(client, &info, sizeof(info));
+
+    // TODO: hack until client can handle multiple per packet
+    flushCompressionBuffer(client);
+
+    auto* pStringsHdr = addToCompressionBufferT<ReqTraceStringsResp>(client);
+    core::zero_this(pStringsHdr);
+    pStringsHdr->type = DataStreamTypeViewer::TraceStrings;
+    pStringsHdr->handle = pHdr->handle;
+
+    int32_t num = 0;
+
+    if (info.num > 0)
+    {
+        sql::SqlLiteQuery qry(ts.db.con, "SELECT id, value FROM strings");
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            int32_t id = row.get<int32_t>(0);
+            int32_t strLen = row.columnBytes(1);
+            const char* pStr = row.get<const char*>(1);
+
+            TraceStringHdr strHdr;
+            strHdr.id = static_cast<uint16_t>(id);
+            strHdr.length = static_cast<uint16_t>(strLen);
+
+            if (getCompressionBufferSpace(client) < sizeof(strHdr) + strLen)
+            {
+                pStringsHdr->num = num;
+                num = 0;
+
+                flushCompressionBuffer(client);
+
+                pStringsHdr = addToCompressionBufferT<ReqTraceStringsResp>(client);
+                core::zero_this(pStringsHdr);
+                pStringsHdr->type = DataStreamTypeViewer::TraceStrings;
+                pStringsHdr->handle = pHdr->handle;
+            }
+
+            addToCompressionBuffer(client, &strHdr, sizeof(strHdr));
+            addToCompressionBuffer(client, pStr, strLen);
+
+            num++;
+        }
+
+        if (num) {
+            pStringsHdr->num = num;
+            flushCompressionBuffer(client);
+        }
+    }
+
+    // TODO: needed?
     flushCompressionBuffer(client);
     return true;
 }
