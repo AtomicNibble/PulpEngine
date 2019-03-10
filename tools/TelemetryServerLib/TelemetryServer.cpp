@@ -289,6 +289,7 @@ namespace
             stats.durationNano = (*it).get<int64_t>(0);
         }
 
+
         {
             // simular performance.
             // SELECT * FROM zones WHERE _rowid_ = (SELECT MAX(_rowid_) FROM zones);
@@ -1709,8 +1710,14 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
 
             ++numZones;
         }
+
+        if (numZones) {
+            pZonesHdr->num = numZones;
+            flushCompressionBuffer(client);
+        }
     }
 
+    // TODO: needed?
     flushCompressionBuffer(client);
     return true;
 }
