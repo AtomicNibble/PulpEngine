@@ -27,6 +27,7 @@ using TelemFixedStr = core::StackString<MAX_STRING_LEN, char>;
 struct TraceStats
 {
     core::Guid guid;
+    tt_int64 numStrings;
     tt_int64 numZones;
     tt_int64 numTicks;
     tt_int64 durationNano;

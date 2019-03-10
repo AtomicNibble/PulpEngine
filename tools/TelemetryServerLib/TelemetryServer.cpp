@@ -244,6 +244,18 @@ namespace
     bool getStats(sql::SqlLiteDb& db, TraceStats& stats)
     {
         // These need to be fast even when there is 10 million rows etc..
+
+        {
+            sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM strings LIMIT 1");
+            auto it = qry.begin();
+            if (it == qry.end()) {
+                X_ERROR("TelemSrv", "Failed to load string count");
+                return false;
+            }
+
+            stats.numStrings = (*it).get<int64_t>(0);
+        }
+
         {
             sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM zones LIMIT 1");
             auto it = qry.begin();
