@@ -348,7 +348,7 @@ bool TraceDB::createDB(core::Path<char>& path)
     cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
     cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, startTick, endTick, startNano, endNano) VALUES(?,?,?,?,?)");
     cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
-    cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, start, end, descriptionStrId) VALUES(?,?,?,?,?)");
+    cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, startTick, endTick, descriptionStrId) VALUES(?,?,?,?,?)");
     cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, time, state) VALUES(?,?,?,?)");
     cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, time, nameStrId) VALUES(?,?,?)");
     cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, time, nameStrId) VALUES(?,?,?)");
@@ -486,8 +486,8 @@ CREATE TABLE IF NOT EXISTS "lockTry" (
 	"Id"	            INTEGER,
 	"lockId"	        INTEGER NOT NULL,
     "threadId"	        INTEGER NOT NULL,
-	"start"	            INTEGER NOT NULL,
-	"end"	            INTEGER NOT NULL,
+	"startTick"	        INTEGER NOT NULL,
+	"endTick"	        INTEGER NOT NULL,
 	"descriptionStrId"	INTEGER,
 	PRIMARY KEY("Id")
 );
