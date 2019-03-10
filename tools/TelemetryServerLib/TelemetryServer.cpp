@@ -248,7 +248,7 @@ namespace
             sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM zones LIMIT 1");
             auto it = qry.begin();
             if (it == qry.end()) {
-                X_ERROR("TelemSrv", "Failed to load zone counts");
+                X_ERROR("TelemSrv", "Failed to load zone count");
                 return false;
             }
 
@@ -259,7 +259,7 @@ namespace
             sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM ticks LIMIT 1");
             auto it = qry.begin();
             if (it == qry.end()) {
-                X_ERROR("TelemSrv", "Failed to load tick counts");
+                X_ERROR("TelemSrv", "Failed to load tick count");
                 return false;
             }
 
@@ -270,7 +270,7 @@ namespace
             sql::SqlLiteQuery qry(db, "SELECT endNano FROM ticks WHERE _rowid_ = (SELECT MAX(_rowid_) FROM ticks)");
             auto it = qry.begin();
             if (it == qry.end()) {
-                X_ERROR("TelemSrv", "Failed to load tick counts");
+                X_ERROR("TelemSrv", "Failed to load last tick");
                 return false;
             }
 
