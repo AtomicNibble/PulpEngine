@@ -1762,9 +1762,12 @@ bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBa
         auto& zone = pZones[i];
 
         ZoneData zd;
-        zd.start = zone.start;
-        zd.end = zone.end;
+        zd.startTicks = zone.start;
+        zd.endTicks = zone.end;
+        zd.startNano = view.ticksToNano(zone.start);
+        zd.endNano = view.ticksToNano(zone.end);
         
+
         // want a thread
         int32_t t;
         for(t =0; t < threadIDs.size(); t++)
