@@ -42,6 +42,25 @@ struct Trace
         active(false)
     {}
 
+
+    TELEM_INLINE int64_t ticksToNano(tt_int64 tsc) const
+    {
+        // This is correct using ticksPerMicro to work out nano.
+        // TODO: switch this to ticksPerMs to get better accuracy.
+        const tt_int64 whole = (tsc / ticksPerMicro) * 1000;
+        const tt_int64 part = (tsc % ticksPerMicro) * 1000 / ticksPerMicro;
+
+        return whole + part;
+    }
+
+    TELEM_INLINE int64_t nanoToTicks(tt_int64 nano) const
+    {
+        const tt_int64 whole = nano * (ticksPerMicro / 1000);
+        const tt_int64 part = (nano * (ticksPerMicro % 1000)) / 1000;
+
+        return whole + part;
+    }
+
     bool active;
     core::Guid guid;
     uint64_t ticksPerMicro;
