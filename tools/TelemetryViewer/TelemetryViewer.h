@@ -25,8 +25,12 @@ struct Animation
 struct ZoneData
 {
     // 16
-    uint64_t start;
-    uint64_t end;
+    int64_t startNano;
+    int64_t endNano;
+
+    // 16
+    int64_t startTicks;
+    int64_t endTicks;
 };
 
 struct TickData
