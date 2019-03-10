@@ -78,7 +78,8 @@ public:
         endNano(0),
         ticks(arena),
         threads(arena)
-    {}
+    {
+    }
 
     // this should just be for a range of time.
     // it may have no ticks, should probs move ticks out of this then.
@@ -89,6 +90,66 @@ public:
     ZoneSegmentThreadArr threads;
 };
 
+struct TraceStrings
+{
+    struct StringHdr
+    {
+        tt_int16 length;
+    };
+
+    using OffsetArr = core::Array<int32_t>;
+
+public:
+    TraceStrings(core::MemoryArenaBase* arena) :
+        idxOffset(0),
+        lookUp(arena),
+        data(arena)
+    {
+    }
+
+    void init(int32_t num, int32_t minId, int32_t maxId, int32_t strDataSize) {
+
+        const int32_t range = (maxId - minId) + 1;
+
+        const int32_t extraBytesPerString = 3;
+        const int32_t totalBytes = strDataSize + (num * extraBytesPerString);
+
+        idxOffset = minId;
+        lookUp.resize(range, -1);
+        data.reserve(totalBytes);
+    }
+
+    void addString(int16_t id, int16_t len, const char* pData) {
+        auto idx = id - idxOffset;
+
+        auto offset = safe_static_cast<int32_t>(data.size());
+
+        StringHdr hdr;
+        hdr.length = len;
+
+        data.write(hdr);
+        data.write(pData, len);
+        data.write('\0');
+
+        X_ASSERT(lookUp[idx] == -1, "Index taken")(idx);
+        lookUp[idx] = offset;
+    }
+
+    core::string_view getString(int16_t id) const {
+        auto idx = id - idxOffset;
+        auto offset = lookUp[idx];
+
+        auto* pHdr = reinterpret_cast<const StringHdr*>(data.data() + offset);
+        auto* pStr = reinterpret_cast<const char*>(pHdr + 1);
+
+        return { pStr, static_cast<uint32_t>(pHdr->length) };
+    }
+
+    int32_t idxOffset;
+    OffsetArr lookUp;
+
+    core::ByteStream data;
+};
 
 struct TraceView
 {
@@ -100,7 +161,8 @@ public:
         ticksPerMicro(ticksPerMicro),
         stats(stats),
         handle(handle),
-        segments(arena)
+        segments(arena),
+        strings(arena)
     {
         open_ = true;
 
@@ -167,6 +229,7 @@ public:
     Animation zoomAnim_;
 
     ZoneSegmentArr segments;
+    TraceStrings strings;
 };
 
 using GuidTraceStats = std::pair<core::Guid, TraceStats>;
