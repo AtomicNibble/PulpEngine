@@ -1489,7 +1489,7 @@ bool Server::handleReqTraceTicks(ClientConnection& client, uint8_t* pData)
     // MEOW
     // load me the ticks!
     int32_t handle = pHdr->handle;
-    if (handle <= 0 || handle >= static_cast<int32_t>(client.traces.size())) {
+    if (handle < 0 || handle >= static_cast<int32_t>(client.traces.size())) {
         return false;
     }
 
@@ -1534,7 +1534,7 @@ bool Server::handleReqTraceZones(ClientConnection& client, uint8_t* pData)
     }
 
     int32_t handle = pHdr->handle;
-    if (handle <= 0 || handle >= static_cast<int32_t>(client.traces.size())) {
+    if (handle < 0 || handle >= static_cast<int32_t>(client.traces.size())) {
         return false;
     }
 
