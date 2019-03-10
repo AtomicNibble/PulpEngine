@@ -141,7 +141,7 @@ public:
     core::Guid guid;
     uint64_t ticksPerMicro;
     TraceStats stats;
-    tt_int8 handle;
+    int8_t handle;
 
     // int32_t numFrames_;
     // int32_t frameStart_;
