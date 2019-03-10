@@ -297,6 +297,10 @@ namespace
         draw->AddText(pos, color, text, end);
     }
 
+    inline void DrawTextContrast(ImDrawList* draw, const ImVec2& pos, uint32_t color, core::string_view str)
+    {
+        DrawTextContrast(draw, pos, color, str.begin(), str.end());
+    }
 
     bool Splitter(bool split_vertically, float thickness, float* size1, float* size2,
         float min_size1, float min_size2, float splitter_long_axis_size = -1.0f)
@@ -1156,22 +1160,22 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
                 if (x < 0 || x > w - tsz.x)
                 {
                     ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
-                    DrawTextContrast(draw, wpos + ImVec2(std::max(std::max(0., px0), std::min(double(w - tsz.x), x)), offset), 0xFFFFFFFF, zoneName.begin(), zoneName.end());
+                    DrawTextContrast(draw, wpos + ImVec2(std::max(std::max(0., px0), std::min(double(w - tsz.x), x)), offset), 0xFFFFFFFF, zoneName);
                     ImGui::PopClipRect();
                 }
                 else if (zone.startNano == zone.endNano)
                 {
-                    DrawTextContrast(draw, wpos + ImVec2(px0 + (px1 - px0 - tsz.x) * 0.5, offset), 0xFFFFFFFF, zoneName.begin(), zoneName.end());
+                    DrawTextContrast(draw, wpos + ImVec2(px0 + (px1 - px0 - tsz.x) * 0.5, offset), 0xFFFFFFFF, zoneName);
                 }
                 else
                 {
-                    DrawTextContrast(draw, wpos + ImVec2(x, offset), 0xFFFFFFFF, zoneName.begin(), zoneName.end());
+                    DrawTextContrast(draw, wpos + ImVec2(x, offset), 0xFFFFFFFF, zoneName);
                 }
             }
             else
             {
                 ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
-                DrawTextContrast(draw, wpos + ImVec2((zone.startNano - view.zvStartNS_) * pxns, offset), 0xFFFFFFFF, zoneName.begin(), zoneName.end());
+                DrawTextContrast(draw, wpos + ImVec2((zone.startNano - view.zvStartNS_) * pxns, offset), 0xFFFFFFFF, zoneName);
                 ImGui::PopClipRect();
             }
 
