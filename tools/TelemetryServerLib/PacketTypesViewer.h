@@ -96,10 +96,8 @@ struct ReqTraceZoneSegment : public PacketBase
 {
     tt_int8 handle;
 
-    tt_int32 tickIdx;
-    tt_int32 max;      // -1 for all
-    // tt_int64 startMicro;
-    // tt_int64 endMicro;
+    tt_int64 startNano;
+    tt_int64 endNano;
 };
 
 struct DataPacketBaseViewer

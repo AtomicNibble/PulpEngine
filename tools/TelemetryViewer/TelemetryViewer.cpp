@@ -1961,19 +1961,19 @@ bool handleOpenTraceResp(Client& client, uint8_t* pData)
     rzs.handle = pHdr->handle;
     // so what should i request here?
     // time segments?
-    auto start = 0;
-    auto mid = pHdr->stats.numTicks / 2;
-    auto trailing = pHdr->stats.numTicks - mid;
+    // auto start = 0;
+    // auto mid = pHdr->stats.numTicks / 2;
+    // auto trailing = pHdr->stats.numTicks - mid;
 
-    rzs.tickIdx = start;
-    rzs.max = mid;
+    rzs.startNano = 0;
+    rzs.endNano = 1000 * 1000 * 1000;
     client.sendDataToServer(&rzs, sizeof(rzs));
 
-    // humm maybe do this based on ticks?
-    // but i dunno how big a tick will be
-    rzs.tickIdx = mid;
-    rzs.max = trailing;
+#if 0
+    rzs.endNano = 1000 * 1000 * 500;
+    rzs.endNano = rzs.startNano + 1000 * 1000 * 1000;
     client.sendDataToServer(&rzs, sizeof(rzs));
+#endif
 
     return true;
 }

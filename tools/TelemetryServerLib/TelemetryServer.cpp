@@ -390,8 +390,8 @@ bool TraceDB::createIndexes(void)
         CREATE INDEX IF NOT EXISTS "zones_start" ON "zones" (
             "startTick"	ASC
         );
-        CREATE INDEX IF NOT EXISTS "ticks_startNano" ON "ticks" (
-            "startNano"	ASC
+        CREATE INDEX IF NOT EXISTS "ticks_start" ON "ticks" (
+            "startTick"	ASC
         );
     )");
 
@@ -1485,6 +1485,9 @@ bool Server::handleReqTraceTicks(ClientConnection& client, uint8_t* pData)
     // if there is loads of data we just send multiple compressed packets.
     const int32_t numToReturn = pHdr->num;
 
+    // this need to be based on time.
+
+
     sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, startNano, endNano FROM ticks LIMIT ? OFFSET ?");
     qry.bind(1, pHdr->tickIdx);
     qry.bind(2, numToReturn);
@@ -1563,7 +1566,6 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
     }
 
     auto& ts = client.traces[pHdr->handle];
-
     DataPacketTickInfo startTick;
     DataPacketTickInfo endTick;
 
@@ -1573,9 +1575,12 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
         pTickHdr->num = 0;
         pTickHdr->handle = pHdr->handle;
 
-        sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, startNano, endNano FROM ticks LIMIT ? OFFSET ?");
-        qry.bind(1, pHdr->max);
-        qry.bind(2, pHdr->tickIdx);
+        auto begin = ts.pTrace->nanoToTicks(pHdr->startNano);
+        auto end = ts.pTrace->nanoToTicks(pHdr->endNano);
+
+        sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, startNano, endNano FROM ticks WHERE startTick >= ? AND startTick < ?");
+        qry.bind(1, begin);
+        qry.bind(2, end);
 
         auto it = qry.begin();
         if (it == qry.end()) {
