@@ -761,7 +761,7 @@ bool DrawZoneFrames(TraceView& view)
     FrameTextStrBuf frameStrBuf;
 
     bool tooltipDisplayed = false;
-    const bool activeFrameSet = false;
+    const bool activeFrameSet = true; // I don't support multiple sets for comparing etc.
     const bool continuous = true; // TODO: ?
 
     const auto inactiveColor = GetColorMuted(0x888888, activeFrameSet);
