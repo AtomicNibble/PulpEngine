@@ -593,14 +593,14 @@ void HandleZoneViewMouse(TraceView& view, int64_t timespan, const ImVec2& wpos, 
     }
 }
 
-void ZoneTooltip(TraceView& view, const ZoneData& ev)
+void ZoneTooltip(TraceView& view, const ZoneData& zone)
 {
     X_UNUSED(view);
 
-    const int64_t cycles = ev.endTicks - ev.startTicks;
+    const int64_t cycles = zone.endTicks - zone.startTicks;
 
-    const int64_t end = ev.endNano;
-    const int64_t time = end - ev.startNano;
+    const int64_t end = zone.endNano;
+    const int64_t time = end - zone.startNano;
     const int64_t childTime = 0;
     const int64_t selftime = time - childTime;
 
