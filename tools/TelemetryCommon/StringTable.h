@@ -14,10 +14,13 @@ struct StringTableIndex
 
 static_assert(sizeof(StringTableIndex) == 2, "Incorrect size");
 
-inline StringTableIndex BuildIndex(bool inserted, tt_uintptr index)
+namespace Internal
 {
-    return { inserted, static_cast<tt_uint16>(index & 0x7FFF) };
-}
+    inline StringTableIndex BuildIndex(bool inserted, tt_uintptr index)
+    {
+        return { inserted, static_cast<tt_uint16>(index & 0x7FFF) };
+    }
+} // namespace Internal
 
 // TODO: if this string table is always the same size just make the mask a constant.
 // then can skip some loads.
@@ -90,12 +93,12 @@ inline StringTableIndex StringTableGetIndex(StringTable& st, const void* pPtr)
     while (st.pTable[index] != nullptr)
     {
         if (st.pTable[index] == pPtr) {
-            return BuildIndex(false, index);
+            return Internal::BuildIndex(false, index);
         }
 
         index = (index + 1) & st.sizeMask;
     }
 
     st.pTable[index] = pPtr;
-    return BuildIndex(true, index);
+    return Internal::BuildIndex(true, index);
 }
