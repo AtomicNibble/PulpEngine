@@ -611,15 +611,17 @@ void ZoneTooltip(TraceView& view, const ZoneData& zone)
 
     StringBuf strBuf;
 
+    auto strZone = view.strings.getString(zone.strIdxZone);
     auto strFunc = view.strings.getString(zone.strIdxFunction);
     auto strFile = view.strings.getString(zone.strIdxFile);
 
     ImGui::BeginTooltip();
   
-        ImGui::TextUnformatted(strFunc.begin(), strFunc.end());
+        ImGui::TextUnformatted(strZone.begin(), strZone.end());
         ImGui::Separator();
+        ImGui::TextUnformatted(strFunc.begin(), strFunc.end());
         ImGui::Text("%s:%i", strFile.data(), zone.lineNo);
-        TextFocused("Thread:", "Goat Thread");
+        TextFocused("Thread:", "TODO: ThreadName :)");
         ImGui::SameLine();
         ImGui::TextDisabled("(0x%" PRIX32 ")", 0x12345);
         ImGui::Separator();
