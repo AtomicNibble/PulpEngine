@@ -94,7 +94,6 @@ namespace
         core::StopWatch timer;
         int32_t total = 0;
 
-        ttSetThreadName(ctx, ::GetCurrentThreadId(), "BackgroundThread");
         ttSetLockName(ctx, &cs0, "Magic lock");
         ttSetLockName(ctx, &cs1, "Stu's lock");
 
@@ -125,9 +124,11 @@ namespace
                 }
 #endif
 
+                ttZone(ctx, "Stu is that you?");
+
                 for (int j = 0; j < 50; j++)
                 {
-                    ttZone(ctx, "Meoooow");
+                    ttZone(ctx, "One goat to slap them all");
 
                     for (int y = 0; y < 2; y++)
                     {
@@ -236,12 +237,30 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
                 gEnv->pConsoleWnd->redirectSTD();
 
-                core::Thread thread;
-                thread.create("Test");
-                thread.start(threadFunc);
+                const int32_t numThreads = 4;
 
-                thread.join();
-                thread.destroy();
+                core::Thread thread[numThreads];
+                const char* threadNames[numThreads] = {
+                    "Worker 0",
+                    "Worker 1",
+                    "Worker 2",
+                    "Worker 3",
+                };
+
+                for (int32_t i = 0; i < numThreads; i++)
+                {
+                    thread[i].create(threadNames[i]);
+                    thread[i].start(threadFunc);
+
+                    // TODO: Support dynamic strings.
+                    ttSetThreadName(ctx, thread[i].getID(), threadNames[i]);
+                }
+
+                for (int32_t i = 0; i < numThreads; i++)
+                {
+                    thread[i].join();
+                    thread[i].destroy();
+                }
 
                 gEnv->pConsoleWnd->pressToContinue();
             }
