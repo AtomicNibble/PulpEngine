@@ -1933,7 +1933,7 @@ bool handleOpenTraceResp(Client& client, uint8_t* pData)
     }
 
     core::CriticalSection::ScopedLock lock(client.dataCS);
-    client.views.emplace_back(pHdr->guid, pHdr->stats, pHdr->handle, g_arena);
+    client.views.emplace_back(pHdr->guid, pHdr->ticksPerMicro, pHdr->stats, pHdr->handle, g_arena);
 
     // ask for some data?
     // do i want zones and ticks seperate?

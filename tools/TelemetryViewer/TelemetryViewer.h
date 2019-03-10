@@ -82,8 +82,9 @@ struct TraceView
     using ZoneSegmentArr = core::Array<ZoneSegment>;
 
 public:
-    TraceView(core::Guid guid, TraceStats stats, tt_int8 handle, core::MemoryArenaBase* arena) :
+    TraceView(core::Guid guid, uint64_t ticksPerMicro, TraceStats stats, int8_t handle, core::MemoryArenaBase* arena) :
         guid(guid),
+        ticksPerMicro(ticksPerMicro),
         stats(stats),
         handle(handle),
         segments(arena)
@@ -119,6 +120,13 @@ public:
         return zvStartNS_ - GetTimeBegin();
     }
 
+    X_INLINE uint64_t ticksToNano(uint64_t tsc) const
+    {
+        const uint64_t whole = (tsc / ticksPerMicro) * 1000;
+        const uint64_t part = (tsc % ticksPerMicro) * 1000 / ticksPerMicro;
+
+        return whole + part;
+    }
 
     core::StackString<64,char> tabName;
 
@@ -127,6 +135,7 @@ public:
     bool _pad[2];
 
     core::Guid guid;
+    uint64_t ticksPerMicro;
     TraceStats stats;
     tt_int8 handle;
 

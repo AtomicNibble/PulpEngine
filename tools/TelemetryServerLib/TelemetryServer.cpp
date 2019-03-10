@@ -1370,6 +1370,7 @@ bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
     otr.dataSize = sizeof(otr);
     otr.type = PacketType::OpenTraceResp;
     otr.guid = pHdr->guid;
+    otr.ticksPerMicro = 0;
     otr.handle = -1_ui8;
 
     // TODO: check we don't have it open already.
@@ -1388,6 +1389,7 @@ bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
             }
 
             otr.handle = safe_static_cast<int8_t>(i);
+            otr.ticksPerMicro = trace.pTrace->ticksPerMicro;
             sendDataToClient(client, &otr, sizeof(otr));
             return true;
         }
@@ -1416,6 +1418,7 @@ bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
                         client.traces.emplace_back(std::move(ts));
 
                         otr.handle = safe_static_cast<int8_t>(id);
+                        otr.ticksPerMicro = trace.ticksPerMicro;
                         sendDataToClient(client, &otr, sizeof(otr));
                         return true;
                     }
