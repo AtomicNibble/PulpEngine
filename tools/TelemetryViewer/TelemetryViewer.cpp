@@ -1841,11 +1841,64 @@ bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBa
         thread.zones.push_back(zd);
     }
 
-
-    pHdr->handle;
     return true;
 }
 
+bool handleTraceStringsInfo(Client& client, const DataPacketBaseViewer* pBase)
+{
+    auto* pHdr = static_cast<const ReqTraceStringsRespInfo*>(pBase);
+    if (pHdr->type != DataStreamTypeViewer::TraceStringsInfo) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    // shake it.
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+
+    TraceView* pView = client.viewForHandle(pHdr->handle);
+    if (!pView) {
+        return false;
+    }
+
+    auto& view = *pView;
+
+    view.strings.init(pHdr->num, pHdr->minId, pHdr->maxId, pHdr->strDataSize);
+    return true;
+}
+
+
+bool handleTraceStrings(Client& client, const DataPacketBaseViewer* pBase)
+{
+    auto* pHdr = static_cast<const ReqTraceStringsResp*>(pBase);
+    if (pHdr->type != DataStreamTypeViewer::TraceStrings) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    // shake it.
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+
+    TraceView* pView = client.viewForHandle(pHdr->handle);
+    if (!pView) {
+        return false;
+    }
+
+    auto& view = *pView;
+    auto& strings = view.strings;
+
+    auto* pData = reinterpret_cast<const uint8_t*>(pHdr + 1);
+    for (int32_t i = 0; i < pHdr->num; i++)
+    {
+        auto* pStrHdr = reinterpret_cast<const TraceStringHdr*>(pData);
+        auto* pStr = reinterpret_cast<const char*>(pStrHdr + 1);
+
+        // we have the string!
+        // push it back and made a pointer.
+        strings.addString(pStrHdr->id, pStrHdr->length, pStr);
+
+        pData += (sizeof(*pStrHdr) + pStrHdr->length);
+    }
+
+    return true;
+}
 
 
 bool handleDataSream(Client& client, uint8_t* pData)
@@ -1890,6 +1943,11 @@ bool handleDataSream(Client& client, uint8_t* pData)
                 return handleTraceZoneSegmentTicks(client, pPacket);
             case DataStreamTypeViewer::TraceZoneSegmentZones:
                 return handleTraceZoneSegmentZones(client, pPacket);
+
+            case DataStreamTypeViewer::TraceStringsInfo:
+                return handleTraceStringsInfo(client, pPacket);
+            case DataStreamTypeViewer::TraceStrings:
+                return handleTraceStrings(client, pPacket);
 
             default:
                 X_NO_SWITCH_DEFAULT_ASSERT;
@@ -2007,6 +2065,12 @@ bool handleOpenTraceResp(Client& client, uint8_t* pData)
     // i guess if we just request small blocks say 10ms.
     // and just keep doing that it be okay.
     // some sort of sliding window kinda thing that works out a good time range to request.
+
+    ReqTraceStrings rts;
+    rts.type = PacketType::ReqTraceStrings;
+    rts.dataSize = sizeof(rts);
+    rts.handle = pHdr->handle;
+    client.sendDataToServer(&rts, sizeof(rts));
 
     ReqTraceZoneSegment rzs;
     rzs.type = PacketType::ReqTraceZoneSegment;
