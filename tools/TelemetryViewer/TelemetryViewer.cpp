@@ -1724,17 +1724,7 @@ bool handleTraceZoneSegmentTicks(Client& client, const DataPacketBaseViewer* pBa
     // TODO: fix.
     core::CriticalSection::ScopedLock lock(client.dataCS);
 
-    TraceView* pView = nullptr;
-
-    for (auto& view : client.views)
-    {
-        if (view.handle == pHdr->handle)
-        {
-            pView = &view;
-            break;
-        }
-    }
-
+    TraceView* pView = client.viewForHandle(pHdr->handle);
     if (!pView) {
         return false;
     }
@@ -1790,17 +1780,7 @@ bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBa
 
     core::CriticalSection::ScopedLock lock(client.dataCS);
 
-    TraceView* pView = nullptr;
-
-    for (auto& view : client.views)
-    {
-        if (view.handle == pHdr->handle)
-        {
-            pView = &view;
-            break;
-        }
-    }
-
+    TraceView* pView = client.viewForHandle(pHdr->handle);
     if (!pView) {
         return false;
     }
@@ -2171,6 +2151,22 @@ bool Client::isConnected(void) const
 {
     return socket != INV_SOCKET;
 }
+
+TraceView* Client::viewForHandle(tt_int8 handle)
+{
+    TraceView* pView = nullptr;
+
+    for (auto& view : views)
+    {
+        if (view.handle == handle)
+        {
+            return &view;
+        }
+    }
+
+    return pView;
+}
+
 
 bool connectToServer(Client& client)
 {

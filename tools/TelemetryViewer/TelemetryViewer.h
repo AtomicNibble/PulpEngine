@@ -186,6 +186,7 @@ struct Client
 
     bool isConnected(void) const;
     void sendDataToServer(const void* pData, int32_t len);
+    TraceView* viewForHandle(tt_int8 handle);
 
     core::StackString256 addr;
     uint16_t port;
