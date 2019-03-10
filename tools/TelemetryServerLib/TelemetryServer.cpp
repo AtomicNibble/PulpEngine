@@ -999,10 +999,12 @@ bool Server::processPacket(ClientConnection& client, uint8_t* pData)
             return handleQueryTraceInfo(client, pData);
         case PacketType::OpenTrace:
             return handleOpenTrace(client, pData);
+#if 0
         case PacketType::ReqTraceTicks:
             return handleReqTraceTicks(client, pData);
         case PacketType::ReqTraceZones:
             return handleReqTraceZones(client, pData);
+#endif
         case PacketType::ReqTraceZoneSegment:
             return handleReqTraceZoneSegment(client, pData);
         case PacketType::ReqTraceStrings:
@@ -1464,6 +1466,7 @@ T* addToCompressionBufferT(ClientConnection& client)
     return pPtr;
 }
 
+#if 0
 bool Server::handleReqTraceTicks(ClientConnection& client, uint8_t* pData)
 {
     auto* pHdr = reinterpret_cast<const ReqTraceTicks*>(pData);
@@ -1547,6 +1550,7 @@ bool Server::handleReqTraceZones(ClientConnection& client, uint8_t* pData)
     flushCompressionBuffer(client);
     return true;
 }
+#endif
 
 X_DISABLE_WARNING(4701) // potentially uninitialized local variable 'tick' used
 

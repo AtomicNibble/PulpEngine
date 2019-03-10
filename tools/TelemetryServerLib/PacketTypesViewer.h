@@ -69,6 +69,7 @@ struct OpenTraceResp : public PacketBase
     tt_int8 handle;
 };
 
+#if 0
 struct ReqTraceTicks : public PacketBase
 {
     tt_int8 handle;
@@ -84,6 +85,7 @@ struct ReqTraceZones : public PacketBase
     tt_int64 start;
     tt_int64 end;   // -1 for ubounded
 };
+#endif
 
 struct ReqTraceStrings : public PacketBase
 {
