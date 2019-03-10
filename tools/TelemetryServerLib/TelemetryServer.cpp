@@ -349,11 +349,11 @@ bool TraceDB::createDB(core::Path<char>& path)
     cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, startTick, endTick, startNano, endNano) VALUES(?,?,?,?,?)");
     cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
     cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, startTick, endTick, descriptionStrId) VALUES(?,?,?,?,?)");
-    cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, time, state) VALUES(?,?,?,?)");
-    cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, time, nameStrId) VALUES(?,?,?)");
-    cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, time, nameStrId) VALUES(?,?,?)");
+    cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, timeTicks, state) VALUES(?,?,?,?)");
+    cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, timeTicks, nameStrId) VALUES(?,?,?)");
+    cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, nameStrId) VALUES(?,?,?)");
     cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)");
-    cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, time, operation) VALUES(?,?,?,?,?)");
+    cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation) VALUES(?,?,?,?,?)");
     return true;
 }
 
@@ -430,7 +430,7 @@ CREATE TABLE IF NOT EXISTS "ticks" (
 CREATE TABLE IF NOT EXISTS "threadNames" (
     "Id"            INTEGER,
     "threadId"      INTEGER NOT NULL,
-    "time"          INTEGER NOT NULL,
+    "timeTicks"     INTEGER NOT NULL,
     "nameStrId"     INTEGER NOT NULL,
     PRIMARY KEY("Id")
 );
@@ -476,8 +476,8 @@ CREATE TABLE IF NOT EXISTS "locks" (
 
 CREATE TABLE IF NOT EXISTS "lockNames" (
     "Id"            INTEGER,
-    "lockId"          INTEGER NOT NULL,
-    "time"          INTEGER NOT NULL,
+    "lockId"        INTEGER NOT NULL,
+    "timeTicks"     INTEGER NOT NULL,
     "nameStrId"     INTEGER NOT NULL,
     PRIMARY KEY("Id")
 );
@@ -496,7 +496,7 @@ CREATE TABLE IF NOT EXISTS "lockStates" (
 	"Id"	        INTEGER,
 	"lockId"	    INTEGER NOT NULL,
 	"threadId"	    INTEGER NOT NULL,
-	"time"	        INTEGER NOT NULL,
+	"timeTicks"	    INTEGER NOT NULL,
 	"state"	        INTEGER NOT NULL,
 	PRIMARY KEY("Id")
 );
@@ -506,7 +506,7 @@ CREATE TABLE "memory" (
 	"allocId"	    INTEGER NOT NULL,
 	"size"	        INTEGER NOT NULL,
 	"threadId"	    INTEGER NOT NULL,
-	"time"	        INTEGER NOT NULL,
+	"timeTicks"	    INTEGER NOT NULL,
 	"operation"	    INTEGER NOT NULL,
 	PRIMARY KEY("Id")
 );
