@@ -25,7 +25,7 @@ struct TraceDB
                 uint16_t lineNo;
                 uint16_t idxFunction;
                 uint16_t idxFile;
-                uint16_t __blank;
+                uint16_t idxZone;
             } raw;
 
             uint64_t packed;

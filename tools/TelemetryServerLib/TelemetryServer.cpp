@@ -608,6 +608,7 @@ void TraceDB::handleDataPacketZone(const DataPacketZone* pData)
     info.raw.lineNo = pData->lineNo;
     info.raw.idxFunction = pData->strIdxFunction;
     info.raw.idxFile = pData->strIdxFile;
+    info.raw.idxZone = pData->strIdxZone;
 
     uint64_t sourceInfo = info.packed;
 
@@ -1690,7 +1691,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
             zone.lineNo = info.raw.lineNo;
             zone.strIdxFunction = info.raw.idxFunction;
             zone.strIdxFile = info.raw.idxFile;
-            zone.strIdxZone = 0; // TODO: ?
+            zone.strIdxZone = info.raw.idxZone;
 
             if (getCompressionBufferSpace(client) < sizeof(zone))
             {
