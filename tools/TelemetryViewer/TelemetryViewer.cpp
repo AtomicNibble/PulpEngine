@@ -1947,17 +1947,14 @@ bool handleOpenTraceResp(Client& client, uint8_t* pData)
     // should i index the zone data based on ticks?
 
     // in terms of getting the data back i just kinda wanna build a zone so having all the ticks and zones for a 
-    // egment would be nice.
+    // segment would be nice.
     // and the segment size is ajustable.
-    // oh but i was gonna support the sserver just sending you data.
-    // so i would need to build segments for that.
-    // can i just put data in to segemts?
-    // would mean i have to process every block check it's time and place it in a zone.
-    // if the zones are out of order could be messy.
-    // i was going to get the server to sort zones before insert.
-    // so maybe the server should do that and send the data as a segment.
-    // acutally the server just relaying you data is probs not a great idea
-    // since if you want to look at stuff we don't want anymore data other than new total time to update scroll bar.
+    // so i think this will have to be time based.
+    // the problem is knowing how much data we are going to get back?
+    // i guess if we just request small blocks say 10ms.
+    // and just keep doing that it be okay.
+    // some sort of sliding window kinda thing that works out a good time range to request.
+
     ReqTraceZoneSegment rzs;
     rzs.type = PacketType::ReqTraceZoneSegment;
     rzs.dataSize = sizeof(rzs);
