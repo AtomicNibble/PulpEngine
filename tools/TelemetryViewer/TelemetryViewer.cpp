@@ -856,12 +856,12 @@ int64_t GetZoneEnd(const telemetry::ZoneData& ev)
     auto ptr = &ev;
     for (;;)
     {
-        if (ptr->end >= 0) {
-            return ptr->end;
+        if (ptr->endNano >= 0) {
+            return ptr->endNano;
         }
         // TODO
        // if (ptr->child < 0) {
-            return ptr->start;
+            return ptr->startNano;
         //}
 
 //        X_ASSERT_UNREACHABLE();
@@ -901,13 +901,14 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
 
     auto& zones = thread.zones;
 
-    // cast to uint64_t, so that unended zones (end = -1) are still drawn
-    auto it = std::lower_bound(zones.begin(), zones.end(), (uint64_t)view.zvStartNS_, [](const auto& l, const auto& r) { return l.end < r; });
+    // find the last zone that ends before view.
+    auto it = std::lower_bound(zones.begin(), zones.end(), view.zvStartNS_, [](const auto& l, const auto& r) { return l.endNano < r; });
     if (it == zones.end()) {
         return depth;
     }
 
-    const auto zitend = std::lower_bound(it, zones.end(), (uint64_t)view.zvEndNS_, [](const auto& l, const auto& r) { return l.start < r; });
+    // find the first zone that starts after view.
+    const auto zitend = std::lower_bound(it, zones.end(), view.zvEndNS_, [](const auto& l, const auto& r) { return l.startNano < r; });
     if (it == zitend) {
         return depth;
     }
@@ -934,12 +935,12 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
         auto& zone = *it;
         const auto color = GetZoneColor(zone);
         const auto end = GetZoneEnd(zone);
-        const auto zsz = std::max((end - zone.start) * pxns, pxns * 0.5);
+        const auto zsz = std::max((end - zone.startNano) * pxns, pxns * 0.5);
 
         if (zsz < MinVisSize)
         {
             int num = 1;
-            const auto px0 = (zone.start - view.zvStartNS_) * pxns;
+            const auto px0 = (zone.startNano - view.zvStartNS_) * pxns;
             auto px1 = (end - view.zvStartNS_) * pxns;
             auto rend = end;
             for (;;)
@@ -1052,7 +1053,7 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
                 tsz = ImGui::CalcTextSize(zoneName);
             }
 
-            const auto pr0 = (zone.start - view.zvStartNS_) * pxns;
+            const auto pr0 = (zone.startNano - view.zvStartNS_) * pxns;
             const auto pr1 = (end - view.zvStartNS_) * pxns;
             const auto px0 = std::max(pr0, -10.0);
             const auto px1 = std::max({ std::min(pr1, double(w + 10)), px0 + pxns * 0.5, px0 + MinVisSize });
@@ -1077,14 +1078,14 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
             }
             if (tsz.x < zsz)
             {
-                const auto x = (zone.start - view.zvStartNS_) * pxns + ((end - zone.start) * pxns - tsz.x) / 2;
+                const auto x = (zone.startNano - view.zvStartNS_) * pxns + ((end - zone.startNano) * pxns - tsz.x) / 2;
                 if (x < 0 || x > w - tsz.x)
                 {
                     ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
                     DrawTextContrast(draw, wpos + ImVec2(std::max(std::max(0., px0), std::min(double(w - tsz.x), x)), offset), 0xFFFFFFFF, zoneName);
                     ImGui::PopClipRect();
                 }
-                else if (zone.start == zone.end)
+                else if (zone.startNano == zone.endNano)
                 {
                     DrawTextContrast(draw, wpos + ImVec2(px0 + (px1 - px0 - tsz.x) * 0.5, offset), 0xFFFFFFFF, zoneName);
                 }
@@ -1096,7 +1097,7 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
             else
             {
                 ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
-                DrawTextContrast(draw, wpos + ImVec2((zone.start - view.zvStartNS_) * pxns, offset), 0xFFFFFFFF, zoneName);
+                DrawTextContrast(draw, wpos + ImVec2((zone.startNano - view.zvStartNS_) * pxns, offset), 0xFFFFFFFF, zoneName);
                 ImGui::PopClipRect();
             }
 
