@@ -3,6 +3,7 @@
 
 X_NAMESPACE_BEGIN(telemetry)
 
+using namespace core::string_view_literals;
 
 namespace
 {
@@ -290,10 +291,10 @@ namespace
         }
     }
 
-    void DrawTextContrast(ImDrawList* draw, const ImVec2& pos, uint32_t color, const char* text)
+    void DrawTextContrast(ImDrawList* draw, const ImVec2& pos, uint32_t color, const char* text, const char* end = nullptr)
     {
-        draw->AddText(pos + ImVec2(1, 1), 0x88000000, text);
-        draw->AddText(pos, color, text);
+        draw->AddText(pos + ImVec2(1, 1), 0x88000000, text, end);
+        draw->AddText(pos, color, text, end);
     }
 
 
@@ -606,11 +607,14 @@ void ZoneTooltip(TraceView& view, const ZoneData& zone)
 
     StringBuf strBuf;
 
+    auto strFunc = view.strings.getString(zone.strIdxFunction);
+    auto strFile = view.strings.getString(zone.strIdxFile);
+
     ImGui::BeginTooltip();
   
-        ImGui::TextUnformatted("Function name");
+        ImGui::TextUnformatted(strFunc.begin(), strFunc.end());
         ImGui::Separator();
-        ImGui::Text("%s:%i", "FlyingGoat\\stu.cpp", zone.lineNo);
+        ImGui::Text("%s:%i", strFile.data(), zone.lineNo);
         TextFocused("Thread:", "Goat Thread");
         ImGui::SameLine();
         ImGui::TextDisabled("(0x%" PRIX32 ")", 0x12345);
@@ -895,7 +899,7 @@ bool DrawZoneFrames(TraceView& view)
     return hover;
 }
 
-const char* ShortenNamespace(const char* name)
+core::string_view ShortenNamespace(core::string_view name)
 {
     return name;
 }
@@ -943,12 +947,15 @@ float GetZoneThickness(const telemetry::ZoneData& ev)
     return 1.f;
 }
 
-const char* GetZoneName(const telemetry::ZoneData& ev)
+core::string_view GetZoneName(const TraceView& view, const telemetry::ZoneData& zone)
 {
-    X_UNUSED(ev);
-    return "meooow!";
+#if 0 // TODO: zone names are not currently set?
+    return view.strings.getString(zone.strIdxZone);
+#else
+    X_UNUSED(view, zone);
+    return "meooow!"_sv;
+#endif
 }
-
 
 uint32_t DarkenColor(uint32_t color)
 {
@@ -1083,7 +1090,7 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
         }
         else
         {
-            const char* zoneName = GetZoneName(zone);
+            auto zoneName = GetZoneName(view, zone);
             // TODO: 
             int dmul = 1; // zone.text.active ? 2 : 1;
 
@@ -1113,11 +1120,11 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
             }
 #endif
 
-            auto tsz = ImGui::CalcTextSize(zoneName);
+            auto tsz = ImGui::CalcTextSize(zoneName.begin(), zoneName.end());
             if (tsz.x > zsz)
             {
                 zoneName = ShortenNamespace(zoneName);
-                tsz = ImGui::CalcTextSize(zoneName);
+                tsz = ImGui::CalcTextSize(zoneName.begin(), zoneName.end());
             }
 
             const auto pr0 = (zone.startNano - view.zvStartNS_) * pxns;
@@ -1149,22 +1156,22 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
                 if (x < 0 || x > w - tsz.x)
                 {
                     ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
-                    DrawTextContrast(draw, wpos + ImVec2(std::max(std::max(0., px0), std::min(double(w - tsz.x), x)), offset), 0xFFFFFFFF, zoneName);
+                    DrawTextContrast(draw, wpos + ImVec2(std::max(std::max(0., px0), std::min(double(w - tsz.x), x)), offset), 0xFFFFFFFF, zoneName.begin(), zoneName.end());
                     ImGui::PopClipRect();
                 }
                 else if (zone.startNano == zone.endNano)
                 {
-                    DrawTextContrast(draw, wpos + ImVec2(px0 + (px1 - px0 - tsz.x) * 0.5, offset), 0xFFFFFFFF, zoneName);
+                    DrawTextContrast(draw, wpos + ImVec2(px0 + (px1 - px0 - tsz.x) * 0.5, offset), 0xFFFFFFFF, zoneName.begin(), zoneName.end());
                 }
                 else
                 {
-                    DrawTextContrast(draw, wpos + ImVec2(x, offset), 0xFFFFFFFF, zoneName);
+                    DrawTextContrast(draw, wpos + ImVec2(x, offset), 0xFFFFFFFF, zoneName.begin(), zoneName.end());
                 }
             }
             else
             {
                 ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
-                DrawTextContrast(draw, wpos + ImVec2((zone.startNano - view.zvStartNS_) * pxns, offset), 0xFFFFFFFF, zoneName);
+                DrawTextContrast(draw, wpos + ImVec2((zone.startNano - view.zvStartNS_) * pxns, offset), 0xFFFFFFFF, zoneName.begin(), zoneName.end());
                 ImGui::PopClipRect();
             }
 
