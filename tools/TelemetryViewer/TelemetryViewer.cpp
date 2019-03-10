@@ -917,6 +917,9 @@ uint32_t GetZoneHighlight(const telemetry::ZoneData& ev)
 
 int64_t GetZoneEnd(const telemetry::ZoneData& ev)
 {
+#if 1 // currently we don't support open zones.
+    return ev.endNano;
+#else
     auto ptr = &ev;
     for (;;)
     {
@@ -931,6 +934,7 @@ int64_t GetZoneEnd(const telemetry::ZoneData& ev)
 //        X_ASSERT_UNREACHABLE();
 //        return 0;
     }
+#endif
 }
 
 float GetZoneThickness(const telemetry::ZoneData& ev)
