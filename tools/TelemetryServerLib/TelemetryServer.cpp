@@ -593,8 +593,8 @@ void TraceDB::handleDataPacketZone(const DataPacketZone* pData)
 {
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
-    info.raw.idxFunction = pData->strIdxFunction.index;
-    info.raw.idxFile = pData->strIdxFile.index;
+    info.raw.idxFunction = pData->strIdxFunction;
+    info.raw.idxFile = pData->strIdxFile;
 
     uint64_t sourceInfo = info.packed;
 
@@ -622,7 +622,7 @@ void TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
     cmd.bind(2, static_cast<int32_t>(pData->threadID));
     cmd.bind(3, static_cast<int64_t>(pData->start));
     cmd.bind(4, static_cast<int64_t>(pData->end));
-    cmd.bind(5, static_cast<int32_t>(pData->strIdxDescrption.index));
+    cmd.bind(5, static_cast<int32_t>(pData->strIdxDescrption));
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -657,7 +657,7 @@ void TraceDB::handleDataPacketLockSetName(const DataPacketLockSetName* pData)
     auto& cmd = cmdInsertLockName;
     cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
     cmd.bind(2, static_cast<int64_t>(pData->time));
-    cmd.bind(3, static_cast<int32_t>(pData->strIdxName.index));
+    cmd.bind(3, static_cast<int32_t>(pData->strIdxName));
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -672,7 +672,7 @@ void TraceDB::handleDataPacketThreadSetName(const DataPacketThreadSetName* pData
     auto& cmd = cmdInsertThreadName;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
     cmd.bind(2, static_cast<int64_t>(pData->time));
-    cmd.bind(3, static_cast<int32_t>(pData->strIdxName.index));
+    cmd.bind(3, static_cast<int32_t>(pData->strIdxName));
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -1652,7 +1652,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
 
         int32_t numZones = 0;
 
-        sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, stackDepth FROM zones WHERE startTick >= ? AND startTick < ?");
+        sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, stackDepth, sourceInfoIdx FROM zones WHERE startTick >= ? AND startTick < ?");
         qry.bind(1, static_cast<int64_t>(start));
         qry.bind(2, static_cast<int64_t>(end));
 
@@ -1666,7 +1666,14 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
             zone.start = static_cast<uint64_t>(row.get<int64_t>(1));
             zone.end = static_cast<uint64_t>(row.get<int64_t>(2));
             zone.stackDepth = static_cast<tt_int8>(row.get<int32_t>(3));
-            // TODO: finish
+
+            TraceDB::PackedSourceInfo info;
+            info.packed = static_cast<uint64_t>(row.get<int64_t>(4));
+
+            zone.lineNo = info.raw.lineNo;
+            zone.strIdxFunction = info.raw.idxFunction;
+            zone.strIdxFile = info.raw.idxFile;
+            zone.strIdxZone = 0; // TODO: ?
 
             if (getCompressionBufferSpace(client) < sizeof(zone))
             {

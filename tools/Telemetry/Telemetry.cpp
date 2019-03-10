@@ -944,7 +944,7 @@ namespace
     }
 
     // Processing.
-    StringTableIndex GetStringId(PacketCompressor* pComp, const char* pStr)
+    tt_uint16 GetStringId(PacketCompressor* pComp, const char* pStr)
     {
         auto idx = StringTableGetIndex(pComp->strTable, pStr);
 
@@ -952,7 +952,7 @@ namespace
             writeStringCompressionBuffer(pComp, idx, pStr);
         }
 
-        return idx;
+        return idx.index;
     }
 
 

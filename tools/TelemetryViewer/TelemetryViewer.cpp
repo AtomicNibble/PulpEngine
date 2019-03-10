@@ -610,7 +610,7 @@ void ZoneTooltip(TraceView& view, const ZoneData& zone)
   
         ImGui::TextUnformatted("Function name");
         ImGui::Separator();
-        ImGui::Text("%s:%i", "FlyingGoat\\stu.cpp", 1337);
+        ImGui::Text("%s:%i", "FlyingGoat\\stu.cpp", zone.lineNo);
         TextFocused("Thread:", "Goat Thread");
         ImGui::SameLine();
         ImGui::TextDisabled("(0x%" PRIX32 ")", 0x12345);
@@ -1003,6 +1003,7 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
     while (it < zitend)
     {
         auto& zone = *it;
+
         const auto color = GetZoneColor(zone);
         const auto end = GetZoneEnd(zone);
         const auto zsz = std::max((end - zone.startNano) * pxns, pxns * 0.5);
@@ -1808,6 +1809,10 @@ bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBa
 
     if (view.segments.isEmpty()) {
         view.segments.emplace_back(g_arena);
+        view.segments.front().threads.reserve(12);
+        for (auto& thread : view.segments.front().threads) {
+            thread.zones.reserve(256'000);
+        }
     }
 
     auto& segment = view.segments.front();
@@ -1826,11 +1831,16 @@ bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBa
         auto& zone = pZones[i];
 
         ZoneData zd;
+        // sizeof(zd);
         zd.startTicks = zone.start;
         zd.endTicks = zone.end;
         zd.startNano = view.ticksToNano(zone.start);
         zd.endNano = view.ticksToNano(zone.end);
-        
+        zd.lineNo = zone.lineNo;
+        zd.strIdxFunction = zone.strIdxFunction;
+        zd.strIdxFile = zone.strIdxFile;
+        zd.strIdxZone = zone.strIdxZone;
+        zd.stackDepth = zone.stackDepth;
 
         // want a thread
         int32_t t;

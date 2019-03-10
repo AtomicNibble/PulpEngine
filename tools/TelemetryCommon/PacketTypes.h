@@ -199,10 +199,10 @@ struct DataPacketZone : public DataPacketBase
     tt_uint64 end;
 
     // 8
-    tt_uint16        lineNo;
-    StringTableIndex strIdxFunction;
-    StringTableIndex strIdxFile;
-    StringTableIndex strIdxZone;
+    tt_uint16 lineNo;
+    tt_uint16 strIdxFunction;
+    tt_uint16 strIdxFile;
+    tt_uint16 strIdxZone;
 };
 
 struct DataPacketTickInfo : public DataPacketBase
@@ -220,7 +220,7 @@ struct DataPacketTickInfo : public DataPacketBase
 struct DataPacketThreadSetName : public DataPacketBase
 {
     // 2
-    StringTableIndex strIdxName;
+    tt_uint16 strIdxName;
     // 4
     TtthreadId threadID;
     // 8
@@ -236,7 +236,7 @@ struct DataPacketCallStack : public DataPacketBase
 struct DataPacketLockSetName : public DataPacketBase
 {
     // 2
-    StringTableIndex strIdxName;
+    tt_uint16 strIdxName;
 
     // 8
     tt_uint64 time;
@@ -258,7 +258,7 @@ struct DataPacketLockTry : public DataPacketBase
     tt_uint64 lockHandle;
 
     // 2
-    StringTableIndex strIdxDescrption;
+    tt_uint16 strIdxDescrption;
 };
 
 

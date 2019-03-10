@@ -31,6 +31,15 @@ struct ZoneData
     // 16
     int64_t startTicks;
     int64_t endTicks;
+
+    // 8
+    int16_t lineNo;
+    int16_t strIdxFunction;
+    int16_t strIdxFile;
+    int16_t strIdxZone;
+
+    // 1 :/
+    int8_t stackDepth;
 };
 
 struct TickData
