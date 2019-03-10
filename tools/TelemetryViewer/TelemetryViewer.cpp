@@ -955,12 +955,7 @@ float GetZoneThickness(const telemetry::ZoneData& ev)
 
 core::string_view GetZoneName(const TraceView& view, const telemetry::ZoneData& zone)
 {
-#if 0 // TODO: zone names are not currently set?
     return view.strings.getString(zone.strIdxZone);
-#else
-    X_UNUSED(view, zone);
-    return "meooow!"_sv;
-#endif
 }
 
 uint32_t DarkenColor(uint32_t color)
