@@ -69,9 +69,6 @@ public:
     void handleDataPacketMemFree(const DataPacketMemFree* pData);
     void handleDataPacketCallStack(const DataPacketCallStack* pData);
 
-    bool getTicks(core::Array<DataPacketTickInfo>& ticks, int32_t startIdx, int32_t num);
-    bool getZones(core::Array<DataPacketZone>& zones, uint64_t tickBegin, uint64_t tickEnd);
-
 private:
     bool setPragmas(void);
     bool createTables(void);

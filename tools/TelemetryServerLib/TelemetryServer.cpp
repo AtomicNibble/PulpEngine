@@ -729,68 +729,6 @@ void TraceDB::handleDataPacketCallStack(const DataPacketCallStack* pData)
     // TODO: ...
 }
 
-
-bool TraceDB::getTicks(core::Array<DataPacketTickInfo>& ticks, int32_t startIdx, int32_t num)
-{
-    sql::SqlLiteQuery qry(con, "SELECT * FROM ticks LIMIT ? OFFSET ?");
-    qry.bind(1, num);
-    qry.bind(2, startIdx);
-
-    auto it = qry.begin();
-    if (it != qry.end()) {
-        auto row = *it;
-
-        DataPacketTickInfo tick;
-        auto id = row.get<int32_t>(0);
-        X_UNUSED(id);
-        tick.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
-        tick.start = static_cast<uint64_t>(row.get<int64_t>(2));
-        tick.end = static_cast<uint64_t>(row.get<int64_t>(3));
-        tick.startNano = static_cast<uint64_t>(row.get<int64_t>(4));
-        tick.endNano = static_cast<uint64_t>(row.get<int64_t>(5));
-
-        ticks.append(tick);
-    }
-
-    return true;
-}
-
-bool TraceDB::getZones(core::Array<DataPacketZone>& zones, uint64_t tickBegin, uint64_t tickEnd)
-{
-    sql::SqlLiteQuery qry(con, "SELECT threadId, start, end, sourceInfoIdx, stackDepth FROM zones WHERE start >= ? AND start < ?");
-    qry.bind(1, static_cast<int64_t>(tickBegin));
-    qry.bind(2, static_cast<int64_t>(tickEnd));
-
-    // how to send this back?
-    // hot like a potato
-    // do want to make new types for query api?
-    // not really but then we have this goaty prefix on all the types
-    // maybe it would be better to split it out :(
-
-    auto it = qry.begin();
-    if (it != qry.end()) {
-        auto row = *it;
-
-        PacketSourceInfo srcInfo;
-
-        DataPacketZone zone;
-        zone.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
-        zone.start = static_cast<uint64_t>(row.get<int64_t>(1));
-        zone.end = static_cast<uint64_t>(row.get<int64_t>(2));
-        srcInfo.packed = row.get<int32_t>(3);
-        zone.stackDepth = static_cast<uint8_t>(row.get<int32_t>(4));
-
-        zone.lineNo = srcInfo.raw.lineNo;
-        zone.strIdxFile.index = srcInfo.raw.idxFile;
-        zone.strIdxZone.index = srcInfo.raw.idxFunction;
-
-        zones.append(zone);
-    }
-
-    return true;
-}
-
-
 // --------------------------------
 
 core::UniquePointer<ITelemServer> createServer(core::MemoryArenaBase* arena)
