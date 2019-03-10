@@ -38,14 +38,14 @@ struct Trace
 {
     Trace() :
         ticksPerMicro(0),
-        ticksPerNano(0),
+        ticksPerMs(0),
         active(false)
     {}
 
     bool active;
     core::Guid guid;
     uint64_t ticksPerMicro;
-    uint64_t ticksPerNano;
+    uint64_t ticksPerMs;
     core::DateTimeStamp date;
     core::string hostName;
     core::string buildInfo;

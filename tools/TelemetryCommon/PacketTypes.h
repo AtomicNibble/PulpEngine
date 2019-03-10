@@ -121,7 +121,7 @@ struct ConnectionRequestHdr : public PacketBase
     tt_uint16 buildInfoLen;
     tt_uint16 cmdLineLen;
     tt_uint64 ticksPerMicro;
-    tt_uint64 ticksPerNano;
+    tt_uint64 ticksPerMs;
 };
 
 struct ConnectionRequestAcceptedHdr : public PacketBase

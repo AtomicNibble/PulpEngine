@@ -45,7 +45,6 @@ namespace
     }
 
     SysTimer gSysTimer;
-    tt_uint64 gTicksPerNano;
     tt_uint64 gTicksPerMicro;
 
     TELEM_INLINE tt_uint32 getThreadID(void)
@@ -140,7 +139,7 @@ namespace
         TraceThread* pThreadData;
         tt_int32 numThreadData;
 
-        tt_uint64 ticksPerNano;
+        tt_uint64 ticksPerMicro;
         tt_uint64 baseTicks;
         tt_uint64 baseNano;
 
@@ -212,7 +211,13 @@ namespace
 
     TELEM_INLINE tt_uint64 ticksToNano(TraceContext* pCtx, tt_uint64 tsc)
     {
-        return (tsc / pCtx->ticksPerNano);
+        // This is correct using ticksPerMicro to work out nano.
+        // TODO: switch this to ticksPerMs to get better accuracy.
+        const tt_uint64 ticksPerMicro = pCtx->ticksPerMicro;
+        const tt_uint64 whole = (tsc / ticksPerMicro) * 1000;
+        const tt_uint64 part = (tsc % ticksPerMicro) * 1000 / ticksPerMicro;
+
+        return whole + part;
     }
 
     TELEM_INLINE tt_uint64 getRelativeTicks(TraceContext* pCtx)
@@ -1269,7 +1274,6 @@ bool TelemInit(void)
         }
 
         gTicksPerMicro = (tsc_end - tsc_start) / (micro_end - micro_start);
-        gTicksPerNano = gTicksPerMicro / 1000;
     }
 
     return true;
@@ -1339,7 +1343,7 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     pCtx->socket = INV_SOCKET;
     pCtx->pThreadData = reinterpret_cast<TraceThread*>(pThreadDataBuf);
     pCtx->numThreadData = 0;
-    pCtx->ticksPerNano = gTicksPerNano;
+    pCtx->ticksPerMicro = gTicksPerMicro;
     pCtx->baseTicks = pCtx->lastTick;
     pCtx->baseNano = pCtx->lastTickNano;
 
@@ -1518,7 +1522,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     cr.buildInfoLen = static_cast<tt_uint16>(buildInfoLen);
     cr.cmdLineLen = static_cast<tt_uint16>(cmdLenUtf8);
     cr.ticksPerMicro = gTicksPerMicro;
-    cr.ticksPerNano = gTicksPerNano;
+    cr.ticksPerMs = gTicksPerMicro * 1000;
     cr.dataSize = sizeof(cr) + cr.appNameLen + cr.buildInfoLen + cr.cmdLineLen;
 
     sendDataToServer(pCtx, &cr, sizeof(cr));

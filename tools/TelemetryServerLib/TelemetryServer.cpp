@@ -908,7 +908,7 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
         loaded &= getMetaStr(db, "buildInfo", trace.buildInfo);
         loaded &= getMetaStr(db, "cmdLine", trace.cmdLine);
         loaded &= getMetaUInt64(db, "tickPerMicro", trace.ticksPerMicro);
-        loaded &= getMetaUInt64(db, "tickPerNano", trace.ticksPerNano);
+        loaded &= getMetaUInt64(db, "tickPerMs", trace.ticksPerMs);
 
         if (!loaded) {
             X_ERROR("TelemSrv", "Failed to load meta for: \"%s\"", trace.dbPath.c_str());
@@ -1153,7 +1153,7 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     trace.buildInfo.assign(pBuildInfoStr, pConReq->buildInfoLen);
     trace.cmdLine.assign(pCmdLineStr, pConReq->cmdLineLen);
     trace.ticksPerMicro = pConReq->ticksPerMicro;
-    trace.ticksPerNano = pConReq->ticksPerNano;
+    trace.ticksPerMs = pConReq->ticksPerMs;
 
     core::Path<> workingDir;
     if (!gEnv->pFileSys->getWorkingDirectory(workingDir)) {
@@ -1203,7 +1203,7 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     setMeta &= strm.db.setMeta("clientVer", client.clientVer.toString(verStr));
     setMeta &= strm.db.setMeta("serverVer", serverVer.toString(verStr));
     setMeta &= strm.db.setMeta<int64_t>("tickPerMicro", static_cast<int64_t>(trace.ticksPerMicro));
-    setMeta &= strm.db.setMeta<int64_t>("tickPerNano", static_cast<int64_t>(trace.ticksPerNano));
+    setMeta &= strm.db.setMeta<int64_t>("tickPerMs", static_cast<int64_t>(trace.ticksPerMs));
 
     if (!setMeta) {
         return false;
