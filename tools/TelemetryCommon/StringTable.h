@@ -83,7 +83,6 @@ inline void StringTableInsert(StringTable& st, const void* pPtr)
     st.pTable[index] = pPtr;
 }
 
-// Returns true if inserted
 inline StringTableIndex StringTableGetIndex(StringTable& st, const void* pPtr)
 {
     auto index = getIndex(st, pPtr);
