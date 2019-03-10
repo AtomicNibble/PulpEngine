@@ -108,18 +108,18 @@ public:
         tabName.set("Trace - Zones");
     }
 
-    int64_t GetTimeBegin(void) const 
+    X_INLINE int64_t GetTimeBegin(void) const
     {
         // we always start from zero?
         return 0;
     }
 
-    int64_t GetVisiableNS(void) const
+    X_INLINE int64_t GetVisiableNS(void) const
     {
         return zvEndNS_ - zvStartNS_;
     }
 
-    int64_t GetVisibleStartNS(void) const
+    X_INLINE int64_t GetVisibleStartNS(void) const
     {
         return zvStartNS_ - GetTimeBegin();
     }
