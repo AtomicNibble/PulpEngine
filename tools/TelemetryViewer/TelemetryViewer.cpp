@@ -256,11 +256,11 @@ namespace
         ImGui::PopStyleColor();
     }
 
-    void TextFocused(const char* label, const char* value)
+    void TextFocused(const char* label, const char* value, const char* end = nullptr)
     {
         TextDisabledUnformatted(label);
         ImGui::SameLine();
-        ImGui::TextUnformatted(value);
+        ImGui::TextUnformatted(value, end);
     }
 
     void TextFocusedFmt(const char* label, const char* pFmt, ...)
@@ -598,7 +598,7 @@ void HandleZoneViewMouse(TraceView& view, int64_t timespan, const ImVec2& wpos, 
     }
 }
 
-void ZoneTooltip(TraceView& view, const ZoneData& zone)
+void ZoneTooltip(TraceView& view, ZoneSegmentThread& thread, const ZoneData& zone)
 {
     X_UNUSED(view);
 
@@ -614,6 +614,7 @@ void ZoneTooltip(TraceView& view, const ZoneData& zone)
     auto strZone = view.strings.getString(zone.strIdxZone);
     auto strFunc = view.strings.getString(zone.strIdxFunction);
     auto strFile = view.strings.getString(zone.strIdxFile);
+    auto strThread = view.strings.getThreadName(thread.id);
 
     ImGui::BeginTooltip();
   
@@ -621,9 +622,9 @@ void ZoneTooltip(TraceView& view, const ZoneData& zone)
         ImGui::Separator();
         ImGui::TextUnformatted(strFunc.begin(), strFunc.end());
         ImGui::Text("%s:%i", strFile.data(), zone.lineNo);
-        TextFocused("Thread:", "TODO: ThreadName :)");
+        TextFocused("Thread:", strThread.begin(), strThread.end());
         ImGui::SameLine();
-        ImGui::TextDisabled("(0x%" PRIX32 ")", 0x12345);
+        ImGui::TextDisabled("(0x%" PRIX32 ")", thread.id);
         ImGui::Separator();
         TextFocused("Execution time:", TimeToString(strBuf, time));
         ImGui::SameLine();
@@ -1068,7 +1069,7 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
                 }
                 else
                 {
-                    ZoneTooltip(view, zone);
+                    ZoneTooltip(view, thread, zone);
 
                     if (ImGui::IsMouseClicked(2) && rend - zone.startNano > 0)
                     {
@@ -1178,7 +1179,7 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
 
             if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y)))
             {
-                ZoneTooltip(view, zone);
+                ZoneTooltip(view, thread, zone);
 
                 if (!view.zoomAnim_.active && ImGui::IsMouseClicked(2))
                 {
@@ -1296,10 +1297,10 @@ void DrawZones(TraceView& view)
 
                 }
 
-                const char* txt = "Thread";
-                const auto txtsz = ImGui::CalcTextSize(txt);
+                const auto txt = view.strings.getThreadName(thread.id);
+                const auto txtsz = ImGui::CalcTextSize(txt.begin(), txt.end());
 
-                draw->AddText(wpos + ImVec2(ty, offset), labelColor, txt);
+                draw->AddText(wpos + ImVec2(ty, offset), labelColor, txt.begin(), txt.end());
 
                 if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2(0, offset), wpos + ImVec2(ty + txtsz.x, offset + ty)))
                 {

@@ -139,6 +139,34 @@ public:
         lookUp[idx] = offset;
     }
 
+    core::string_view getThreadName(uint32_t threadId) const {
+
+        const TraceThreadNameData* pData = nullptr;
+
+        for (int32_t i = 0; i < threadNames.size(); i++)
+        {
+            auto& name = threadNames[i];
+            if (name.threadId == threadId)
+            {
+                if (!pData)
+                {
+                    pData = &name;
+                }
+                else
+                {
+                    // TODO: is this a better fit based on time?
+
+                }
+            }
+        }
+
+        if (pData) {
+            return getString(pData->strIdx);
+        }
+
+        return core::string_view("???");
+    }
+
     core::string_view getString(int16_t id) const {
 
         using namespace core::string_view_literals;
