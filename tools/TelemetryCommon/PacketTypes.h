@@ -29,8 +29,6 @@ struct PacketType
         ReqTraceZoneSegment,
 
         // These just respond with DataStreams.
-        ReqTraceTicks,
-        ReqTraceZones,
         ReqTraceStrings,
         ReqTraceThreadNames,
 

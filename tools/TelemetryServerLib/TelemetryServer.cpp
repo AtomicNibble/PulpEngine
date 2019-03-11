@@ -1013,12 +1013,6 @@ bool Server::processPacket(ClientConnection& client, uint8_t* pData)
             return handleQueryTraceInfo(client, pData);
         case PacketType::OpenTrace:
             return handleOpenTrace(client, pData);
-#if 0
-        case PacketType::ReqTraceTicks:
-            return handleReqTraceTicks(client, pData);
-        case PacketType::ReqTraceZones:
-            return handleReqTraceZones(client, pData);
-#endif
         case PacketType::ReqTraceZoneSegment:
             return handleReqTraceZoneSegment(client, pData);
         case PacketType::ReqTraceStrings:
@@ -1480,91 +1474,6 @@ T* addToCompressionBufferT(ClientConnection& client)
     return pPtr;
 }
 
-#if 0
-bool Server::handleReqTraceTicks(ClientConnection& client, uint8_t* pData)
-{
-    auto* pHdr = reinterpret_cast<const ReqTraceTicks*>(pData);
-    if (pHdr->type != PacketType::ReqTraceTicks) {
-        X_ASSERT_UNREACHABLE();
-    }
-
-    // MEOW
-    // load me the ticks!
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(client.traces.size())) {
-        return false;
-    }
-
-
-    auto& ts = client.traces[pHdr->handle];
-
-    // we just stream the rows to the client.
-    // if there is loads of data we just send multiple compressed packets.
-    const int32_t numToReturn = pHdr->num;
-
-    // this need to be based on time.
-
-
-    sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, startNano, endNano FROM ticks LIMIT ? OFFSET ?");
-    qry.bind(1, pHdr->tickIdx);
-    qry.bind(2, numToReturn);
-
-    auto it = qry.begin();
-    while (it != qry.end()) {
-        auto row = *it;
-
-        DataPacketTickInfo tick;
-        tick.type = DataStreamType::TickInfo;
-        tick.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
-        tick.start = static_cast<uint64_t>(row.get<int64_t>(1));
-        tick.end = static_cast<uint64_t>(row.get<int64_t>(2));
-        tick.startNano = static_cast<uint64_t>(row.get<int64_t>(3));
-        tick.endNano = static_cast<uint64_t>(row.get<int64_t>(4));
-
-        addToCompressionBuffer(client, &tick, sizeof(tick));
-    }
-
-    flushCompressionBuffer(client);
-    return true;
-}
-
-bool Server::handleReqTraceZones(ClientConnection& client, uint8_t* pData)
-{
-    auto* pHdr = reinterpret_cast<const ReqTraceZones*>(pData);
-    if (pHdr->type != PacketType::ReqTraceZones) {
-        X_ASSERT_UNREACHABLE();
-    }
-
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(client.traces.size())) {
-        return false;
-    }
-
-    auto& ts = client.traces[pHdr->handle];
-
-    sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, stackDepth FROM zones WHERE start >= ? AND end < ?");
-    qry.bind(1, pHdr->start);
-    qry.bind(2, pHdr->end);
-
-    auto it = qry.begin();
-    while (it != qry.end()) {
-        auto row = *it;
-
-        DataPacketZone zone;
-        zone.type = DataStreamType::Zone;
-        zone.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
-        zone.start = static_cast<uint64_t>(row.get<int64_t>(1));
-        zone.end = static_cast<uint64_t>(row.get<int64_t>(2));
-        zone.stackDepth = static_cast<tt_int8>(row.get<int32_t>(3));
-        // TODO: finish
-
-        addToCompressionBuffer(client, &zone, sizeof(zone));
-    }
-
-    flushCompressionBuffer(client);
-    return true;
-}
-#endif
 
 X_DISABLE_WARNING(4701) // potentially uninitialized local variable 'tick' used
 
