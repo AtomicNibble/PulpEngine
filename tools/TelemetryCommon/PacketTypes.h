@@ -27,13 +27,9 @@ struct PacketType
         OpenTraceResp,
 
         ReqTraceZoneSegment,
-
-        // These just respond with DataStreams.
         ReqTraceStrings,
         ReqTraceThreadNames,
-
-        //QuerySrvStats,
-        //QuerySrvStatsResp,
+        ReqTraceLockNames,
 
         Num
     };

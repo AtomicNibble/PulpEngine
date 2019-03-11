@@ -1908,6 +1908,64 @@ bool handleTraceStrings(Client& client, const DataPacketBaseViewer* pBase)
     return true;
 }
 
+bool handleTraceThreadNames(Client& client, const DataPacketBaseViewer* pBase)
+{
+    auto* pHdr = static_cast<const ReqTraceThreadNamesResp*>(pBase);
+    if (pHdr->type != DataStreamTypeViewer::TraceThreadNames) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    // shake it.
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+
+    TraceView* pView = client.viewForHandle(pHdr->handle);
+    if (!pView) {
+        return false;
+    }
+
+    auto& view = *pView;
+    auto& strings = view.strings;
+
+    strings.threadNames.reserve(strings.threadNames.size() + pHdr->num);
+
+    auto* pData = reinterpret_cast<const TraceThreadNameData*>(pHdr + 1);
+    for (int32_t i = 0; i < pHdr->num; i++)
+    {
+        strings.threadNames.append(pData[i]);
+    }
+
+    return true;
+}
+
+bool handleTraceLockNames(Client& client, const DataPacketBaseViewer* pBase)
+{
+    auto* pHdr = static_cast<const ReqTraceLockNamesResp*>(pBase);
+    if (pHdr->type != DataStreamTypeViewer::TraceLockNames) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    // shake it.
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+
+    TraceView* pView = client.viewForHandle(pHdr->handle);
+    if (!pView) {
+        return false;
+    }
+
+    auto& view = *pView;
+    auto& strings = view.strings;
+
+    strings.lockNames.reserve(strings.lockNames.size() + pHdr->num);
+
+    auto* pData = reinterpret_cast<const TraceLockNameData*>(pHdr + 1);
+    for (int32_t i = 0; i < pHdr->num; i++)
+    {
+        strings.lockNames.append(pData[i]);
+    }
+
+    return true;
+}
+
 
 bool handleDataSream(Client& client, uint8_t* pData)
 {
@@ -1956,6 +2014,10 @@ bool handleDataSream(Client& client, uint8_t* pData)
                 return handleTraceStringsInfo(client, pPacket);
             case DataStreamTypeViewer::TraceStrings:
                 return handleTraceStrings(client, pPacket);
+            case DataStreamTypeViewer::TraceThreadNames:
+                return handleTraceThreadNames(client, pPacket);
+            case DataStreamTypeViewer::TraceLockNames:
+                return handleTraceLockNames(client, pPacket);
 
             default:
                 X_NO_SWITCH_DEFAULT_ASSERT;
@@ -2079,6 +2141,18 @@ bool handleOpenTraceResp(Client& client, uint8_t* pData)
     rts.dataSize = sizeof(rts);
     rts.handle = pHdr->handle;
     client.sendDataToServer(&rts, sizeof(rts));
+
+    ReqTraceThreadNames rttn;
+    rttn.type = PacketType::ReqTraceThreadNames;
+    rttn.dataSize = sizeof(rttn);
+    rttn.handle = pHdr->handle;
+    client.sendDataToServer(&rttn, sizeof(rttn));
+
+    ReqTraceLockNames rtln;
+    rtln.type = PacketType::ReqTraceLockNames;
+    rtln.dataSize = sizeof(rtln);
+    rtln.handle = pHdr->handle;
+    client.sendDataToServer(&rtln, sizeof(rtln));
 
     ReqTraceZoneSegment rzs;
     rzs.type = PacketType::ReqTraceZoneSegment;

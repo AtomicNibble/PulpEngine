@@ -171,6 +171,8 @@ private:
     bool handleOpenTrace(ClientConnection& client, uint8_t* pData);
     bool handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData);
     bool handleReqTraceStrings(ClientConnection& client, uint8_t* pData);
+    bool handleReqTraceThreadNames(ClientConnection& client, uint8_t* pData);
+    bool handleReqTraceLockNames(ClientConnection& client, uint8_t* pData);
 
 private:
     core::MemoryArenaBase* arena_;

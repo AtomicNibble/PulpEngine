@@ -98,9 +98,13 @@ struct TraceStrings
     };
 
     using OffsetArr = core::Array<int32_t>;
+    using TraceThreadNameDataArr = core::Array<TraceThreadNameData>;
+    using TraceLockNameDataArr = core::Array<TraceLockNameData>;
 
 public:
     TraceStrings(core::MemoryArenaBase* arena) :
+        threadNames(arena),
+        lockNames(arena),
         idxOffset(0),
         lookUp(arena),
         data(arena)
@@ -156,6 +160,9 @@ public:
 
         return { pStr, static_cast<uint32_t>(pHdr->length) };
     }
+
+    TraceThreadNameDataArr threadNames;
+    TraceLockNameDataArr lockNames;
 
     int32_t idxOffset;
     OffsetArr lookUp;

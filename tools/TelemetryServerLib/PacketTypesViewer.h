@@ -16,6 +16,8 @@ struct DataStreamTypeViewer
         TraceZoneSegmentZones,
         TraceStringsInfo,
         TraceStrings,
+        TraceThreadNames,
+        TraceLockNames,
     };
 };
 
@@ -74,8 +76,17 @@ struct OpenTraceResp : public PacketBase
 struct ReqTraceStrings : public PacketBase
 {
     tt_int8 handle;
-
     // currently just return them all don't think it's every going to be that much data.
+};
+
+struct ReqTraceThreadNames : public PacketBase
+{
+    tt_int8 handle;
+};
+
+struct ReqTraceLockNames : public PacketBase
+{
+    tt_int8 handle;
 };
 
 struct ReqTraceZoneSegment : public PacketBase
@@ -123,6 +134,33 @@ struct TraceStringHdr
 {
     tt_uint16 id;
     tt_uint16 length;
+};
+
+
+struct ReqTraceThreadNamesResp : public DataPacketBaseViewer
+{
+    tt_int8 handle;
+    tt_int32 num;
+};
+
+struct TraceThreadNameData
+{
+    tt_uint32 threadId;
+    tt_int64  timeTicks;
+    tt_uint16 strIdx;
+};
+
+struct ReqTraceLockNamesResp : public DataPacketBaseViewer
+{
+    tt_int8 handle;
+    tt_int32 num;
+};
+
+struct TraceLockNameData
+{
+    tt_uint64 lockId;
+    tt_int64  timeTicks;
+    tt_uint16 strIdx;
 };
 
 

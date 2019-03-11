@@ -1013,10 +1013,15 @@ bool Server::processPacket(ClientConnection& client, uint8_t* pData)
             return handleQueryTraceInfo(client, pData);
         case PacketType::OpenTrace:
             return handleOpenTrace(client, pData);
+
         case PacketType::ReqTraceZoneSegment:
             return handleReqTraceZoneSegment(client, pData);
         case PacketType::ReqTraceStrings:
             return handleReqTraceStrings(client, pData);
+        case PacketType::ReqTraceThreadNames:
+            return handleReqTraceThreadNames(client, pData);
+        case PacketType::ReqTraceLockNames:
+            return handleReqTraceLockNames(client, pData);
         default:
             X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
             return false;
@@ -1427,6 +1432,11 @@ void flushCompressionBuffer(ClientConnection& client)
     }
 }
 
+X_INLINE int32_t getCompressionBufferSize(ClientConnection& client)
+{
+    return client.cmpBufEnd - client.cmpBufBegin;
+}
+
 X_INLINE int32_t getCompressionBufferSpace(ClientConnection& client)
 {
     const int32_t space = COMPRESSION_MAX_INPUT_SIZE - (client.cmpBufEnd - client.cmpBufBegin);
@@ -1726,6 +1736,119 @@ bool Server::handleReqTraceStrings(ClientConnection& client, uint8_t* pData)
     return true;
 }
 
+bool Server::handleReqTraceThreadNames(ClientConnection& client, uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const ReqTraceThreadNames*>(pData);
+    if (pHdr->type != PacketType::ReqTraceThreadNames) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    int32_t handle = pHdr->handle;
+    if (handle < 0 || handle >= static_cast<int32_t>(client.traces.size())) {
+        return false;
+    }
+
+    auto& ts = client.traces[pHdr->handle];
+
+    auto* pNamesHdr = addToCompressionBufferT<ReqTraceThreadNamesResp>(client);
+    core::zero_this(pNamesHdr);
+    pNamesHdr->type = DataStreamTypeViewer::TraceThreadNames;
+    pNamesHdr->handle = pHdr->handle;
+
+    int32_t num = 0;
+
+    sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, timeTicks, nameStrId FROM threadNames");
+
+    auto it = qry.begin();
+    for (; it != qry.end(); ++it) {
+        auto row = *it;
+
+        TraceThreadNameData tnd;
+        tnd.threadId = row.get<int32_t>(0);
+        tnd.timeTicks = row.get<int64_t>(1);
+        tnd.strIdx = safe_static_cast<uint16_t>(row.get<int32_t>(2));
+              
+        if (getCompressionBufferSpace(client) < sizeof(tnd)) {
+            pNamesHdr->num = num;
+            num = 0;
+
+            flushCompressionBuffer(client);
+
+            pNamesHdr = addToCompressionBufferT<ReqTraceThreadNamesResp>(client);
+            core::zero_this(pNamesHdr);
+            pNamesHdr->type = DataStreamTypeViewer::TraceThreadNames;
+            pNamesHdr->handle = pHdr->handle;
+        }
+
+        addToCompressionBuffer(client, &tnd, sizeof(tnd));
+
+        num++;
+    }
+
+    if (num) {
+        pNamesHdr->num = num;
+        flushCompressionBuffer(client);
+    }
+    
+    return true;
+}
+
+bool Server::handleReqTraceLockNames(ClientConnection& client, uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const ReqTraceLockNames*>(pData);
+    if (pHdr->type != PacketType::ReqTraceLockNames) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    int32_t handle = pHdr->handle;
+    if (handle < 0 || handle >= static_cast<int32_t>(client.traces.size())) {
+        return false;
+    }
+
+    auto& ts = client.traces[pHdr->handle];
+
+    auto* pNamesHdr = addToCompressionBufferT<ReqTraceLockNamesResp>(client);
+    core::zero_this(pNamesHdr);
+    pNamesHdr->type = DataStreamTypeViewer::TraceLockNames;
+    pNamesHdr->handle = pHdr->handle;
+
+    int32_t num = 0;
+
+    sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, timeTicks, nameStrId FROM lockNames");
+
+    auto it = qry.begin();
+    for (; it != qry.end(); ++it) {
+        auto row = *it;
+
+        TraceLockNameData lnd;
+        lnd.lockId = static_cast<uint64_t>(row.get<int64_t>(0));
+        lnd.timeTicks = row.get<int64_t>(1);
+        lnd.strIdx = safe_static_cast<uint16_t>(row.get<int32_t>(2));
+
+        if (getCompressionBufferSpace(client) < sizeof(lnd)) {
+            pNamesHdr->num = num;
+            num = 0;
+
+            flushCompressionBuffer(client);
+
+            pNamesHdr = addToCompressionBufferT<ReqTraceLockNamesResp>(client);
+            core::zero_this(pNamesHdr);
+            pNamesHdr->type = DataStreamTypeViewer::TraceLockNames;
+            pNamesHdr->handle = pHdr->handle;
+        }
+
+        addToCompressionBuffer(client, &lnd, sizeof(lnd));
+
+        num++;
+    }
+
+    if (num) {
+        pNamesHdr->num = num;
+        flushCompressionBuffer(client);
+    }
+
+    return true;
+}
 
 
 
