@@ -55,16 +55,20 @@ struct ZoneSegmentThread
 {
     // this is all the zones for this thread.
     using ZoneDataArr = core::ArrayGrowMultiply<ZoneData>;
+    using ZoneDataArrStackArr = core::FixedArray<ZoneDataArr, 16>; // TODO: use constant.
 
 public:
     ZoneSegmentThread(uint32_t id, core::MemoryArenaBase* arena) :
-        id(id),
-        zones(arena)
-    {}
+        id(id)
+        // zones(arena)
+    {
+        X_UNUSED(arena);
+    }
 
     uint32_t id;
 
-    ZoneDataArr zones;
+    // need zones for each depth
+    ZoneDataArrStackArr zonesPerDepth;
 };
 
 struct ZoneSegment
@@ -154,7 +158,7 @@ public:
                 }
                 else
                 {
-                    // TODO: is this a better fit based on time?
+                    // TODO: is this a better fit based on time? 
 
                 }
             }

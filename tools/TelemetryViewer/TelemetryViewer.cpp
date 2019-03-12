@@ -967,7 +967,7 @@ uint32_t DarkenColor(uint32_t color)
         (std::min<int>(0xFF, (((color & 0x000000FF)) * 2 / 3)));
 }
 
-int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double pxns, const ImVec2& wpos, 
+void DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double pxns, const ImVec2& wpos, 
     int _offset, int depth, float yMin, float yMax)
 {
 
@@ -976,18 +976,18 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
     // const auto delay = m_worker.GetDelay();
     // const auto resolution = m_worker.GetResolution();
 
-    auto& zones = thread.zones;
+    auto& zones = thread.zonesPerDepth[depth];
 
     // find the last zone that ends before view.
     auto it = std::lower_bound(zones.begin(), zones.end(), view.zvStartNS_, [](const auto& l, const auto& r) { return l.endNano < r; });
     if (it == zones.end()) {
-        return depth;
+        return;
     }
 
     // find the first zone that starts after view.
     const auto zitend = std::lower_bound(it, zones.end(), view.zvEndNS_, [](const auto& l, const auto& r) { return l.startNano < r; });
     if (it == zitend) {
-        return depth;
+        return;
     }
     
 #if false
@@ -1003,9 +1003,6 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
     auto draw = ImGui::GetWindowDrawList();
     const auto dsz = pxns;
     const auto rsz = pxns;
-
-    depth++;
-    int maxdepth = depth;
 
     StringBuf strBuf;
 
@@ -1096,31 +1093,6 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
             // TODO: 
             int dmul = 1; // zone.text.active ? 2 : 1;
 
-//            bool migration = false;
-
-#if 0
-
-            if (m_lastCpu != zone.cpu_start)
-            {
-                if (m_lastCpu >= 0)
-                {
-                    migration = true;
-                }
-                m_lastCpu = zone.cpu_start;
-            }
-
-            if (zone.child >= 0)
-            {
-                const auto d = DispatchZoneLevel(m_worker.GetZoneChildren(zone.child), hover, pxns, wpos, _offset, depth, yMin, yMax);
-                if (d > maxdepth) maxdepth = d;
-            }
-
-            if (zone.end >= 0 && m_lastCpu != zone.cpu_end)
-            {
-                m_lastCpu = zone.cpu_end;
-                migration = true;
-            }
-#endif
 
             auto tsz = ImGui::CalcTextSize(zoneName.begin(), zoneName.end());
             if (tsz.x > zsz)
@@ -1195,10 +1167,9 @@ int DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double
             ++it;
         }
     }
-    return maxdepth;
 }
 
-int DispatchZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double pxns, const ImVec2& wpos, 
+void DispatchZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double pxns, const ImVec2& wpos, 
     int _offset, int depth, float yMin, float yMax)
 {
     const auto ty = ImGui::GetFontSize();
@@ -1208,12 +1179,11 @@ int DispatchZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, do
     const auto yPos = wpos.y + offset;
     if (yPos + ostep >= yMin && yPos <= yMax)
     {
-        return DrawZoneLevel(view, thread, hover, pxns, wpos, _offset, depth, yMin, yMax);
+        DrawZoneLevel(view, thread, hover, pxns, wpos, _offset, depth, yMin, yMax);
     }
     else
     {
-        return 0;
-    //    return SkipZoneLevel(view, thread, hover, pxns, wpos, _offset, depth, yMin, yMax);
+    //  SkipZoneLevel(view, thread, hover, pxns, wpos, _offset, depth, yMin, yMax);
     }
 }
 
@@ -1335,12 +1305,16 @@ void DrawZones(TraceView& view)
 
             if (expanded)
             {
-            //    m_lastCpu = -1;
-
 #if 1
                 // if (m_drawZones)
                 {
-                    const auto depth = DispatchZoneLevel(view, thread, hover, pxns, wpos, offset, 0, yMin, yMax);
+                    auto depth = static_cast<int32_t>(thread.zonesPerDepth.size());
+
+                    for (int32_t stackDepth = 0; stackDepth < depth; stackDepth++)
+                    {
+                        DispatchZoneLevel(view, thread, hover, pxns, wpos, offset, stackDepth, yMin, yMax);
+                    }
+
                     offset += ostep * depth;
                 }
 #endif
@@ -1799,9 +1773,6 @@ bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBa
     if (view.segments.isEmpty()) {
         view.segments.emplace_back(g_arena);
         view.segments.front().threads.reserve(12);
-        for (auto& thread : view.segments.front().threads) {
-            thread.zones.reserve(256'000);
-        }
     }
 
     auto& segment = view.segments.front();
@@ -1847,7 +1818,13 @@ bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBa
         }
 
         auto& thread = threads[t];
-        thread.zones.push_back(zd);
+
+        // now we select thread.
+        while (thread.zonesPerDepth.size() <= zd.stackDepth) {
+            thread.zonesPerDepth.emplace_back(g_arena);
+        }
+
+        thread.zonesPerDepth[zd.stackDepth].push_back(zd);
     }
 
     return true;
