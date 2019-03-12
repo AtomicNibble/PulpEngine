@@ -911,19 +911,34 @@ core::string_view ShortenNamespace(core::string_view name)
     return name;
 }
 
-uint32_t GetZoneColor(const telemetry::ZoneData& ev)
+uint32_t GetZoneColor(int32_t threadIdx, int32_t depth)
 {
-    X_UNUSED(ev);
-    return 0xFFCC5555;
+    // i want like thread index and depth
+    const uint32_t threadColors[4][2] = {
+        { 0xFF8A5027, 0xFF724220 },
+        { 0xFF27508A, 0xFF204272 },
+        { 0xFF5A1EC3, 0xFF4A19A1 },
+        { 0xFF177254, 0xFF1C8B66 },
+    };
+
+    return threadColors[threadIdx][depth & 1];
 }
 
-uint32_t GetZoneHighlight(const telemetry::ZoneData& ev)
+uint32_t GetZoneHighlight(int32_t threadIdx, int32_t depth)
 {
-    const auto color = GetZoneColor(ev);
+    const auto color = GetZoneColor(threadIdx, depth);
     return 0xFF000000 |
         (std::min<int>(0xFF, (((color & 0x00FF0000) >> 16) + 25)) << 16) |
         (std::min<int>(0xFF, (((color & 0x0000FF00) >> 8) + 25)) << 8) |
         (std::min<int>(0xFF, (((color & 0x000000FF)) + 25)));
+}
+
+uint32_t DarkenColor(uint32_t color)
+{
+    return 0xFF000000 |
+        (std::min<int>(0xFF, (((color & 0x00FF0000) >> 16) * 2 / 3)) << 16) |
+        (std::min<int>(0xFF, (((color & 0x0000FF00) >> 8) * 2 / 3)) << 8) |
+        (std::min<int>(0xFF, (((color & 0x000000FF)) * 2 / 3)));
 }
 
 int64_t GetZoneEnd(const telemetry::ZoneData& ev)
@@ -954,20 +969,8 @@ float GetZoneThickness(const telemetry::ZoneData& ev)
     return 1.f;
 }
 
-core::string_view GetZoneName(const TraceView& view, const telemetry::ZoneData& zone)
-{
-    return view.strings.getString(zone.strIdxZone);
-}
-
-uint32_t DarkenColor(uint32_t color)
-{
-    return 0xFF000000 |
-        (std::min<int>(0xFF, (((color & 0x00FF0000) >> 16) * 2 / 3)) << 16) |
-        (std::min<int>(0xFF, (((color & 0x0000FF00) >> 8) * 2 / 3)) << 8) |
-        (std::min<int>(0xFF, (((color & 0x000000FF)) * 2 / 3)));
-}
-
-void DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double pxns, const ImVec2& wpos, 
+void DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, int32_t threadIdx, 
+    bool hover, double pxns, const ImVec2& wpos,
     int _offset, int depth, float yMin, float yMax)
 {
 
@@ -1006,11 +1009,14 @@ void DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, doubl
 
     StringBuf strBuf;
 
+    const auto color = GetZoneColor(threadIdx, depth);
+    const auto colorDark = DarkenColor(color);
+
     while (it < zitend)
     {
         auto& zone = *it;
-
-        const auto color = GetZoneColor(zone);
+        
+        // think i want to just do zone color based on thread and depth.
         const auto end = GetZoneEnd(zone);
         const auto zsz = std::max((end - zone.startNano) * pxns, pxns * 0.5);
 
@@ -1047,7 +1053,7 @@ void DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, doubl
                 draw, 
                 wpos + ImVec2(0, offset + ty / 2), std::max(px0, -10.0), 
                 std::min(std::max(px1, px0 + MinVisSize), double(w + 10)), ty / 4, 
-                DarkenColor(color));
+                colorDark);
      
             if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2(std::max(px0, -10.0), offset), wpos + ImVec2(std::min(std::max(px1, px0 + MinVisSize), double(w + 10)), offset + ty)))
             {
@@ -1089,7 +1095,7 @@ void DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, doubl
         }
         else
         {
-            auto zoneName = GetZoneName(view, zone);
+            auto zoneName = view.strings.getString(zone.strIdxZone);
             // TODO: 
             int dmul = 1; // zone.text.active ? 2 : 1;
 
@@ -1107,7 +1113,7 @@ void DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, doubl
             const auto px1 = std::max({ std::min(pr1, double(w + 10)), px0 + pxns * 0.5, px0 + MinVisSize });
             
             draw->AddRectFilled(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y), color);
-            draw->AddRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y), GetZoneHighlight(zone), 0.f, -1, GetZoneThickness(zone));
+            draw->AddRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y), GetZoneHighlight(threadIdx, depth), 0.f, -1, GetZoneThickness(zone));
             
             if (dsz * dmul >= MinVisSize)
             {
@@ -1169,7 +1175,8 @@ void DrawZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, doubl
     }
 }
 
-void DispatchZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, double pxns, const ImVec2& wpos, 
+void DispatchZoneLevel(TraceView& view, ZoneSegmentThread& thread, int32_t threadIdx,
+    bool hover, double pxns, const ImVec2& wpos, 
     int _offset, int depth, float yMin, float yMax)
 {
     const auto ty = ImGui::GetFontSize();
@@ -1179,12 +1186,12 @@ void DispatchZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, d
     const auto yPos = wpos.y + offset;
     if (yPos + ostep >= yMin && yPos <= yMax)
     {
-        DrawZoneLevel(view, thread, hover, pxns, wpos, _offset, depth, yMin, yMax);
+        DrawZoneLevel(view, thread, threadIdx, hover, pxns, wpos, _offset, depth, yMin, yMax);
     }
     else
     {
         // do we need this?
-        // SkipZoneLevel(view, thread, hover, pxns, wpos, _offset, depth, yMin, yMax);
+        // SkipZoneLevel(view, thread, threadIdx, hover, pxns, wpos, _offset, depth, yMin, yMax);
     }
 }
 
@@ -1245,9 +1252,9 @@ void DrawZones(TraceView& view)
     {
         auto& segment = view.segments.front();
 
-        for (auto& thread : segment.threads)
+        for (int32_t threadIdx =0; static_cast<int32_t>(threadIdx<segment.threads.size()); threadIdx++)
         {
-            X_UNUSED(thread);
+            auto& thread = segment.threads[threadIdx];
 
             bool expanded = true;
 
@@ -1313,7 +1320,7 @@ void DrawZones(TraceView& view)
 
                     for (int32_t stackDepth = 0; stackDepth < depth; stackDepth++)
                     {
-                        DispatchZoneLevel(view, thread, hover, pxns, wpos, offset, stackDepth, yMin, yMax);
+                        DispatchZoneLevel(view, thread, threadIdx, hover, pxns, wpos, offset, stackDepth, yMin, yMax);
                     }
 
                     offset += ostep * depth;
@@ -2432,7 +2439,7 @@ bool run(Client& client)
 
     SDL_DisplayMode current;
     SDL_GetCurrentDisplayMode(0, &current);
-    auto pWindow = SDL_CreateWindow("TelemetryViewer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    auto pWindow = SDL_CreateWindow("TelemetryViewer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1680, 1050, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     SDL_GLContext gl_context = SDL_GL_CreateContext(pWindow);
     SDL_GL_SetSwapInterval(1); // Enable vsync
 
