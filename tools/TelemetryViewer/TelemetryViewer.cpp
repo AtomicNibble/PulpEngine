@@ -1183,7 +1183,8 @@ void DispatchZoneLevel(TraceView& view, ZoneSegmentThread& thread, bool hover, d
     }
     else
     {
-    //  SkipZoneLevel(view, thread, hover, pxns, wpos, _offset, depth, yMin, yMax);
+        // do we need this?
+        // SkipZoneLevel(view, thread, hover, pxns, wpos, _offset, depth, yMin, yMax);
     }
 }
 
