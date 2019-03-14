@@ -57,18 +57,23 @@ struct ZoneSegmentThread
     using ZoneDataArr = core::ArrayGrowMultiply<ZoneData>;
     using ZoneDataArrStackArr = core::FixedArray<ZoneDataArr, 16>; // TODO: use constant.
 
+    using LockStateArr = core::ArrayGrowMultiply<DataPacketLockState>;
+    using LockTryArr = core::ArrayGrowMultiply<DataPacketLockTry>;
+
 public:
     ZoneSegmentThread(uint32_t id, core::MemoryArenaBase* arena) :
-        id(id)
-        // zones(arena)
+        id(id),
+        lockStats(arena),
+        lockTry(arena)
     {
         X_UNUSED(arena);
     }
 
     uint32_t id;
-
-    // need zones for each depth
+    
     ZoneDataArrStackArr zonesPerDepth;
+    LockStateArr lockStats;
+    LockTryArr lockTry;
 };
 
 struct ZoneSegment
@@ -92,6 +97,7 @@ public:
 
     TickDataArr ticks;
     ZoneSegmentThreadArr threads;
+
 };
 
 struct TraceStrings

@@ -14,6 +14,8 @@ struct DataStreamTypeViewer
     {
         TraceZoneSegmentTicks = DataStreamType::Num,
         TraceZoneSegmentZones,
+        TraceZoneSegmentLockStates,
+        TraceZoneSegmentLockTry,
         TraceStringsInfo,
         TraceStrings,
         TraceThreadNames,
@@ -115,6 +117,18 @@ struct ReqTraceZoneSegmentRespTicks : public DataPacketBaseViewer
 };
 
 struct ReqTraceZoneSegmentRespZones : public DataPacketBaseViewer
+{
+    tt_int8 handle;
+    tt_int32 num;
+};
+
+struct ReqTraceZoneSegmentRespLockTry : public DataPacketBaseViewer
+{
+    tt_int8 handle;
+    tt_int32 num;
+};
+
+struct ReqTraceZoneSegmentRespLockStates : public DataPacketBaseViewer
 {
     tt_int8 handle;
     tt_int32 num;

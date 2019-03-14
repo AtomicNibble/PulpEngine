@@ -1786,10 +1786,8 @@ bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBa
     auto& segment = view.segments.front();
     auto& threads = segment.threads;
 
-    core::FixedArray<uint32_t, 16> threadIDs;
-
-    for (auto& thread : threads)
-    {
+    core::FixedArray<uint32_t, MAX_ZONE_THREADS> threadIDs;
+    for (auto& thread : threads) {
         threadIDs.push_back(thread.id);
     }
 
@@ -1833,6 +1831,103 @@ bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBa
         }
 
         thread.zonesPerDepth[zd.stackDepth].push_back(zd);
+    }
+
+    return true;
+}
+
+bool handleTraceZoneSegmentLockStates(Client& client, const DataPacketBaseViewer* pBase)
+{
+    auto* pHdr = static_cast<const ReqTraceZoneSegmentRespLockStates*>(pBase);
+    if (pHdr->type != DataStreamTypeViewer::TraceZoneSegmentLockStates) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+
+    TraceView* pView = client.viewForHandle(pHdr->handle);
+    if (!pView) {
+        return false;
+    }
+
+    auto& view = *pView;
+    auto& segment = view.segments.front();
+    auto& threads = segment.threads;
+
+    core::FixedArray<uint32_t, MAX_ZONE_THREADS> threadIDs;
+    for (auto& thread : threads) {
+        threadIDs.push_back(thread.id);
+    }
+
+    // states!
+    auto* pStates = reinterpret_cast<const DataPacketLockState*>(pHdr + 1);
+    for (int32 i = 0; i < pHdr->num; i++)
+    {
+        auto& state = pStates[i];
+
+        int32_t t;
+        for (t = 0; t < threadIDs.size(); t++) {
+            if (threadIDs[t] == state.threadID) {
+                break;
+            }
+        }
+
+        if (t == threadIDs.size()) {
+            threads.emplace_back(state.threadID, g_arena);
+            threadIDs.push_back(state.threadID);
+        }
+
+        auto& thread = threads[t];
+        thread.lockStats.append(state);
+    }
+
+    return true;
+}
+
+
+bool handleTraceZoneSegmentLockTry(Client& client, const DataPacketBaseViewer* pBase)
+{
+    auto* pHdr = static_cast<const ReqTraceZoneSegmentRespLockTry*>(pBase);
+    if (pHdr->type != DataStreamTypeViewer::TraceZoneSegmentLockTry) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+
+    TraceView* pView = client.viewForHandle(pHdr->handle);
+    if (!pView) {
+        return false;
+    }
+
+    auto& view = *pView;
+    auto& segment = view.segments.front();
+    auto& threads = segment.threads;
+
+    core::FixedArray<uint32_t, MAX_ZONE_THREADS> threadIDs;
+    for (auto& thread : threads) {
+        threadIDs.push_back(thread.id);
+    }
+
+    // states!
+    auto* pTry = reinterpret_cast<const DataPacketLockTry*>(pHdr + 1);
+    for (int32 i = 0; i < pHdr->num; i++)
+    {
+        auto& lockTry = pTry[i];
+
+        int32_t t;
+        for (t = 0; t < threadIDs.size(); t++) {
+            if (threadIDs[t] == lockTry.threadID) {
+                break;
+            }
+        }
+
+        if (t == threadIDs.size()) {
+            threads.emplace_back(lockTry.threadID, g_arena);
+            threadIDs.push_back(lockTry.threadID);
+        }
+
+        auto& thread = threads[t];
+        thread.lockTry.append(lockTry);
     }
 
     return true;
@@ -2021,6 +2116,10 @@ bool handleDataSream(Client& client, uint8_t* pData)
                 return handleTraceZoneSegmentTicks(client, pPacket);
             case DataStreamTypeViewer::TraceZoneSegmentZones:
                 return handleTraceZoneSegmentZones(client, pPacket);
+            case DataStreamTypeViewer::TraceZoneSegmentLockStates:
+                return handleTraceZoneSegmentLockStates(client, pPacket);
+            case DataStreamTypeViewer::TraceZoneSegmentLockTry:
+                return handleTraceZoneSegmentLockTry(client, pPacket);
 
             case DataStreamTypeViewer::TraceLocks:
                 return handleTraceLocks(client, pPacket);
