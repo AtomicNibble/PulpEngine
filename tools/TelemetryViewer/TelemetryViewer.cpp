@@ -914,14 +914,19 @@ core::string_view ShortenNamespace(core::string_view name)
 uint32_t GetZoneColor(int32_t threadIdx, int32_t depth)
 {
     // i want like thread index and depth
-    const uint32_t threadColors[4][2] = {
+    const uint32_t threadColors[8][2] = {
+        { 0xFF8A5027, 0xFF724220 },
+        { 0xFF27508A, 0xFF204272 },
+        { 0xFF5A1EC3, 0xFF4A19A1 },
+        { 0xFF177254, 0xFF1C8B66 },
+        // TODO: set colors.
         { 0xFF8A5027, 0xFF724220 },
         { 0xFF27508A, 0xFF204272 },
         { 0xFF5A1EC3, 0xFF4A19A1 },
         { 0xFF177254, 0xFF1C8B66 },
     };
 
-    return threadColors[threadIdx][depth & 1];
+    return threadColors[threadIdx & 7][depth & 1];
 }
 
 uint32_t GetZoneHighlight(int32_t threadIdx, int32_t depth)
