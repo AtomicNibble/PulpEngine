@@ -27,6 +27,7 @@ struct PacketType
         OpenTraceResp,
 
         ReqTraceZoneSegment,
+        ReqTraceLocks,
         ReqTraceStrings,
         ReqTraceThreadNames,
         ReqTraceLockNames,

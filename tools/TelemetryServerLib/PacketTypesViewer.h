@@ -17,6 +17,7 @@ struct DataStreamTypeViewer
         TraceStringsInfo,
         TraceStrings,
         TraceThreadNames,
+        TraceLocks,
         TraceLockNames,
     };
 };
@@ -89,6 +90,11 @@ struct ReqTraceLockNames : public PacketBase
     tt_int8 handle;
 };
 
+struct ReqTraceLocks : public PacketBase
+{
+    tt_int8 handle;
+};
+
 struct ReqTraceZoneSegment : public PacketBase
 {
     tt_int8 handle;
@@ -113,6 +119,18 @@ struct ReqTraceZoneSegmentRespZones : public DataPacketBaseViewer
     tt_int8 handle;
     tt_int32 num;
 };
+
+struct ReqTraceLocksResp : public DataPacketBaseViewer
+{
+    tt_int8 handle;
+    tt_int32 num;
+};
+
+struct TraceLockData
+{
+    tt_uint64 id;
+};
+
 
 struct ReqTraceStringsRespInfo : public DataPacketBaseViewer
 {

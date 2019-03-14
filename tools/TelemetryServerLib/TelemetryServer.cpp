@@ -1016,6 +1016,8 @@ bool Server::processPacket(ClientConnection& client, uint8_t* pData)
 
         case PacketType::ReqTraceZoneSegment:
             return handleReqTraceZoneSegment(client, pData);
+        case PacketType::ReqTraceLocks:
+            return handleReqTraceLocks(client, pData);
         case PacketType::ReqTraceStrings:
             return handleReqTraceStrings(client, pData);
         case PacketType::ReqTraceThreadNames:
@@ -1643,6 +1645,58 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
 }
 
 X_ENABLE_WARNING(4701)
+
+bool Server::handleReqTraceLocks(ClientConnection& client, uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const ReqTraceLocks*>(pData);
+    if (pHdr->type != PacketType::ReqTraceLocks) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    int32_t handle = pHdr->handle;
+    if (handle < 0 || handle >= static_cast<int32_t>(client.traces.size())) {
+        return false;
+    }
+
+    auto& ts = client.traces[pHdr->handle];
+
+    auto* pLocksHdr = addToCompressionBufferT<ReqTraceLocksResp>(client);
+    pLocksHdr->type = DataStreamTypeViewer::TraceLocks;
+    pLocksHdr->handle = pHdr->handle;
+
+    int32_t num = 0;
+
+    sql::SqlLiteQuery qry(ts.db.con, "SELECT id FROM locks");
+
+    auto it = qry.begin();
+    for (; it != qry.end(); ++it) {
+        auto row = *it;
+
+        TraceLockData tld;
+        tld.id = static_cast<uint64_t>(row.get<int64_t>(0));
+
+        if (getCompressionBufferSpace(client) < sizeof(tld)) {
+            pLocksHdr->num = num;
+            num = 0;
+
+            flushCompressionBuffer(client);
+
+            pLocksHdr = addToCompressionBufferT<ReqTraceLocksResp>(client);
+            pLocksHdr->type = DataStreamTypeViewer::TraceLocks;
+            pLocksHdr->handle = pHdr->handle;
+        }
+
+        addToCompressionBuffer(client, &tld, sizeof(tld));
+
+        num++;
+    }
+
+    if (num) {
+        pLocksHdr->num = num;
+        flushCompressionBuffer(client);
+    }
+    return true;
+}
 
 bool Server::handleReqTraceStrings(ClientConnection& client, uint8_t* pData)
 {
