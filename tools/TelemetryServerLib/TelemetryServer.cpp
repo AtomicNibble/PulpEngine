@@ -1645,8 +1645,105 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
         }
     }
 
-    // TODO: needed?
-    flushCompressionBuffer(client);
+    {
+        sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, threadId, startTick, endTick, descriptionStrId FROM lockTry WHERE startTick >= ? AND startTick < ?");
+        qry.bind(1, static_cast<int64_t>(start));
+        qry.bind(2, static_cast<int64_t>(end));
+
+        auto* pLockTryHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespLockTry>(client);
+        pLockTryHdr->type = DataStreamTypeViewer::TraceZoneSegmentLockTry;
+        pLockTryHdr->num = 0;
+        pLockTryHdr->handle = pHdr->handle;
+
+        int32_t numLockTry = 0;
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            DataPacketLockTry lockTry;
+            lockTry.type = DataStreamType::LockTry;
+            lockTry.lockHandle = static_cast<uint64_t>(row.get<int64_t>(0));
+            lockTry.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
+            lockTry.start = static_cast<uint64_t>(row.get<int64_t>(2));
+            lockTry.end = static_cast<uint64_t>(row.get<int64_t>(3));
+            lockTry.strIdxDescrption = static_cast<uint16_t>(row.get<int32_t>(4) & 0xFFFF);
+
+            if (getCompressionBufferSpace(client) < sizeof(lockTry))
+            {
+                // flush etc and add new block header.
+                pLockTryHdr->num = numLockTry;
+                flushCompressionBuffer(client);
+
+                pLockTryHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespLockTry>(client);
+                pLockTryHdr->type = DataStreamTypeViewer::TraceZoneSegmentLockTry;
+                pLockTryHdr->num = 0;
+                pLockTryHdr->handle = pHdr->handle;
+
+                numLockTry = 0;
+            }
+
+            addToCompressionBuffer(client, &lockTry, sizeof(lockTry));
+
+            ++numLockTry;
+        }
+
+        if (numLockTry) {
+            pLockTryHdr->num = numLockTry;
+            flushCompressionBuffer(client);
+        }
+    }
+
+    {
+        // lockStates?
+        sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, threadId, timeTicks, state FROM lockStates WHERE timeTicks >= ? AND timeTicks < ?");
+        qry.bind(1, static_cast<int64_t>(start));
+        qry.bind(2, static_cast<int64_t>(end));
+
+        auto* pLockStateHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespLockStates>(client);
+        pLockStateHdr->type = DataStreamTypeViewer::TraceZoneSegmentLockStates;
+        pLockStateHdr->num = 0;
+        pLockStateHdr->handle = pHdr->handle;
+
+        int32_t numLockState = 0;
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            DataPacketLockState lockState;
+            lockState.type = DataStreamType::LockState;
+            lockState.lockHandle = static_cast<uint64_t>(row.get<int64_t>(0));
+            lockState.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
+            lockState.time = static_cast<uint64_t>(row.get<int64_t>(2));
+            lockState.state = static_cast<TtLockState>(row.get<int32_t>(3));
+
+            if (getCompressionBufferSpace(client) < sizeof(lockState))
+            {
+                // flush etc and add new block header.
+                pLockStateHdr->num = numLockState;
+                flushCompressionBuffer(client);
+
+                pLockStateHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespLockStates>(client);
+                pLockStateHdr->type = DataStreamTypeViewer::TraceZoneSegmentLockStates;
+                pLockStateHdr->num = 0;
+                pLockStateHdr->handle = pHdr->handle;
+
+                numLockState = 0;
+            }
+
+            addToCompressionBuffer(client, &lockState, sizeof(lockState));
+
+            ++numLockState;
+        }
+
+        if (numLockState) {
+            pLockStateHdr->num = numLockState;
+            flushCompressionBuffer(client);
+        }
+    }
+
+    X_ASSERT(getCompressionBufferSize(client) == 0, "Compression buffer is not empty")();
     return true;
 }
 
@@ -1791,8 +1888,7 @@ bool Server::handleReqTraceStrings(ClientConnection& client, uint8_t* pData)
         }
     }
 
-    // TODO: needed?
-    flushCompressionBuffer(client);
+    X_ASSERT(getCompressionBufferSize(client) == 0, "Compression buffer is not empty")();
     return true;
 }
 
