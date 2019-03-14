@@ -1838,6 +1838,32 @@ bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBa
     return true;
 }
 
+bool handleTraceLocks(Client& client, const DataPacketBaseViewer* pBase)
+{
+    auto* pHdr = static_cast<const ReqTraceLocksResp*>(pBase);
+    if (pHdr->type != DataStreamTypeViewer::TraceLocks) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    // shake it.
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+
+    TraceView* pView = client.viewForHandle(pHdr->handle);
+    if (!pView) {
+        return false;
+    }
+
+    auto& view = *pView;
+
+    auto* pLocks = reinterpret_cast<const TraceLockData*>(pHdr + 1);
+    for (int32 i = 0; i < pHdr->num; i++) {
+        view.locks.push_back(pLocks[i]);
+    }
+
+    return true;
+}
+
+
 bool handleTraceStringsInfo(Client& client, const DataPacketBaseViewer* pBase)
 {
     auto* pHdr = static_cast<const ReqTraceStringsRespInfo*>(pBase);
@@ -1996,6 +2022,8 @@ bool handleDataSream(Client& client, uint8_t* pData)
             case DataStreamTypeViewer::TraceZoneSegmentZones:
                 return handleTraceZoneSegmentZones(client, pPacket);
 
+            case DataStreamTypeViewer::TraceLocks:
+                return handleTraceLocks(client, pPacket);
             case DataStreamTypeViewer::TraceStringsInfo:
                 return handleTraceStringsInfo(client, pPacket);
             case DataStreamTypeViewer::TraceStrings:
@@ -2139,6 +2167,12 @@ bool handleOpenTraceResp(Client& client, uint8_t* pData)
     rtln.dataSize = sizeof(rtln);
     rtln.handle = pHdr->handle;
     client.sendDataToServer(&rtln, sizeof(rtln));
+
+    ReqTraceLocks trl;
+    trl.type = PacketType::ReqTraceLocks;
+    trl.dataSize = sizeof(trl);
+    trl.handle = pHdr->handle;
+    client.sendDataToServer(&trl, sizeof(trl));
 
     ReqTraceZoneSegment rzs;
     rzs.type = PacketType::ReqTraceZoneSegment;

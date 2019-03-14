@@ -205,6 +205,7 @@ public:
 struct TraceView
 {
     using ZoneSegmentArr = core::Array<ZoneSegment>;
+    using TraceLockDataArr = core::Array<TraceLockData>;
 
 public:
     TraceView(core::Guid guid, uint64_t ticksPerMicro, TraceStats stats, int8_t handle, core::MemoryArenaBase* arena) :
@@ -213,6 +214,7 @@ public:
         stats(stats),
         handle(handle),
         segments(arena),
+        locks(arena),
         strings(arena)
     {
         open_ = true;
@@ -280,6 +282,7 @@ public:
     Animation zoomAnim_;
 
     ZoneSegmentArr segments;
+    TraceLockDataArr locks;
     TraceStrings strings;
 };
 
