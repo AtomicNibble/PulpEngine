@@ -406,6 +406,12 @@ bool TraceDB::createIndexes(void)
         CREATE INDEX IF NOT EXISTS "ticks_start" ON "ticks" (
             "startTick"	ASC
         );
+        CREATE INDEX IF NOT EXISTS "lockTry_start" ON "lockTry" (
+            "startTick"	ASC
+        );
+        CREATE INDEX IF NOT EXISTS "lockStates_time" ON "lockStates" (
+            "timeTicks"	ASC
+        );
     )");
 
     auto res = cmd.execute();
