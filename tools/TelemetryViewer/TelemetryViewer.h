@@ -51,19 +51,28 @@ struct TickData
     int64_t endNano;
 };
 
+struct LockState
+{
+    int64_t time;
+    int64_t timeNano;
+
+    uint64_t lockHandle;
+    TtLockState state;
+};
+
 struct ZoneSegmentThread
 {
     // this is all the zones for this thread.
     using ZoneDataArr = core::ArrayGrowMultiply<ZoneData>;
     using ZoneDataArrStackArr = core::FixedArray<ZoneDataArr, 16>; // TODO: use constant.
 
-    using LockStateArr = core::ArrayGrowMultiply<DataPacketLockState>;
+    using LockStateArr = core::ArrayGrowMultiply<LockState>;
     using LockTryArr = core::ArrayGrowMultiply<DataPacketLockTry>;
 
 public:
     ZoneSegmentThread(uint32_t id, core::MemoryArenaBase* arena) :
         id(id),
-        lockStats(arena),
+        lockStates(arena),
         lockTry(arena)
     {
         X_UNUSED(arena);
@@ -72,7 +81,7 @@ public:
     uint32_t id;
     
     ZoneDataArrStackArr zonesPerDepth;
-    LockStateArr lockStats;
+    LockStateArr lockStates;
     LockTryArr lockTry;
 };
 

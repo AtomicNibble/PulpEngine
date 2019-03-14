@@ -1878,7 +1878,14 @@ bool handleTraceZoneSegmentLockStates(Client& client, const DataPacketBaseViewer
         }
 
         auto& thread = threads[t];
-        thread.lockStats.append(state);
+
+        LockState ls;
+        ls.time = state.time;
+        ls.timeNano = view.ticksToNano(state.time);
+        ls.lockHandle = state.lockHandle;
+        ls.state = state.state;
+
+        thread.lockStates.append(ls);
     }
 
     return true;
