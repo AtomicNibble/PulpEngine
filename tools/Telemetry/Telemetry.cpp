@@ -252,7 +252,7 @@ namespace
     }
 
 
-    TraceLock* getLock(TraceThread* pThread, const void* pLockPtr)
+    TraceLock* getLockAndClearSlot(TraceThread* pThread, const void* pLockPtr)
     {
         TraceLock* pLock = nullptr;
 
@@ -261,6 +261,8 @@ namespace
         {
             if (locks.pLockPtr[i] == pLockPtr)
             {
+                locks.pLockPtr[i] = nullptr; // clear the slot.
+
                 pLock = &locks.locks[i];
                 // TODO: is breaking faster here?
                 // I'm guessing not as long as this loop is unrolled.
@@ -1804,7 +1806,7 @@ void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult resul
         return;
     }
 
-    auto* pLock = getLock(pThreadData, pPtr);
+    auto* pLock = getLockAndClearSlot(pThreadData, pPtr);
     if (!pLock) {
         return;
     }
@@ -1824,7 +1826,7 @@ void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPt
         return;
     }
 
-    auto* pLock = getLock(pThreadData, pPtr);
+    auto* pLock = getLockAndClearSlot(pThreadData, pPtr);
     if (!pLock) {
         return;
     }
