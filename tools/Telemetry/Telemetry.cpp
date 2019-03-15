@@ -1097,6 +1097,8 @@ namespace
 
         auto* pCtx = reinterpret_cast<TraceContext*>(pParam);
 
+        ttSetThreadName(contextToHandle(pCtx), getThreadID(), "Telem - Worker");
+
         tt_uint8 stringTableBuf[STRING_TABLE_BUF_SIZE];
         tt_uint8 packetBuff[MAX_PACKET_SIZE];
 
