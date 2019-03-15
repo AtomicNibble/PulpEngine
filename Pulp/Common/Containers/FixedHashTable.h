@@ -184,7 +184,9 @@ protected:
 template<typename Key, typename Value, class Hash, class KeyEqual>
 class FixedHashTableOwningPolicy : public FixedHashTableBase<Key, Value, Hash, KeyEqual>
 {
+public:
     using BaseT = FixedHashTableBase<Key, Value, Hash, KeyEqual>;
+    using size_type = typename BaseT::size_type;
 
 public:
     FixedHashTableOwningPolicy(core::MemoryArenaBase* arena, size_type maxItem);
@@ -199,7 +201,9 @@ private:
 template<size_t N, typename Key, typename Value, class Hash, class KeyEqual>
 class FixedHashTableStackPolicy : public FixedHashTableBase<Key, Value, Hash, KeyEqual>
 {
+public:
     using BaseT = FixedHashTableBase<Key, Value, Hash, KeyEqual>;
+    using size_type = typename BaseT::size_type;
 
 public:
     FixedHashTableStackPolicy();
@@ -213,8 +217,7 @@ template<class StorageType>
 class FixedHashTablePolicyBase : public StorageType
 {
 public:
-    typedef typename StorageType::size_type size_type;
-
+    using size_type = typename StorageType::size_type;
 
 public:
     using StorageType::StorageType;

@@ -19,10 +19,10 @@ inline FixedHashTableOwningPolicy<Key, Value, Hash, KeyEqual>::~FixedHashTableOw
 template<typename Key, typename Value, class Hash, class KeyEqual>
 inline void FixedHashTableOwningPolicy<Key, Value, Hash, KeyEqual>::free(void)
 {
-    if (pData_) {
-        clear();
-        X_DELETE_ARRAY(reinterpret_cast<uint8_t*>(pData_), arena_);
-        pData_ = nullptr;
+    if (BaseT::pData_) {
+        BaseT::clear();
+        X_DELETE_ARRAY(reinterpret_cast<uint8_t*>(BaseT::pData_), arena_);
+        BaseT::pData_ = nullptr;
     }
 }
 
