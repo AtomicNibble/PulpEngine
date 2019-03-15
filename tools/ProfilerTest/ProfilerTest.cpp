@@ -84,12 +84,11 @@ namespace
         ThreadPolicy& policy_;
     };
 
+    core::CriticalSection cs0, cs1;
 
     core::Thread::ReturnValue threadFunc(const core::Thread& thread)
     {
         X_UNUSED(thread);
-
-        core::CriticalSection cs0, cs1;
 
         core::StopWatch timer;
         int32_t total = 0;
@@ -99,8 +98,6 @@ namespace
 
         for (int i = 0; i < 200; i++)
         {
-            ttTick(ctx);
-
             ttZone(ctx, "Aint no camel like me!");
 
             // alloc me baby.
@@ -247,6 +244,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                     "Worker 3",
                 };
 
+                ttSetThreadName(ctx, core::Thread::getCurrentID(), "Main");
+
                 for (int32_t i = 0; i < numThreads; i++)
                 {
                     thread[i].create(threadNames[i]);
@@ -254,6 +253,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
                     // TODO: Support dynamic strings.
                     ttSetThreadName(ctx, thread[i].getID(), threadNames[i]);
+                }
+
+                // main loop
+                for(int32_t i=0;i<16;i++)
+                {
+                    ttTick(ctx);
+
+                    core::Thread::sleep(16);
                 }
 
                 for (int32_t i = 0; i < numThreads; i++)
