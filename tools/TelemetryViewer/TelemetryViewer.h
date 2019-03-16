@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Threading/Signal.h>
+#include <Containers/FixedHashTable.h>
 
 X_NAMESPACE_BEGIN(telemetry)
 
@@ -56,33 +57,80 @@ struct LockState
     int64_t time;
     int64_t timeNano;
 
-    uint64_t lockHandle;
     TtLockState state;
+    uint16_t threadIdx; // used for colors.
+};
+
+struct LockTry
+{
+    uint64_t lockHandle;
+
+    int64_t startTick;
+    int64_t endTick;
+
+    int64_t startNano;
+    int64_t endNano;
+
+    uint16_t threadIdx; // used for colors.
+    uint16_t strIdxDescrption;
+};
+
+
+struct LockData
+{
+    using LockStateArr = core::ArrayGrowMultiply<LockState>;
+    using LockTryArr = core::ArrayGrowMultiply<LockTry>;
+
+    LockData(uint64_t lockHandle, core::MemoryArenaBase* arena) :
+        lockHandle(lockHandle),
+        lockStates(arena),
+        lockTry(arena)
+    {
+    }
+
+    uint64_t lockHandle;
+
+    LockStateArr lockStates;
+    LockTryArr lockTry;
+};
+
+using LockDataMap = core::FixedHashTable<uint64_t, LockData>;
+
+struct StackLevelData
+{
+    using ZoneDataArr = core::ArrayGrowMultiply<ZoneData>;
+    using LockTryArr = core::ArrayGrowMultiply<LockTry>;
+
+public:
+    StackLevelData(core::MemoryArenaBase* arena) :
+        zones(arena),
+        lockTry(arena)
+    {}
+
+
+    ZoneDataArr zones;
+    LockTryArr lockTry;
 };
 
 struct ZoneSegmentThread
 {
     // this is all the zones for this thread.
-    using ZoneDataArr = core::ArrayGrowMultiply<ZoneData>;
-    using ZoneDataArrStackArr = core::FixedArray<ZoneDataArr, 16>; // TODO: use constant.
+    using StackLevelDataArr = core::FixedArray<StackLevelData, MAX_ZONE_DEPTH>;
 
-    using LockStateArr = core::ArrayGrowMultiply<LockState>;
-    using LockTryArr = core::ArrayGrowMultiply<DataPacketLockTry>;
 
 public:
+    ZoneSegmentThread(ZoneSegmentThread&& oth) = default;
     ZoneSegmentThread(uint32_t id, core::MemoryArenaBase* arena) :
         id(id),
-        lockStates(arena),
-        lockTry(arena)
+        locks(arena, MAX_LOCKS)
     {
         X_UNUSED(arena);
     }
 
     uint32_t id;
     
-    ZoneDataArrStackArr zonesPerDepth;
-    LockStateArr lockStates;
-    LockTryArr lockTry;
+    StackLevelDataArr levels;
+    LockDataMap locks;
 };
 
 struct ZoneSegment
@@ -91,11 +139,13 @@ struct ZoneSegment
     using TickDataArr = core::ArrayGrowMultiply<TickData>;
 
 public:
+    ZoneSegment(ZoneSegment&& oth) = default;
     ZoneSegment(core::MemoryArenaBase* arena) :
         startNano(0),
         endNano(0),
         ticks(arena),
-        threads(arena)
+        threads(arena),
+        locks(arena, MAX_LOCKS)
     {
     }
 
@@ -107,6 +157,7 @@ public:
     TickDataArr ticks;
     ZoneSegmentThreadArr threads;
 
+    LockDataMap locks;
 };
 
 struct TraceStrings
@@ -181,6 +232,20 @@ public:
 
         if (pData) {
             return getString(pData->strIdx);
+        }
+
+        return core::string_view("???");
+    }
+
+    core::string_view getLockName(uint64_t lockId) const {
+
+        for (int32_t i = 0; i < lockNames.size(); i++)
+        {
+            auto& name = lockNames[i];
+            if (name.lockId == lockId)
+            {
+                return getString(name.strIdx);
+            }
         }
 
         return core::string_view("???");
