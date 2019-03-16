@@ -81,6 +81,7 @@ constexpr tt_size MAX_STRING_LEN = 256;
 constexpr tt_size MAX_ZONE_THREADS = 32;
 constexpr tt_size MAX_ZONE_DEPTH = 32;
 constexpr tt_size MAX_LOCKS_HELD_PER_THREAD = 16;
+constexpr tt_size MAX_LOCKS = 128; // max locks we can track
 
 constexpr tt_size COMPRESSION_MAX_INPUT_SIZE = 1024 * 8;
 constexpr tt_size COMPRESSION_RING_BUFFER_SIZE = 1024 * 64;
