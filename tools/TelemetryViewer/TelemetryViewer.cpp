@@ -625,10 +625,10 @@ void LockTryTooltip(TraceView& view, ZoneSegmentThread& thread, const LockTry& l
     ImGui::BeginTooltip();
 
         if (lock.result == TtLockResult::Acquired) {
-            ImGui::TextUnformatted("Waiting for lock. Reuslt: Acquired");
+            ImGui::TextUnformatted("Waiting for lock (Acquired)");
         }
         else if (lock.result == TtLockResult::Fail) {
-            ImGui::TextUnformatted("Waiting for lock. Reuslt: Fail");
+            ImGui::TextUnformatted("Waiting for lock (Fail)");
         }
         else {
             X_ASSERT_UNREACHABLE();
