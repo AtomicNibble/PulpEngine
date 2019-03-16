@@ -619,10 +619,15 @@ void LockTryTooltip(TraceView& view, ZoneSegmentThread& thread, const LockTry& l
     StringBuf strBuf;
 
     auto strDesc = view.strings.getString(lock.strIdxDescrption);
+    auto strFunc = view.strings.getString(lock.strIdxFunction);
+    auto strFile = view.strings.getString(lock.strIdxFile);
 
     ImGui::BeginTooltip();
 
     ImGui::TextUnformatted(strDesc.begin(), strDesc.end());
+    ImGui::Separator();
+    ImGui::TextUnformatted(strFunc.begin(), strFunc.end());
+    ImGui::Text("%s:%i", strFile.data(), lock.lineNo);
     ImGui::Separator();
     TextFocused("Execution time:", TimeToString(strBuf, time));
     ImGui::SameLine();
@@ -2499,6 +2504,9 @@ bool handleTraceZoneSegmentLockTry(Client& client, const DataPacketBaseViewer* p
         lt.startNano = view.ticksToNano(lockTry.start);
         lt.endNano = view.ticksToNano(lockTry.end);
         lt.threadIdx = safe_static_cast<uint16_t>(t);
+        lt.lineNo = lockTry.lineNo;
+        lt.strIdxFunction = lockTry.strIdxFunction;
+        lt.strIdxFile = lockTry.strIdxFile;
         lt.strIdxDescrption = lockTry.strIdxDescrption;
 
         it->second.lockTry.push_back(lt);

@@ -253,9 +253,14 @@ struct DataPacketLockTry : public DataPacketBase
     // 8
     tt_uint64 lockHandle;
 
-    // 4
-    tt_uint16 depth;
+    // 8
+    tt_uint16 lineNo;
+    tt_uint16 strIdxFunction;
+    tt_uint16 strIdxFile;
     tt_uint16 strIdxDescrption;
+
+    // 1
+    tt_uint8 depth;
 };
 
 
@@ -316,13 +321,12 @@ struct DataPacketMemFree : public DataPacketBase
     tt_uint64 ptr;
 };
 
-
 static_assert(sizeof(DataPacketBase) == 1, "Incorrect size");
 static_assert(sizeof(DataPacketStringTableAdd) == 6, "Incorrect size");
 static_assert(sizeof(DataPacketZone) == 32, "Incorrect size");
 static_assert(sizeof(DataPacketThreadSetName) == 16, "Incorrect size");
 static_assert(sizeof(DataPacketLockSetName) == 20, "Incorrect size");
-static_assert(sizeof(DataPacketLockTry) == 36, "Incorrect size");
+static_assert(sizeof(DataPacketLockTry) == 44, "Incorrect size");
 static_assert(sizeof(DataPacketLockState) == 28, "Incorrect size");
 static_assert(sizeof(DataPacketLockCount) == 24, "Incorrect size");
 static_assert(sizeof(DataPacketMemAlloc) == 28, "Incorrect size");

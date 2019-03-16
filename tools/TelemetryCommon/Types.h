@@ -32,7 +32,7 @@ static_assert(sizeof(tt_uintptr) == sizeof(void*), "Size missmatch");
 
 // TODO: find better home.
 
-enum TtLockResult
+enum TtLockResult : tt_uint8
 {
     Acquired,
     Fail

@@ -60,15 +60,23 @@ namespace
 
     const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
 
+    TELEM_PACK_PUSH(1)
+
     struct TraceLock
     {
         tt_uint64 start;
         tt_uint64 end;
 
-        TtLockResult result;
-        tt_int32 depth;
         const char* pDescription;
+        TtLockResult result;
+        tt_uint16 depth;
+        TtSourceInfo sourceInfo;
+
+        static_assert(std::numeric_limits<decltype(depth)>::max() >= MAX_ZONE_DEPTH, "Can't store max zone depth");
     };
+
+
+    TELEM_PACK_POP;
 
     struct TraceLocks
     {
@@ -268,6 +276,7 @@ namespace
                 // TODO: is breaking faster here?
                 // I'm guessing not as long as this loop is unrolled.
                 // break;
+
             }
         }
 
@@ -661,8 +670,8 @@ namespace
 
     TELEM_ALIGNED_SYMBOL(struct QueueDataLockTry, 64) : public QueueDataBase
     {
-        TtthreadId threadID;
         TraceLock lock;
+        TtthreadId threadID;
         const void* pLockPtr;
     };
 
@@ -823,7 +832,7 @@ namespace
         }
 
         // no space,
-#if X_DEBUG
+#if X_DEBUG && 0
         if (offset + size > pCtx->tickBufCapacity) {
             ::DebugBreak();
         }
@@ -1042,8 +1051,11 @@ namespace
         packet.start = toRelativeTicks(pComp->pCtx, lock.start);
         packet.end = toRelativeTicks(pComp->pCtx, lock.end);
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
-        packet.depth = static_cast<tt_uint16>(pBuf->lock.depth);
+        packet.strIdxFile = GetStringId(pComp, lock.sourceInfo.pFile_);
+        packet.strIdxFunction = GetStringId(pComp, lock.sourceInfo.pFunction_);
+        packet.lineNo = static_cast<tt_uint16>(lock.sourceInfo.line_);
         packet.strIdxDescrption = GetStringId(pComp, lock.pDescription);
+        packet.depth = static_cast<tt_uint8>(pBuf->lock.depth);
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
     }
@@ -1143,6 +1155,8 @@ namespace
                 // rip.
                 break;
             }
+
+            //ttZone(contextToHandle(pCtx), "Process buffer");
 
             auto start = gSysTimer.GetTicks();
 
@@ -1772,7 +1786,7 @@ void TelemSetLockName(TraceContexHandle ctx, const void* pPtr, const char* pLock
     queueLockSetName(pCtx, pPtr, pLockName);
 }
 
-void TelemTryLock(TraceContexHandle ctx, const void* pPtr, const char* pDescription)
+void TelemTryLock(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, const char* pDescription)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
@@ -1791,12 +1805,13 @@ void TelemTryLock(TraceContexHandle ctx, const void* pPtr, const char* pDescript
 
     pLock->start = getTicks();
     pLock->pDescription = pDescription;
+    pLock->sourceInfo = sourceInfo;
 }
 
-void TelemTryLockEx(TraceContexHandle ctx, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const void* pPtr, const char* pDescription)
+void TelemTryLockEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const void* pPtr, const char* pDescription)
 {
     matchIdOut = minMicroSec;
-    TelemTryLock(ctx, pPtr, pDescription);
+    TelemTryLock(ctx, sourceInfo, pPtr, pDescription);
 }
 
 void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult result)
@@ -1815,7 +1830,7 @@ void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult resul
 
     pLock->end = getTicks();
     pLock->result = result;
-    pLock->depth = pThreadData->stackDepth;
+    pLock->depth = static_cast<decltype(pLock->depth)>(pThreadData->stackDepth);
 
     queueLockTry(pCtx, pThreadData, pPtr, pLock);
 }
@@ -1836,7 +1851,7 @@ void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPt
 
     pLock->end = getTicks();
     pLock->result = result;
-    pLock->depth = pThreadData->stackDepth;
+    pLock->depth = static_cast<decltype(pLock->depth)>(pThreadData->stackDepth);
 
     // work out if we send it.
     auto minMicroSec = matchId;

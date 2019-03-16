@@ -52,6 +52,8 @@ struct TtCallStack
     void* frames[MAX_FRAMES];
 };
 
+TELEM_PACK_PUSH(4)
+
 struct TtSourceInfo
 {
     TtSourceInfo() = default;
@@ -68,6 +70,8 @@ struct TtSourceInfo
     const char* pFunction_;
     int line_;
 };
+
+TELEM_PACK_POP;
 
 #define TT_SOURCE_INFO TtSourceInfo(__FILE__, __FUNCTION__, __LINE__)
 
@@ -130,8 +134,8 @@ extern "C"
 
     // Lock util
     __TELEM_API_VOID(TelemSetLockName, TraceContexHandle ctx, const void* pPtr, const char* pLockName);
-    __TELEM_API_VOID(TelemTryLock, TraceContexHandle ctx, const void* pPtr, const char* pDescription);
-    __TELEM_API_VOID(TelemTryLockEx, TraceContexHandle ctx, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const void* pPtr, const char* pDescription);
+    __TELEM_API_VOID(TelemTryLock, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, const char* pDescription);
+    __TELEM_API_VOID(TelemTryLockEx, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const void* pPtr, const char* pDescription);
     __TELEM_API_VOID(TelemEndTryLock, TraceContexHandle ctx, const void* pPtr, TtLockResult result);
     __TELEM_API_VOID(TelemEndTryLockEx, TraceContexHandle ctx, tt_uint64 matchId, const void* pPtr, TtLockResult result);
     __TELEM_API_VOID(TelemSetLockState, TraceContexHandle ctx, const void* pPtr, TtLockState state);
@@ -382,8 +386,8 @@ namespace telem
 
 // Lock util
 #define ttSetLockName(ctx, pPtr, pLockName) __TELEM_FUNC_NAME(TelemSetLockName)(ctx, pPtr, pLockName);
-#define ttTryLock(ctx, pPtr, pDescription) __TELEM_FUNC_NAME(TelemTryLock)(ctx, pPtr, pDescription);
-#define ttTryLockEx(ctx, matchIdOut, minMicroSec, pPtr, pDescription) __TELEM_FUNC_NAME(TelemTryLock)(ctx, matchIdOut, minMicroSec, pPtr, pDescription);
+#define ttTryLock(ctx, pPtr, pDescription) __TELEM_FUNC_NAME(TelemTryLock)(ctx, TT_SOURCE_INFO, pPtr, pDescription);
+#define ttTryLockEx(ctx, matchIdOut, minMicroSec, pPtr, pDescription) __TELEM_FUNC_NAME(TelemTryLock)(ctx, TT_SOURCE_INFO, matchIdOut, minMicroSec, pPtr, pDescription);
 #define ttEndTryLock(ctx, pPtr, result) __TELEM_FUNC_NAME(TelemEndTryLock)(ctx, pPtr, result);
 #define ttEndTryLockEx(ctx, matchIdOut, pPtr, result) __TELEM_FUNC_NAME(TelemEndTryLockEx)(ctx, matchIdOut, pPtr, result);
 #define ttSetLockState(ctx, pPtr, state) __TELEM_FUNC_NAME(TelemSetLockState)(ctx, pPtr, state);
