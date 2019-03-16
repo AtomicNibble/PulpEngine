@@ -108,6 +108,13 @@ struct TraceStream
     TraceDB db;
 };
 
+enum class ClientType
+{
+    Unknown,
+    TraceStream,
+    Viewer
+};
+
 struct ClientConnection
 {
     using TraceStreamArr = core::Array<TraceStream>;
@@ -117,6 +124,7 @@ struct ClientConnection
     {
         core::zero_object(clientVer);
         socket = INV_SOCKET;
+        type = ClientType::Unknown;
 
         cmpBufBegin = 0;
         cmpBufEnd = 0;
@@ -129,6 +137,7 @@ struct ClientConnection
     platform::SOCKET socket;
     VersionInfo clientVer;
     core::string hostName;
+    ClientType type;
 
     TraceStreamArr traces;
     TraceStream traceStrm;

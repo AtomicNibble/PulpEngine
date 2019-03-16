@@ -1000,6 +1000,11 @@ bool Server::listen(void)
  
         handleClient(client);
 
+        // TEMP: add index if needed
+        if (client.type == ClientType::TraceStream) {
+            client.traceStrm.db.createIndexes();
+        }
+
         platform::closesocket(clientSocket);
     }
 
@@ -1195,6 +1200,9 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     cra.serverVer = serverVer;
 
     sendDataToClient(client, &cra, sizeof(cra));
+
+    X_ASSERT(client.type == ClientType::Unknown, "Client type already set")(client.type);
+    client.type = ClientType::TraceStream;
     return true;
 }
 
@@ -1235,6 +1243,8 @@ bool Server::handleConnectionRequestViewer(ClientConnection& client, uint8_t* pD
         X_LOG0("TelemSrv", "Error sending app list to client");
     }
 
+    X_ASSERT(client.type == ClientType::Unknown, "Client type already set")(client.type);
+    client.type = ClientType::Viewer;
     return true;
 }
 
