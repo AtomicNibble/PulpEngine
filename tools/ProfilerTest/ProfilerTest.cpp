@@ -136,8 +136,8 @@ namespace
                 }
             }
 
-            // Lock me up like a goat.
             ScopedLockTelemetry lock(cs1);
+            ttZone(ctx, "Sleeping under lock");
             core::Thread::sleep(1);
         }
 
