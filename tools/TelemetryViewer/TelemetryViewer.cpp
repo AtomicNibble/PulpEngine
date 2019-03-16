@@ -621,15 +621,16 @@ void LockTryTooltip(TraceView& view, ZoneSegmentThread& thread, const LockTry& l
     auto strDesc = view.strings.getString(lock.strIdxDescrption);
     auto strFunc = view.strings.getString(lock.strIdxFunction);
     auto strFile = view.strings.getString(lock.strIdxFile);
+    auto strLockName = view.strings.getLockName(lock.lockHandle);
     auto strThread = view.strings.getThreadName(thread.id);
 
     ImGui::BeginTooltip();
 
         if (lock.result == TtLockResult::Acquired) {
-            ImGui::TextUnformatted("Waiting for lock (Acquired)");
+            ImGui::Text("Waiting for lock \"%s\" (Acquired)", strLockName.begin());
         }
         else if (lock.result == TtLockResult::Fail) {
-            ImGui::TextUnformatted("Waiting for lock (Fail)");
+            ImGui::Text("Waiting for lock \"%s\" (Fail)", strLockName.begin());
         }
         else {
             X_ASSERT_UNREACHABLE();
