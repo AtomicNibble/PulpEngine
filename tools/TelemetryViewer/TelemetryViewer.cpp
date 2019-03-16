@@ -621,6 +621,7 @@ void LockTryTooltip(TraceView& view, ZoneSegmentThread& thread, const LockTry& l
     auto strDesc = view.strings.getString(lock.strIdxDescrption);
     auto strFunc = view.strings.getString(lock.strIdxFunction);
     auto strFile = view.strings.getString(lock.strIdxFile);
+    auto strThread = view.strings.getThreadName(thread.id);
 
     ImGui::BeginTooltip();
 
@@ -638,6 +639,9 @@ void LockTryTooltip(TraceView& view, ZoneSegmentThread& thread, const LockTry& l
         ImGui::Separator();
         ImGui::TextUnformatted(strFunc.begin(), strFunc.end());
         ImGui::Text("%s:%i", strFile.data(), lock.lineNo);
+        TextFocused("Thread:", strThread.begin(), strThread.end());
+        ImGui::SameLine();
+        ImGui::TextDisabled("(0x%" PRIX32 ")", thread.id);
         ImGui::Separator();
         TextFocused("Execution time:", TimeToString(strBuf, time));
         ImGui::SameLine();
