@@ -72,7 +72,9 @@ struct LockTry
     int64_t endNano;
 
     uint16_t threadIdx; // used for colors.
+    TtLockResult result;
 
+    // 8
     uint16_t lineNo;
     uint16_t strIdxFunction;
     uint16_t strIdxFile;

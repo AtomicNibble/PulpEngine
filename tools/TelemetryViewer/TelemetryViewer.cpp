@@ -624,14 +624,24 @@ void LockTryTooltip(TraceView& view, ZoneSegmentThread& thread, const LockTry& l
 
     ImGui::BeginTooltip();
 
-    ImGui::TextUnformatted(strDesc.begin(), strDesc.end());
-    ImGui::Separator();
-    ImGui::TextUnformatted(strFunc.begin(), strFunc.end());
-    ImGui::Text("%s:%i", strFile.data(), lock.lineNo);
-    ImGui::Separator();
-    TextFocused("Execution time:", TimeToString(strBuf, time));
-    ImGui::SameLine();
-    TextFocusedFmt("Cycles:", "%" PRId64, cycles);
+        if (lock.result == TtLockResult::Acquired) {
+            ImGui::TextUnformatted("Waiting for lock. Reuslt: Acquired");
+        }
+        else if (lock.result == TtLockResult::Fail) {
+            ImGui::TextUnformatted("Waiting for lock. Reuslt: Fail");
+        }
+        else {
+            X_ASSERT_UNREACHABLE();
+        }
+        ImGui::Separator();
+        ImGui::TextUnformatted(strDesc.begin(), strDesc.end());
+        ImGui::Separator();
+        ImGui::TextUnformatted(strFunc.begin(), strFunc.end());
+        ImGui::Text("%s:%i", strFile.data(), lock.lineNo);
+        ImGui::Separator();
+        TextFocused("Execution time:", TimeToString(strBuf, time));
+        ImGui::SameLine();
+        TextFocusedFmt("Cycles:", "%" PRId64, cycles);
 
     ImGui::EndTooltip();
 }
@@ -2504,6 +2514,7 @@ bool handleTraceZoneSegmentLockTry(Client& client, const DataPacketBaseViewer* p
         lt.startNano = view.ticksToNano(lockTry.start);
         lt.endNano = view.ticksToNano(lockTry.end);
         lt.threadIdx = safe_static_cast<uint16_t>(t);
+        lt.result = lockTry.result;
         lt.lineNo = lockTry.lineNo;
         lt.strIdxFunction = lockTry.strIdxFunction;
         lt.strIdxFile = lockTry.strIdxFile;

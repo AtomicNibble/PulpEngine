@@ -1055,6 +1055,7 @@ namespace
         packet.strIdxFunction = GetStringId(pComp, lock.sourceInfo.pFunction_);
         packet.lineNo = static_cast<tt_uint16>(lock.sourceInfo.line_);
         packet.strIdxDescrption = GetStringId(pComp, lock.pDescription);
+        packet.result = lock.result;
         packet.depth = static_cast<tt_uint8>(pBuf->lock.depth);
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));

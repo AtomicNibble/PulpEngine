@@ -361,7 +361,7 @@ bool TraceDB::createDB(core::Path<char>& path)
     cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
     cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, startTick, endTick, startNano, endNano) VALUES(?,?,?,?,?)");
     cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
-    cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, startTick, endTick, depth, sourceInfoIdx) VALUES(?,?,?,?,?,?)");
+    cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, startTick, endTick, result, depth, sourceInfoIdx) VALUES(?,?,?,?,?,?,?)");
     cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, timeTicks, state) VALUES(?,?,?,?)");
     cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, timeTicks, nameStrId) VALUES(?,?,?)");
     cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, nameStrId) VALUES(?,?,?)");
@@ -508,7 +508,8 @@ CREATE TABLE IF NOT EXISTS "lockTry" (
 	"startTick"	        INTEGER NOT NULL,
 	"endTick"	        INTEGER NOT NULL,
     "depth"	            INTEGER NOT NULL,
-	"sourceInfoIdx"	    INTEGER,
+    "result"	        INTEGER NOT NULL,
+	"sourceInfoIdx"	    INTEGER NOT NULL,
 	PRIMARY KEY("Id")
 );
 
@@ -649,8 +650,9 @@ void TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
     cmd.bind(2, static_cast<int32_t>(pData->threadID));
     cmd.bind(3, static_cast<int64_t>(pData->start));
     cmd.bind(4, static_cast<int64_t>(pData->end));
-    cmd.bind(5, static_cast<int64_t>(pData->depth));
-    cmd.bind(6, static_cast<int64_t>(info.packed));
+    cmd.bind(5, static_cast<int32_t>(pData->result));
+    cmd.bind(6, static_cast<int64_t>(pData->depth));
+    cmd.bind(7, static_cast<int64_t>(info.packed));
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -1664,7 +1666,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
     }
 
     {
-        sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, threadId, startTick, endTick, depth, sourceInfoIdx FROM lockTry WHERE startTick >= ? AND startTick < ?");
+        sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, threadId, startTick, endTick, result, depth, sourceInfoIdx FROM lockTry WHERE startTick >= ? AND startTick < ?");
         qry.bind(1, static_cast<int64_t>(start));
         qry.bind(2, static_cast<int64_t>(end));
 
@@ -1685,10 +1687,11 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
             lockTry.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
             lockTry.start = static_cast<uint64_t>(row.get<int64_t>(2));
             lockTry.end = static_cast<uint64_t>(row.get<int64_t>(3));
-            lockTry.depth = static_cast<uint8_t>(row.get<int32_t>(4) & 0xFFFF);
+            lockTry.result = static_cast<TtLockResult>(row.get<int32_t>(4));
+            lockTry.depth = static_cast<uint8_t>(row.get<int32_t>(5) & 0xFFFF);
 
             TraceDB::PackedSourceInfo info;
-            info.packed = static_cast<uint64_t>(row.get<int64_t>(5));
+            info.packed = static_cast<uint64_t>(row.get<int64_t>(6));
 
             lockTry.lineNo = info.raw.lineNo;
             lockTry.strIdxFunction = info.raw.idxFunction;
