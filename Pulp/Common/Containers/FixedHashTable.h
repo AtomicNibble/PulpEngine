@@ -189,6 +189,7 @@ public:
     using size_type = typename BaseT::size_type;
 
 public:
+    FixedHashTableOwningPolicy(FixedHashTableOwningPolicy&& oth);
     FixedHashTableOwningPolicy(core::MemoryArenaBase* arena, size_type maxItem);
     ~FixedHashTableOwningPolicy();
 

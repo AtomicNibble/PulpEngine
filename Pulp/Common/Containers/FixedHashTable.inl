@@ -2,6 +2,13 @@
 X_NAMESPACE_BEGIN(core)
 
 
+template<typename Key, typename Value, class Hash, class KeyEqual>
+inline FixedHashTableOwningPolicy<Key, Value, Hash, KeyEqual>::FixedHashTableOwningPolicy(FixedHashTableOwningPolicy&& oth) :
+    BaseT(std::move(oth)),
+    arena_(std::move(oth.arena_))
+{
+}
+
 
 template<typename Key, typename Value, class Hash, class KeyEqual>
 inline FixedHashTableOwningPolicy<Key, Value, Hash, KeyEqual>::FixedHashTableOwningPolicy(core::MemoryArenaBase* arena, size_type maxItem) :
