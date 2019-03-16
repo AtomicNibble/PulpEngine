@@ -12,7 +12,7 @@ inline FixedHashTableOwningPolicy<Key, Value, Hash, KeyEqual>::FixedHashTableOwn
 
 template<typename Key, typename Value, class Hash, class KeyEqual>
 inline FixedHashTableOwningPolicy<Key, Value, Hash, KeyEqual>::FixedHashTableOwningPolicy(core::MemoryArenaBase* arena, size_type maxItem) :
-    FixedHashTableBase<Key, Value, Hash, KeyEqual>(X_NEW_ARRAY_ALIGNED(uint8_t, maxItem * sizeof(BaseT::value_type), arena, "FixedHashTableOwningPolicy", X_ALIGN_OF(BaseT::value_type)), maxItem),
+    BaseT(X_NEW_ARRAY_ALIGNED(uint8_t, maxItem * sizeof(BaseT::value_type), arena, "FixedHashTableOwningPolicy", X_ALIGN_OF(BaseT::value_type)), maxItem),
     arena_(arena)
 {
 }
