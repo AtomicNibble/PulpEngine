@@ -66,6 +66,7 @@ namespace
         tt_uint64 end;
 
         TtLockResult result;
+        tt_int32 depth;
         const char* pDescription;
     };
 
@@ -1041,6 +1042,7 @@ namespace
         packet.start = toRelativeTicks(pComp->pCtx, lock.start);
         packet.end = toRelativeTicks(pComp->pCtx, lock.end);
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
+        packet.depth = static_cast<tt_uint16>(pBuf->lock.depth);
         packet.strIdxDescrption = GetStringId(pComp, lock.pDescription);
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
@@ -1813,6 +1815,7 @@ void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult resul
 
     pLock->end = getTicks();
     pLock->result = result;
+    pLock->depth = pThreadData->stackDepth;
 
     queueLockTry(pCtx, pThreadData, pPtr, pLock);
 }
@@ -1833,6 +1836,7 @@ void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPt
 
     pLock->end = getTicks();
     pLock->result = result;
+    pLock->depth = pThreadData->stackDepth;
 
     // work out if we send it.
     auto minMicroSec = matchId;

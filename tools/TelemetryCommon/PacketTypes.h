@@ -253,7 +253,8 @@ struct DataPacketLockTry : public DataPacketBase
     // 8
     tt_uint64 lockHandle;
 
-    // 2
+    // 4
+    tt_uint16 depth;
     tt_uint16 strIdxDescrption;
 };
 
