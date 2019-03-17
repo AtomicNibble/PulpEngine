@@ -357,16 +357,16 @@ bool TraceDB::createDB(core::Path<char>& path)
         return false;
     }
 
-    cmdInsertZone.prepare("INSERT INTO zones (threadID, startTick, endTick, sourceInfoIdx, stackDepth) VALUES(?,?,?,?,?)");
+    cmdInsertZone.prepare("INSERT INTO zones (threadID, startTick, endTick, packedSourceInfo, stackDepth) VALUES(?,?,?,?,?)");
     cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
     cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, startTick, endTick, startNano, endNano) VALUES(?,?,?,?,?)");
     cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
-    cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, startTick, endTick, result, depth, sourceInfoIdx) VALUES(?,?,?,?,?,?,?)");
+    cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, startTick, endTick, result, depth, packedSourceInfo) VALUES(?,?,?,?,?,?,?)");
     cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, timeTicks, state) VALUES(?,?,?,?)");
     cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, timeTicks, nameStrId) VALUES(?,?,?)");
     cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, nameStrId) VALUES(?,?,?)");
     cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)");
-    cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation, sourceInfoIdx) VALUES(?,?,?,?,?,?)");
+    cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation, packedSourceInfo) VALUES(?,?,?,?,?,?)");
     return true;
 }
 
@@ -477,13 +477,13 @@ CREATE TABLE IF NOT EXISTS "zoneInfo" (
 );
 
 CREATE TABLE IF NOT EXISTS "zones" (
-    "id"	        INTEGER,
-    "zoneId"	    INTEGER,
-    "threadId"	    INTEGER NOT NULL,
-    "startTick"	    INTEGER NOT NULL,
-    "endTick"	    INTEGER NOT NULL,
-    "sourceInfoIdx"	INTEGER NOT NULL,
-    "stackDepth"	INTEGER NOT NULL,
+    "id"	            INTEGER,
+    "zoneId"	        INTEGER,
+    "threadId"	        INTEGER NOT NULL,
+    "startTick"	        INTEGER NOT NULL,
+    "endTick"	        INTEGER NOT NULL,
+    "packedSourceInfo"	INTEGER NOT NULL,
+    "stackDepth"	    INTEGER NOT NULL,
     PRIMARY KEY("id"),
     FOREIGN KEY("zoneId") REFERENCES "zoneInfo"("Id")
 );
@@ -509,7 +509,7 @@ CREATE TABLE IF NOT EXISTS "lockTry" (
 	"endTick"	        INTEGER NOT NULL,
     "depth"	            INTEGER NOT NULL,
     "result"	        INTEGER NOT NULL,
-	"sourceInfoIdx"	    INTEGER NOT NULL,
+	"packedSourceInfo"	INTEGER NOT NULL,
 	PRIMARY KEY("Id")
 );
 
@@ -529,7 +529,7 @@ CREATE TABLE "memory" (
 	"threadId"	        INTEGER NOT NULL,
 	"timeTicks"	        INTEGER NOT NULL,
 	"operation"	        INTEGER NOT NULL,
-    "sourceInfoIdx"	    INTEGER NOT NULL,
+    "packedSourceInfo"	INTEGER NOT NULL,
 	PRIMARY KEY("Id")
 );
 
@@ -1632,7 +1632,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
 
         int32_t numZones = 0;
 
-        sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, stackDepth, sourceInfoIdx FROM zones WHERE startTick >= ? AND startTick < ?");
+        sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, stackDepth, packedSourceInfo FROM zones WHERE startTick >= ? AND startTick < ?");
         qry.bind(1, static_cast<int64_t>(start));
         qry.bind(2, static_cast<int64_t>(end));
 
@@ -1681,7 +1681,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
     }
 
     {
-        sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, threadId, startTick, endTick, result, depth, sourceInfoIdx FROM lockTry WHERE startTick >= ? AND startTick < ?");
+        sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, threadId, startTick, endTick, result, depth, packedSourceInfo FROM lockTry WHERE startTick >= ? AND startTick < ?");
         qry.bind(1, static_cast<int64_t>(start));
         qry.bind(2, static_cast<int64_t>(end));
 
