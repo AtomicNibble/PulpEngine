@@ -1366,14 +1366,14 @@ void DrawZoneLevelWaits(TraceView& view, ZoneSegmentThread& thread, int32_t thre
     X_UNUSED(yMin, yMax, hover, threadIdx);
 
     auto& level = thread.levels[depth];
-    auto& lockTry = level.lockTry;
+    auto& lockTryVec = level.lockTry;
 
-    auto it = std::lower_bound(lockTry.begin(), lockTry.end(), view.zvStartNS_, [](const auto& l, const auto& r) { return l.endNano < r; });
-    if (it == lockTry.end()) {
+    auto it = std::lower_bound(lockTryVec.begin(), lockTryVec.end(), view.zvStartNS_, [](const auto& l, const auto& r) { return l.endNano < r; });
+    if (it == lockTryVec.end()) {
         return;
     }
 
-    const auto itend = std::lower_bound(it, lockTry.end(), view.zvEndNS_, [](const auto& l, const auto& r) { return l.startNano < r; });
+    const auto itend = std::lower_bound(it, lockTryVec.end(), view.zvEndNS_, [](const auto& l, const auto& r) { return l.startNano < r; });
     if (it == itend) {
         return;
     }
