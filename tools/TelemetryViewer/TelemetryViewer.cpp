@@ -610,9 +610,7 @@ void HandleZoneViewMouse(TraceView& view, int64_t timespan, const ImVec2& wpos, 
 void LockTryTooltip(TraceView& view, const LockTry& lock)
 {
     const int64_t cycles = lock.endTick - lock.startTick;
-
-    const int64_t end = lock.endNano;
-    const int64_t time = end - lock.startNano;
+    const int64_t time = lock.endNano - lock.startNano;
 
     StringBuf strBuf;
 
