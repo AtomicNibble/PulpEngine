@@ -163,6 +163,7 @@ struct DataStreamType
         LockCount,
         MemAlloc,
         MemFree,
+        Message,
 
         Num
     };
@@ -339,6 +340,16 @@ struct DataPacketMemFree : public DataPacketBase
     tt_uint16 lineNo;
     tt_uint16 strIdxFunction;
     tt_uint16 strIdxFile;
+};
+
+struct DataPacketMessage : public DataPacketBase
+{
+    // 8
+    tt_uint64 time;
+
+    // 3
+    tt_uint16 logType;
+    tt_uint16 strIdxFmt;
 };
 
 static_assert(sizeof(DataPacketBase) == 1, "Incorrect size");

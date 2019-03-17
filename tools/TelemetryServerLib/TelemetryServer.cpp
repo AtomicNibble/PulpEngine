@@ -230,6 +230,12 @@ namespace
                     i += sizeof(DataPacketMemFree);
                     break;
                 }
+                case DataStreamType::Message:
+                {
+                    strm.db.handleDataPacketMessage(reinterpret_cast<const DataPacketMessage*>(&pDst[i]));
+                    i += sizeof(DataPacketMessage);
+                    break;
+                }
 
                 default:
                     X_NO_SWITCH_DEFAULT_ASSERT;
@@ -367,6 +373,7 @@ bool TraceDB::createDB(core::Path<char>& path)
     cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, nameStrId) VALUES(?,?,?)");
     cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)");
     cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation, packedSourceInfo) VALUES(?,?,?,?,?,?)");
+    cmdInsertMessage.prepare("INSERT INTO messages (timeTicks, type, fmtStrIdx) VALUES(?,?,?)");
     return true;
 }
 
@@ -410,6 +417,9 @@ bool TraceDB::createIndexes(void)
             "startTick"	ASC
         );
         CREATE INDEX IF NOT EXISTS "lockStates_time" ON "lockStates" (
+            "timeTicks"	ASC
+        );
+        CREATE INDEX IF NOT EXISTS "messages_time" ON "messages" (
             "timeTicks"	ASC
         );
     )");
@@ -534,6 +544,13 @@ CREATE TABLE "memory" (
 	PRIMARY KEY("Id")
 );
 
+CREATE TABLE "messages" (
+	"Id"	            INTEGER,
+	"type"	            INTEGER NOT NULL,
+	"timeTicks"	        INTEGER NOT NULL,
+	"fmtStrIdx"	        INTEGER NOT NULL,
+	PRIMARY KEY("Id")
+);
 
             )")) {
         X_ERROR("TelemSrv", "Failed to create tables");
@@ -766,6 +783,21 @@ void TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
     cmd.bind(4, static_cast<int64_t>(pData->time));
     cmd.bind(5, static_cast<int32_t>(MemOp::Free));
     cmd.bind(6, static_cast<int64_t>(info.packed));
+
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
+    }
+
+    cmd.reset();
+}
+
+void TraceDB::handleDataPacketMessage(const DataPacketMessage* pData)
+{
+    auto& cmd = cmdInsertMessage;
+    cmd.bind(1, static_cast<int32_t>(pData->time));
+    cmd.bind(2, static_cast<int32_t>(pData->logType));
+    cmd.bind(3, static_cast<int32_t>(pData->strIdxFmt));
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {

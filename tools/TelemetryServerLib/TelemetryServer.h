@@ -44,7 +44,8 @@ struct TraceDB
         cmdInsertThreadName(con),
         cmdInsertLockName(con),
         cmdInsertMeta(con),
-        cmdInsertMemory(con)
+        cmdInsertMemory(con),
+        cmdInsertMessage(con)
     {
     }
 
@@ -67,6 +68,7 @@ public:
     void handleDataPacketLockCount(const DataPacketLockCount* pData);
     void handleDataPacketMemAlloc(const DataPacketMemAlloc* pData);
     void handleDataPacketMemFree(const DataPacketMemFree* pData);
+    void handleDataPacketMessage(const DataPacketMessage* pData);
     void handleDataPacketCallStack(const DataPacketCallStack* pData);
 
 private:
@@ -87,6 +89,7 @@ private:
     sql::SqlLiteCmd cmdInsertLockName;
     sql::SqlLiteCmd cmdInsertMeta;
     sql::SqlLiteCmd cmdInsertMemory;
+    sql::SqlLiteCmd cmdInsertMessage;
 
     core::FixedArray<uint64_t, MAX_LOCKS> lockSet;
 };

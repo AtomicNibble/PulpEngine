@@ -129,7 +129,7 @@ namespace
 #endif // X_64
 
 
-    void defaultLogFunction(void* pUserData, LogType type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm)
+    void defaultLogFunction(void* pUserData, TtLogType::Enum type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm)
     {
         TELEM_UNUSED(pUserData);
         TELEM_UNUSED(lenWithoutTerm);
@@ -308,7 +308,7 @@ namespace
         return pThreadData;
     }
 
-    void writeLog(TraceContext* pCtx, LogType type, const char* pFmt, ...)
+    void writeLog(TraceContext* pCtx, TtLogType::Enum type, const char* pFmt, ...)
     {
         char buf[MAX_STRING_LEN] = {};
 
@@ -331,28 +331,28 @@ namespace
             int res = platform::recv(pCtx->socket, &pBuffer[bytesRead], maxReadSize, 0);
 
             if (res == 0) {
-                writeLog(pCtx, LogType::Error, "Connection closing...");
+                writeLog(pCtx, TtLogType::Error, "Connection closing...");
                 return false;
             }
             else if (res < 0) {
-                writeLog(pCtx, LogType::Error, "recv failed with error: %d", platform::WSAGetLastError());
+                writeLog(pCtx, TtLogType::Error, "recv failed with error: %d", platform::WSAGetLastError());
                 return false;
             }
 
             bytesRead += res;
 
-            writeLog(pCtx, LogType::Msg, "got: %d bytes\n", res);
+            writeLog(pCtx, TtLogType::Msg, "got: %d bytes\n", res);
 
             if (bytesRead == sizeof(PacketBase))
             {
                 auto* pHdr = reinterpret_cast<const PacketBase*>(pBuffer);
                 if (pHdr->dataSize == 0) {
-                    writeLog(pCtx, LogType::Error, "Client sent packet with length zero...");
+                    writeLog(pCtx, TtLogType::Error, "Client sent packet with length zero...");
                     return false;
                 }
 
                 if (pHdr->dataSize > bufLengthInOut) {
-                    writeLog(pCtx, LogType::Error, "Client sent oversied packet of size %i...", static_cast<tt_int32>(pHdr->dataSize));
+                    writeLog(pCtx, TtLogType::Error, "Client sent oversied packet of size %i...", static_cast<tt_int32>(pHdr->dataSize));
                     return false;
                 }
 
@@ -364,7 +364,7 @@ namespace
                 return true;
             }
             else if (bytesRead > bufLength) {
-                writeLog(pCtx, LogType::Error, "Overread packet bytesRead: %d recvbuflen: %d", bytesRead, bufLength);
+                writeLog(pCtx, TtLogType::Error, "Overread packet bytesRead: %d recvbuflen: %d", bytesRead, bufLength);
                 return false;
             }
         }
@@ -383,7 +383,7 @@ namespace
             case PacketType::ConnectionRequestRejected: {
                 auto* pConRej = reinterpret_cast<const ConnectionRequestRejectedHdr*>(pData);
                 auto* pStrData = reinterpret_cast<const char*>(pConRej + 1);
-                writeLog(pCtx, LogType::Error, "Connection rejected: %.*s", pConRej->reasonLen, pStrData);
+                writeLog(pCtx, TtLogType::Error, "Connection rejected: %.*s", pConRej->reasonLen, pStrData);
 
             }
             default:
@@ -410,7 +410,7 @@ namespace
         // TODO: none blocking?
         int res = platform::send(pCtx->socket, reinterpret_cast<const char*>(pData), len, 0);
         if (res == SOCKET_ERROR) {
-            writeLog(pCtx, LogType::Error, "Socket: send failed with error: %d", platform::WSAGetLastError());
+            writeLog(pCtx, TtLogType::Error, "Socket: send failed with error: %d", platform::WSAGetLastError());
             return;
         }
     }
@@ -623,7 +623,8 @@ namespace
         LockState,
         LockCount,
         MemAlloc,
-        MemFree
+        MemFree,
+        Message
     };
 
     struct QueueDataBase
@@ -710,6 +711,14 @@ namespace
         TtSourceInfo sourceInfo;
     };
 
+    TELEM_ALIGNED_SYMBOL(struct QueueDataMessage, 64) : public QueueDataBase
+    {
+        tt_uint64 time;
+        const char* pFmtStr;
+        TtLogType::Enum logType;
+    };
+
+
     constexpr size_t size0 = sizeof(QueueDataThreadSetName);
     constexpr size_t size1 = sizeof(QueueDataZone);
     constexpr size_t size2 = sizeof(QueueDataLockSetName);
@@ -718,6 +727,7 @@ namespace
     constexpr size_t size5 = sizeof(QueueDataLockCount);
     constexpr size_t size6 = sizeof(QueueDataMemAlloc);
     constexpr size_t size7 = sizeof(QueueDataMemFree);
+    constexpr size_t size8 = sizeof(QueueDataMessage);
 
     static_assert(64 == sizeof(QueueDataThreadSetName));
     static_assert(64 == sizeof(QueueDataTickInfo));
@@ -729,6 +739,7 @@ namespace
     static_assert(64 == sizeof(QueueDataLockCount));
     static_assert(64 == sizeof(QueueDataMemAlloc));
     static_assert(64 == sizeof(QueueDataMemFree));
+    static_assert(64 == sizeof(QueueDataMessage));
 
     void flipBufferInternal(TraceContext* pCtx, bool force)
     {
@@ -765,7 +776,7 @@ namespace
             // did we have to wait more than 0.1ms?
             if (ellapsedNano > 100'000)
             {
-                writeLog(pCtx, LogType::Warning, "Flip stalled for: %lluns", ellapsedNano);
+                writeLog(pCtx, TtLogType::Warning, "Flip stalled for: %lluns", ellapsedNano);
             }
         }
 
@@ -963,6 +974,18 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
+    TELEM_INLINE void queueMessage(TraceContext* pCtx, TtLogType::Enum type, const char* pFmtString)
+    {
+        QueueDataMessage data;
+        data.type = QueueDataType::Message;
+        data.time = getRelativeTicks(pCtx);
+        data.pFmtStr = pFmtString;
+        data.logType = type;
+
+        addToTickBuffer(pCtx, &data, sizeof(data));
+    }
+
+
     // Processing.
     tt_uint16 GetStringId(PacketCompressor* pComp, const char* pStr)
     {
@@ -1128,6 +1151,18 @@ namespace
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
     }
 
+    void queueProcessMessage(PacketCompressor* pComp, const QueueDataMessage* pBuf)
+    {
+        DataPacketMessage packet;
+        packet.type = DataStreamType::Message;
+        packet.time = pBuf->time;
+        packet.strIdxFmt = GetStringId(pComp, pBuf->pFmtStr);
+        packet.logType = pBuf->logType;
+
+        addToCompressionBuffer(pComp, &packet, sizeof(packet));
+    }
+
+
     DWORD __stdcall WorkerThread(LPVOID pParam)
     {
         setThreadName(getThreadID(), "Telemetry");
@@ -1250,6 +1285,10 @@ namespace
                         queueProcessMemFree(&comp, reinterpret_cast<const QueueDataMemFree*>(pBuf));
                         pBuf += sizeof(QueueDataMemFree);
                         break;
+                    case QueueDataType::Message:
+                        queueProcessMessage(&comp, reinterpret_cast<const QueueDataMessage*>(pBuf));
+                        pBuf += sizeof(QueueDataMessage);
+                        break;
 
                     default:
 #if X_DEBUG
@@ -1272,7 +1311,7 @@ namespace
             auto end = gSysTimer.GetTicks();
             auto ellapsed = end - start;
 
-            writeLog(pCtx, LogType::Msg, "processed %iin: %fms", num, gSysTimer.ToMilliSeconds(ellapsed));
+            writeLog(pCtx, TtLogType::Msg, "processed %iin: %fms", num, gSysTimer.ToMilliSeconds(ellapsed));
         }
 
         return 0;
@@ -1523,7 +1562,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     tt_int32 sock_opt = 1024 * 16;
     res = platform::setsockopt(connectSocket, SOL_SOCKET, SO_SNDBUF, (char*)&sock_opt, sizeof(sock_opt));
     if (res != 0) {
-        writeLog(pCtx, LogType::Error, "Failed to set sndbuf on socket. Error: %d", platform::WSAGetLastError());
+        writeLog(pCtx, TtLogType::Error, "Failed to set sndbuf on socket. Error: %d", platform::WSAGetLastError());
         return TtError::Error;
     }
    
@@ -1978,11 +2017,19 @@ void tmPlotU64(TraceContexHandle ctx, TtPlotType type, tt_uint64 value, const ch
     TELEM_UNUSED(pName);
 }
 
+// ----------- Message Stuff -----------
 
-void TelemMessage(TraceContexHandle ctx, LogType type, const char* pFmtString, ...)
+void TelemMessage(TraceContexHandle ctx, TtLogType::Enum type, const char* pFmtString, tt_int32 numArgs, ...)
 {
     TELEM_UNUSED(ctx);
     TELEM_UNUSED(type);
     TELEM_UNUSED(pFmtString);
+    TELEM_UNUSED(numArgs);
 
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    queueMessage(pCtx, type, pFmtString);
 }
