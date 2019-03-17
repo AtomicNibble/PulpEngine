@@ -71,6 +71,8 @@ struct LockTry
     int64_t startNano;
     int64_t endNano;
 
+    uint32_t threadID; // TODO: can just use threadIdx?
+
     uint16_t threadIdx; // used for colors.
     TtLockResult result;
 

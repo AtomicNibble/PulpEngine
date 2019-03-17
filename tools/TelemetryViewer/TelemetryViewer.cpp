@@ -607,10 +607,8 @@ void HandleZoneViewMouse(TraceView& view, int64_t timespan, const ImVec2& wpos, 
     }
 }
 
-void LockTryTooltip(TraceView& view, ZoneSegmentThread& thread, const LockTry& lock)
+void LockTryTooltip(TraceView& view, const LockTry& lock)
 {
-    X_UNUSED(view, thread);
-
     const int64_t cycles = lock.endTick - lock.startTick;
 
     const int64_t end = lock.endNano;
@@ -622,7 +620,7 @@ void LockTryTooltip(TraceView& view, ZoneSegmentThread& thread, const LockTry& l
     auto strFunc = view.strings.getString(lock.strIdxFunction);
     auto strFile = view.strings.getString(lock.strIdxFile);
     auto strLockName = view.strings.getLockName(lock.lockHandle);
-    auto strThread = view.strings.getThreadName(thread.id);
+    auto strThread = view.strings.getThreadName(lock.threadID);
 
     ImGui::BeginTooltip();
 
@@ -642,7 +640,7 @@ void LockTryTooltip(TraceView& view, ZoneSegmentThread& thread, const LockTry& l
         ImGui::Text("%s:%i", strFile.data(), lock.lineNo);
         TextFocused("Thread:", strThread.begin(), strThread.end());
         ImGui::SameLine();
-        ImGui::TextDisabled("(0x%" PRIX32 ")", thread.id);
+        ImGui::TextDisabled("(0x%" PRIX32 ")", lock.threadID);
         ImGui::Separator();
         TextFocused("Execution time:", TimeToString(strBuf, time));
         ImGui::SameLine();
@@ -1060,6 +1058,309 @@ float GetZoneThickness(const telemetry::ZoneData& ev)
     return 1.f;
 }
 
+
+int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns, const ImVec2& wpos, int _offset, float yMin, float yMax)
+{
+    X_UNUSED(view, locks, hover, pxns, wpos, _offset, yMin, yMax);
+
+    const auto w = ImGui::GetWindowContentRegionWidth() - 1;
+    const auto h = std::max<float>(view.zvHeight_, ImGui::GetContentRegionAvail().y - 4); // magic border value
+    auto draw = ImGui::GetWindowDrawList();
+
+    const auto ty = ImGui::GetFontSize();
+    const auto ostep = ty + 1;
+    const auto to = 9.f;
+    const auto th = (ty - to) * sqrt(3) * 0.5;
+
+    StringBuf strBuf;
+
+    int cnt = 0;
+
+    // want to draw all the locks like a dirty sket.
+    // have the LockStates then lockTry
+
+    const bool expanded = true;
+
+    if (expanded)
+    {
+        {
+            const auto offset = _offset + ostep * cnt;
+            const auto labelColor = (expanded ? 0xFFFFFFFF : 0xFF888888);
+
+            const auto txt = "Lock Holds"_sv;
+            const auto txtsz = ImGui::CalcTextSize(txt.begin(), txt.end());
+
+            if (expanded)
+            {
+                draw->AddTriangleFilled(wpos + ImVec2(to / 2, offset + to / 2), wpos + ImVec2(ty - to / 2, offset + to / 2), wpos + ImVec2(ty * 0.5, offset + to / 2 + th), labelColor);
+            }
+            else
+            {
+                draw->AddTriangle(wpos + ImVec2(to / 2, offset + to / 2), wpos + ImVec2(to / 2, offset + ty - to / 2), wpos + ImVec2(to / 2 + th, offset + ty * 0.5), labelColor, 2.0f);
+            }
+
+            draw->AddLine(wpos + ImVec2(0, offset + ostep - 1), wpos + ImVec2(w, offset + ostep - 1), 0x33FFFFFF);
+            draw->AddText(wpos + ImVec2(ty, offset), labelColor, txt.begin(), txt.end());
+
+            cnt++;
+        }
+
+        for (auto& lockIt : locks) {
+            auto& lockHandle = lockIt.first;
+            auto& lockData = lockIt.second;
+
+            const auto offset = _offset + ostep * cnt;
+            const auto yPos = wpos.y + offset;
+
+            if (yPos + ostep >= yMin && yPos <= yMax) {
+                auto& ls = lockData.lockStates;
+
+                auto vbegin = std::lower_bound(ls.begin(), ls.end(), view.zvStartNS_, [](const auto& l, const auto& r) { return l.timeNano < r; });
+                const auto vend = std::lower_bound(vbegin, ls.end(), view.zvEndNS_, [](const auto& l, const auto& r) { return l.timeNano < r; });
+
+                if (vbegin > ls.begin()) {
+                    vbegin--;
+                }
+
+                // TODO: something better?
+                {
+                    if (vbegin < ls.end()) {
+                        while ((*vbegin).state != TtLockState::Locked) {
+                            vbegin++;
+                        }
+                    }
+                }
+
+                double pxend = 0;
+
+                while (vbegin < vend) 
+                {
+                    auto& lockState = (*vbegin);
+                    const auto t0 = lockState.timeNano;
+
+                    auto next = vbegin + 1;
+
+                    const auto px0 = std::max(pxend, (t0 - view.zvStartNS_) * pxns);
+                    int64_t t1 = next == ls.end() ? 0 : (*next).timeNano;
+                    double px1 = (t1 - view.zvStartNS_) * pxns;
+
+                    // i need to only draw between locked and released
+
+                    pxend = std::max({ px1, px0 + MinVisSize, px0 + pxns * 0.5 });
+
+                    auto col = GetLockColor(lockState.threadIdx);
+                    draw->AddRectFilled(wpos + ImVec2(std::max(px0, -10.0), offset), wpos + ImVec2(std::min(pxend, double(w + 10)), offset + ty), col);
+                    draw->AddRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset), GetHighlightColor(col), 0.f, -1, 1.f);
+
+                    ++vbegin;
+                    ++vbegin; // skip released.
+                }
+
+#if 0
+                // lock name.
+                auto lockName = view.strings.getLockName(lockHandle);
+                draw->AddText(wpos + ImVec2(ty, offset), 0xFF79A379, lockName.begin(), lockName.end());
+#endif
+
+                cnt++;
+            }
+        }
+    }
+
+    if (expanded)
+    {
+        {
+            const auto offset = _offset + ostep * cnt;
+            const auto labelColor = (expanded ? 0xFFFFFFFF : 0xFF888888);
+
+            const auto txt = "Lock Try"_sv;
+            const auto txtsz = ImGui::CalcTextSize(txt.begin(), txt.end());
+
+            if (expanded)
+            {
+                draw->AddTriangleFilled(wpos + ImVec2(to / 2, offset + to / 2), wpos + ImVec2(ty - to / 2, offset + to / 2), wpos + ImVec2(ty * 0.5, offset + to / 2 + th), labelColor);
+            }
+            else
+            {
+                draw->AddTriangle(wpos + ImVec2(to / 2, offset + to / 2), wpos + ImVec2(to / 2, offset + ty - to / 2), wpos + ImVec2(to / 2 + th, offset + ty * 0.5), labelColor, 2.0f);
+            }
+
+            draw->AddLine(wpos + ImVec2(0, offset + ostep - 1), wpos + ImVec2(w, offset + ostep - 1), 0x33FFFFFF);
+            draw->AddText(wpos + ImVec2(ty, offset), labelColor, txt.begin(), txt.end());
+
+            cnt++;
+        }
+
+        for (auto& lockIt : locks) {
+//            auto& lockHandle = lockIt.first;
+            auto& lockData = lockIt.second;
+
+            const auto offset = _offset + ostep * cnt;
+            const auto yPos = wpos.y + offset;
+
+            if (yPos + ostep >= yMin && yPos <= yMax) {
+                auto& lt = lockData.lockTry;
+
+                auto it = std::lower_bound(lt.begin(), lt.end(), view.zvStartNS_, [](const auto& l, const auto& r) { return l.endNano < r; });
+                const auto itend = std::lower_bound(it, lt.end(), view.zvEndNS_, [](const auto& l, const auto& r) { return l.startNano < r; });
+
+                double pxend = 0;
+
+                while (it < itend)
+                {
+                    auto& lockTry = (*it);
+                    
+                    const auto locksz = std::max((lockTry.endNano - lockTry.startNano) * pxns, pxns * 0.5);
+
+                    if (locksz < MinVisSize)
+                    {
+                        int num = 1;
+                        const auto px0 = (lockTry.startNano - view.zvStartNS_) * pxns;
+                        auto px1 = (lockTry.endNano - view.zvStartNS_) * pxns;
+                        auto rend = lockTry.endNano;
+                        for (;;)
+                        {
+                            ++it;
+                            if (it == itend) {
+                                break;
+                            }
+
+                            const auto nend = it->endNano;
+                            const auto pxnext = (nend - view.zvStartNS_) * pxns;
+                            if (pxnext - px1 >= MinVisSize * 2) {
+                                break;
+                            }
+
+                            px1 = pxnext;
+                            rend = nend;
+                            num++;
+                        }
+
+                        // need to make this work a bit better when zones get compressed also.
+                        auto color = GetLockColor(lockTry.threadIdx);
+                        auto colorDark = DarkenColor(color);
+
+                        draw->AddRectFilled(
+                            wpos + ImVec2(std::max(px0, -10.0), offset),
+                            wpos + ImVec2(std::min(std::max(px1, px0 + MinVisSize), double(w + 10)), offset + ty),
+                            color);
+
+                        DrawZigZag(
+                            draw,
+                            wpos + ImVec2(0, offset + ty / 2), std::max(px0, -10.0),
+                            std::min(std::max(px1, px0 + MinVisSize), double(w + 10)), ty / 4,
+                            colorDark);
+
+                        if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2(std::max(px0, -10.0), offset), wpos + ImVec2(std::min(std::max(px1, px0 + MinVisSize), double(w + 10)), offset + ty)))
+                        {
+                            if (num > 1)
+                            {
+                                ImGui::BeginTooltip();
+                                TextFocused("Lock waits too small to display:", IntToString(strBuf, num));
+                                ImGui::Separator();
+                                TextFocused("Total time:", TimeToString(strBuf, rend - lockTry.startNano));
+                                ImGui::EndTooltip();
+
+                                if (ImGui::IsMouseClicked(2) && rend - lockTry.startNano > 0)
+                                {
+                                    ZoomToRange(view, lockTry.startNano, rend);
+                                }
+                            }
+                            else
+                            {
+                                LockTryTooltip(view, lockTry);
+
+                                if (ImGui::IsMouseClicked(2) && rend - lockTry.startNano > 0)
+                                {
+                                    ZoomToLockTry(view, lockTry);
+                                }
+                            }
+                        }
+
+                        IntToString(strBuf, num);
+                        const auto tsz = ImGui::CalcTextSize(strBuf.begin(), strBuf.end());
+                        if (tsz.x < px1 - px0)
+                        {
+                            const auto x = px0 + (px1 - px0 - tsz.x) / 2;
+                            DrawTextContrast(draw, wpos + ImVec2(x, offset), 0xFF4488DD, strBuf.c_str());
+                        }
+                    }
+                    else
+                    {
+                        const auto t0 = lockTry.startNano;
+                        const auto t1 = lockTry.endNano;
+                        const auto px0 = std::max(pxend, (t0 - view.zvStartNS_) * pxns);
+                        double px1 = (t1 - view.zvStartNS_) * pxns;
+
+                        pxend = std::max({ px1, px0 + MinVisSize, px0 + pxns * 0.5 });
+
+
+                        constexpr auto prefix = "<Waiting> "_sv;
+                        auto lockName = view.strings.getLockName(lockTry.lockHandle);
+
+                        core::StackString256 str;
+                        str.append(prefix.begin(), prefix.end());
+                        str.append(lockName.begin(), lockName.end());
+
+                        auto text = core::string_view(str);
+                        auto tsz = ImGui::CalcTextSize(text.begin(), text.end());
+
+                        auto color = GetLockColor(lockTry.threadIdx);
+                        draw->AddRectFilled(wpos + ImVec2(std::max(px0, -10.0), offset), wpos + ImVec2(std::min(pxend, double(w + 10)), offset + ty), color);
+
+                        if (tsz.x < locksz)
+                        {
+                            const auto x = (lockTry.startNano - view.zvStartNS_) * pxns + ((lockTry.endNano - lockTry.startNano) * pxns - tsz.x) / 2;
+                            if (x < 0 || x > w - tsz.x)
+                            {
+                                ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
+                                DrawTextContrast(draw, wpos + ImVec2(std::max(std::max(0., px0), std::min(double(w - tsz.x), x)), offset), 0xFFFFFFFF, text);
+                                ImGui::PopClipRect();
+                            }
+                            else if (lockTry.startNano == lockTry.endNano)
+                            {
+                                DrawTextContrast(draw, wpos + ImVec2(px0 + (px1 - px0 - tsz.x) * 0.5, offset), 0xFFFFFFFF, text);
+                            }
+                            else
+                            {
+                                DrawTextContrast(draw, wpos + ImVec2(x, offset), 0xFFFFFFFF, text);
+                            }
+                        }
+                        else
+                        {
+                            ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
+                            DrawTextContrast(draw, wpos + ImVec2((lockTry.startNano - view.zvStartNS_) * pxns, offset), 0xFFFFFFFF, text);
+                            ImGui::PopClipRect();
+                        }
+
+                        if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y)))
+                        {
+                            LockTryTooltip(view, lockTry);
+
+                            if (!view.zoomAnim_.active && ImGui::IsMouseClicked(2))
+                            {
+                                ZoomToLockTry(view, lockTry);
+                            }
+                        }
+                    }
+
+                    ++it;
+                }
+
+#if 0
+                // lock name.
+                auto lockName = view.strings.getLockName(lockHandle);
+                draw->AddText(wpos + ImVec2(ty, offset), 0xFF79A379, lockName.begin(), lockName.end());
+#endif
+
+                cnt++;
+            }
+        }
+    }
+
+    return cnt;
+}
+
 void DrawZoneLevelWaits(TraceView& view, ZoneSegmentThread& thread, int32_t threadIdx,
     bool hover, double pxns, const ImVec2& wpos,
     int _offset, int depth, float yMin, float yMax)
@@ -1092,16 +1393,16 @@ void DrawZoneLevelWaits(TraceView& view, ZoneSegmentThread& thread, int32_t thre
 
     while (it < itend)
     {
-        auto& lock = *it;
+        auto& lockTry = *it;
 
-        const auto locksz = std::max((lock.endNano - lock.startNano) * pxns, pxns * 0.5);
+        const auto locksz = std::max((lockTry.endNano - lockTry.startNano) * pxns, pxns * 0.5);
 
         if (locksz < MinVisSize)
         {
             int num = 1;
-            const auto px0 = (lock.startNano - view.zvStartNS_) * pxns;
-            auto px1 = (lock.endNano - view.zvStartNS_) * pxns;
-            auto rend = lock.endNano;
+            const auto px0 = (lockTry.startNano - view.zvStartNS_) * pxns;
+            auto px1 = (lockTry.endNano - view.zvStartNS_) * pxns;
+            auto rend = lockTry.endNano;
             for (;;)
             {
                 ++it;
@@ -1173,8 +1474,8 @@ void DrawZoneLevelWaits(TraceView& view, ZoneSegmentThread& thread, int32_t thre
         }
         else
         {
-            const auto pr0 = (lock.startNano - view.zvStartNS_) * pxns;
-            const auto pr1 = (lock.endNano - view.zvStartNS_) * pxns;
+            const auto pr0 = (lockTry.startNano - view.zvStartNS_) * pxns;
+            const auto pr1 = (lockTry.endNano - view.zvStartNS_) * pxns;
             const auto px0 = std::max(pr0, -10.0);
             const auto px1 = std::max({ std::min(pr1, double(w + 10)), px0 + pxns * 0.5, px0 + MinVisSize });
 
@@ -1187,28 +1488,21 @@ void DrawZoneLevelWaits(TraceView& view, ZoneSegmentThread& thread, int32_t thre
             str.append(lockName.begin(), lockName.end());
 
             auto text = core::string_view(str);
-
             auto tsz = ImGui::CalcTextSize(text.begin(), text.end());
-            if (tsz.x > locksz)
-            {
-                text = ShortenNamespace(text);
-                tsz = ImGui::CalcTextSize(text.begin(), text.end());
-            }
 
             draw->AddRectFilled(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y), color);
             draw->AddRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y), GetHighlightColor(color), 0.f, -1, 1.f);
 
-
             if (tsz.x < locksz)
             {
-                const auto x = (lock.startNano - view.zvStartNS_) * pxns + ((lock.endNano - lock.startNano) * pxns - tsz.x) / 2;
+                const auto x = (lockTry.startNano - view.zvStartNS_) * pxns + ((lockTry.endNano - lockTry.startNano) * pxns - tsz.x) / 2;
                 if (x < 0 || x > w - tsz.x)
                 {
                     ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
                     DrawTextContrast(draw, wpos + ImVec2(std::max(std::max(0., px0), std::min(double(w - tsz.x), x)), offset), 0xFFFFFFFF, text);
                     ImGui::PopClipRect();
                 }
-                else if (lock.startNano == lock.endNano)
+                else if (lockTry.startNano == lockTry.endNano)
                 {
                     DrawTextContrast(draw, wpos + ImVec2(px0 + (px1 - px0 - tsz.x) * 0.5, offset), 0xFFFFFFFF, text);
                 }
@@ -1220,18 +1514,55 @@ void DrawZoneLevelWaits(TraceView& view, ZoneSegmentThread& thread, int32_t thre
             else
             {
                 ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
-                DrawTextContrast(draw, wpos + ImVec2((lock.startNano - view.zvStartNS_) * pxns, offset), 0xFFFFFFFF, text);
+                DrawTextContrast(draw, wpos + ImVec2((lockTry.startNano - view.zvStartNS_) * pxns, offset), 0xFFFFFFFF, text);
                 ImGui::PopClipRect();
             }
 
             if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y)))
             {
-                LockTryTooltip(view, thread, lock);
+                LockTryTooltip(view, lockTry);
 
                 if (!view.zoomAnim_.active && ImGui::IsMouseClicked(2))
                 {
-                    ZoomToLockTry(view, lock);
+                    ZoomToLockTry(view, lockTry);
                 }
+
+#if 0
+                // when you hover over a waiting section.
+                // i want to highlights who has locks during that time.
+                // so basically finding all lockHolds during this waits timespan.
+
+                auto lockIt = thread.locks.find(lock.lockHandle);
+                if (lockIt != thread.locks.end()) {
+
+                    auto& lockData = lockIt->second;
+                    auto& states = lockData.lockStates;
+
+                    // MEOWWWWWWWWWWWW
+                    auto statesIt = std::lower_bound(states.begin(), states.end(), lock.startNano, [](const auto& l, const auto& r) { return l.timeNano < r; });
+                    if (statesIt == states.end()) {
+                        return;
+                    }
+
+                    const auto statesItend = std::lower_bound(statesIt, states.end(), lock.endNano, [](const auto& l, const auto& r) { return l.timeNano < r; });
+                    if (statesIt == statesItend) {
+                        return;
+                    }
+
+                    if (statesIt != statesItend)
+                    {
+                        // so only bit about this that's annoying is i need to calculate locked regions.
+                        // but once done that should just draw some shit over the threads.
+                        // means i need to know where threads end and start, which i don't here.
+                        // since there are more threads to draw.
+                        // so this needs to be something done last.
+                        statesIt->threadIdx;
+
+
+                    }
+                }
+#endif
+
             }
         }
 
@@ -1469,177 +1800,6 @@ void DispatchZoneLevel(TraceView& view, ZoneSegmentThread& thread, int32_t threa
         // SkipZoneLevel(view, thread, threadIdx, hover, pxns, wpos, _offset, depth, yMin, yMax);
     }
 }
-
-int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns, const ImVec2& wpos, int _offset, float yMin, float yMax)
-{
-    X_UNUSED(view, locks, hover, pxns, wpos, _offset, yMin, yMax);
-
-    const auto w = ImGui::GetWindowContentRegionWidth() - 1;
-    const auto h = std::max<float>(view.zvHeight_, ImGui::GetContentRegionAvail().y - 4); // magic border value
-    auto draw = ImGui::GetWindowDrawList();
-
-    const auto ty = ImGui::GetFontSize();
-    const auto ostep = ty + 1;
-    const auto to = 9.f;
-    const auto th = (ty - to) * sqrt(3) * 0.5;
-
-    int cnt = 0;
-    
-    // want to draw all the locks like a dirty sket.
-    // have the LockStates then lockTry
-
-    const bool expanded = true;
-
-    if(expanded)
-    {
-        {
-            const auto offset = _offset + ostep * cnt;
-            const auto labelColor = (expanded ? 0xFFFFFFFF : 0xFF888888);
-
-            const auto txt = "Lock Holds"_sv;
-            const auto txtsz = ImGui::CalcTextSize(txt.begin(), txt.end());
-
-            if (expanded)
-            {
-                draw->AddTriangleFilled(wpos + ImVec2(to / 2, offset + to / 2), wpos + ImVec2(ty - to / 2, offset + to / 2), wpos + ImVec2(ty * 0.5, offset + to / 2 + th), labelColor);
-            }
-            else
-            {
-                draw->AddTriangle(wpos + ImVec2(to / 2, offset + to / 2), wpos + ImVec2(to / 2, offset + ty - to / 2), wpos + ImVec2(to / 2 + th, offset + ty * 0.5), labelColor, 2.0f);
-            }
-
-            draw->AddLine(wpos + ImVec2(0, offset + ostep - 1), wpos + ImVec2(w, offset + ostep - 1), 0x33FFFFFF);
-            draw->AddText(wpos + ImVec2(ty, offset), labelColor, txt.begin(), txt.end());
-
-            cnt++;
-        }
-
-        for (auto& lockIt : locks) {
-            auto& lockHandle = lockIt.first;
-            auto& lockData = lockIt.second;
-
-            const auto offset = _offset + ostep * cnt;
-            const auto yPos = wpos.y + offset;
-
-            if (yPos + ostep >= yMin && yPos <= yMax) {
-                auto& ls = lockData.lockStates;
-
-                auto vbegin = std::lower_bound(ls.begin(), ls.end(), view.zvStartNS_, [](const auto& l, const auto& r) { return l.timeNano < r; });
-                const auto vend = std::lower_bound(vbegin, ls.end(), view.zvEndNS_, [](const auto& l, const auto& r) { return l.timeNano < r; });
-
-                if (vbegin > ls.begin()) {
-                    vbegin--;
-                }
-
-                // TODO: something better?
-                {
-                    if (vbegin < ls.end()) {
-                        while ((*vbegin).state != TtLockState::Locked) {
-                            vbegin++;
-                        }
-                    }
-                }
-
-                double pxend = 0;
-
-                while (vbegin < vend) {
-                    auto& lockState = (*vbegin);
-                    const auto t0 = lockState.timeNano;
-
-                    auto next = vbegin + 1;
-
-                    const auto px0 = std::max(pxend, (t0 - view.zvStartNS_) * pxns);
-                    int64_t t1 = next == ls.end() ? 0 : (*next).timeNano;
-                    double px1 = (t1 - view.zvStartNS_) * pxns;
-
-                    // i need to only draw between locked and released
-
-                    pxend = std::max({px1, px0 + MinVisSize, px0 + pxns * 0.5});
-
-                    auto col = GetLockColor(lockState.threadIdx);
-                    draw->AddRectFilled(wpos + ImVec2(std::max(px0, -10.0), offset), wpos + ImVec2(std::min(pxend, double(w + 10)), offset + ty), col);
-                    draw->AddRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset), GetHighlightColor(col), 0.f, -1, 1.f);
-
-                    ++vbegin;
-                    ++vbegin; // skip released.
-                }
-
-                // lock name.
-                auto lockName = view.strings.getLockName(lockHandle);
-                draw->AddText(wpos + ImVec2(ty, offset), 0xFF79A379, lockName.begin(), lockName.end());
-
-                cnt++;
-            }
-        }
-    }
-
-    if (expanded)
-    {
-        {
-            const auto offset = _offset + ostep * cnt;
-            const auto labelColor = (expanded ? 0xFFFFFFFF : 0xFF888888);
-
-            const auto txt = "Lock Try"_sv;
-            const auto txtsz = ImGui::CalcTextSize(txt.begin(), txt.end());
-
-            if (expanded)
-            {
-                draw->AddTriangleFilled(wpos + ImVec2(to / 2, offset + to / 2), wpos + ImVec2(ty - to / 2, offset + to / 2), wpos + ImVec2(ty * 0.5, offset + to / 2 + th), labelColor);
-            }
-            else
-            {
-                draw->AddTriangle(wpos + ImVec2(to / 2, offset + to / 2), wpos + ImVec2(to / 2, offset + ty - to / 2), wpos + ImVec2(to / 2 + th, offset + ty * 0.5), labelColor, 2.0f);
-            }
-
-            draw->AddLine(wpos + ImVec2(0, offset + ostep - 1), wpos + ImVec2(w, offset + ostep - 1), 0x33FFFFFF);
-            draw->AddText(wpos + ImVec2(ty, offset), labelColor, txt.begin(), txt.end());
-
-            cnt++;
-        }
-
-        for (auto& lockIt : locks) {
-            auto& lockHandle = lockIt.first;
-            auto& lockData = lockIt.second;
-
-            const auto offset = _offset + ostep * cnt;
-            const auto yPos = wpos.y + offset;
-
-            if (yPos + ostep >= yMin && yPos <= yMax) {
-                auto& lt = lockData.lockTry;
-
-                auto vbegin = std::lower_bound(lt.begin(), lt.end(), view.zvStartNS_, [](const auto& l, const auto& r) { return l.endNano < r; });
-                const auto vend = std::lower_bound(vbegin, lt.end(), view.zvEndNS_, [](const auto& l, const auto& r) { return l.startNano < r; });
-
-                double pxend = 0;
-
-                while (vbegin < vend) {
-                    auto& lockState = (*vbegin);
-                    const auto t0 = lockState.startNano;
-                    const auto t1 = lockState.endNano;
-
-                    const auto px0 = std::max(pxend, (t0 - view.zvStartNS_) * pxns);
-                    double px1 = (t1 - view.zvStartNS_) * pxns;
-
-                    pxend = std::max({px1, px0 + MinVisSize, px0 + pxns * 0.5});
-
-                    auto col = GetLockColor(lockState.threadIdx);
-                    draw->AddRectFilled(wpos + ImVec2(std::max(px0, -10.0), offset), wpos + ImVec2(std::min(pxend, double(w + 10)), offset + ty), col);
-
-                    ++vbegin;
-                }
-
-                // lock name.
-                auto lockName = view.strings.getLockName(lockHandle);
-                draw->AddText(wpos + ImVec2(ty, offset), 0xFF79A379, lockName.begin(), lockName.end());
-
-                cnt++;
-            }
-        }
-    }
-
-    return cnt;
-}
-
 
 
 // This draws the timeline frame info and zones.
@@ -2391,6 +2551,7 @@ bool handleTraceZoneSegmentLockTry(Client& client, const DataPacketBaseViewer* p
         lt.endTick = lockTry.end;
         lt.startNano = view.ticksToNano(lockTry.start);
         lt.endNano = view.ticksToNano(lockTry.end);
+        lt.threadID = lockTry.threadID;
         lt.threadIdx = safe_static_cast<uint16_t>(t);
         lt.result = lockTry.result;
         lt.lineNo = lockTry.lineNo;
