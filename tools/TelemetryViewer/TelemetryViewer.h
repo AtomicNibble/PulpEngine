@@ -318,8 +318,8 @@ public:
     //    frameStart_ = 0;
     //    frameScale_ = 0;
 
-        zvStartNS_ = 1000 * 1000 * 800;
-        zvEndNS_ = 1000 * 1000 * 1500;
+        zvStartNS_ = 1000 * 1000 * 000;
+        zvEndNS_ = 1000 * 1000 * 1000;
 
         zvHeight_ = 0;
         zvScroll_ = 0;
