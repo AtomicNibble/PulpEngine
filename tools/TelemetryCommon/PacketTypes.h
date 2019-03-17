@@ -308,6 +308,11 @@ struct DataPacketMemAlloc : public DataPacketBase
 
     // 8
     tt_uint64 ptr;
+
+    // 6
+    tt_uint16 lineNo;
+    tt_uint16 strIdxFunction;
+    tt_uint16 strIdxFile;
 };
 
 struct DataPacketMemFree : public DataPacketBase
@@ -320,6 +325,11 @@ struct DataPacketMemFree : public DataPacketBase
 
     // 8
     tt_uint64 ptr;
+
+    // 6
+    tt_uint16 lineNo;
+    tt_uint16 strIdxFunction;
+    tt_uint16 strIdxFile;
 };
 
 static_assert(sizeof(DataPacketBase) == 1, "Incorrect size");

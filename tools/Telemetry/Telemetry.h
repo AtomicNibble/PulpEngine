@@ -142,8 +142,8 @@ extern "C"
     __TELEM_API_VOID(TelemSignalLockCount, TraceContexHandle ctx, const void* pPtr, tt_int32 count);
 
     // Some allocation tracking.
-    __TELEM_API_VOID(TelemAlloc, TraceContexHandle ctx, void* pPtr, tt_size size);
-    __TELEM_API_VOID(TelemFree, TraceContexHandle ctx, void* pPtr);
+    __TELEM_API_VOID(TelemAlloc, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr, tt_size size);
+    __TELEM_API_VOID(TelemFree, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr);
 
     __TELEM_API_VOID(TelemPlot, TraceContexHandle ctx, TtPlotType type, float value, const char* pName);
     __TELEM_API_VOID(TelemPlotF32, TraceContexHandle ctx, TtPlotType type, float value, const char* pName);
@@ -394,8 +394,8 @@ namespace telem
 #define ttSignalLockCount(ctx, pPtr, count) __TELEM_FUNC_NAME(TelemSignalLockCount)(ctx, pPtr, count);
 
 // Some allocation tracking.
-#define ttAlloc(ctx, pPtr, size) __TELEM_FUNC_NAME(TelemAlloc)(ctx, pPtr, size);
-#define ttFree(ctx, pPtr) __TELEM_FUNC_NAME(TelemFree)(ctx, pPtr);
+#define ttAlloc(ctx, pPtr, size) __TELEM_FUNC_NAME(TelemAlloc)(ctx, TT_SOURCE_INFO, pPtr, size);
+#define ttFree(ctx, pPtr) __TELEM_FUNC_NAME(TelemFree)(ctx, TT_SOURCE_INFO, pPtr);
 
 #define ttPlot(ctx, type, value, pName);
 #define ttPlotF32(ctx, type, value, pName);
