@@ -61,6 +61,11 @@ struct LockState
     uint16_t threadIdx; // used for colors.
 
     uint32_t threadID; // TODO: can just use threadIdx?
+
+    // 8
+    uint16_t lineNo;
+    uint16_t strIdxFunction;
+    uint16_t strIdxFile;
 };
 
 struct LockTry

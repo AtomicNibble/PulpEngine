@@ -44,6 +44,19 @@ enum TtLockState
     Released
 };
 
+inline const char* TtLockStateToString(TtLockState ls)
+{
+    switch (ls)
+    {
+        case Locked:
+            return "Locked";
+        case Released:
+            return "Released";
+        default:
+            return "<ukn>";
+    }
+}
+
 // Plots
 enum TtPlotType
 {

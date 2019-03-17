@@ -654,18 +654,29 @@ void LockStateTooltip(TraceView& view, const LockState& lockState, const LockSta
     const int64_t cycles = lockStateNext.time - lockState.time;
     const int64_t time = lockStateNext.timeNano - lockState.timeNano;
 
+
+    // these should never driff across threads?
+    // currently no.
+    auto strThread = view.strings.getThreadName(lockState.threadID);
+    auto strFunc = view.strings.getString(lockState.strIdxFunction);
+    auto strFile = view.strings.getString(lockState.strIdxFile);
+
     StringBuf strBuf;
+    core::StackString256 str;
+    str.appendFmt("%s -> %s", TtLockStateToString(lockState.state), TtLockStateToString(lockStateNext.state));
 
     ImGui::BeginTooltip();
 
-        ImGui::TextUnformatted("Lock state change");
+        ImGui::TextUnformatted(str.begin(), str.end());
+        ImGui::Separator();
+        ImGui::TextUnformatted(strFunc.begin(), strFunc.end());
+        ImGui::Text("%s:%i", strFile.data(), lockState.lineNo);
         ImGui::Separator();
         TextFocused("Execution time:", TimeToString(strBuf, time));
         ImGui::SameLine();
         TextFocusedFmt("Cycles:", "%" PRId64, cycles);
 
     ImGui::EndTooltip();
-
 }
 
 
@@ -2565,6 +2576,9 @@ bool handleTraceZoneSegmentLockStates(Client& client, const DataPacketBaseViewer
         ls.state = state.state;
         ls.threadIdx = safe_static_cast<uint16_t>(t);
         ls.threadID = state.threadID;
+        ls.lineNo = state.lineNo;
+        ls.strIdxFunction = state.strIdxFunction;
+        ls.strIdxFile = state.strIdxFile;
 
         it->second.lockStates.push_back(ls);
     }
