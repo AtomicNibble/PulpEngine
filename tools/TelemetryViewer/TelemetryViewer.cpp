@@ -654,9 +654,10 @@ void LockStateTooltip(TraceView& view, const LockState& lockState, const LockSta
     const int64_t cycles = lockStateNext.time - lockState.time;
     const int64_t time = lockStateNext.timeNano - lockState.timeNano;
 
-
     // these should never driff across threads?
     // currently no.
+    X_ASSERT(lockStateNext.threadID == lockState.threadID, "Lock state on diffrent thread")();
+
     auto strThread = view.strings.getThreadName(lockState.threadID);
     auto strFunc = view.strings.getString(lockState.strIdxFunction);
     auto strFile = view.strings.getString(lockState.strIdxFile);
