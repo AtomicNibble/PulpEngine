@@ -366,7 +366,7 @@ bool TraceDB::createDB(core::Path<char>& path)
     cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, timeTicks, nameStrId) VALUES(?,?,?)");
     cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, nameStrId) VALUES(?,?,?)");
     cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)");
-    cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation) VALUES(?,?,?,?,?)");
+    cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation, sourceInfoIdx) VALUES(?,?,?,?,?,?)");
     return true;
 }
 
@@ -523,12 +523,13 @@ CREATE TABLE IF NOT EXISTS "lockStates" (
 );
 
 CREATE TABLE "memory" (
-	"Id"	        INTEGER,
-	"allocId"	    INTEGER NOT NULL,
-	"size"	        INTEGER NOT NULL,
-	"threadId"	    INTEGER NOT NULL,
-	"timeTicks"	    INTEGER NOT NULL,
-	"operation"	    INTEGER NOT NULL,
+	"Id"	            INTEGER,
+	"allocId"	        INTEGER NOT NULL,
+	"size"	            INTEGER NOT NULL,
+	"threadId"	        INTEGER NOT NULL,
+	"timeTicks"	        INTEGER NOT NULL,
+	"operation"	        INTEGER NOT NULL,
+    "sourceInfoIdx"	    INTEGER NOT NULL,
 	PRIMARY KEY("Id")
 );
 
@@ -720,12 +721,19 @@ void TraceDB::handleDataPacketLockCount(const DataPacketLockCount* pData)
 
 void TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
 {
+    PackedSourceInfo info;
+    info.raw.lineNo = pData->lineNo;
+    info.raw.idxFunction = pData->strIdxFunction;
+    info.raw.idxFile = pData->strIdxFile;
+    info.raw.idxZone = 0;
+
     auto& cmd = cmdInsertMemory;
     cmd.bind(1, static_cast<int32_t>(pData->ptr));
     cmd.bind(2, static_cast<int32_t>(pData->size));
     cmd.bind(3, static_cast<int32_t>(pData->threadID));
     cmd.bind(4, static_cast<int64_t>(pData->time));
     cmd.bind(5, static_cast<int32_t>(MemOp::Alloc));
+    cmd.bind(6, static_cast<int64_t>(info.packed));
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -737,12 +745,19 @@ void TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
 
 void TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
 {
+    PackedSourceInfo info;
+    info.raw.lineNo = pData->lineNo;
+    info.raw.idxFunction = pData->strIdxFunction;
+    info.raw.idxFile = pData->strIdxFile;
+    info.raw.idxZone = 0;
+
     auto& cmd = cmdInsertMemory;
     cmd.bind(1, static_cast<int32_t>(pData->ptr));
     cmd.bind(2, -1);
     cmd.bind(3, static_cast<int32_t>(pData->threadID));
     cmd.bind(4, static_cast<int64_t>(pData->time));
     cmd.bind(5, static_cast<int32_t>(MemOp::Free));
+    cmd.bind(6, static_cast<int64_t>(info.packed));
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
