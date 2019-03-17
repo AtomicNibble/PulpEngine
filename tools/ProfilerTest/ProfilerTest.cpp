@@ -150,7 +150,7 @@ namespace
     }
 
 
-    void LogFunc(void* pUserData, LogType type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm)
+    void LogFunc(void* pUserData, TtLogType::Enum type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm)
     {
         X_UNUSED(pUserData);
         X_UNUSED(type);
