@@ -647,6 +647,28 @@ void LockTryTooltip(TraceView& view, const LockTry& lock)
     ImGui::EndTooltip();
 }
 
+void LockStateTooltip(TraceView& view, const LockState& lockState, const LockState& lockStateNext)
+{
+    X_UNUSED(view);
+
+    const int64_t cycles = lockStateNext.time - lockState.time;
+    const int64_t time = lockStateNext.timeNano - lockState.timeNano;
+
+    StringBuf strBuf;
+
+    ImGui::BeginTooltip();
+
+        ImGui::TextUnformatted("Lock state change");
+        ImGui::Separator();
+        TextFocused("Execution time:", TimeToString(strBuf, time));
+        ImGui::SameLine();
+        TextFocusedFmt("Cycles:", "%" PRId64, cycles);
+
+    ImGui::EndTooltip();
+
+}
+
+
 void ZoneTooltip(TraceView& view, ZoneSegmentThread& thread, const ZoneData& zone)
 {
     X_UNUSED(view);
@@ -1071,6 +1093,7 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
     const auto th = (ty - to) * sqrt(3) * 0.5;
 
     StringBuf strBuf;
+    core::StackString256 str;
 
     int cnt = 0;
 
@@ -1131,24 +1154,77 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
 
                 double pxend = 0;
 
+
+                auto lockName = view.strings.getLockName(lockHandle);
+
+                // need to find lock begin and ends.
+                // not sure what else i might want for states?
                 while (vbegin < vend) 
                 {
                     auto& lockState = (*vbegin);
-                    const auto t0 = lockState.timeNano;
+                    auto& lockStateNext = *(vbegin + 1);
 
-                    auto next = vbegin + 1;
 
-                    const auto px0 = std::max(pxend, (t0 - view.zvStartNS_) * pxns);
-                    int64_t t1 = next == ls.end() ? 0 : (*next).timeNano;
-                    double px1 = (t1 - view.zvStartNS_) * pxns;
+                    const auto locksz = std::max((lockStateNext.timeNano - lockState.timeNano) * pxns, pxns * 0.5);
 
-                    // i need to only draw between locked and released
+                    if (locksz < MinVisSize)
+                    {
 
-                    pxend = std::max({ px1, px0 + MinVisSize, px0 + pxns * 0.5 });
 
-                    auto col = GetLockColor(lockState.threadIdx);
-                    draw->AddRectFilled(wpos + ImVec2(std::max(px0, -10.0), offset), wpos + ImVec2(std::min(pxend, double(w + 10)), offset + ty), col);
-                    draw->AddRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset), GetHighlightColor(col), 0.f, -1, 1.f);
+                    }
+                    else
+                    {
+                        const auto t0 = lockState.timeNano;
+                        const auto t1 = lockStateNext.timeNano;
+                        const auto px0 = std::max(pxend, (t0 - view.zvStartNS_) * pxns);
+                        double px1 = (t1 - view.zvStartNS_) * pxns;
+
+                        pxend = std::max({ px1, px0 + MinVisSize, px0 + pxns * 0.5 });
+
+                        constexpr auto sperator = " <HOLDING> "_sv;
+                        auto threadName = view.strings.getThreadName(lockState.threadID);
+
+                        str.set(threadName.begin(), threadName.end());
+                        str.append(sperator.begin(), sperator.end());
+                        str.append(lockName.begin(), lockName.end());
+
+                        auto text = core::string_view(str);
+                        auto tsz = ImGui::CalcTextSize(text.begin(), text.end());
+
+                        auto col = GetLockColor(lockState.threadIdx);
+                        draw->AddRectFilled(wpos + ImVec2(std::max(px0, -10.0), offset), wpos + ImVec2(std::min(pxend, double(w + 10)), offset + ty), col);
+                        draw->AddRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset), GetHighlightColor(col), 0.f, -1, 1.f);
+
+                        if (tsz.x < locksz)
+                        {
+                            const auto x = (t0 - view.zvStartNS_) * pxns + ((t1 - t0) * pxns - tsz.x) / 2;
+                            if (x < 0 || x > w - tsz.x)
+                            {
+                                ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
+                                DrawTextContrast(draw, wpos + ImVec2(std::max(std::max(0., px0), std::min(double(w - tsz.x), x)), offset), 0xFFFFFFFF, text);
+                                ImGui::PopClipRect();
+                            }
+                            else if (t0 == t1)
+                            {
+                                DrawTextContrast(draw, wpos + ImVec2(px0 + (px1 - px0 - tsz.x) * 0.5, offset), 0xFFFFFFFF, text);
+                            }
+                            else
+                            {
+                                DrawTextContrast(draw, wpos + ImVec2(x, offset), 0xFFFFFFFF, text);
+                            }
+                        }
+                        else
+                        {
+                            ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
+                            DrawTextContrast(draw, wpos + ImVec2((t0 - view.zvStartNS_) * pxns, offset), 0xFFFFFFFF, text);
+                            ImGui::PopClipRect();
+                        }
+
+                        if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y)))
+                        {
+                            LockStateTooltip(view, lockState, lockStateNext);
+                        }
+                    }
 
                     ++vbegin;
                     ++vbegin; // skip released.
@@ -1296,8 +1372,7 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
                         constexpr auto prefix = "<Waiting> "_sv;
                         auto lockName = view.strings.getLockName(lockTry.lockHandle);
 
-                        core::StackString256 str;
-                        str.append(prefix.begin(), prefix.end());
+                        str.set(prefix.begin(), prefix.end());
                         str.append(lockName.begin(), lockName.end());
 
                         auto text = core::string_view(str);
@@ -2489,6 +2564,7 @@ bool handleTraceZoneSegmentLockStates(Client& client, const DataPacketBaseViewer
         ls.timeNano = view.ticksToNano(state.time);
         ls.state = state.state;
         ls.threadIdx = safe_static_cast<uint16_t>(t);
+        ls.threadID = state.threadID;
 
         it->second.lockStates.push_back(ls);
     }

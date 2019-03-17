@@ -59,6 +59,8 @@ struct LockState
 
     TtLockState state;
     uint16_t threadIdx; // used for colors.
+
+    uint32_t threadID; // TODO: can just use threadIdx?
 };
 
 struct LockTry
