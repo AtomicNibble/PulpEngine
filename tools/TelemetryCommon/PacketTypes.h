@@ -277,6 +277,11 @@ struct DataPacketLockState : public DataPacketBase
 
     // 8
     tt_uint64 lockHandle;
+
+    // 6
+    tt_uint16 lineNo;
+    tt_uint16 strIdxFunction;
+    tt_uint16 strIdxFile;
 };
 
 struct DataPacketLockCount : public DataPacketBase
@@ -292,6 +297,11 @@ struct DataPacketLockCount : public DataPacketBase
 
     // 2
     tt_uint16 count;
+
+    // 6
+    tt_uint16 lineNo;
+    tt_uint16 strIdxFunction;
+    tt_uint16 strIdxFile;
 };
 
 struct DataPacketMemAlloc : public DataPacketBase
@@ -337,8 +347,8 @@ static_assert(sizeof(DataPacketZone) == 30, "Incorrect size");
 static_assert(sizeof(DataPacketThreadSetName) == 15, "Incorrect size");
 static_assert(sizeof(DataPacketLockSetName) == 19, "Incorrect size");
 static_assert(sizeof(DataPacketLockTry) == 39, "Incorrect size");
-static_assert(sizeof(DataPacketLockState) == 25, "Incorrect size");
-static_assert(sizeof(DataPacketLockCount) == 23, "Incorrect size");
+static_assert(sizeof(DataPacketLockState) == 31, "Incorrect size");
+static_assert(sizeof(DataPacketLockCount) == 29, "Incorrect size");
 static_assert(sizeof(DataPacketMemAlloc) == 31, "Incorrect size");
 static_assert(sizeof(DataPacketMemFree) == 27, "Incorrect size");
 

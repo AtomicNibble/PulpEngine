@@ -138,8 +138,8 @@ extern "C"
     __TELEM_API_VOID(TelemTryLockEx, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const void* pPtr, const char* pDescription);
     __TELEM_API_VOID(TelemEndTryLock, TraceContexHandle ctx, const void* pPtr, TtLockResult result);
     __TELEM_API_VOID(TelemEndTryLockEx, TraceContexHandle ctx, tt_uint64 matchId, const void* pPtr, TtLockResult result);
-    __TELEM_API_VOID(TelemSetLockState, TraceContexHandle ctx, const void* pPtr, TtLockState state);
-    __TELEM_API_VOID(TelemSignalLockCount, TraceContexHandle ctx, const void* pPtr, tt_int32 count);
+    __TELEM_API_VOID(TelemSetLockState, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState state);
+    __TELEM_API_VOID(TelemSignalLockCount, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, tt_int32 count);
 
     // Some allocation tracking.
     __TELEM_API_VOID(TelemAlloc, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr, tt_size size);
@@ -390,8 +390,8 @@ namespace telem
 #define ttTryLockEx(ctx, matchIdOut, minMicroSec, pPtr, pDescription) __TELEM_FUNC_NAME(TelemTryLock)(ctx, TT_SOURCE_INFO, matchIdOut, minMicroSec, pPtr, pDescription);
 #define ttEndTryLock(ctx, pPtr, result) __TELEM_FUNC_NAME(TelemEndTryLock)(ctx, pPtr, result);
 #define ttEndTryLockEx(ctx, matchIdOut, pPtr, result) __TELEM_FUNC_NAME(TelemEndTryLockEx)(ctx, matchIdOut, pPtr, result);
-#define ttSetLockState(ctx, pPtr, state) __TELEM_FUNC_NAME(TelemSetLockState)(ctx, pPtr, state);
-#define ttSignalLockCount(ctx, pPtr, count) __TELEM_FUNC_NAME(TelemSignalLockCount)(ctx, pPtr, count);
+#define ttSetLockState(ctx, pPtr, state) __TELEM_FUNC_NAME(TelemSetLockState)(ctx, TT_SOURCE_INFO, pPtr, state);
+#define ttSignalLockCount(ctx, pPtr, count) __TELEM_FUNC_NAME(TelemSignalLockCount)(ctx, TT_SOURCE_INFO, pPtr, count);
 
 // Some allocation tracking.
 #define ttAlloc(ctx, pPtr, size) __TELEM_FUNC_NAME(TelemAlloc)(ctx, TT_SOURCE_INFO, pPtr, size);

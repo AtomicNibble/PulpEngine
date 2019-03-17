@@ -362,7 +362,7 @@ bool TraceDB::createDB(core::Path<char>& path)
     cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, startTick, endTick, startNano, endNano) VALUES(?,?,?,?,?)");
     cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
     cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, startTick, endTick, result, depth, packedSourceInfo) VALUES(?,?,?,?,?,?,?)");
-    cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, timeTicks, state) VALUES(?,?,?,?)");
+    cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, timeTicks, state, packedSourceInfo) VALUES(?,?,?,?,?)");
     cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, timeTicks, nameStrId) VALUES(?,?,?)");
     cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, nameStrId) VALUES(?,?,?)");
     cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)");
@@ -514,11 +514,12 @@ CREATE TABLE IF NOT EXISTS "lockTry" (
 );
 
 CREATE TABLE IF NOT EXISTS "lockStates" (
-	"Id"	        INTEGER,
-	"lockId"	    INTEGER NOT NULL,
-	"threadId"	    INTEGER NOT NULL,
-	"timeTicks"	    INTEGER NOT NULL,
-	"state"	        INTEGER NOT NULL,
+	"Id"	            INTEGER,
+	"lockId"	        INTEGER NOT NULL,
+	"threadId"	        INTEGER NOT NULL,
+	"timeTicks"	        INTEGER NOT NULL,
+	"state"	            INTEGER NOT NULL,
+    "packedSourceInfo"	INTEGER NOT NULL,
 	PRIMARY KEY("Id")
 );
 
@@ -667,11 +668,18 @@ void TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
 {
     insertLockIfMissing(pData->lockHandle);
 
+    PackedSourceInfo info;
+    info.raw.lineNo = pData->lineNo;
+    info.raw.idxFunction = pData->strIdxFunction;
+    info.raw.idxFile = pData->strIdxFile;
+    info.raw.idxZone = 0;
+
     auto& cmd = cmdInsertLockState;
     cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
     cmd.bind(2, static_cast<int32_t>(pData->threadID));
     cmd.bind(3, static_cast<int64_t>(pData->time));
     cmd.bind(4, static_cast<int64_t>(pData->state));
+    cmd.bind(5, static_cast<int64_t>(info.packed));
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -1740,7 +1748,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
 
     {
         // lockStates?
-        sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, threadId, timeTicks, state FROM lockStates WHERE timeTicks >= ? AND timeTicks < ?");
+        sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, threadId, timeTicks, state, packedSourceInfo FROM lockStates WHERE timeTicks >= ? AND timeTicks < ?");
         qry.bind(1, static_cast<int64_t>(start));
         qry.bind(2, static_cast<int64_t>(end));
 
@@ -1761,6 +1769,13 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
             lockState.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
             lockState.time = static_cast<uint64_t>(row.get<int64_t>(2));
             lockState.state = static_cast<TtLockState>(row.get<int32_t>(3));
+
+            TraceDB::PackedSourceInfo info;
+            info.packed = static_cast<uint64_t>(row.get<int64_t>(4));
+
+            lockState.lineNo = info.raw.lineNo;
+            lockState.strIdxFunction = info.raw.idxFunction;
+            lockState.strIdxFile = info.raw.idxFile;
 
             if (getCompressionBufferSpace(client) < sizeof(lockState))
             {

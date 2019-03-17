@@ -681,6 +681,7 @@ namespace
         TtthreadId threadID;
         tt_uint64 time;
         const void* pLockPtr;
+        TtSourceInfo sourceInfo;
     };
 
     TELEM_ALIGNED_SYMBOL(struct QueueDataLockCount, 64) : public QueueDataBase
@@ -689,6 +690,7 @@ namespace
         TtthreadId threadID;
         tt_uint64 time;
         const void* pLockPtr;
+        TtSourceInfo sourceInfo;
     };
 
     TELEM_ALIGNED_SYMBOL(struct QueueDataMemAlloc, 64) : public QueueDataBase
@@ -910,7 +912,7 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    TELEM_INLINE void queueLockState(TraceContext* pCtx, const void* pPtr, TtLockState state)
+    TELEM_INLINE void queueLockState(TraceContext* pCtx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState state)
     {
         QueueDataLockState data;
         data.type = QueueDataType::LockState;
@@ -918,11 +920,12 @@ namespace
         data.pLockPtr = pPtr;
         data.state = state;
         data.threadID = getThreadID();
+        data.sourceInfo = sourceInfo;
 
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    TELEM_INLINE void queueLockCount(TraceContext* pCtx, const void* pPtr, tt_int32 count)
+    TELEM_INLINE void queueLockCount(TraceContext* pCtx, const TtSourceInfo& sourceInfo, const void* pPtr, tt_int32 count)
     {
         QueueDataLockCount data;
         data.type = QueueDataType::LockCount;
@@ -930,6 +933,7 @@ namespace
         data.pLockPtr = pPtr;
         data.count = static_cast<tt_uint16>(count);
         data.threadID = getThreadID();
+        data.sourceInfo = sourceInfo;
 
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
@@ -1073,6 +1077,9 @@ namespace
         packet.state = pBuf->state;
         packet.time = pBuf->time;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
+        packet.lineNo = static_cast<tt_uint16>(pBuf->sourceInfo.line_);
+        packet.strIdxFunction = GetStringId(pComp, pBuf->sourceInfo.pFunction_);
+        packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile_);
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
     }
@@ -1085,6 +1092,9 @@ namespace
         packet.count = pBuf->count;
         packet.time = pBuf->time;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
+        packet.lineNo = static_cast<tt_uint16>(pBuf->sourceInfo.line_);
+        packet.strIdxFunction = GetStringId(pComp, pBuf->sourceInfo.pFunction_);
+        packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile_);
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
     }
@@ -1876,24 +1886,24 @@ void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPt
     queueLockTry(pCtx, pThreadData, pPtr, pLock);
 }
 
-void TelemSetLockState(TraceContexHandle ctx, const void* pPtr, TtLockState state)
+void TelemSetLockState(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState state)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
         return;
     }
 
-    queueLockState(pCtx, pPtr, state);
+    queueLockState(pCtx, sourceInfo, pPtr, state);
 }
 
-void TelemSignalLockCount(TraceContexHandle ctx, const void* pPtr, tt_int32 count)
+void TelemSignalLockCount(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, tt_int32 count)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
         return;
     }
 
-    queueLockCount(pCtx, pPtr, count);
+    queueLockCount(pCtx, sourceInfo, pPtr, count);
 }
 
 // ----------- Allocation stuff -----------
