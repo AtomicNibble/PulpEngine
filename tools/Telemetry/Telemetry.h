@@ -153,6 +153,8 @@ extern "C"
     __TELEM_API_VOID(TelemPlotU32, TraceContexHandle ctx, TtPlotType type, tt_uint32 value, const char* pName);
     __TELEM_API_VOID(TelemPlotU64, TraceContexHandle ctx, TtPlotType type, tt_uint64 value, const char* pName);
 
+    __TELEM_API_VOID(TelemMessage, TraceContexHandle ctx, LogType type, const char* pFmtString, ...);
+
 #pragma warning( pop )
 
 #ifdef __cplusplus
@@ -220,6 +222,7 @@ namespace telem
             __TELEM_RESOLVE(TelemSignalLockCount);
             __TELEM_RESOLVE(TelemAlloc);
             __TELEM_RESOLVE(TelemFree);
+            __TELEM_RESOLVE(TelemMessage);
             return true;
         }
 
@@ -251,6 +254,7 @@ namespace telem
             __TELEM_SET_BLANK(TelemSignalLockCount);
             __TELEM_SET_BLANK(TelemAlloc);
             __TELEM_SET_BLANK(TelemFree);
+            __TELEM_SET_BLANK(TelemMessage);
         }
 
         void unLoad()
@@ -288,6 +292,7 @@ namespace telem
         __TELEM_FUNC_PTR(TelemSignalLockCount);
         __TELEM_FUNC_PTR(TelemAlloc);
         __TELEM_FUNC_PTR(TelemFree);
+        __TELEM_FUNC_PTR(TelemMessage);
 
     private:
         HMODULE hLib_;
@@ -404,6 +409,11 @@ namespace telem
 #define ttPlotU32(ctx, type, value, pName)
 #define ttPlotI64(ctx, type, value, pName)
 #define ttPlotU64(ctx, type, value, pName)
+
+#define ttMessage(ctx, type, pFmtString, ...)  __TELEM_FUNC_NAME(TelemMessage)(ctx, type, pFmtString, __VA_ARGS__)
+#define ttLog(ctx, pFmtString, ...) ttMessage(ctx, LogType::Msg, pFmtString, __VA_ARGS__)
+#define ttWarning(ctx, pFmtString, ...) ttMessage(ctx, LogType::Warning, pFmtString, __VA_ARGS__)
+#define ttError(ctx, pFmtString, ...) ttMessage(ctx, LogType::Error, pFmtString, __VA_ARGS__)
 
 #else // TTELEMETRY_ENABLED
 

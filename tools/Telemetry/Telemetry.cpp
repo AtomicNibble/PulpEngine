@@ -1977,3 +1977,12 @@ void tmPlotU64(TraceContexHandle ctx, TtPlotType type, tt_uint64 value, const ch
     TELEM_UNUSED(value);
     TELEM_UNUSED(pName);
 }
+
+
+void TelemMessage(TraceContexHandle ctx, LogType type, const char* pFmtString, ...)
+{
+    TELEM_UNUSED(ctx);
+    TELEM_UNUSED(type);
+    TELEM_UNUSED(pFmtString);
+
+}
