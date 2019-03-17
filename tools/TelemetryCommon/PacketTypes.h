@@ -168,6 +168,8 @@ struct DataStreamType
     };
 };
 
+TELEM_PACK_PUSH(1)
+
 struct DataPacketBase
 {
     DataStreamType::Enum type;
@@ -179,14 +181,8 @@ struct DataPacketStringTableAdd : public DataPacketBase
     tt_uint16 length;
 };
 
-TELEM_PACK_PUSH(4)
-
 struct DataPacketZone : public DataPacketBase
 {
-    // 3
-    tt_int8 stackDepth;
-    tt_int8  _pad0[2];
-
     // 4
     TtthreadId threadID;
 
@@ -199,6 +195,9 @@ struct DataPacketZone : public DataPacketBase
     tt_uint16 strIdxFunction;
     tt_uint16 strIdxFile;
     tt_uint16 strIdxZone;
+
+    // 1
+    tt_int8 stackDepth;
 };
 
 struct DataPacketTickInfo : public DataPacketBase
@@ -215,12 +214,12 @@ struct DataPacketTickInfo : public DataPacketBase
 
 struct DataPacketThreadSetName : public DataPacketBase
 {
-    // 2
-    tt_uint16 strIdxName;
-    // 4
-    TtthreadId threadID;
     // 8
     tt_uint64 time;
+    // 4
+    TtthreadId threadID;
+    // 2
+    tt_uint16 strIdxName;
 };
 
 struct DataPacketCallStack : public DataPacketBase
@@ -231,14 +230,14 @@ struct DataPacketCallStack : public DataPacketBase
 
 struct DataPacketLockSetName : public DataPacketBase
 {
-    // 2
-    tt_uint16 strIdxName;
-
     // 8
     tt_uint64 time;
 
     // 8
     tt_uint64 lockHandle;
+
+    // 2
+    tt_uint16 strIdxName;
 };
 
 struct DataPacketLockTry : public DataPacketBase
@@ -282,9 +281,6 @@ struct DataPacketLockState : public DataPacketBase
 
 struct DataPacketLockCount : public DataPacketBase
 {
-    // 2
-    tt_uint16 count;
-
     // 4
     TtthreadId threadID;
 
@@ -293,6 +289,9 @@ struct DataPacketLockCount : public DataPacketBase
 
     // 8
     tt_uint64 lockHandle;
+
+    // 2
+    tt_uint16 count;
 };
 
 struct DataPacketMemAlloc : public DataPacketBase
@@ -333,15 +332,15 @@ struct DataPacketMemFree : public DataPacketBase
 };
 
 static_assert(sizeof(DataPacketBase) == 1, "Incorrect size");
-static_assert(sizeof(DataPacketStringTableAdd) == 6, "Incorrect size");
-static_assert(sizeof(DataPacketZone) == 32, "Incorrect size");
-static_assert(sizeof(DataPacketThreadSetName) == 16, "Incorrect size");
-static_assert(sizeof(DataPacketLockSetName) == 20, "Incorrect size");
-static_assert(sizeof(DataPacketLockTry) == 44, "Incorrect size");
-static_assert(sizeof(DataPacketLockState) == 28, "Incorrect size");
-static_assert(sizeof(DataPacketLockCount) == 24, "Incorrect size");
-static_assert(sizeof(DataPacketMemAlloc) == 28, "Incorrect size");
-static_assert(sizeof(DataPacketMemFree) == 24, "Incorrect size");
+static_assert(sizeof(DataPacketStringTableAdd) == 5, "Incorrect size");
+static_assert(sizeof(DataPacketZone) == 30, "Incorrect size");
+static_assert(sizeof(DataPacketThreadSetName) == 15, "Incorrect size");
+static_assert(sizeof(DataPacketLockSetName) == 19, "Incorrect size");
+static_assert(sizeof(DataPacketLockTry) == 39, "Incorrect size");
+static_assert(sizeof(DataPacketLockState) == 25, "Incorrect size");
+static_assert(sizeof(DataPacketLockCount) == 23, "Incorrect size");
+static_assert(sizeof(DataPacketMemAlloc) == 31, "Incorrect size");
+static_assert(sizeof(DataPacketMemFree) == 27, "Incorrect size");
 
 
 TELEM_PACK_POP
