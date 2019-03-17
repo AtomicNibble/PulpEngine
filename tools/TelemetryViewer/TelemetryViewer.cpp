@@ -1151,95 +1151,149 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
                 auto vbegin = std::lower_bound(ls.begin(), ls.end(), view.zvStartNS_, [](const auto& l, const auto& r) { return l.timeNano < r; });
                 const auto vend = std::lower_bound(vbegin, ls.end(), view.zvEndNS_, [](const auto& l, const auto& r) { return l.timeNano < r; });
 
-                if (vbegin > ls.begin()) {
-                    vbegin--;
-                }
 
-                // TODO: something better?
-                {
-                    if (vbegin < ls.end()) {
-                        while ((*vbegin).state != TtLockState::Locked) {
-                            vbegin++;
-                        }
-                    }
-                }
 
+                const auto lockName = view.strings.getLockName(lockHandle);
                 double pxend = 0;
 
-
-                auto lockName = view.strings.getLockName(lockHandle);
-
-                // need to find lock begin and ends.
-                // not sure what else i might want for states?
-                while (vbegin < vend) 
+                auto getNextState = [](const LockState* pBegin, const LockState* pEnd) -> const LockState*
                 {
-                    auto& lockState = (*vbegin);
-                    auto& lockStateNext = *(vbegin + 1);
-
-
-                    const auto locksz = std::max((lockStateNext.timeNano - lockState.timeNano) * pxns, pxns * 0.5);
-
-                    if (locksz < MinVisSize)
+                    if (pBegin->state == TtLockState::Locked)
                     {
+                        ++pBegin;
 
+                        while (pBegin < pEnd)
+                        {
+                            if (pBegin->state == TtLockState::Released)
+                            {
+                                break;
+                            }
+                            
+                            ++pBegin;
+                        }
+                    }
+                    else if (pBegin->state == TtLockState::Released)
+                    {
+                        ++pBegin;
 
+                        while (pBegin < pEnd)
+                        {
+                            if (pBegin->state == TtLockState::Locked)
+                            {
+                                break;
+                            }
+
+                            ++pBegin;
+                        }
                     }
                     else
                     {
-                        const auto t0 = lockState.timeNano;
-                        const auto t1 = lockStateNext.timeNano;
-                        const auto px0 = std::max(pxend, (t0 - view.zvStartNS_) * pxns);
-                        double px1 = (t1 - view.zvStartNS_) * pxns;
+                        X_ASSERT_UNREACHABLE();
+                    }
 
-                        pxend = std::max({ px1, px0 + MinVisSize, px0 + pxns * 0.5 });
+                    return pBegin;
+                };
 
-                        constexpr auto sperator = " <HOLDING> "_sv;
-                        auto threadName = view.strings.getThreadName(lockState.threadID);
+                if (vbegin < vend)
+                {
+                    if (vbegin > ls.begin()) {
+                        vbegin--;
+                    }
 
-                        str.set(threadName.begin(), threadName.end());
-                        str.append(sperator.begin(), sperator.end());
-                        str.append(lockName.begin(), lockName.end());
+                    if (vbegin->state != TtLockState::Locked) {
+                        vbegin = getNextState(vbegin, vend);
+                    }
 
-                        auto text = core::string_view(str);
-                        auto tsz = ImGui::CalcTextSize(text.begin(), text.end());
+                    if (vbegin < vend) {
+                        X_ASSERT((*vbegin).state == TtLockState::Locked, "Incorrect state")();
+                    }
 
-                        auto col = GetLockColor(lockState.threadIdx);
-                        draw->AddRectFilled(wpos + ImVec2(std::max(px0, -10.0), offset), wpos + ImVec2(std::min(pxend, double(w + 10)), offset + ty), col);
-                        draw->AddRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset), GetHighlightColor(col), 0.f, -1, 1.f);
+                    auto vbeginOrig = vbegin;
+                    auto vendOrig = vend;
 
-                        if (tsz.x < locksz)
+                    X_UNUSED(vbeginOrig, vendOrig);
+
+                    while (vbegin < vend) 
+                    {
+                        auto& lockState = (*vbegin);
+                        vbegin = getNextState(vbegin, vend);
+
+                        // TODO: support open states.
+                        if (vbegin == vend) {
+                            break;
+                        }
+
+                        auto& lockStateNext = *(vbegin);
+                        ++vbegin;
+
+                        X_ASSERT(lockState.state == TtLockState::Locked && lockStateNext.state == TtLockState::Released, "Incorrect states")();
+                        const auto locksz = std::max((lockStateNext.timeNano - lockState.timeNano) * pxns, pxns * 0.5);
+
+                        if (locksz < MinVisSize)
                         {
-                            const auto x = (t0 - view.zvStartNS_) * pxns + ((t1 - t0) * pxns - tsz.x) / 2;
-                            if (x < 0 || x > w - tsz.x)
-                            {
-                                ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
-                                DrawTextContrast(draw, wpos + ImVec2(std::max(std::max(0., px0), std::min(double(w - tsz.x), x)), offset), 0xFFFFFFFF, text);
-                                ImGui::PopClipRect();
-                            }
-                            else if (t0 == t1)
-                            {
-                                DrawTextContrast(draw, wpos + ImVec2(px0 + (px1 - px0 - tsz.x) * 0.5, offset), 0xFFFFFFFF, text);
-                            }
-                            else
-                            {
-                                DrawTextContrast(draw, wpos + ImVec2(x, offset), 0xFFFFFFFF, text);
-                            }
+                            // so we need to just go over zones.
+                            // what about color tho?
+                            // they can be for multiple threads.
+                            // dunno lol
+
+
+
+
                         }
                         else
                         {
-                            ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
-                            DrawTextContrast(draw, wpos + ImVec2((t0 - view.zvStartNS_) * pxns, offset), 0xFFFFFFFF, text);
-                            ImGui::PopClipRect();
-                        }
+                            const auto t0 = lockState.timeNano;
+                            const auto t1 = lockStateNext.timeNano;
+                            const auto px0 = std::max(pxend, (t0 - view.zvStartNS_) * pxns);
+                            double px1 = (t1 - view.zvStartNS_) * pxns;
 
-                        if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y)))
-                        {
-                            LockStateTooltip(view, lockState, lockStateNext);
+                            pxend = std::max({ px1, px0 + MinVisSize, px0 + pxns * 0.5 });
+
+                            constexpr auto sperator = " <HOLDING> "_sv;
+                            auto threadName = view.strings.getThreadName(lockState.threadID);
+
+                            str.set(threadName.begin(), threadName.end());
+                            str.append(sperator.begin(), sperator.end());
+                            str.append(lockName.begin(), lockName.end());
+
+                            auto text = core::string_view(str);
+                            auto tsz = ImGui::CalcTextSize(text.begin(), text.end());
+
+                            auto col = GetLockColor(lockState.threadIdx);
+                            draw->AddRectFilled(wpos + ImVec2(std::max(px0, -10.0), offset), wpos + ImVec2(std::min(pxend, double(w + 10)), offset + ty), col);
+                            draw->AddRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset), GetHighlightColor(col), 0.f, -1, 1.f);
+
+                            if (tsz.x < locksz)
+                            {
+                                const auto x = (t0 - view.zvStartNS_) * pxns + ((t1 - t0) * pxns - tsz.x) / 2;
+                                if (x < 0 || x > w - tsz.x)
+                                {
+                                    ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
+                                    DrawTextContrast(draw, wpos + ImVec2(std::max(std::max(0., px0), std::min(double(w - tsz.x), x)), offset), 0xFFFFFFFF, text);
+                                    ImGui::PopClipRect();
+                                }
+                                else if (t0 == t1)
+                                {
+                                    DrawTextContrast(draw, wpos + ImVec2(px0 + (px1 - px0 - tsz.x) * 0.5, offset), 0xFFFFFFFF, text);
+                                }
+                                else
+                                {
+                                    DrawTextContrast(draw, wpos + ImVec2(x, offset), 0xFFFFFFFF, text);
+                                }
+                            }
+                            else
+                            {
+                                ImGui::PushClipRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y * 2), true);
+                                DrawTextContrast(draw, wpos + ImVec2((t0 - view.zvStartNS_) * pxns, offset), 0xFFFFFFFF, text);
+                                ImGui::PopClipRect();
+                            }
+
+                            if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y)))
+                            {
+                                LockStateTooltip(view, lockState, lockStateNext);
+                            }
                         }
                     }
-
-                    ++vbegin;
-                    ++vbegin; // skip released.
                 }
 
 #if 0
