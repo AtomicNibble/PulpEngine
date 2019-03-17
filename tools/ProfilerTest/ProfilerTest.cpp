@@ -101,8 +101,8 @@ namespace
             ttZone(ctx, "Aint no camel like me!");
 
             // alloc me baby.
-            ttAlloc(ctx, (void*)0x12345678, 0x300 * (i + 1))
-            ttFree(ctx, (void*)0x12345678)
+            ttAlloc(ctx, (void*)0x12345678, 0x300 * (i + 1));
+            ttFree(ctx, (void*)0x12345678);
 
             for (int x = 0; x < 10; x++)
             {
@@ -129,8 +129,8 @@ namespace
 
                     for (int y = 0; y < 2; y++)
                     {
-                        ttEnter(ctx, "Yep")
-                        ttLeave(ctx)
+                        ttEnter(ctx, "Yep");
+                        ttLeave(ctx);
                     }
 
                 }

@@ -296,7 +296,7 @@ namespace telem
     // if you have multiple dll's this will be diffrent.
     // so you would have to call it in each dll init.
     // but also means you can conditionally enable telemetry for various modules.
-    // it's not safe to resole functions during a zone.
+    // it's not safe to resole functions during a zone for the same module.
     static TelemetryAPI gTelemApi;
 
 #endif // TTELEMETRY_LINK
@@ -347,8 +347,8 @@ namespace telem
 #define ttLoadLibary() telem::gTelemApi.loadModule()
 #endif // TTELEMETRY_LINK
 
-#define ttZone(ctx, pLabel) telem::ScopedZone __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, TT_SOURCE_INFO, pLabel);
-#define ttZoneFilterd(ctx, minMicroSec, pLabel) telem::ScopedZoneFilterd __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, TT_SOURCE_INFO, minMicroSec, pLabel);
+#define ttZone(ctx, pLabel) telem::ScopedZone __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, TT_SOURCE_INFO, pLabel)
+#define ttZoneFilterd(ctx, minMicroSec, pLabel) telem::ScopedZoneFilterd __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, TT_SOURCE_INFO, minMicroSec, pLabel)
 
 #define ttInit() __TELEM_FUNC_NAME(TelemInit)()
 #define ttShutDown() __TELEM_FUNC_NAME(TelemShutDown)()
@@ -357,7 +357,7 @@ namespace telem
 #define ttInitializeContext(out, pBuf, bufLen) __TELEM_FUNC_NAME(TelemInitializeContext)(out, pBuf, bufLen)
 #define ttShutdownContext(ctx) __TELEM_FUNC_NAME(TelemShutdownContext)(ctx)
 
-#define ttSetContextLogFunc(ctx, func, pUserData) __TELEM_FUNC_NAME(TelemSetContextLogFunc)(ctx, func, pUserData);
+#define ttSetContextLogFunc(ctx, func, pUserData) __TELEM_FUNC_NAME(TelemSetContextLogFunc)(ctx, func, pUserData)
 
 #define ttOpen(ctx, pAppName, pBuildInfo, pServerAddress, serverPort, conType, timeoutMS) \
     __TELEM_FUNC_NAME(TelemOpen)(ctx, pAppName, pBuildInfo, pServerAddress, serverPort, conType, timeoutMS)
@@ -372,39 +372,38 @@ namespace telem
 #define ttIsPaused(ctx) __TELEM_FUNC_NAME(TelemIsPaused)(ctx)
 
 // Thread
-#define ttSetThreadName(ctx, threadID, pName) TelemSetThreadName(ctx, threadID, pName);
+#define ttSetThreadName(ctx, threadID, pName) TelemSetThreadName(ctx, threadID, pName)
 
 #define ttGetCallStack(ctx, stackOut) TelemGetCallStack(ctx, stackOut)
 #define ttSendCallStack(ctx, pStack) TelemSendCallStack(ctx, pStack)
 
 // Zones
-#define ttEnter(ctx, pZoneName) __TELEM_FUNC_NAME(TelemEnter)(ctx, TT_SOURCE_INFO, pZoneName);
-#define ttEnterEx(ctx, matchIdOut, minMicroSec, pZoneName) __TELEM_FUNC_NAME(TelemEnterEx)(ctx, TT_SOURCE_INFO, matchIdOut, minMicroSec, pZoneName);
-#define ttLeave(ctx) __TELEM_FUNC_NAME(TelemLeave)(ctx);
-#define ttLeaveEx(ctx, matchId) __TELEM_FUNC_NAME(TelemLeaveEx)(ctx, matchId);
+#define ttEnter(ctx, pZoneName) __TELEM_FUNC_NAME(TelemEnter)(ctx, TT_SOURCE_INFO, pZoneName)
+#define ttEnterEx(ctx, matchIdOut, minMicroSec, pZoneName) __TELEM_FUNC_NAME(TelemEnterEx)(ctx, TT_SOURCE_INFO, matchIdOut, minMicroSec, pZoneName)
+#define ttLeave(ctx) __TELEM_FUNC_NAME(TelemLeave)(ctx)
+#define ttLeaveEx(ctx, matchId) __TELEM_FUNC_NAME(TelemLeaveEx)(ctx, matchId)
 
 
 // Lock util
-#define ttSetLockName(ctx, pPtr, pLockName) __TELEM_FUNC_NAME(TelemSetLockName)(ctx, pPtr, pLockName);
-#define ttTryLock(ctx, pPtr, pDescription) __TELEM_FUNC_NAME(TelemTryLock)(ctx, TT_SOURCE_INFO, pPtr, pDescription);
-#define ttTryLockEx(ctx, matchIdOut, minMicroSec, pPtr, pDescription) __TELEM_FUNC_NAME(TelemTryLock)(ctx, TT_SOURCE_INFO, matchIdOut, minMicroSec, pPtr, pDescription);
-#define ttEndTryLock(ctx, pPtr, result) __TELEM_FUNC_NAME(TelemEndTryLock)(ctx, pPtr, result);
-#define ttEndTryLockEx(ctx, matchIdOut, pPtr, result) __TELEM_FUNC_NAME(TelemEndTryLockEx)(ctx, matchIdOut, pPtr, result);
-#define ttSetLockState(ctx, pPtr, state) __TELEM_FUNC_NAME(TelemSetLockState)(ctx, TT_SOURCE_INFO, pPtr, state);
-#define ttSignalLockCount(ctx, pPtr, count) __TELEM_FUNC_NAME(TelemSignalLockCount)(ctx, TT_SOURCE_INFO, pPtr, count);
+#define ttSetLockName(ctx, pPtr, pLockName) __TELEM_FUNC_NAME(TelemSetLockName)(ctx, pPtr, pLockName)
+#define ttTryLock(ctx, pPtr, pDescription) __TELEM_FUNC_NAME(TelemTryLock)(ctx, TT_SOURCE_INFO, pPtr, pDescription)
+#define ttTryLockEx(ctx, matchIdOut, minMicroSec, pPtr, pDescription) __TELEM_FUNC_NAME(TelemTryLock)(ctx, TT_SOURCE_INFO, matchIdOut, minMicroSec, pPtr, pDescription)
+#define ttEndTryLock(ctx, pPtr, result) __TELEM_FUNC_NAME(TelemEndTryLock)(ctx, pPtr, result)
+#define ttEndTryLockEx(ctx, matchIdOut, pPtr, result) __TELEM_FUNC_NAME(TelemEndTryLockEx)(ctx, matchIdOut, pPtr, result)
+#define ttSetLockState(ctx, pPtr, state) __TELEM_FUNC_NAME(TelemSetLockState)(ctx, TT_SOURCE_INFO, pPtr, state)
+#define ttSignalLockCount(ctx, pPtr, count) __TELEM_FUNC_NAME(TelemSignalLockCount)(ctx, TT_SOURCE_INFO, pPtr, count)
 
 // Some allocation tracking.
-#define ttAlloc(ctx, pPtr, size) __TELEM_FUNC_NAME(TelemAlloc)(ctx, TT_SOURCE_INFO, pPtr, size);
-#define ttFree(ctx, pPtr) __TELEM_FUNC_NAME(TelemFree)(ctx, TT_SOURCE_INFO, pPtr);
+#define ttAlloc(ctx, pPtr, size) __TELEM_FUNC_NAME(TelemAlloc)(ctx, TT_SOURCE_INFO, pPtr, size)
+#define ttFree(ctx, pPtr) __TELEM_FUNC_NAME(TelemFree)(ctx, TT_SOURCE_INFO, pPtr)
 
-#define ttPlot(ctx, type, value, pName);
-#define ttPlotF32(ctx, type, value, pName);
-#define ttPlotF64(ctx, type, value, pName);
-#define ttPlotI32(ctx, type, value, pName);
-#define ttPlotU32(ctx, type, value, pName);
-#define ttPlotI64(ctx, type, value, pName);
-#define ttPlotU64(ctx, type, value, pName);
-
+#define ttPlot(ctx, type, value, pName)
+#define ttPlotF32(ctx, type, value, pName)
+#define ttPlotF64(ctx, type, value, pName)
+#define ttPlotI32(ctx, type, value, pName)
+#define ttPlotU32(ctx, type, value, pName)
+#define ttPlotI64(ctx, type, value, pName)
+#define ttPlotU64(ctx, type, value, pName)
 
 #else // TTELEMETRY_ENABLED
 
