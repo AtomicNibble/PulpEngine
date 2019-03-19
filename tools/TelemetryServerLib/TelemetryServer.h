@@ -58,18 +58,18 @@ public:
     bool setMeta(const char* pName, T value);
     void insertLockIfMissing(uint64_t lockHandle);
 
-    void handleDataPacketTickInfo(const DataPacketTickInfo* pData);
-    void handleDataPacketStringTableAdd(const DataPacketStringTableAdd* pData);
-    void handleDataPacketZone(const DataPacketZone* pData);
-    void handleDataPacketLockTry(const DataPacketLockTry* pData);
-    void handleDataPacketLockState(const DataPacketLockState* pData);
-    void handleDataPacketLockSetName(const DataPacketLockSetName* pData);
-    void handleDataPacketThreadSetName(const DataPacketThreadSetName* pData);
-    void handleDataPacketLockCount(const DataPacketLockCount* pData);
-    void handleDataPacketMemAlloc(const DataPacketMemAlloc* pData);
-    void handleDataPacketMemFree(const DataPacketMemFree* pData);
+    int32_t handleDataPacketTickInfo(const DataPacketTickInfo* pData);
+    int32_t handleDataPacketStringTableAdd(const DataPacketStringTableAdd* pData);
+    int32_t handleDataPacketZone(const DataPacketZone* pData);
+    int32_t handleDataPacketLockTry(const DataPacketLockTry* pData);
+    int32_t handleDataPacketLockState(const DataPacketLockState* pData);
+    int32_t handleDataPacketLockSetName(const DataPacketLockSetName* pData);
+    int32_t handleDataPacketThreadSetName(const DataPacketThreadSetName* pData);
+    int32_t handleDataPacketLockCount(const DataPacketLockCount* pData);
+    int32_t handleDataPacketMemAlloc(const DataPacketMemAlloc* pData);
+    int32_t handleDataPacketMemFree(const DataPacketMemFree* pData);
     int32_t handleDataPacketMessage(const DataPacketMessage* pData);
-    void handleDataPacketCallStack(const DataPacketCallStack* pData);
+    int32_t handleDataPacketCallStack(const DataPacketCallStack* pData);
 
 private:
     bool setPragmas(void);

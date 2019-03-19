@@ -172,62 +172,52 @@ namespace
                 }
                 case DataStreamType::Zone:
                 {
-                    strm.db.handleDataPacketZone(reinterpret_cast<const DataPacketZone*>(&pDst[i]));
-                    i += sizeof(DataPacketZone);
+                    i += strm.db.handleDataPacketZone(reinterpret_cast<const DataPacketZone*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::TickInfo:
                 {
-                    strm.db.handleDataPacketTickInfo(reinterpret_cast<const DataPacketTickInfo*>(&pDst[i]));
-                    i += sizeof(DataPacketTickInfo);
+                    i += strm.db.handleDataPacketTickInfo(reinterpret_cast<const DataPacketTickInfo*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::ThreadSetName:
                 {
-                    strm.db.handleDataPacketThreadSetName(reinterpret_cast<const DataPacketThreadSetName*>(&pDst[i]));
-                    i += sizeof(DataPacketThreadSetName);
+                    i += strm.db.handleDataPacketThreadSetName(reinterpret_cast<const DataPacketThreadSetName*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::CallStack:
                 {
-                    strm.db.handleDataPacketCallStack(reinterpret_cast<const DataPacketCallStack*>(&pDst[i]));
-                    i += sizeof(DataPacketCallStack);
+                    i += strm.db.handleDataPacketCallStack(reinterpret_cast<const DataPacketCallStack*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::LockSetName:
                 {
-                    strm.db.handleDataPacketLockSetName(reinterpret_cast<const DataPacketLockSetName*>(&pDst[i]));
-                    i += sizeof(DataPacketLockSetName);
+                    i += strm.db.handleDataPacketLockSetName(reinterpret_cast<const DataPacketLockSetName*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::LockTry:
                 {
-                    strm.db.handleDataPacketLockTry(reinterpret_cast<const DataPacketLockTry*>(&pDst[i]));
-                    i += sizeof(DataPacketLockTry);
+                    i += strm.db.handleDataPacketLockTry(reinterpret_cast<const DataPacketLockTry*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::LockState:
                 {
-                    strm.db.handleDataPacketLockState(reinterpret_cast<const DataPacketLockState*>(&pDst[i]));
-                    i += sizeof(DataPacketLockState);
+                    i += strm.db.handleDataPacketLockState(reinterpret_cast<const DataPacketLockState*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::LockCount:
                 {
-                    strm.db.handleDataPacketLockCount(reinterpret_cast<const DataPacketLockCount*>(&pDst[i]));
-                    i += sizeof(DataPacketLockCount);
+                    i += strm.db.handleDataPacketLockCount(reinterpret_cast<const DataPacketLockCount*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::MemAlloc:
                 {
-                    strm.db.handleDataPacketMemAlloc(reinterpret_cast<const DataPacketMemAlloc*>(&pDst[i]));
-                    i += sizeof(DataPacketMemAlloc);
+                    i += strm.db.handleDataPacketMemAlloc(reinterpret_cast<const DataPacketMemAlloc*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::MemFree:
                 {
-                    strm.db.handleDataPacketMemFree(reinterpret_cast<const DataPacketMemFree*>(&pDst[i]));
-                    i += sizeof(DataPacketMemFree);
+                    i += strm.db.handleDataPacketMemFree(reinterpret_cast<const DataPacketMemFree*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::Message:
@@ -596,7 +586,7 @@ void TraceDB::insertLockIfMissing(uint64_t lockHandle)
     cmd.reset();
 }
 
-void TraceDB::handleDataPacketTickInfo(const DataPacketTickInfo* pData)
+int32_t TraceDB::handleDataPacketTickInfo(const DataPacketTickInfo* pData)
 {
     auto& cmd = cmdInsertTickInfo;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
@@ -611,9 +601,10 @@ void TraceDB::handleDataPacketTickInfo(const DataPacketTickInfo* pData)
     }
 
     cmd.reset();
+    return sizeof(std::remove_pointer_t<decltype(pData)>);
 }
 
-void TraceDB::handleDataPacketStringTableAdd(const DataPacketStringTableAdd* pData)
+int32_t TraceDB::handleDataPacketStringTableAdd(const DataPacketStringTableAdd* pData)
 {
     const char* pString = reinterpret_cast<const char*>(pData + 1);
 
@@ -627,10 +618,14 @@ void TraceDB::handleDataPacketStringTableAdd(const DataPacketStringTableAdd* pDa
     }
 
     cmd.reset();
+    return sizeof(std::remove_pointer_t<decltype(pData)>);
 }
 
-void TraceDB::handleDataPacketZone(const DataPacketZone* pData)
+int32_t TraceDB::handleDataPacketZone(const DataPacketZone* pData)
 {
+    const int32_t argDataSize = pData->argDataSize;
+    const int32_t totalSize = sizeof(*pData) + argDataSize;
+
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
     info.raw.idxFunction = pData->strIdxFunction;
@@ -652,10 +647,14 @@ void TraceDB::handleDataPacketZone(const DataPacketZone* pData)
     }
 
     cmd.reset();
+    return totalSize;
 }
 
-void TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
+int32_t TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
 {
+    const int32_t argDataSize = pData->argDataSize;
+    const int32_t totalSize = sizeof(*pData) + argDataSize;
+
     insertLockIfMissing(pData->lockHandle);
 
     PackedSourceInfo info;
@@ -679,9 +678,10 @@ void TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
     }
 
     cmd.reset();
+    return totalSize;
 }
 
-void TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
+int32_t TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
 {
     insertLockIfMissing(pData->lockHandle);
 
@@ -704,10 +704,14 @@ void TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
     }
 
     cmd.reset();
+    return sizeof(*pData);
 }
 
-void TraceDB::handleDataPacketLockSetName(const DataPacketLockSetName* pData)
+int32_t TraceDB::handleDataPacketLockSetName(const DataPacketLockSetName* pData)
 {
+    const int32_t argDataSize = pData->argDataSize;
+    const int32_t totalSize = sizeof(*pData) + argDataSize;
+
     insertLockIfMissing(pData->lockHandle);
 
     auto& cmd = cmdInsertLockName;
@@ -721,10 +725,14 @@ void TraceDB::handleDataPacketLockSetName(const DataPacketLockSetName* pData)
     }
 
     cmd.reset();
+    return totalSize;
 }
 
-void TraceDB::handleDataPacketThreadSetName(const DataPacketThreadSetName* pData)
+int32_t TraceDB::handleDataPacketThreadSetName(const DataPacketThreadSetName* pData)
 {
+    const int32_t argDataSize = pData->argDataSize;
+    const int32_t totalSize = sizeof(*pData) + argDataSize;
+
     auto& cmd = cmdInsertThreadName;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
     cmd.bind(2, static_cast<int64_t>(pData->time));
@@ -736,16 +744,22 @@ void TraceDB::handleDataPacketThreadSetName(const DataPacketThreadSetName* pData
     }
 
     cmd.reset();
+    return totalSize;
 }
 
-void TraceDB::handleDataPacketLockCount(const DataPacketLockCount* pData)
+int32_t TraceDB::handleDataPacketLockCount(const DataPacketLockCount* pData)
 {
     X_UNUSED(pData);
     // not sure how best to store this just yet.
+
+    return sizeof(*pData);
 }
 
-void TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
+int32_t TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
 {
+    const int32_t argDataSize = pData->argDataSize;
+    const int32_t totalSize = sizeof(*pData) + argDataSize;
+
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
     info.raw.idxFunction = pData->strIdxFunction;
@@ -766,10 +780,14 @@ void TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
     }
 
     cmd.reset();
+    return totalSize;
 }
 
-void TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
+int32_t TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
 {
+    const int32_t argDataSize = pData->argDataSize;
+    const int32_t totalSize = sizeof(*pData) + argDataSize;
+
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
     info.raw.idxFunction = pData->strIdxFunction;
@@ -790,6 +808,7 @@ void TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
     }
 
     cmd.reset();
+    return totalSize;
 }
 
 int32_t TraceDB::handleDataPacketMessage(const DataPacketMessage* pData)
@@ -811,15 +830,16 @@ int32_t TraceDB::handleDataPacketMessage(const DataPacketMessage* pData)
     }
 
     cmd.reset();
-
     return totalSize;
 }
 
-void TraceDB::handleDataPacketCallStack(const DataPacketCallStack* pData)
+int32_t TraceDB::handleDataPacketCallStack(const DataPacketCallStack* pData)
 {
     X_UNUSED(pData);
 
     // TODO: ...
+
+    return sizeof(*pData);
 }
 
 // --------------------------------
