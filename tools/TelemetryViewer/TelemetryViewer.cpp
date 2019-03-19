@@ -2550,7 +2550,7 @@ bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBa
         zd.lineNo = zone.lineNo;
         zd.strIdxFunction = zone.strIdxFunction;
         zd.strIdxFile = zone.strIdxFile;
-        zd.strIdxZone = zone.strIdxZone;
+        zd.strIdxZone = zone.strIdxFmt;
         zd.stackDepth = zone.stackDepth;
 
         // want a thread
@@ -2702,7 +2702,7 @@ bool handleTraceZoneSegmentLockTry(Client& client, const DataPacketBaseViewer* p
         lt.lineNo = lockTry.lineNo;
         lt.strIdxFunction = lockTry.strIdxFunction;
         lt.strIdxFile = lockTry.strIdxFile;
-        lt.strIdxDescrption = lockTry.strIdxDescrption;
+        lt.strIdxDescrption = lockTry.strIdxFmt;
 
         it->second.lockTry.push_back(lt);
 
