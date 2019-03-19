@@ -780,6 +780,8 @@ namespace
                     const char* pStr = reinterpret_cast<const char*>(pValues[idx]);
                     auto len = static_cast<tt_uint32>(strnlen(pStr, precision));
 
+                    static_assert(std::numeric_limits<tt_uint8>::max() >= MAX_STRING_LEN, "Can't store max string length");
+
                     // TODO: handle buffer not having space etc.
                     *pStrData++ = static_cast<tt_uint8>(len & 0xFF);
                     memcpy(pStrData, pStr, len);
