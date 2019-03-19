@@ -1105,7 +1105,7 @@ namespace
             memcpy(&data.argData, &scopeData.argData, scopeData.argDataSize);
         }
 
-        addToTickBuffer(pCtx, &data, GetDataSize<QueueDataZone>(scopeData.argDataSize));
+        addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(scopeData.argDataSize));
     }
 
     TELEM_INLINE void queueLockSetName(TraceContext* pCtx, const void* pPtr, const char* pLockName)
@@ -1134,7 +1134,7 @@ namespace
             memcpy(&data.argData, &pLock->argData, pLock->argDataSize);
         }
 
-        addToTickBuffer(pCtx, &data, GetDataSize<QueueDataZone>(pLock->argDataSize));
+        addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(pLock->argDataSize));
     }
 
     TELEM_INLINE void queueLockState(TraceContext* pCtx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState state)
@@ -2114,7 +2114,7 @@ void TelemSetLockName(TraceContexHandle ctx, const void* pPtr, const char* pFmtS
 
     if (!numArgs)
     {
-        constexpr auto size = GetSizeWithoutArgData<QueueDataLockSetName>();
+        constexpr auto size = GetSizeWithoutArgData<decltype(data)>();
         data.argDataSize = 0;
         addToTickBuffer(pCtx, &data, size);
     }
@@ -2128,7 +2128,7 @@ void TelemSetLockName(TraceContexHandle ctx, const void* pPtr, const char* pFmtS
 
         va_end(l);
 
-        addToTickBuffer(pCtx, &data, GetDataSize<QueueDataLockSetName>(argDataSize));
+        addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(argDataSize));
     }
 }
 
@@ -2301,7 +2301,7 @@ void TelemAlloc(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPt
 
     if (!numArgs)
     {
-        constexpr auto size = GetSizeWithoutArgData<QueueDataMessage>();
+        constexpr auto size = GetSizeWithoutArgData<decltype(data)>();
         data.argDataSize = 0;
         addToTickBuffer(pCtx, &data, size);
     }
@@ -2315,7 +2315,7 @@ void TelemAlloc(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPt
 
         va_end(l);
 
-        addToTickBuffer(pCtx, &data, GetDataSize<QueueDataMessage>(argDataSize));
+        addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(argDataSize));
     }
 }
 
@@ -2397,7 +2397,7 @@ void TelemMessage(TraceContexHandle ctx, TtLogType::Enum type, const char* pFmtS
 
     if (!numArgs)
     {
-        constexpr auto size = GetSizeWithoutArgData<QueueDataMessage>();
+        constexpr auto size = GetSizeWithoutArgData<decltype(data)>();
         data.argDataSize = 0;
         addToTickBuffer(pCtx, &data, size);
     }
@@ -2411,6 +2411,6 @@ void TelemMessage(TraceContexHandle ctx, TtLogType::Enum type, const char* pFmtS
 
         va_end(l);
 
-        addToTickBuffer(pCtx, &data, GetDataSize<QueueDataMessage>(argDataSize));
+        addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(argDataSize));
     }
 }
