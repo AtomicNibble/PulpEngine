@@ -695,7 +695,6 @@ namespace
     }
 
 
-
     auto _isDigit = [](char ch) -> bool {
         return (ch >= '0') && (ch <= '9');
     };
