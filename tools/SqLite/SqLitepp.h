@@ -199,24 +199,24 @@ public:
     Result::Enum step(void);
     Result::Enum reset(void);
 
-    Result::Enum bind(int idx, int value);
-    Result::Enum bind(int idx, double value);
-    Result::Enum bind(int idx, long long int value);
-    Result::Enum bind(int idx, const char* value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
-    Result::Enum bind(int idx, const char* value, size_t length, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
-    Result::Enum bind(int idx, void const* value, int32_t length, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
-    Result::Enum bind(int idx, const core::string& value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
-    Result::Enum bind(int idx, const core::string_view value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
-    Result::Enum bind(int idx);
-    Result::Enum bind(int idx, null_type);
+    Result::Enum bind(int32_t idx, int32_t value);
+    Result::Enum bind(int32_t idx, double value);
+    Result::Enum bind(int32_t idx, long long int value);
+    Result::Enum bind(int32_t idx, const char* value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+    Result::Enum bind(int32_t idx, const char* value, size_t length, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+    Result::Enum bind(int32_t idx, void const* value, int32_t length, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+    Result::Enum bind(int32_t idx, const core::string& value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+    Result::Enum bind(int32_t idx, const core::string_view value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+    Result::Enum bind(int32_t idx);
+    Result::Enum bind(int32_t idx, null_type);
 
     template<typename T, class = typename std::enable_if<std::is_enum<T>::value>::type>
-    X_INLINE Result::Enum bind(int idx, T value)
+    X_INLINE Result::Enum bind(int32_t idx, T value)
     {
-        return bind(idx, static_cast<int>(value));
+        return bind(idx, static_cast<int32_t>(value));
     }
 
-    Result::Enum bind(const char* pName, int value);
+    Result::Enum bind(const char* pName, int32_t value);
     Result::Enum bind(const char* pName, double value);
     Result::Enum bind(const char* pName, long long int value);
     Result::Enum bind(const char* pName, const char* value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
