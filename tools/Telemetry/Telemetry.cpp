@@ -1044,6 +1044,7 @@ namespace
     {
         QueueDataTickInfo data;
         data.type = QueueDataType::TickInfo;
+        data.argDataSize = 0;
         data.threadID = getThreadID();
         data.start = toRelativeTicks(pCtx, startTick);
         data.end = toRelativeTicks(pCtx, endTick);
@@ -1057,17 +1058,19 @@ namespace
     {
         QueueDataThreadSetName data;
         data.type = QueueDataType::ThreadSetName;
+        data.argDataSize = 0;
         data.time = getRelativeTicks(pCtx);
         data.threadID = threadID;
         data.pName = pName;
 
-        addToTickBuffer(pCtx, &data, sizeof(data));
+        addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
     }
 
     TELEM_INLINE void queueCallStack(TraceContext* pCtx, const TtCallStack& stack)
     {
         QueueDataCallStack data;
         data.type = QueueDataType::CallStack;
+        data.argDataSize = 0;
         data.callstack = stack;
 
         addToTickBuffer(pCtx, &data, sizeof(data));
@@ -1077,98 +1080,92 @@ namespace
     {
         QueueDataZone data;
         data.type = QueueDataType::Zone;
+        data.argDataSize = 0;
         data.stackDepth = static_cast<tt_uint8>(pThread->stackDepth);
         data.threadID = pThread->id;
         data.zone = zone;
 
-        addToTickBuffer(pCtx, &data, sizeof(data));
+        addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
     }
 
     TELEM_INLINE void queueLockSetName(TraceContext* pCtx, const void* pPtr, const char* pLockName)
     {
         QueueDataLockSetName data;
         data.type = QueueDataType::LockSetName;
+        data.argDataSize = 0;
         data.time = getRelativeTicks(pCtx);
         data.pLockPtr = pPtr;
         data.pLockName = pLockName;
 
-        addToTickBuffer(pCtx, &data, sizeof(data));
+        addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
     }
 
     TELEM_INLINE void queueLockTry(TraceContext* pCtx, TraceThread* pThread, const void* pPtr, TraceLock* pLock)
     {
         QueueDataLockTry data;
         data.type = QueueDataType::LockTry;
+        data.argDataSize = 0;
         data.threadID = pThread->id;
         data.lock = *pLock;
         data.pLockPtr = pPtr;
 
-        addToTickBuffer(pCtx, &data, sizeof(data));
+        addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
     }
 
     TELEM_INLINE void queueLockState(TraceContext* pCtx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState state)
     {
         QueueDataLockState data;
         data.type = QueueDataType::LockState;
+        data.argDataSize = 0;
         data.time = getRelativeTicks(pCtx);
         data.pLockPtr = pPtr;
         data.state = state;
         data.threadID = getThreadID();
         data.sourceInfo = sourceInfo;
 
-        addToTickBuffer(pCtx, &data, sizeof(data));
+        addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
     }
 
     TELEM_INLINE void queueLockCount(TraceContext* pCtx, const TtSourceInfo& sourceInfo, const void* pPtr, tt_int32 count)
     {
         QueueDataLockCount data;
         data.type = QueueDataType::LockCount;
+        data.argDataSize = 0;
         data.time = getRelativeTicks(pCtx);
         data.pLockPtr = pPtr;
         data.count = static_cast<tt_uint16>(count);
         data.threadID = getThreadID();
         data.sourceInfo = sourceInfo;
 
-        addToTickBuffer(pCtx, &data, sizeof(data));
+        addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
     }
 
     TELEM_INLINE void queueMemAlloc(TraceContext* pCtx, const TtSourceInfo& sourceInfo, const void* pPtr, tt_size size)
     {
         QueueDataMemAlloc data;
         data.type = QueueDataType::MemAlloc;
+        data.argDataSize = 0;
         data.time = getRelativeTicks(pCtx);
         data.pPtr = pPtr;
         data.size = static_cast<tt_uint32>(size);;
         data.threadID = getThreadID();
         data.sourceInfo = sourceInfo;
 
-        addToTickBuffer(pCtx, &data, sizeof(data));
+        addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
     }
 
     TELEM_INLINE void queueMemFree(TraceContext* pCtx, const TtSourceInfo& sourceInfo, const void* pPtr)
     {
         QueueDataMemFree data;
         data.type = QueueDataType::MemFree;
+        data.argDataSize = 0;
         data.time = getRelativeTicks(pCtx);
         data.pPtr = pPtr;
         data.threadID = getThreadID();
         data.sourceInfo = sourceInfo;
 
-        addToTickBuffer(pCtx, &data, sizeof(data));
+        addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
     }
-
-#if 0
-    TELEM_INLINE void queueMessage(TraceContext* pCtx, TtLogType::Enum type, const char* pFmtString)
-    {
-        QueueDataMessage data;
-        data.type = QueueDataType::Message;
-        data.time = getRelativeTicks(pCtx);
-        data.pFmtStr = pFmtString;
-        data.logType = type;
-
-        addToTickBuffer(pCtx, &data, sizeof(data));
-    }
-#endif
 
     // Processing.
     tt_uint16 GetStringId(PacketCompressor* pComp, const char* pStr)
