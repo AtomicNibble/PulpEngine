@@ -75,7 +75,7 @@ namespace Internal
 // need to tune this with data for a real program.
 constexpr tt_size MAX_PACKET_SIZE = 1024 * 16; 
 constexpr tt_size MAX_CMDLINE_LEN = 1024 * 8;
-constexpr tt_size MAX_STRING_LEN = 256;
+constexpr tt_size MAX_STRING_LEN = 255;
 
 // TODO: move?
 constexpr tt_size MAX_ZONE_THREADS = 32;
