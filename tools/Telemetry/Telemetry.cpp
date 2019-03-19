@@ -590,6 +590,42 @@ namespace
 #endif // !PACKET_COMPRESSION
     }
 
+    tt_int32 getCompressionBufferSpace(PacketCompressor* pComp)
+    {
+        const tt_int32 space = COMPRESSION_MAX_INPUT_SIZE - (pComp->writeEnd - pComp->writeBegin);
+        return space;
+    }
+
+    void flushCompressionBufferIfrequired(PacketCompressor* pComp, tt_int32 requiredSpace)
+    {
+        const tt_int32 space = getCompressionBufferSpace(pComp);
+        if (space < requiredSpace) {
+            flushCompressionBuffer(pComp);
+        }
+    }
+
+    void addToCompressionBufferNoFlush(PacketCompressor* pComp, const void* pData, tt_int32 len)
+    {
+#if PACKET_COMPRESSION
+
+#if X_DEBUG
+        if (len > COMPRESSION_MAX_INPUT_SIZE) {
+            ::DebugBreak();
+        }
+
+        const tt_int32 space = getCompressionBufferSpace(pComp);
+        if (space < len) {
+            ::DebugBreak();
+        }
+#endif // X_DEBUG
+
+        memcpy(&pComp->srcRingBuf[pComp->writeEnd], pData, len);
+        pComp->writeEnd += len;
+#else
+        addToPacketBuffer(pComp->pCtx, pComp->pBuffer, pData, len);
+#endif // !PACKET_COMPRESSION
+    }
+
     void addToCompressionBuffer(PacketCompressor* pComp, const void* pData, tt_int32 len)
     {
 #if PACKET_COMPRESSION
@@ -601,10 +637,7 @@ namespace
 #endif // X_DEBUG
 
         // can we fit this data?
-        const tt_int32 space = COMPRESSION_MAX_INPUT_SIZE - (pComp->writeEnd - pComp->writeBegin);
-        if (space < len) {
-            flushCompressionBuffer(pComp);
-        }
+        flushCompressionBufferIfrequired(pComp, len);
 
         memcpy(&pComp->srcRingBuf[pComp->writeEnd], pData, len);
         pComp->writeEnd += len;
@@ -639,6 +672,13 @@ namespace
     inline constexpr tt_int32 RoundUpToMultiple(tt_int32 numToRound, tt_int32 multipleOf)
     {
         return (numToRound + multipleOf - 1) & ~(multipleOf - 1);
+    }
+
+    template<typename T>
+    inline constexpr tt_int32 GetSizeNotArgData(void)
+    {
+        static_assert(sizeof(T) == 64);
+        return sizeof(T);
     }
 
     template<typename T>
@@ -1193,7 +1233,7 @@ namespace
     }
 
 
-    void queueProcessZone(PacketCompressor* pComp, const QueueDataZone* pBuf)
+    tt_int32 queueProcessZone(PacketCompressor* pComp, const QueueDataZone* pBuf)
     {
         auto& zone = pBuf->zone;
 
@@ -1207,11 +1247,20 @@ namespace
         packet.strIdxFunction = GetStringId(pComp, zone.sourceInfo.pFunction_);
         packet.strIdxZone = GetStringId(pComp, zone.pZoneName);
         packet.lineNo = static_cast<tt_uint16>(zone.sourceInfo.line_);
+        packet.argDataSize = pBuf->argDataSize;
 
-        addToCompressionBuffer(pComp, &packet, sizeof(packet));
+        const auto dataSize = GetDataSize<std::remove_pointer_t<decltype(pBuf)>>(pBuf->argDataSize);
+        flushCompressionBufferIfrequired(pComp, dataSize);
+
+        addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
+        if (pBuf->argDataSize) {
+            addToCompressionBufferNoFlush(pComp, &pBuf->argData, pBuf->argDataSize);
+        }
+
+        return dataSize;
     }
 
-    void queueProcessTickInfo(PacketCompressor* pComp, const QueueDataTickInfo* pBuf)
+    tt_int32 queueProcessTickInfo(PacketCompressor* pComp, const QueueDataTickInfo* pBuf)
     {
         DataPacketTickInfo packet;
         packet.type = DataStreamType::TickInfo;
@@ -1222,20 +1271,30 @@ namespace
         packet.endNano = pBuf->endNano;
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
+        return GetSizeNotArgData<std::remove_pointer_t<decltype(pBuf)>>();
     }
 
-    void queueProcessThreadSetName(PacketCompressor* pComp, const QueueDataThreadSetName* pBuf)
+    tt_int32 queueProcessThreadSetName(PacketCompressor* pComp, const QueueDataThreadSetName* pBuf)
     {
         DataPacketThreadSetName packet;
         packet.type = DataStreamType::ThreadSetName;
         packet.threadID = pBuf->threadID;
         packet.strIdxName = GetStringId(pComp, pBuf->pName);
         packet.time = pBuf->time;
+        packet.argDataSize = pBuf->argDataSize;
 
-        addToCompressionBuffer(pComp, &packet, sizeof(packet));
+        const auto dataSize = GetDataSize<std::remove_pointer_t<decltype(pBuf)>>(pBuf->argDataSize);
+        flushCompressionBufferIfrequired(pComp, dataSize);
+
+        addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
+        if (pBuf->argDataSize) {
+            addToCompressionBufferNoFlush(pComp, &pBuf->argData, pBuf->argDataSize);
+        }
+
+        return dataSize;
     }
 
-    void queueProcessCallStack(PacketCompressor* pComp, const QueueDataCallStack* pBuf)
+    tt_int32 queueProcessCallStack(PacketCompressor* pComp, const QueueDataCallStack* pBuf)
     {
         DataPacketCallStack packet;
         packet.type = DataStreamType::CallStack;
@@ -1253,20 +1312,30 @@ namespace
         // but callstack cache should be done in background thread.
         // meaning
 
+        return GetSizeNotArgData<std::remove_pointer_t<decltype(pBuf)>>();
     }
 
-    void queueProcessLockSetName(PacketCompressor* pComp, const QueueDataLockSetName* pBuf)
+    tt_int32 queueProcessLockSetName(PacketCompressor* pComp, const QueueDataLockSetName* pBuf)
     {
         DataPacketLockSetName packet;
         packet.type = DataStreamType::LockSetName;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
         packet.strIdxName = GetStringId(pComp, pBuf->pLockName);
         packet.time = pBuf->time;
+        packet.argDataSize = pBuf->argDataSize;
 
-        addToCompressionBuffer(pComp, &packet, sizeof(packet));
+        const auto dataSize = GetDataSize<std::remove_pointer_t<decltype(pBuf)>>(pBuf->argDataSize);
+        flushCompressionBufferIfrequired(pComp, dataSize);
+
+        addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
+        if (pBuf->argDataSize) {
+            addToCompressionBufferNoFlush(pComp, &pBuf->argData, pBuf->argDataSize);
+        }
+
+        return dataSize;
     }
 
-    void queueProcessLockTry(PacketCompressor* pComp, const QueueDataLockTry* pBuf)
+    tt_int32 queueProcessLockTry(PacketCompressor* pComp, const QueueDataLockTry* pBuf)
     {
         auto& lock = pBuf->lock;
 
@@ -1282,11 +1351,20 @@ namespace
         packet.strIdxDescrption = GetStringId(pComp, lock.pDescription);
         packet.result = lock.result;
         packet.depth = static_cast<tt_uint8>(pBuf->lock.depth);
+        packet.argDataSize = pBuf->argDataSize;
 
-        addToCompressionBuffer(pComp, &packet, sizeof(packet));
+        const auto dataSize = GetDataSize<std::remove_pointer_t<decltype(pBuf)>>(pBuf->argDataSize);
+        flushCompressionBufferIfrequired(pComp, dataSize);
+
+        addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
+        if (pBuf->argDataSize) {
+            addToCompressionBufferNoFlush(pComp, &pBuf->argData, pBuf->argDataSize);
+        }
+
+        return dataSize;
     }
 
-    void queueProcessLockState(PacketCompressor* pComp, const QueueDataLockState* pBuf)
+    tt_int32 queueProcessLockState(PacketCompressor* pComp, const QueueDataLockState* pBuf)
     {
         DataPacketLockState packet;
         packet.type = DataStreamType::LockState;
@@ -1297,11 +1375,20 @@ namespace
         packet.lineNo = static_cast<tt_uint16>(pBuf->sourceInfo.line_);
         packet.strIdxFunction = GetStringId(pComp, pBuf->sourceInfo.pFunction_);
         packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile_);
+        packet.argDataSize = pBuf->argDataSize;
 
-        addToCompressionBuffer(pComp, &packet, sizeof(packet));
+        const auto dataSize = GetDataSize<std::remove_pointer_t<decltype(pBuf)>>(pBuf->argDataSize);
+        flushCompressionBufferIfrequired(pComp, dataSize);
+
+        addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
+        if (pBuf->argDataSize) {
+            addToCompressionBufferNoFlush(pComp, &pBuf->argData, pBuf->argDataSize);
+        }
+
+        return dataSize;
     }
 
-    void queueProcessLockCount(PacketCompressor* pComp, const QueueDataLockCount* pBuf)
+    tt_int32 queueProcessLockCount(PacketCompressor* pComp, const QueueDataLockCount* pBuf)
     {
         DataPacketLockCount packet;
         packet.type = DataStreamType::LockCount;
@@ -1314,9 +1401,11 @@ namespace
         packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile_);
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
+
+        return GetSizeWithoutArgData<std::remove_pointer_t<decltype(pBuf)>>();
     }
 
-    void queueProcessMemAlloc(PacketCompressor* pComp, const QueueDataMemAlloc* pBuf)
+    tt_int32 queueProcessMemAlloc(PacketCompressor* pComp, const QueueDataMemAlloc* pBuf)
     {
         DataPacketMemAlloc packet;
         packet.type = DataStreamType::MemAlloc;
@@ -1327,11 +1416,20 @@ namespace
         packet.lineNo = static_cast<tt_uint16>(pBuf->sourceInfo.line_);
         packet.strIdxFunction = GetStringId(pComp, pBuf->sourceInfo.pFunction_);
         packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile_);
+        packet.argDataSize = pBuf->argDataSize;
 
-        addToCompressionBuffer(pComp, &packet, sizeof(packet));
+        const auto dataSize = GetDataSize<std::remove_pointer_t<decltype(pBuf)>>(pBuf->argDataSize);
+        flushCompressionBufferIfrequired(pComp, dataSize);
+
+        addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
+        if (pBuf->argDataSize) {
+            addToCompressionBufferNoFlush(pComp, &pBuf->argData, pBuf->argDataSize);
+        }
+
+        return dataSize;
     }
 
-    void queueProcessMemFree(PacketCompressor* pComp, const QueueDataMemFree* pBuf)
+    tt_int32 queueProcessMemFree(PacketCompressor* pComp, const QueueDataMemFree* pBuf)
     {
         DataPacketMemFree packet;
         packet.type = DataStreamType::MemFree;
@@ -1341,8 +1439,17 @@ namespace
         packet.lineNo = static_cast<tt_uint16>(pBuf->sourceInfo.line_);
         packet.strIdxFunction = GetStringId(pComp, pBuf->sourceInfo.pFunction_);
         packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile_);
+        packet.argDataSize = pBuf->argDataSize;
 
-        addToCompressionBuffer(pComp, &packet, sizeof(packet));
+        const auto dataSize = GetDataSize<std::remove_pointer_t<decltype(pBuf)>>(pBuf->argDataSize);
+        flushCompressionBufferIfrequired(pComp, dataSize);
+
+        addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
+        if (pBuf->argDataSize) {
+            addToCompressionBufferNoFlush(pComp, &pBuf->argData, pBuf->argDataSize);
+        }
+
+        return dataSize;
     }
 
     tt_int32 queueProcessMessage(PacketCompressor* pComp, const QueueDataMessage* pBuf)
@@ -1354,15 +1461,15 @@ namespace
         packet.logType = pBuf->logType;
         packet.argDataSize = pBuf->argDataSize;
 
-        addToCompressionBuffer(pComp, &packet, sizeof(packet));
+        const auto dataSize = GetDataSize<std::remove_pointer_t<decltype(pBuf)>>(pBuf->argDataSize);
+        flushCompressionBufferIfrequired(pComp, dataSize);
 
-        if (pBuf->argDataSize == 0) {
-            constexpr tt_int32 size = GetSizeWithoutArgData<QueueDataMessage>();
-            return size;
+        addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
+        if (pBuf->argDataSize) {
+            addToCompressionBufferNoFlush(pComp, &pBuf->argData, pBuf->argDataSize);
         }
 
-        addToCompressionBuffer(pComp, &pBuf->argData, pBuf->argDataSize);
-        return GetDataSize<QueueDataMessage>(pBuf->argDataSize);
+        return dataSize;
     }
 
 
@@ -1450,44 +1557,34 @@ namespace
                 switch (type)
                 {
                     case QueueDataType::Zone:
-                        queueProcessZone(&comp, reinterpret_cast<const QueueDataZone*>(pBuf));
-                        pBuf += sizeof(QueueDataZone);
+                        pBuf += queueProcessZone(&comp, reinterpret_cast<const QueueDataZone*>(pBuf));
                         break;
                     case QueueDataType::TickInfo:
-                        queueProcessTickInfo(&comp, reinterpret_cast<const QueueDataTickInfo*>(pBuf));
-                        pBuf += sizeof(QueueDataTickInfo);
+                        pBuf += queueProcessTickInfo(&comp, reinterpret_cast<const QueueDataTickInfo*>(pBuf));
                         break;
                     case QueueDataType::ThreadSetName:
-                        queueProcessThreadSetName(&comp, reinterpret_cast<const QueueDataThreadSetName*>(pBuf));
-                        pBuf += sizeof(QueueDataThreadSetName);
+                        pBuf += queueProcessThreadSetName(&comp, reinterpret_cast<const QueueDataThreadSetName*>(pBuf));
                         break;
                     case QueueDataType::CallStack:
-                        queueProcessCallStack(&comp, reinterpret_cast<const QueueDataCallStack*>(pBuf));
-                        pBuf += sizeof(QueueDataCallStack);
+                        pBuf += queueProcessCallStack(&comp, reinterpret_cast<const QueueDataCallStack*>(pBuf));
                         break;
                     case QueueDataType::LockSetName:
-                        queueProcessLockSetName(&comp, reinterpret_cast<const QueueDataLockSetName*>(pBuf));
-                        pBuf += sizeof(QueueDataLockSetName);
+                        pBuf += queueProcessLockSetName(&comp, reinterpret_cast<const QueueDataLockSetName*>(pBuf));
                         break;
                     case QueueDataType::LockTry:
-                        queueProcessLockTry(&comp, reinterpret_cast<const QueueDataLockTry*>(pBuf));
-                        pBuf += sizeof(QueueDataLockTry);
+                        pBuf += queueProcessLockTry(&comp, reinterpret_cast<const QueueDataLockTry*>(pBuf));
                         break;
                     case QueueDataType::LockState:
-                        queueProcessLockState(&comp, reinterpret_cast<const QueueDataLockState*>(pBuf));
-                        pBuf += sizeof(QueueDataLockState);
+                        pBuf += queueProcessLockState(&comp, reinterpret_cast<const QueueDataLockState*>(pBuf));
                         break;
                     case QueueDataType::LockCount:
-                        queueProcessLockCount(&comp, reinterpret_cast<const QueueDataLockCount*>(pBuf));
-                        pBuf += sizeof(QueueDataLockCount);
+                        pBuf += queueProcessLockCount(&comp, reinterpret_cast<const QueueDataLockCount*>(pBuf));
                         break;
                     case QueueDataType::MemAlloc:
-                        queueProcessMemAlloc(&comp, reinterpret_cast<const QueueDataMemAlloc*>(pBuf));
-                        pBuf += sizeof(QueueDataMemAlloc);
+                        pBuf += queueProcessMemAlloc(&comp, reinterpret_cast<const QueueDataMemAlloc*>(pBuf));
                         break;
                     case QueueDataType::MemFree:
-                        queueProcessMemFree(&comp, reinterpret_cast<const QueueDataMemFree*>(pBuf));
-                        pBuf += sizeof(QueueDataMemFree);
+                        pBuf += queueProcessMemFree(&comp, reinterpret_cast<const QueueDataMemFree*>(pBuf));
                         break;
                     case QueueDataType::Message:
                         pBuf += queueProcessMessage(&comp, reinterpret_cast<const QueueDataMessage*>(pBuf));
