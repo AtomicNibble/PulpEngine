@@ -639,7 +639,7 @@ int32_t TraceDB::handleDataPacketZone(const DataPacketZone* pData)
     cmd.bind(3, static_cast<int64_t>(pData->end));
     cmd.bind(4, static_cast<int64_t>(sourceInfo));
     cmd.bind(5, pData->stackDepth);
-    cmd.bind(6, pArgData, argDataSize);
+    cmd.bind(6, argDataSize ? pArgData : nullptr, argDataSize);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -672,7 +672,7 @@ int32_t TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
     cmd.bind(5, static_cast<int32_t>(pData->result));
     cmd.bind(6, static_cast<int64_t>(pData->depth));
     cmd.bind(7, static_cast<int64_t>(info.packed));
-    cmd.bind(8, pArgData, argDataSize);
+    cmd.bind(8, argDataSize ? pArgData : nullptr, argDataSize);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -703,7 +703,7 @@ int32_t TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
     cmd.bind(3, static_cast<int64_t>(pData->time));
     cmd.bind(4, static_cast<int64_t>(pData->state));
     cmd.bind(5, static_cast<int64_t>(info.packed));
-    cmd.bind(6, pArgData, argDataSize);
+    cmd.bind(6, argDataSize ? pArgData : nullptr, argDataSize);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -726,7 +726,7 @@ int32_t TraceDB::handleDataPacketLockSetName(const DataPacketLockSetName* pData)
     cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
     cmd.bind(2, static_cast<int64_t>(pData->time)); 
     cmd.bind(3, static_cast<int32_t>(pData->strIdxFmt));
-    cmd.bind(4, pArgData, argDataSize);
+    cmd.bind(4, argDataSize ? pArgData : nullptr, argDataSize);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -747,7 +747,7 @@ int32_t TraceDB::handleDataPacketThreadSetName(const DataPacketThreadSetName* pD
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
     cmd.bind(2, static_cast<int64_t>(pData->time));
     cmd.bind(3, static_cast<int32_t>(pData->strIdxFmt));
-    cmd.bind(4, pArgData, argDataSize);
+    cmd.bind(4, argDataSize ? pArgData : nullptr, argDataSize);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -785,7 +785,7 @@ int32_t TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
     cmd.bind(4, static_cast<int64_t>(pData->time));
     cmd.bind(5, static_cast<int32_t>(MemOp::Alloc));
     cmd.bind(6, static_cast<int64_t>(info.packed));
-    cmd.bind(7, pArgData, argDataSize);
+    cmd.bind(7, argDataSize ? pArgData : nullptr, argDataSize);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -831,7 +831,7 @@ int32_t TraceDB::handleDataPacketMessage(const DataPacketMessage* pData)
     cmd.bind(1, static_cast<int32_t>(pData->time));
     cmd.bind(2, static_cast<int32_t>(pData->logType));
     cmd.bind(3, static_cast<int32_t>(pData->strIdxFmt));
-    cmd.bind(4, pArgData, argDataSize);
+    cmd.bind(4, argDataSize ? pArgData : nullptr, argDataSize);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
