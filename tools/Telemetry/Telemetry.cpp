@@ -60,6 +60,14 @@ namespace
 
     const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
 
+    struct ArgDataBuilder
+    {
+        constexpr static tt_int32 BUF_SIZE = 255;
+
+        tt_uint8 numArgs;
+        tt_uint8 data[BUF_SIZE];
+    };
+
     TELEM_PACK_PUSH(1)
 
     struct TraceLock
@@ -75,13 +83,19 @@ namespace
         static_assert(std::numeric_limits<decltype(depth)>::max() >= MAX_ZONE_DEPTH, "Can't store max zone depth");
     };
 
-
     TELEM_PACK_POP;
+
+    struct TraceLockBuilder
+    {
+        TraceLock lock;
+        tt_int32 argDataSize;
+        ArgDataBuilder argData;
+    };
 
     struct TraceLocks
     {
         const void* pLockPtr[MAX_LOCKS_HELD_PER_THREAD];
-        TraceLock locks[MAX_LOCKS_HELD_PER_THREAD];
+        TraceLockBuilder locks[MAX_LOCKS_HELD_PER_THREAD];
     };
 
     struct TraceZone
@@ -92,6 +106,15 @@ namespace
         const char* pZoneName;
         TtSourceInfo sourceInfo;
     };
+
+    // TODO: don't bother storing argData if not passed.
+    struct TraceZoneBuilder
+    {
+        TraceZone zone;
+        tt_int32 argDataSize;
+        ArgDataBuilder argData;
+    };
+
 
     // some data for each thread!
     TELEM_ALIGNED_SYMBOL(struct TraceThread, 64)
@@ -110,7 +133,7 @@ namespace
         TtthreadId id;
         tt_int32 stackDepth;
 
-        TraceZone zones[MAX_ZONE_DEPTH];
+        TraceZoneBuilder zones[MAX_ZONE_DEPTH];
         TraceLocks locks;
     };
 
@@ -245,7 +268,7 @@ namespace
         return buf.bufOffset;
     }
 
-    TraceLock* addLock(TraceThread* pThread, const void* pLockPtr)
+    TraceLockBuilder* addLock(TraceThread* pThread, const void* pLockPtr)
     {
         auto& locks = pThread->locks;
         for (tt_int32 i = 0; i < MAX_LOCKS_HELD_PER_THREAD; i++)
@@ -261,9 +284,9 @@ namespace
     }
 
 
-    TraceLock* getLockAndClearSlot(TraceThread* pThread, const void* pLockPtr)
+    TraceLockBuilder* getLockAndClearSlot(TraceThread* pThread, const void* pLockPtr)
     {
-        TraceLock* pLock = nullptr;
+        TraceLockBuilder* pLock = nullptr;
 
         auto& locks = pThread->locks;
         for (tt_int32 i = 0; i < MAX_LOCKS_HELD_PER_THREAD; i++)
@@ -612,14 +635,6 @@ namespace
     }
 
     // -----------------------------------
-
-    struct ArgDataBuilder
-    {
-        constexpr static tt_int32 BUF_SIZE = 255;
-
-        tt_uint8 numArgs;
-        tt_uint8 data[BUF_SIZE];
-    };
 
     inline constexpr tt_int32 RoundUpToMultiple(tt_int32 numToRound, tt_int32 multipleOf)
     {
@@ -1076,16 +1091,21 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    TELEM_INLINE void queueZone(TraceContext* pCtx, TraceThread* pThread, TraceZone& zone)
+    TELEM_INLINE void queueZone(TraceContext* pCtx, TraceThread* pThread, TraceZoneBuilder& scopeData)
     {
         QueueDataZone data;
         data.type = QueueDataType::Zone;
-        data.argDataSize = 0;
-        data.stackDepth = static_cast<tt_uint8>(pThread->stackDepth);
+        data.argDataSize = static_cast<tt_uint8>(scopeData.argDataSize & 0xFF);
+        data.stackDepth = static_cast<tt_uint8>(pThread->stackDepth & 0xFF);
         data.threadID = pThread->id;
-        data.zone = zone;
+        data.zone = scopeData.zone;
 
-        addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
+        if (scopeData.argDataSize)
+        {
+            memcpy(&data.argData, &scopeData.argData, scopeData.argDataSize);
+        }
+
+        addToTickBuffer(pCtx, &data, GetDataSize<QueueDataZone>(scopeData.argDataSize));
     }
 
     TELEM_INLINE void queueLockSetName(TraceContext* pCtx, const void* pPtr, const char* pLockName)
@@ -1100,16 +1120,21 @@ namespace
         addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
     }
 
-    TELEM_INLINE void queueLockTry(TraceContext* pCtx, TraceThread* pThread, const void* pPtr, TraceLock* pLock)
+    TELEM_INLINE void queueLockTry(TraceContext* pCtx, TraceThread* pThread, const void* pPtr, TraceLockBuilder* pLock)
     {
         QueueDataLockTry data;
         data.type = QueueDataType::LockTry;
         data.argDataSize = 0;
         data.threadID = pThread->id;
-        data.lock = *pLock;
+        data.lock = pLock->lock;
         data.pLockPtr = pPtr;
 
-        addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
+        if (pLock->argDataSize)
+        {
+            memcpy(&data.argData, &pLock->argData, pLock->argDataSize);
+        }
+
+        addToTickBuffer(pCtx, &data, GetDataSize<QueueDataZone>(pLock->argDataSize));
     }
 
     TELEM_INLINE void queueLockState(TraceContext* pCtx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState state)
@@ -1956,7 +1981,7 @@ void TelemSendCallStack(TraceContexHandle ctx, const TtCallStack* pStack)
 
 // ----------- Zones -----------
 
-void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pZoneName)
+void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = getThreadData(pCtx);
@@ -1968,10 +1993,27 @@ void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const cha
     auto depth = pThreadData->stackDepth;
     ++pThreadData->stackDepth;
 
-    auto& zone = pThreadData->zones[depth];
-    zone.start = getTicks();
-    zone.pZoneName = pZoneName;
-    zone.sourceInfo = sourceInfo;
+    auto& scopeData = pThreadData->zones[depth];
+    scopeData.zone.start = getTicks();
+    scopeData.zone.pZoneName = pFmtString;
+    scopeData.zone.sourceInfo = sourceInfo;
+
+    // for this arg data it would be nicer to be like a linera array.
+    // basically a fixed sized buffer we just offset from.
+    // can do that later tho.
+    if (numArgs)
+    {
+        va_list l;
+        va_start(l, numArgs);
+
+        scopeData.argDataSize = BuildArgData(scopeData.argData, pFmtString, numArgs, l);
+
+        va_end(l);
+    }
+    else
+    {
+        scopeData.argDataSize = 0;
+    }
 }
 
 void TelemLeave(TraceContexHandle ctx)
@@ -1985,17 +2027,46 @@ void TelemLeave(TraceContexHandle ctx)
 
     auto depth = --pThreadData->stackDepth;
 
-    auto& zone = pThreadData->zones[depth];
-    zone.end = getTicks();
+    auto& scopeData = pThreadData->zones[depth];
+    scopeData.zone.end = getTicks();
 
-    queueZone(pCtx, pThreadData, zone);
+    queueZone(pCtx, pThreadData, scopeData);
 }
 
-void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const char* pZoneName)
+void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const char* pFmtString, tt_int32 numArgs, ...)
 {
-    // we can just copy it?
+    // This is a copy of TelemEnter since can't pick up the va_args later unless we always pass them.
+    auto* pCtx = handleToContext(ctx);
+    auto* pThreadData = getThreadData(pCtx);
+
+    if (!pCtx->isEnabled || !pThreadData) {
+        return;
+    }
+
+    // only do the copy when enabled?
     matchIdOut = minMicroSec;
-    TelemEnter(ctx, sourceInfo, pZoneName);
+
+    auto depth = pThreadData->stackDepth;
+    ++pThreadData->stackDepth;
+
+    auto& scopeData = pThreadData->zones[depth];
+    scopeData.zone.start = getTicks();
+    scopeData.zone.pZoneName = pFmtString;
+    scopeData.zone.sourceInfo = sourceInfo;
+
+    if (numArgs)
+    {
+        va_list l;
+        va_start(l, numArgs);
+
+        scopeData.argDataSize = BuildArgData(scopeData.argData, pFmtString, numArgs, l);
+
+        va_end(l);
+    }
+    else
+    {
+        scopeData.argDataSize = 0;
+    }
 }
 
 
@@ -2010,35 +2081,58 @@ void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId)
 
     auto depth = --pThreadData->stackDepth;
 
-    auto& zone = pThreadData->zones[depth];
-    zone.end = getTicks();
+    auto& scopeData = pThreadData->zones[depth];
+    scopeData.zone.end = getTicks();
 
     // work out if we send it.
     auto minMicroSec = matchId;
-    auto elpased = zone.end - zone.start;
+    auto elpased = scopeData.zone.end - scopeData.zone.start;
     auto elapsedNano = ticksToNano(pCtx, elpased);
 
     if (elapsedNano > minMicroSec * 1000) {
         return;
     }
 
-    queueZone(pCtx, pThreadData, zone);
+    queueZone(pCtx, pThreadData, scopeData);
 }
 
 
 // ----------- Lock stuff -----------
 
-void TelemSetLockName(TraceContexHandle ctx, const void* pPtr, const char* pLockName)
+void TelemSetLockName(TraceContexHandle ctx, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
         return;
     }
 
-    queueLockSetName(pCtx, pPtr, pLockName);
+    QueueDataLockSetName data;
+    data.type = QueueDataType::LockSetName;
+    data.time = getRelativeTicks(pCtx);
+    data.pLockPtr = pPtr;
+    data.pLockName = pFmtString;
+
+    if (!numArgs)
+    {
+        constexpr auto size = GetSizeWithoutArgData<QueueDataLockSetName>();
+        data.argDataSize = 0;
+        addToTickBuffer(pCtx, &data, size);
+    }
+    else
+    {
+        va_list l;
+        va_start(l, numArgs);
+
+        auto argDataSize = BuildArgData(data.argData, pFmtString, numArgs, l);
+        data.argDataSize = static_cast<tt_int8>(argDataSize & 0xFF);
+
+        va_end(l);
+
+        addToTickBuffer(pCtx, &data, GetDataSize<QueueDataLockSetName>(argDataSize));
+    }
 }
 
-void TelemTryLock(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, const char* pDescription)
+void TelemTryLock(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
@@ -2055,15 +2149,64 @@ void TelemTryLock(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const v
         return;
     }
 
-    pLock->start = getTicks();
-    pLock->pDescription = pDescription;
-    pLock->sourceInfo = sourceInfo;
+    auto& lock = pLock->lock;
+    lock.start = getTicks();
+    lock.pDescription = pFmtString;
+    lock.sourceInfo = sourceInfo;
+
+    if (numArgs)
+    {
+        va_list l;
+        va_start(l, numArgs);
+
+        pLock->argDataSize = BuildArgData(pLock->argData, pFmtString, numArgs, l);
+
+        va_end(l);
+    }
+    else
+    {
+        pLock->argDataSize = 0;
+    }
 }
 
-void TelemTryLockEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const void* pPtr, const char* pDescription)
+void TelemTryLockEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, 
+    const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...)
 {
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    auto* pThreadData = getThreadData(pCtx);
+    if (!pThreadData) {
+        return;
+    }
+
+    auto* pLock = addLock(pThreadData, pPtr);
+    if (!pLock) {
+        return;
+    }
+
     matchIdOut = minMicroSec;
-    TelemTryLock(ctx, sourceInfo, pPtr, pDescription);
+
+    auto& lock = pLock->lock;
+    lock.start = getTicks();
+    lock.pDescription = pFmtString;
+    lock.sourceInfo = sourceInfo;
+
+    if (numArgs)
+    {
+        va_list l;
+        va_start(l, numArgs);
+
+        pLock->argDataSize = BuildArgData(pLock->argData, pFmtString, numArgs, l);
+
+        va_end(l);
+    }
+    else
+    {
+        pLock->argDataSize = 0;
+    }
 }
 
 void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult result)
@@ -2080,9 +2223,10 @@ void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult resul
         return;
     }
 
-    pLock->end = getTicks();
-    pLock->result = result;
-    pLock->depth = static_cast<decltype(pLock->depth)>(pThreadData->stackDepth);
+    auto& lock = pLock->lock;
+    lock.end = getTicks();
+    lock.result = result;
+    lock.depth = static_cast<decltype(lock.depth)>(pThreadData->stackDepth);
 
     queueLockTry(pCtx, pThreadData, pPtr, pLock);
 }
@@ -2101,13 +2245,14 @@ void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPt
         return;
     }
 
-    pLock->end = getTicks();
-    pLock->result = result;
-    pLock->depth = static_cast<decltype(pLock->depth)>(pThreadData->stackDepth);
+    auto& lock = pLock->lock;
+    lock.end = getTicks();
+    lock.result = result;
+    lock.depth = static_cast<decltype(lock.depth)>(pThreadData->stackDepth);
 
     // work out if we send it.
     auto minMicroSec = matchId;
-    auto elpased = pLock->end - pLock->start;
+    auto elpased = lock.end - lock.start;
     auto elapsedNano = ticksToNano(pCtx, elpased);
 
     if (elapsedNano > minMicroSec * 1000) {
@@ -2139,14 +2284,39 @@ void TelemSignalLockCount(TraceContexHandle ctx, const TtSourceInfo& sourceInfo,
 
 // ----------- Allocation stuff -----------
 
-void TelemAlloc(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr, tt_size size)
+void TelemAlloc(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr, tt_size allocSize, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
         return;
     }
 
-    queueMemAlloc(pCtx, sourceInfo, pPtr, size);
+    QueueDataMemAlloc data;
+    data.type = QueueDataType::MemAlloc;
+    data.time = getRelativeTicks(pCtx);
+    data.pPtr = pPtr;
+    data.size = static_cast<tt_uint32>(allocSize);
+    data.threadID = getThreadID();
+    data.sourceInfo = sourceInfo;
+
+    if (!numArgs)
+    {
+        constexpr auto size = GetSizeWithoutArgData<QueueDataMessage>();
+        data.argDataSize = 0;
+        addToTickBuffer(pCtx, &data, size);
+    }
+    else
+    {
+        va_list l;
+        va_start(l, numArgs);
+
+        auto argDataSize = BuildArgData(data.argData, pFmtString, numArgs, l);
+        data.argDataSize = static_cast<tt_int8>(argDataSize & 0xFF);
+
+        va_end(l);
+
+        addToTickBuffer(pCtx, &data, GetDataSize<QueueDataMessage>(argDataSize));
+    }
 }
 
 void TelemFree(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr)

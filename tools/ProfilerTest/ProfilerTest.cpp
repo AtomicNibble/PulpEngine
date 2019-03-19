@@ -101,15 +101,20 @@ namespace
             ttZone(ctx, "Aint no camel like me!");
 
             // alloc me baby.
-            ttAlloc(ctx, (void*)0x12345678, 0x300 * (i + 1));
+            ttAlloc(ctx, (void*)0x12345678, 0x300 * (i + 1), "Alloc some data!");
             ttFree(ctx, (void*)0x12345678);
 
             for (int x = 0; x < 10; x++)
             {
                 {
+                    ttEnter(ctx, "Slap my %s!", "goat");
+                    ttLeave(ctx);
+                }
+
+                {
                     ScopedLockTelemetry lock(cs0);
 
-                    ttZone(ctx, "Slap my goat!");
+                    ttZone(ctx, "Slap a pickle!");
                     total++;
                     core::Thread::sleep(0);
                 }
