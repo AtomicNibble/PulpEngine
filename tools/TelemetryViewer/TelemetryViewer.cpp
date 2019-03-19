@@ -1133,6 +1133,7 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
             }
 
             draw->AddLine(wpos + ImVec2(0, offset + ostep - 1), wpos + ImVec2(w, offset + ostep - 1), 0x33FFFFFF);
+            draw->AddRectFilled(wpos + ImVec2(0, offset), wpos + ImVec2(w, offset + ostep), 0xa0a08f30);
             draw->AddText(wpos + ImVec2(ty, offset), labelColor, txt.begin(), txt.end());
 
             cnt++;
@@ -1326,6 +1327,7 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
             }
 
             draw->AddLine(wpos + ImVec2(0, offset + ostep - 1), wpos + ImVec2(w, offset + ostep - 1), 0x33FFFFFF);
+            draw->AddRectFilled(wpos + ImVec2(0, offset), wpos + ImVec2(w, offset + ostep), 0xa0a08f30);
             draw->AddText(wpos + ImVec2(ty, offset), labelColor, txt.begin(), txt.end());
 
             cnt++;
