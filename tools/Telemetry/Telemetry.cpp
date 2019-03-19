@@ -1108,18 +1108,6 @@ namespace
         addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(scopeData.argDataSize));
     }
 
-    TELEM_INLINE void queueLockSetName(TraceContext* pCtx, const void* pPtr, const char* pLockName)
-    {
-        QueueDataLockSetName data;
-        data.type = QueueDataType::LockSetName;
-        data.argDataSize = 0;
-        data.time = getRelativeTicks(pCtx);
-        data.pLockPtr = pPtr;
-        data.pLockName = pLockName;
-
-        addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
-    }
-
     TELEM_INLINE void queueLockTry(TraceContext* pCtx, TraceThread* pThread, const void* pPtr, TraceLockBuilder* pLock)
     {
         QueueDataLockTry data;
