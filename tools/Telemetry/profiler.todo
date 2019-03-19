@@ -20,15 +20,15 @@ ServerLib:
   ☐ Create nice api for the server exe to just run.
   ☐ Support multiple client connections / data streams
 
-  ☐ Process the incoming data
+  ✔ Process the incoming data @done (19-03-17 12:45)
     ☐ Use a thread pool for processing data from multiple clients.
 
-  ☐ Have a api for querying data for a given client
-     ☐ Also support a REST like api, so remove viewers can connect.
+  ✔ Have a api for querying data for a given client @done (19-03-17 12:45)
+     ✔ Also support a REST like api, so remote viewers can connect. @done (19-03-17 12:45)
 
 Server:
 
-  ☐ Ideally just load the ServerLib and bind!
+  ✔ Ideally just load the ServerLib and bind! @done (19-03-17 12:44)
 
 Architecture:
   - Server that can just run all the time collecting logs from the network.
