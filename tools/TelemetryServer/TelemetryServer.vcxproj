@@ -465,6 +465,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EngineApp.cpp" />
+    <ClCompile Include="sprintf.cpp" />
     <ClCompile Include="TelemetryServer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
