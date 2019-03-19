@@ -255,6 +255,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 ttError(ctx, "Goat has no boat %" PRIi32 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %f %f %s",
                     124_i32, 5226262_i64, 16_i64, 32_i64, 64_i64, 0.353f, 515152025025.020, "meow meow");
 
+
+                ttPlot(ctx, TtPlotType::Integer, 1, "meow?");
+                ttPlotF32(ctx, TtPlotType::Integer, 1, "cow?");
+                ttPlotF64(ctx, TtPlotType::Integer, 1, "pickle?");
+                ttPlotI32(ctx, TtPlotType::Integer, 1, "nickle?");
+                ttPlotI64(ctx, TtPlotType::Integer, 1, "pizza?");
+                ttPlotU32(ctx, TtPlotType::Integer, 1, "noodles?");
+                ttPlotU64(ctx, TtPlotType::Integer, 1, "bananan?");
+
                 for (int32_t i = 0; i < numThreads; i++)
                 {
                     thread[i].create(threadNames[i]);
