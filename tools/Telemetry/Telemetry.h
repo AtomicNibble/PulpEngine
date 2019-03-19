@@ -165,13 +165,12 @@ extern "C"
     __TELEM_API_VOID(TelemAlloc, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr, tt_size allocSize, const char* pFmtString, tt_int32 numArgs, ...);
     __TELEM_API_VOID(TelemFree, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr);
 
-    __TELEM_API_VOID(TelemPlot, TraceContexHandle ctx, TtPlotType type, float value, const char* pName);
-    __TELEM_API_VOID(TelemPlotF32, TraceContexHandle ctx, TtPlotType type, float value, const char* pName);
-    __TELEM_API_VOID(TelemPlotF64, TraceContexHandle ctx, TtPlotType type, double value, const char* pName);
-    __TELEM_API_VOID(TelemPlotI32, TraceContexHandle ctx, TtPlotType type, tt_int32 value, const char* pName);
-    __TELEM_API_VOID(TelemPlotI64, TraceContexHandle ctx, TtPlotType type, tt_int64 value, const char* pName);
-    __TELEM_API_VOID(TelemPlotU32, TraceContexHandle ctx, TtPlotType type, tt_uint32 value, const char* pName);
-    __TELEM_API_VOID(TelemPlotU64, TraceContexHandle ctx, TtPlotType type, tt_uint64 value, const char* pName);
+    __TELEM_API_VOID(TelemPlotF32, TraceContexHandle ctx, TtPlotType type, float value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotF64, TraceContexHandle ctx, TtPlotType type, double value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotI32, TraceContexHandle ctx, TtPlotType type, tt_int32 value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotI64, TraceContexHandle ctx, TtPlotType type, tt_int64 value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotU32, TraceContexHandle ctx, TtPlotType type, tt_uint32 value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotU64, TraceContexHandle ctx, TtPlotType type, tt_uint64 value, const char* pFmtString, tt_int32 numArgs, ...);
 
     __TELEM_API_VOID(TelemMessage, TraceContexHandle ctx, TtLogType::Enum type, const char* pFmtString, tt_int32 numArgs, ...);
 
@@ -242,6 +241,12 @@ namespace telem
             __TELEM_RESOLVE(TelemSignalLockCount);
             __TELEM_RESOLVE(TelemAlloc);
             __TELEM_RESOLVE(TelemFree);
+            __TELEM_RESOLVE(TelemPlotF32);
+            __TELEM_RESOLVE(TelemPlotF64);
+            __TELEM_RESOLVE(TelemPlotI32);
+            __TELEM_RESOLVE(TelemPlotI64);
+            __TELEM_RESOLVE(TelemPlotU32);
+            __TELEM_RESOLVE(TelemPlotU64);
             __TELEM_RESOLVE(TelemMessage);
             return true;
         }
@@ -274,6 +279,12 @@ namespace telem
             __TELEM_SET_BLANK(TelemSignalLockCount);
             __TELEM_SET_BLANK(TelemAlloc);
             __TELEM_SET_BLANK(TelemFree);
+            __TELEM_SET_BLANK(TelemPlotF32);
+            __TELEM_SET_BLANK(TelemPlotF64);
+            __TELEM_SET_BLANK(TelemPlotI32);
+            __TELEM_SET_BLANK(TelemPlotI64);
+            __TELEM_SET_BLANK(TelemPlotU32);
+            __TELEM_SET_BLANK(TelemPlotU64);
             __TELEM_SET_BLANK(TelemMessage);
         }
 
@@ -312,6 +323,12 @@ namespace telem
         __TELEM_FUNC_PTR(TelemSignalLockCount);
         __TELEM_FUNC_PTR(TelemAlloc);
         __TELEM_FUNC_PTR(TelemFree);
+        __TELEM_FUNC_PTR(TelemPlotF32);
+        __TELEM_FUNC_PTR(TelemPlotF64);
+        __TELEM_FUNC_PTR(TelemPlotI32);
+        __TELEM_FUNC_PTR(TelemPlotI64);
+        __TELEM_FUNC_PTR(TelemPlotU32);
+        __TELEM_FUNC_PTR(TelemPlotU64);
         __TELEM_FUNC_PTR(TelemMessage);
 
     private:
@@ -397,10 +414,10 @@ namespace telem
 #define ttIsPaused(ctx) __TELEM_FUNC_NAME(TelemIsPaused)(ctx)
 
 // Thread
-#define ttSetThreadName(ctx, threadID, pName) TelemSetThreadName(ctx, threadID, pName)
+#define ttSetThreadName(ctx, threadID, pName) __TELEM_FUNC_NAME(TelemSetThreadName)(ctx, threadID, pName)
 
-#define ttGetCallStack(ctx, stackOut) TelemGetCallStack(ctx, stackOut)
-#define ttSendCallStack(ctx, pStack) TelemSendCallStack(ctx, pStack)
+#define ttGetCallStack(ctx, stackOut) __TELEM_FUNC_NAME(TelemGetCallStack)(ctx, stackOut)
+#define ttSendCallStack(ctx, pStack) __TELEM_FUNC_NAME(TelemSendCallStack)(ctx, pStack)
 
 // Zones
 #define ttEnter(ctx, pFmtString, ...) __TELEM_FUNC_NAME(TelemEnter)(ctx, TT_SOURCE_INFO, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
@@ -422,13 +439,13 @@ namespace telem
 #define ttAlloc(ctx, pPtr, size, pFmtString, ...) __TELEM_FUNC_NAME(TelemAlloc)(ctx, TT_SOURCE_INFO, pPtr, size, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ttFree(ctx, pPtr) __TELEM_FUNC_NAME(TelemFree)(ctx, TT_SOURCE_INFO, pPtr)
 
-#define ttPlot(ctx, type, value, pName)
-#define ttPlotF32(ctx, type, value, pName)
-#define ttPlotF64(ctx, type, value, pName)
-#define ttPlotI32(ctx, type, value, pName)
-#define ttPlotU32(ctx, type, value, pName)
-#define ttPlotI64(ctx, type, value, pName)
-#define ttPlotU64(ctx, type, value, pName)
+#define ttPlot(ctx, type, value, pFmtString, ...)    ttPlotF32(ctx, type, value, pFmtString, __VA_ARGS__);
+#define ttPlotF32(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotF32)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttPlotF64(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotF64)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttPlotI32(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotI32)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttPlotU32(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotU32)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttPlotI64(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotI64)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttPlotU64(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotU64)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 
 #define ttMessage(ctx, type, pFmtString, ...)  __TELEM_FUNC_NAME(TelemMessage)(ctx, type, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ttLog(ctx, pFmtString, ...) ttMessage(ctx, TtLogType::Msg, pFmtString, __VA_ARGS__)
@@ -479,8 +496,26 @@ namespace telem
 // Lock util
 #define ttSetLockName(...);
 #define ttTryLock(...);
+#define ttTryLockEx(...);
 #define ttEndTryLock(...);
+#define ttEndTryLockEx(...);
 #define ttSetLockState(...);
 #define ttSignalLockCount(...);
+
+#define ttAlloc(...);
+#define ttFree(...);
+
+#define ttPlot(...);
+#define ttPlotF32(...);
+#define ttPlotF64(...);
+#define ttPlotI32(...);
+#define ttPlotU32(...);
+#define ttPlotI64(...);
+#define ttPlotU64(...);
+
+#define ttMessage(...);
+#define ttLog(...);
+#define ttWarning(...);
+#define ttError(...);
 
 #endif // TTELEMETRY_ENABLED

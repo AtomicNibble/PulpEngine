@@ -2331,52 +2331,58 @@ void TelemFree(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr
 
 // ----------- Plot stuff -----------
 
-void tmPlotF32(TraceContexHandle ctx, TtPlotType type, float value, const char* pName)
+void TelemPlotF32(TraceContexHandle ctx, TtPlotType type, float value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     TELEM_UNUSED(ctx);
     TELEM_UNUSED(type);
     TELEM_UNUSED(value);
-    TELEM_UNUSED(pName);
+    TELEM_UNUSED(pFmtString);
+    TELEM_UNUSED(numArgs);
 }
 
-void tmPlotF64(TraceContexHandle ctx, TtPlotType type, double value, const char* pName)
+void TelemPlotF64(TraceContexHandle ctx, TtPlotType type, double value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     TELEM_UNUSED(ctx);
     TELEM_UNUSED(type);
     TELEM_UNUSED(value);
-    TELEM_UNUSED(pName);
+    TELEM_UNUSED(pFmtString);
+    TELEM_UNUSED(numArgs);
 }
 
-void tmPlotI32(TraceContexHandle ctx, TtPlotType type, tt_int32 value, const char* pName)
+void TelemPlotI32(TraceContexHandle ctx, TtPlotType type, tt_int32 value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     TELEM_UNUSED(ctx);
     TELEM_UNUSED(type);
     TELEM_UNUSED(value);
-    TELEM_UNUSED(pName);
+    TELEM_UNUSED(pFmtString);
+    TELEM_UNUSED(numArgs);
 }
 
-void tmPlotI64(TraceContexHandle ctx, TtPlotType type, tt_int64 value, const char* pName)
+void TelemPlotI64(TraceContexHandle ctx, TtPlotType type, tt_int64 value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     TELEM_UNUSED(ctx);
     TELEM_UNUSED(type);
     TELEM_UNUSED(value);
-    TELEM_UNUSED(pName);
+    TELEM_UNUSED(pFmtString);
+    TELEM_UNUSED(numArgs);
 }
 
-void tmPlotU32(TraceContexHandle ctx, TtPlotType type, tt_uint32 value, const char* pName)
+void TelemPlotU32(TraceContexHandle ctx, TtPlotType type, tt_uint32 value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     TELEM_UNUSED(ctx);
     TELEM_UNUSED(type);
     TELEM_UNUSED(value);
-    TELEM_UNUSED(pName);
+    TELEM_UNUSED(pFmtString);
+    TELEM_UNUSED(numArgs);
 }
 
-void tmPlotU64(TraceContexHandle ctx, TtPlotType type, tt_uint64 value, const char* pName)
+void TelemPlotU64(TraceContexHandle ctx, TtPlotType type, tt_uint64 value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     TELEM_UNUSED(ctx);
     TELEM_UNUSED(type);
     TELEM_UNUSED(value);
-    TELEM_UNUSED(pName);
+    TELEM_UNUSED(pFmtString);
+    TELEM_UNUSED(numArgs);
 }
 
 // ----------- Message Stuff -----------
