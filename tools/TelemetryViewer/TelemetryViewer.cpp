@@ -1325,7 +1325,7 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
             {
                 draw->AddTriangle(wpos + ImVec2(to / 2, offset + to / 2), wpos + ImVec2(to / 2, offset + ty - to / 2), wpos + ImVec2(to / 2 + th, offset + ty * 0.5), labelColor, 2.0f);
             }
-
+            
             draw->AddLine(wpos + ImVec2(0, offset + ostep - 1), wpos + ImVec2(w, offset + ostep - 1), 0x33FFFFFF);
             draw->AddRectFilled(wpos + ImVec2(0, offset), wpos + ImVec2(w, offset + ostep), 0xa0a08f30);
             draw->AddText(wpos + ImVec2(ty, offset), labelColor, txt.begin(), txt.end());
