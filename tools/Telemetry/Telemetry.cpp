@@ -782,12 +782,22 @@ namespace
 
                     static_assert(std::numeric_limits<tt_uint8>::max() >= MAX_STRING_LEN, "Can't store max string length");
 
+                    const auto offset = std::distance(data.data, pStrData);
+
                     // TODO: handle buffer not having space etc.
                     *pStrData++ = static_cast<tt_uint8>(len & 0xFF);
                     memcpy(pStrData, pStr, len);
 
                     pStrData += len;
                     bytesLeft -= len;
+
+                    // replace this with offset, should also compress better
+                    pValues[idx] = offset;
+
+                    // TODO: make this sentinal a bit more robust?
+                    if (idx > 1 && precision == MAX_STRING_LEN) {
+                        pValues[idx-1] = 0;
+                    }
                     break;
                 }
 
