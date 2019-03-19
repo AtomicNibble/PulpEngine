@@ -611,8 +611,166 @@ namespace
         addToCompressionBuffer(pComp, &strDataBuf, packetLen);
     }
 
+    // -----------------------------------
 
-    enum class QueueDataType
+    struct ArgDataBuilder
+    {
+        constexpr static tt_int32 BUF_SIZE = 255;
+
+        tt_uint8 numArgs;
+        tt_uint8 data[BUF_SIZE];
+    };
+
+    inline constexpr tt_int32 RoundUpToMultiple(tt_int32 numToRound, tt_int32 multipleOf)
+    {
+        return (numToRound + multipleOf - 1) & ~(multipleOf - 1);
+    }
+
+    template<typename T>
+    inline constexpr tt_int32 GetSizeWithoutArgData(void)
+    {
+        constexpr tt_int32 argDataSize = sizeof(T::argData);
+        return RoundUpToMultiple(sizeof(T) - argDataSize, 64);
+    }
+
+    template<typename T>
+    inline constexpr tt_int32 GetDataSize(tt_int32 argDataSize)
+    {
+        return RoundUpToMultiple(GetSizeWithoutArgData<T>() + argDataSize, 64);
+    }
+
+
+
+    auto _isDigit = [](char ch) -> bool {
+        return (ch >= '0') && (ch <= '9');
+    };
+
+    auto _atoi = [](const char** pStr) -> tt_int32 {
+        tt_int32 i = 0;
+
+        while (_isDigit(**pStr)) {
+            i = i * 10 + static_cast<tt_int32>(*((*pStr)++) - '0');
+        }
+
+        return i;
+    };
+
+    tt_int32 AddStrings(ArgDataBuilder& data, const char* pFmtString, tt_int32 numArgs, uintptr_t* pValues)
+    {
+        // now we need to parse any strings and add them to the buffer.
+        const tt_int32 bytesUsed = numArgs * sizeof(uintptr_t);
+        tt_int32 bytesLeft = sizeof(data.data) - bytesUsed;
+        tt_uint8* pStrData = &data.data[bytesUsed];
+
+        tt_int32 idx = 0;
+
+        // %[flags][width][.precision][length]
+        while (*pFmtString)
+        {
+            if (*pFmtString++ != '%') {
+                continue;
+            }
+
+            // skip flags
+            bool loop = false;
+
+            do
+            {
+                switch (*pFmtString)
+                {
+                    case '0':
+                    case '-':
+                    case '+':
+                    case ' ':
+                    case '#':
+                        ++pFmtString;
+                        loop = true;
+                        break;
+                    default:
+                        loop = false;
+                        break;
+                }
+            } while (loop);
+
+            // TODO: width field
+
+            // evaluate precision field
+            tt_int32 precision = MAX_STRING_LEN;
+            if (*pFmtString == '.') {
+                ++pFmtString;
+
+                // fixed length or length passed?
+                if (_isDigit(*pFmtString)) {
+                    precision = _atoi(&pFmtString);
+                }
+                else if (*pFmtString == '*') {
+                    const tt_int32 prec = static_cast<tt_int32>(pValues[idx++]);
+                    precision = prec > 0 ? (unsigned int)prec : 0U;
+                    pFmtString++;
+                }
+            }
+
+            switch (*pFmtString) {
+                case 'l':
+                case 'h':
+                case 'j':
+                case 'z':
+                    pFmtString++;
+                    break;
+                default:
+                    break;
+            }
+
+            switch (*pFmtString) {
+                case 's': {
+                    const char* pStr = reinterpret_cast<const char*>(pValues[idx]);
+                    auto len = static_cast<tt_uint32>(strnlen(pStr, precision));
+
+                    // TODO: handle buffer not having space etc.
+                    *pStrData++ = static_cast<tt_uint8>(len & 0xFF);
+                    memcpy(pStrData, pStr, len);
+
+                    pStrData += len;
+                    bytesLeft -= len;
+                    break;
+                }
+
+                case '%':
+                default:
+                    ++pFmtString;
+                    break;
+            }
+
+            ++idx;
+        }
+
+        return (sizeof(data.numArgs) + sizeof(data)) - bytesLeft;
+    }
+
+    // template<typename T>
+    tt_int32 BuildArgData(ArgDataBuilder& data, const char* pFmtString, tt_int32 numArgs, va_list& l)
+    {
+        data.numArgs = static_cast<tt_int8>(numArgs & 0xFF);
+        uintptr_t* pValues = reinterpret_cast<uintptr_t*>(data.data);
+
+        for (int32_t i = 0; i < numArgs; i++) {
+            pValues[i] = va_arg(l, uintptr_t);
+        }
+
+        // if we know there are no strings we can just return here.
+        bool noStrings = false;
+
+        if (noStrings) {
+            const tt_int32 bytesUsed = numArgs * sizeof(uintptr_t);
+            return sizeof(data.numArgs) + bytesUsed;
+        }
+
+        return AddStrings(data, pFmtString, numArgs, pValues);
+    }
+
+    // -----------------------------------
+
+    enum class QueueDataType : tt_uint8
     {
         Zone,
         TickInfo,
@@ -627,11 +785,13 @@ namespace
         Message
     };
 
+    TELEM_PACK_PUSH(8)
+
     struct QueueDataBase
     {
         QueueDataType type;
+        tt_uint8 argDataSize;
     };
-
     
     TELEM_ALIGNED_SYMBOL(struct QueueDataTickInfo, 64) : public QueueDataBase
     {
@@ -642,11 +802,13 @@ namespace
         tt_uint64 endNano;
     };
 
-    TELEM_ALIGNED_SYMBOL(struct QueueDataThreadSetName, 64) : public QueueDataBase
+    struct QueueDataThreadSetName : public QueueDataBase
     {
         TtthreadId threadID;
         tt_uint64 time;
         const char* pName;
+
+        ArgDataBuilder argData;
     };
 
     TELEM_ALIGNED_SYMBOL(struct QueueDataCallStack, 64) : public QueueDataBase
@@ -654,101 +816,88 @@ namespace
         TtCallStack callstack;
     };
 
-    TELEM_ALIGNED_SYMBOL(struct QueueDataZone, 64) : public QueueDataBase
+    struct QueueDataZone : public QueueDataBase
     {
         tt_int8 stackDepth;
         TtthreadId threadID;
         
         TraceZone zone;
+
+        ArgDataBuilder argData;
     };
 
-    TELEM_ALIGNED_SYMBOL(struct QueueDataLockSetName, 64) : public QueueDataBase
+    struct QueueDataLockSetName : public QueueDataBase
     {
         const void* pLockPtr;
-        tt_uint64 time;
         const char* pLockName;
+        tt_uint64 time;
+
+        ArgDataBuilder argData;
     };
 
-    TELEM_ALIGNED_SYMBOL(struct QueueDataLockTry, 64) : public QueueDataBase
+    struct QueueDataLockTry : public QueueDataBase
     {
         TraceLock lock;
         TtthreadId threadID;
         const void* pLockPtr;
+
+        ArgDataBuilder argData;
     };
 
-    TELEM_ALIGNED_SYMBOL(struct QueueDataLockState, 64) : public QueueDataBase
+    struct QueueDataLockState : public QueueDataBase
     {
         TtLockState state;
         TtthreadId threadID;
         tt_uint64 time;
         const void* pLockPtr;
         TtSourceInfo sourceInfo;
+
+        ArgDataBuilder argData;
     };
 
-    TELEM_ALIGNED_SYMBOL(struct QueueDataLockCount, 64) : public QueueDataBase
+    struct QueueDataLockCount : public QueueDataBase
     {
         tt_uint16 count;
         TtthreadId threadID;
         tt_uint64 time;
         const void* pLockPtr;
         TtSourceInfo sourceInfo;
+
+        ArgDataBuilder argData;
     };
 
-    TELEM_ALIGNED_SYMBOL(struct QueueDataMemAlloc, 64) : public QueueDataBase
+    struct QueueDataMemAlloc : public QueueDataBase
     {
         TtthreadId threadID;
         tt_uint64 time;
         const void* pPtr;
         tt_uint32 size;
         TtSourceInfo sourceInfo;
+
+        ArgDataBuilder argData;
     };
 
-    TELEM_ALIGNED_SYMBOL(struct QueueDataMemFree, 64) : public QueueDataBase
+    struct QueueDataMemFree : public QueueDataBase
     {
         TtthreadId threadID;
         tt_uint64 time;
         const void* pPtr;
         TtSourceInfo sourceInfo;
-    };
-
-    struct ArgDataBuilder
-    {
-        constexpr static tt_int32 BUF_SIZE = 255;
-
-        tt_uint8 numArgs;
-        tt_uint8 data[BUF_SIZE];
-    };
-
-
-    struct QueueDataMessage : public QueueDataBase
-    {
-        tt_uint64 time;
-        const char* pFmtStr;
-        TtLogType::Enum logType;
-        tt_uint8 argDataSize;
 
         ArgDataBuilder argData;
     };
 
-
-    inline constexpr tt_int32 RoundUpToMultiple(tt_int32 numToRound, tt_int32 multipleOf)
+    struct QueueDataMessage : public QueueDataBase
     {
-        return (numToRound + multipleOf - 1) & ~(multipleOf - 1);
-    }
+        TtLogType::Enum logType;
+        tt_uint64 time;
+        const char* pFmtStr;
 
-    template<typename T>
-    inline constexpr tt_int32 GetSizeWithoutArgData(void)
-    {
-        constexpr tt_int32 argDataSize = sizeof(T::argData);
+        ArgDataBuilder argData;
+    };
 
-        return RoundUpToMultiple(sizeof(T) - argDataSize, 64);
-    }
+    TELEM_PACK_POP
 
-    template<typename T>
-    inline constexpr tt_int32 GetDataSize(tt_int32 argDataSize)
-    {
-        return RoundUpToMultiple(GetSizeWithoutArgData<T>() + argDataSize, 64);
-    }
 
     constexpr size_t size0 = sizeof(QueueDataThreadSetName);
     constexpr size_t size1 = sizeof(QueueDataZone);
@@ -763,17 +912,17 @@ namespace
     constexpr size_t size9 = sizeof(ArgDataBuilder);
     
 
-    static_assert(64 == sizeof(QueueDataThreadSetName));
+    static_assert(64 == GetSizeWithoutArgData<QueueDataThreadSetName>());
     static_assert(64 == sizeof(QueueDataTickInfo));
-    static_assert(64 == sizeof(QueueDataZone));
-    static_assert(64 == sizeof(QueueDataLockSetName));
+    static_assert(64 == GetSizeWithoutArgData<QueueDataZone>());
+    static_assert(64 == GetSizeWithoutArgData<QueueDataLockSetName>());
     static_assert(64 == sizeof(QueueDataCallStack));
-    static_assert(64 == sizeof(QueueDataLockTry));
-    static_assert(64 == sizeof(QueueDataLockState));
-    static_assert(64 == sizeof(QueueDataLockCount));
-    static_assert(64 == sizeof(QueueDataMemAlloc));
-    static_assert(64 == sizeof(QueueDataMemFree));
-  //  static_assert(64 == sizeof(QueueDataMessage));
+    static_assert(64 == GetSizeWithoutArgData<QueueDataLockTry>());
+    static_assert(64 == GetSizeWithoutArgData<QueueDataLockState>());
+    static_assert(64 == GetSizeWithoutArgData<QueueDataLockCount>());
+    static_assert(64 == GetSizeWithoutArgData<QueueDataMemAlloc>());
+    static_assert(64 == GetSizeWithoutArgData<QueueDataMemFree>());
+    static_assert(64 == GetSizeWithoutArgData<QueueDataMessage>());
 
     void flipBufferInternal(TraceContext* pCtx, bool force)
     {
@@ -2065,132 +2214,6 @@ void tmPlotU64(TraceContexHandle ctx, TtPlotType type, tt_uint64 value, const ch
 
 // ----------- Message Stuff -----------
 
-auto _isDigit = [](char ch) -> bool {
-    return (ch >= '0') && (ch <= '9');
-};
-
-auto _atoi = [](const char** pStr) -> tt_int32 {
-    tt_int32 i = 0;
-
-    while (_isDigit(**pStr)) {
-        i = i * 10 + static_cast<tt_int32>(*((*pStr)++) - '0');
-    }
-
-    return i;
-};
-
-tt_int32 AddStrings(ArgDataBuilder& data, const char* pFmtString, tt_int32 numArgs, uintptr_t* pValues)
-{
-    // now we need to parse any strings and add them to the buffer.
-    const tt_int32 bytesUsed = numArgs * sizeof(uintptr_t);
-    tt_int32 bytesLeft = sizeof(data.data) - bytesUsed;
-    tt_uint8* pStrData = &data.data[bytesUsed];
-
-    tt_int32 idx = 0;
-
-    // %[flags][width][.precision][length]
-    while (*pFmtString)
-    {
-        if (*pFmtString++ != '%') {
-            continue;
-        }
-
-        // skip flags
-        bool loop = false;
-
-        do
-        {
-            switch (*pFmtString)
-            {
-                case '0':
-                case '-':
-                case '+':
-                case ' ':
-                case '#':
-                    ++pFmtString;
-                    loop = true;
-                    break;
-                default:
-                    loop = false;
-                    break;
-            }
-        } while (loop);
-
-        // TODO: width field
-
-        // evaluate precision field
-        tt_int32 precision = MAX_STRING_LEN;
-        if (*pFmtString == '.') {
-            ++pFmtString;
-
-            // fixed length or length passed?
-            if (_isDigit(*pFmtString)) {
-                precision = _atoi(&pFmtString);
-            }
-            else if (*pFmtString == '*') {
-                const tt_int32 prec = static_cast<tt_int32>(pValues[idx++]);
-                precision = prec > 0 ? (unsigned int)prec : 0U;
-                pFmtString++;
-            }
-        }
-
-        switch (*pFmtString) {
-            case 'l':
-            case 'h':
-            case 'j':
-            case 'z':
-                pFmtString++;
-                break;
-            default:
-                break;
-        }
-
-        switch (*pFmtString) {
-            case 's': {
-                const char* pStr = reinterpret_cast<const char*>(pValues[idx]);
-                auto len = static_cast<tt_uint32>(strnlen(pStr, precision));
-
-                // TODO: handle buffer not having space etc.
-                *pStrData++ = static_cast<tt_uint8>(len & 0xFF);
-                memcpy(pStrData, pStr, len);
-
-                pStrData += len;
-                bytesLeft -= len;
-                break;
-            }
-
-            case '%':
-            default:
-                ++pFmtString;
-                break;
-        }
-
-        ++idx;
-    }
-
-    return (sizeof(data.numArgs) + sizeof(data)) - bytesLeft;
-}
-
-// template<typename T>
-tt_int32 BuildArgData(ArgDataBuilder& data, const char* pFmtString, tt_int32 numArgs, va_list& l)
-{
-    data.numArgs = static_cast<tt_int8>(numArgs & 0xFF);
-    uintptr_t* pValues = reinterpret_cast<uintptr_t*>(data.data);
-
-    for (int32_t i = 0; i < numArgs; i++) {
-        pValues[i] = va_arg(l, uintptr_t);
-    }
-
-    // if we know there are no strings we can just return here.
-    bool noStrings = false;
-
-    if (noStrings) {
-        const tt_int32 bytesUsed = numArgs * sizeof(uintptr_t);
-        return sizeof(data.numArgs) + bytesUsed;
-    }
-
-    return AddStrings(data, pFmtString, numArgs, pValues);
-}
 
 void TelemMessage(TraceContexHandle ctx, TtLogType::Enum type, const char* pFmtString, tt_int32 numArgs, ...)
 {
