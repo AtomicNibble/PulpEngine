@@ -75,7 +75,7 @@ namespace
         tt_uint64 start;
         tt_uint64 end;
 
-        const char* pDescription;
+        const char* pFmtStr;
         TtLockResult result;
         tt_uint16 depth;
         TtSourceInfo sourceInfo;
@@ -103,7 +103,7 @@ namespace
         tt_uint64 start;
         tt_uint64 end;
 
-        const char* pZoneName;
+        const char* pFmtStr;
         TtSourceInfo sourceInfo;
     };
 
@@ -861,7 +861,7 @@ namespace
     {
         TtthreadId threadID;
         tt_uint64 time;
-        const char* pName;
+        const char* pFmtStr;
 
         ArgDataBuilder argData;
     };
@@ -884,7 +884,7 @@ namespace
     struct QueueDataLockSetName : public QueueDataBase
     {
         const void* pLockPtr;
-        const char* pLockName;
+        const char* pFmtStr;
         tt_uint64 time;
 
         ArgDataBuilder argData;
@@ -904,8 +904,9 @@ namespace
         TtLockState state;
         TtthreadId threadID;
         tt_uint64 time;
-        const void* pLockPtr;
         TtSourceInfo sourceInfo;
+        const void* pLockPtr;
+        const char* pFmtStr;
 
         ArgDataBuilder argData;
     };
@@ -915,8 +916,9 @@ namespace
         tt_uint16 count;
         TtthreadId threadID;
         tt_uint64 time;
-        const void* pLockPtr;
         TtSourceInfo sourceInfo;
+        const void* pLockPtr;
+        const char* pFmtStr;
 
         ArgDataBuilder argData;
     };
@@ -925,9 +927,10 @@ namespace
     {
         TtthreadId threadID;
         tt_uint64 time;
-        const void* pPtr;
         tt_uint32 size;
         TtSourceInfo sourceInfo;
+        const void* pPtr;
+        const char* pFmtStr;
 
         ArgDataBuilder argData;
     };
@@ -936,8 +939,9 @@ namespace
     {
         TtthreadId threadID;
         tt_uint64 time;
-        const void* pPtr;
         TtSourceInfo sourceInfo;
+        const void* pPtr;
+        const char* pFmtStr;
 
         ArgDataBuilder argData;
     };
@@ -1116,7 +1120,7 @@ namespace
         data.argDataSize = 0;
         data.time = getRelativeTicks(pCtx);
         data.threadID = threadID;
-        data.pName = pName;
+        data.pFmtStr = pName;
 
         addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
     }
@@ -1140,8 +1144,7 @@ namespace
         data.threadID = pThread->id;
         data.zone = scopeData.zone;
 
-        if (scopeData.argDataSize)
-        {
+        if (scopeData.argDataSize) {
             memcpy(&data.argData, &scopeData.argData, scopeData.argDataSize);
         }
 
@@ -1157,8 +1160,7 @@ namespace
         data.lock = pLock->lock;
         data.pLockPtr = pPtr;
 
-        if (pLock->argDataSize)
-        {
+        if (pLock->argDataSize) {
             memcpy(&data.argData, &pLock->argData, pLock->argDataSize);
         }
 
@@ -1175,6 +1177,7 @@ namespace
         data.state = state;
         data.threadID = getThreadID();
         data.sourceInfo = sourceInfo;
+        data.pFmtStr = "<none>";
 
         addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
     }
@@ -1189,20 +1192,7 @@ namespace
         data.count = static_cast<tt_uint16>(count);
         data.threadID = getThreadID();
         data.sourceInfo = sourceInfo;
-
-        addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
-    }
-
-    TELEM_INLINE void queueMemAlloc(TraceContext* pCtx, const TtSourceInfo& sourceInfo, const void* pPtr, tt_size size)
-    {
-        QueueDataMemAlloc data;
-        data.type = QueueDataType::MemAlloc;
-        data.argDataSize = 0;
-        data.time = getRelativeTicks(pCtx);
-        data.pPtr = pPtr;
-        data.size = static_cast<tt_uint32>(size);;
-        data.threadID = getThreadID();
-        data.sourceInfo = sourceInfo;
+        data.pFmtStr = "<none>";
 
         addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
     }
@@ -1245,7 +1235,7 @@ namespace
         packet.end = toRelativeTicks(pComp->pCtx, zone.end);
         packet.strIdxFile = GetStringId(pComp, zone.sourceInfo.pFile_);
         packet.strIdxFunction = GetStringId(pComp, zone.sourceInfo.pFunction_);
-        packet.strIdxZone = GetStringId(pComp, zone.pZoneName);
+        packet.strIdxFmt = GetStringId(pComp, zone.pFmtStr);
         packet.lineNo = static_cast<tt_uint16>(zone.sourceInfo.line_);
         packet.argDataSize = pBuf->argDataSize;
 
@@ -1279,7 +1269,7 @@ namespace
         DataPacketThreadSetName packet;
         packet.type = DataStreamType::ThreadSetName;
         packet.threadID = pBuf->threadID;
-        packet.strIdxName = GetStringId(pComp, pBuf->pName);
+        packet.strIdxFmt = GetStringId(pComp, pBuf->pFmtStr);
         packet.time = pBuf->time;
         packet.argDataSize = pBuf->argDataSize;
 
@@ -1320,7 +1310,7 @@ namespace
         DataPacketLockSetName packet;
         packet.type = DataStreamType::LockSetName;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
-        packet.strIdxName = GetStringId(pComp, pBuf->pLockName);
+        packet.strIdxFmt = GetStringId(pComp, pBuf->pFmtStr);
         packet.time = pBuf->time;
         packet.argDataSize = pBuf->argDataSize;
 
@@ -1348,7 +1338,7 @@ namespace
         packet.strIdxFile = GetStringId(pComp, lock.sourceInfo.pFile_);
         packet.strIdxFunction = GetStringId(pComp, lock.sourceInfo.pFunction_);
         packet.lineNo = static_cast<tt_uint16>(lock.sourceInfo.line_);
-        packet.strIdxDescrption = GetStringId(pComp, lock.pDescription);
+        packet.strIdxFmt = GetStringId(pComp, lock.pFmtStr);
         packet.result = lock.result;
         packet.depth = static_cast<tt_uint8>(pBuf->lock.depth);
         packet.argDataSize = pBuf->argDataSize;
@@ -1375,6 +1365,7 @@ namespace
         packet.lineNo = static_cast<tt_uint16>(pBuf->sourceInfo.line_);
         packet.strIdxFunction = GetStringId(pComp, pBuf->sourceInfo.pFunction_);
         packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile_);
+        packet.strIdxFmt = GetStringId(pComp, pBuf->pFmtStr);
         packet.argDataSize = pBuf->argDataSize;
 
         const auto dataSize = GetDataSize<std::remove_pointer_t<decltype(pBuf)>>(pBuf->argDataSize);
@@ -1400,6 +1391,13 @@ namespace
         packet.strIdxFunction = GetStringId(pComp, pBuf->sourceInfo.pFunction_);
         packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile_);
 
+#if X_DEBUG
+        // Should not have any args.
+        if (pBuf->argDataSize) {
+            ::DebugBreak();
+        }
+#endif // !TELEM_DEBUG
+
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
 
         return GetSizeWithoutArgData<std::remove_pointer_t<decltype(pBuf)>>();
@@ -1416,6 +1414,7 @@ namespace
         packet.lineNo = static_cast<tt_uint16>(pBuf->sourceInfo.line_);
         packet.strIdxFunction = GetStringId(pComp, pBuf->sourceInfo.pFunction_);
         packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile_);
+        packet.strIdxFmt = GetStringId(pComp, pBuf->pFmtStr);
         packet.argDataSize = pBuf->argDataSize;
 
         const auto dataSize = GetDataSize<std::remove_pointer_t<decltype(pBuf)>>(pBuf->argDataSize);
@@ -1439,17 +1438,16 @@ namespace
         packet.lineNo = static_cast<tt_uint16>(pBuf->sourceInfo.line_);
         packet.strIdxFunction = GetStringId(pComp, pBuf->sourceInfo.pFunction_);
         packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile_);
-        packet.argDataSize = pBuf->argDataSize;
 
-        const auto dataSize = GetDataSize<std::remove_pointer_t<decltype(pBuf)>>(pBuf->argDataSize);
-        flushCompressionBufferIfrequired(pComp, dataSize);
-
-        addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
+#if X_DEBUG
+        // Should not have any args.
         if (pBuf->argDataSize) {
-            addToCompressionBufferNoFlush(pComp, &pBuf->argData, pBuf->argDataSize);
+            ::DebugBreak();
         }
+#endif // !TELEM_DEBUG
 
-        return dataSize;
+        addToCompressionBuffer(pComp, &packet, sizeof(packet));
+        return GetSizeWithoutArgData<std::remove_pointer_t<decltype(pBuf)>>();
     }
 
     tt_int32 queueProcessMessage(PacketCompressor* pComp, const QueueDataMessage* pBuf)
@@ -2080,7 +2078,7 @@ void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const cha
 
     auto& scopeData = pThreadData->zones[depth];
     scopeData.zone.start = getTicks();
-    scopeData.zone.pZoneName = pFmtString;
+    scopeData.zone.pFmtStr = pFmtString;
     scopeData.zone.sourceInfo = sourceInfo;
 
     // for this arg data it would be nicer to be like a linera array.
@@ -2136,7 +2134,7 @@ void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint
 
     auto& scopeData = pThreadData->zones[depth];
     scopeData.zone.start = getTicks();
-    scopeData.zone.pZoneName = pFmtString;
+    scopeData.zone.pFmtStr = pFmtString;
     scopeData.zone.sourceInfo = sourceInfo;
 
     if (numArgs)
@@ -2195,7 +2193,7 @@ void TelemSetLockName(TraceContexHandle ctx, const void* pPtr, const char* pFmtS
     data.type = QueueDataType::LockSetName;
     data.time = getRelativeTicks(pCtx);
     data.pLockPtr = pPtr;
-    data.pLockName = pFmtString;
+    data.pFmtStr = pFmtString;
 
     if (!numArgs)
     {
@@ -2236,7 +2234,7 @@ void TelemTryLock(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const v
 
     auto& lock = pLock->lock;
     lock.start = getTicks();
-    lock.pDescription = pFmtString;
+    lock.pFmtStr = pFmtString;
     lock.sourceInfo = sourceInfo;
 
     if (numArgs)
@@ -2276,7 +2274,7 @@ void TelemTryLockEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_ui
 
     auto& lock = pLock->lock;
     lock.start = getTicks();
-    lock.pDescription = pFmtString;
+    lock.pFmtStr = pFmtString;
     lock.sourceInfo = sourceInfo;
 
     if (numArgs)
@@ -2383,6 +2381,7 @@ void TelemAlloc(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPt
     data.size = static_cast<tt_uint32>(allocSize);
     data.threadID = getThreadID();
     data.sourceInfo = sourceInfo;
+    data.pFmtStr = pFmtString;
 
     if (!numArgs)
     {
@@ -2411,7 +2410,15 @@ void TelemFree(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr
         return;
     }
 
-    queueMemFree(pCtx, sourceInfo, pPtr);
+    QueueDataMemFree data;
+    data.type = QueueDataType::MemFree;
+    data.argDataSize = 0;
+    data.time = getRelativeTicks(pCtx);
+    data.pPtr = pPtr;
+    data.threadID = getThreadID();
+    data.sourceInfo = sourceInfo;
+
+    addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
 }
 
 // ----------- Plot stuff -----------
