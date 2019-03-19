@@ -68,7 +68,7 @@ public:
     void handleDataPacketLockCount(const DataPacketLockCount* pData);
     void handleDataPacketMemAlloc(const DataPacketMemAlloc* pData);
     void handleDataPacketMemFree(const DataPacketMemFree* pData);
-    void handleDataPacketMessage(const DataPacketMessage* pData);
+    int32_t handleDataPacketMessage(const DataPacketMessage* pData);
     void handleDataPacketCallStack(const DataPacketCallStack* pData);
 
 private:

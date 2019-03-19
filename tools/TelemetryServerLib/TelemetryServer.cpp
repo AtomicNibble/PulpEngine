@@ -232,8 +232,7 @@ namespace
                 }
                 case DataStreamType::Message:
                 {
-                    strm.db.handleDataPacketMessage(reinterpret_cast<const DataPacketMessage*>(&pDst[i]));
-                    i += sizeof(DataPacketMessage);
+                    i += strm.db.handleDataPacketMessage(reinterpret_cast<const DataPacketMessage*>(&pDst[i]));
                     break;
                 }
 
@@ -373,7 +372,7 @@ bool TraceDB::createDB(core::Path<char>& path)
     cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, nameStrId) VALUES(?,?,?)");
     cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)");
     cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation, packedSourceInfo) VALUES(?,?,?,?,?,?)");
-    cmdInsertMessage.prepare("INSERT INTO messages (timeTicks, type, fmtStrIdx) VALUES(?,?,?)");
+    cmdInsertMessage.prepare("INSERT INTO messages (timeTicks, type, fmtStrIdx, argData) VALUES(?,?,?,?)");
     return true;
 }
 
@@ -549,6 +548,7 @@ CREATE TABLE "messages" (
 	"type"	            INTEGER NOT NULL,
 	"timeTicks"	        INTEGER NOT NULL,
 	"fmtStrIdx"	        INTEGER NOT NULL,
+    "argData"	        BLOB,
 	PRIMARY KEY("Id")
 );
 
@@ -792,12 +792,18 @@ void TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
     cmd.reset();
 }
 
-void TraceDB::handleDataPacketMessage(const DataPacketMessage* pData)
+int32_t TraceDB::handleDataPacketMessage(const DataPacketMessage* pData)
 {
+    const int32_t argDataSize = pData->argDataSize;
+    const int32_t totalSize = sizeof(*pData) + argDataSize;
+
+    auto* pArgData = reinterpret_cast<const void*>(pData + 1);
+
     auto& cmd = cmdInsertMessage;
     cmd.bind(1, static_cast<int32_t>(pData->time));
     cmd.bind(2, static_cast<int32_t>(pData->logType));
     cmd.bind(3, static_cast<int32_t>(pData->strIdxFmt));
+    cmd.bind(4, pArgData, argDataSize);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -805,6 +811,8 @@ void TraceDB::handleDataPacketMessage(const DataPacketMessage* pData)
     }
 
     cmd.reset();
+
+    return totalSize;
 }
 
 void TraceDB::handleDataPacketCallStack(const DataPacketCallStack* pData)

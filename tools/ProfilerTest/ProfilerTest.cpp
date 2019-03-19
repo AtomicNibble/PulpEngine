@@ -247,7 +247,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 ttSetThreadName(ctx, core::Thread::getCurrentID(), "Main");
                 ttLog(ctx, "Hello stu!");
                 ttWarning(ctx, "Can't find stu");
-                ttError(ctx, "Goat has no boat");
+                ttError(ctx, "Goat has no boat %" PRIi32 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %f %f %s",
+                    124_i32, 5226262_i64, 16_i64, 32_i64, 64_i64, 0.353f, 515152025025.020, "meow meow");
 
                 for (int32_t i = 0; i < numThreads; i++)
                 {

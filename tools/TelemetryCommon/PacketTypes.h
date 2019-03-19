@@ -347,9 +347,10 @@ struct DataPacketMessage : public DataPacketBase
     // 8
     tt_uint64 time;
 
-    // 3
-    tt_uint16 logType;
+    // 4
     tt_uint16 strIdxFmt;
+    tt_uint8 logType;
+    tt_uint8 argDataSize;
 };
 
 static_assert(sizeof(DataPacketBase) == 1, "Incorrect size");
