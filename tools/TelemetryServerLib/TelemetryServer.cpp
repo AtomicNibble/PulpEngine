@@ -828,7 +828,7 @@ int32_t TraceDB::handleDataPacketMessage(const DataPacketMessage* pData)
     auto* pArgData = reinterpret_cast<const void*>(pData + 1);
 
     auto& cmd = cmdInsertMessage;
-    cmd.bind(1, static_cast<int32_t>(pData->time));
+    cmd.bind(1, static_cast<int64_t>(pData->time));
     cmd.bind(2, static_cast<int32_t>(pData->logType));
     cmd.bind(3, static_cast<int32_t>(pData->strIdxFmt));
     cmd.bind(4, argDataSize ? pArgData : nullptr, argDataSize);
