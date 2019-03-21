@@ -1531,9 +1531,7 @@ namespace
                 break;
             }
 
-            //ttZone(contextToHandle(pCtx), "Process buffer");
-
-            auto start = gSysTimer.GetTicks();
+            auto start = getTicks();
 
             // process the bufffer.
             auto tickBuf = pCtx->tickBuffers[pCtx->activeTickBufIdx ^ 1];
@@ -1615,14 +1613,28 @@ namespace
                 ::DebugBreak();
             }
 
+            // Send zone info for this thread
+            {
+                auto end = getTicks();
+
+                QueueDataZone zone;
+                zone.type = QueueDataType::Zone;
+                zone.stackDepth = 0;
+                zone.argDataSize = 0;
+                zone.threadID = getThreadID();
+                zone.zone.start = start;
+                zone.zone.end = end;
+                zone.zone.pFmtStr = "Telem process buffer";
+                zone.zone.sourceInfo.line_ = 0;
+                zone.zone.sourceInfo.pFile_ = "Telem";
+                zone.zone.sourceInfo.pFunction_ = "WorkerThread";
+
+                queueProcessZone(&comp, &zone);
+            }
+
             // flush anything left over to the socket.
             flushCompressionBuffer(&comp);
             flushPacketBuffer(pCtx, &buffer);
-
-            auto end = gSysTimer.GetTicks();
-            auto ellapsed = end - start;
-
-            writeLog(pCtx, TtLogType::Msg, "processed %iin: %fms", num, gSysTimer.ToMilliSeconds(ellapsed));
         }
 
         return 0;
