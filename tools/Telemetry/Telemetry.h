@@ -345,10 +345,12 @@ namespace telem
 
     struct ScopedZone
     {
-        inline ScopedZone(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pLabel) :
+        template<typename ... Args>
+        inline ScopedZone(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pFormat, Args&& ... args) :
             ctx_(ctx)
         {
-            __TELEM_FUNC_NAME(TelemEnter)(ctx, sourceInfo, pLabel, 0);
+            const std::size_t num = sizeof...(Args);
+            __TELEM_FUNC_NAME(TelemEnter)(ctx, sourceInfo, pFormat, num, std::forward<Args>(args) ...);
         }
 
         inline ~ScopedZone() {
@@ -361,10 +363,12 @@ namespace telem
 
     struct ScopedZoneFilterd
     {
-        inline ScopedZoneFilterd(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64 minMicroSec, const char* pLabel) :
+        template<typename ... Args>
+        inline ScopedZoneFilterd(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64 minMicroSec, const char* pFormat, Args&& ... args) :
             ctx_(ctx)
         {
-            __TELEM_FUNC_NAME(TelemEnterEx)(ctx, sourceInfo, matchId_, minMicroSec, pLabel, 0);
+            const std::size_t num = sizeof...(Args);
+            __TELEM_FUNC_NAME(TelemEnterEx)(ctx, sourceInfo, matchId_, minMicroSec, pFormat, num, std::forward<Args>(args) ...);
         }
 
         inline ~ScopedZoneFilterd() {
@@ -389,8 +393,8 @@ namespace telem
 #define ttLoadLibary() telem::gTelemApi.loadModule()
 #endif // TTELEMETRY_LINK
 
-#define ttZone(ctx, pLabel) telem::ScopedZone __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, TT_SOURCE_INFO, pLabel)
-#define ttZoneFilterd(ctx, minMicroSec, pLabel) telem::ScopedZoneFilterd __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, TT_SOURCE_INFO, minMicroSec, pLabel)
+#define ttZone(ctx, pFmtString, ...) telem::ScopedZone __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, TT_SOURCE_INFO, pFmtString, __VA_ARGS__)
+#define ttZoneFilterd(ctx, minMicroSec, pFmtString, ...) telem::ScopedZoneFilterd __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, TT_SOURCE_INFO, minMicroSec, pFmtString, __VA_ARGS__)
 
 #define ttInit() __TELEM_FUNC_NAME(TelemInit)()
 #define ttShutDown() __TELEM_FUNC_NAME(TelemShutDown)()
