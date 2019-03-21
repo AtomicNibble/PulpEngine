@@ -274,8 +274,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 for(int32_t i=0;i<16;i++)
                 {
                     ttTick(ctx);
+                    ttZone(ctx, "Frame");
 
-                    core::Thread::sleep(16);
+                    core::Thread::sleep(32);
+                    X_LOG0("Main", "tick");
                 }
 
                 for (int32_t i = 0; i < numThreads; i++)
