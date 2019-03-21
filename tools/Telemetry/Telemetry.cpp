@@ -17,6 +17,9 @@ TELEM_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
 
 namespace
 {
+    static const char* TELEM_ZONE_SOURCE_FILE = "Telem.cpp";
+
+
     TELEM_PACK_PUSH(8)
     struct THREADNAME_INFO
     {
@@ -546,6 +549,8 @@ namespace
         char cmpBuf[LZ4_COMPRESSBOUND(COMPRESSION_MAX_INPUT_SIZE)];
     };
 
+    tt_uint16 GetStringId(PacketCompressor* pComp, const char* pStr);
+    void addToCompressionBufferNoFlush(PacketCompressor* pComp, const void* pData, tt_int32 len);
 
     void flushCompressionBuffer(PacketCompressor* pComp)
     {
@@ -564,8 +569,12 @@ namespace
             return;
         }
 
+        auto start = getTicks();
+
         const tt_int32 cmpBytes = LZ4_compress_fast_continue(&pComp->lz4Stream, pInBegin,
             pComp->cmpBuf, inBytes, sizeof(pComp->cmpBuf), 9);
+
+        auto end = getTicks();
 
         if (cmpBytes <= 0) {
             // TODO: error.
@@ -585,6 +594,22 @@ namespace
             pComp->writeBegin = 0;
             pComp->writeEnd = 0;
         }
+
+        // we can add the zone here.
+        DataPacketZone packet;
+        packet.type = DataStreamType::Zone;
+        packet.stackDepth = 1;
+        packet.threadID = getThreadID();
+        packet.start = toRelativeTicks(pComp->pCtx, start);
+        packet.end = toRelativeTicks(pComp->pCtx, end);
+        packet.strIdxFile = GetStringId(pComp, TELEM_ZONE_SOURCE_FILE);
+        packet.strIdxFunction = GetStringId(pComp, "Compress");
+        packet.strIdxFmt = GetStringId(pComp, "Telem Compress");
+        packet.lineNo = static_cast<tt_uint16>(0);
+        packet.argDataSize = 0;
+
+        addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
+
 #else
         TELEM_UNUSED(pComp);
 #endif // !PACKET_COMPRESSION
@@ -665,6 +690,17 @@ namespace
         memcpy(strDataBuf + sizeof(DataPacketStringTableAdd), pStr, strLen);
 
         addToCompressionBuffer(pComp, &strDataBuf, packetLen);
+    }
+
+    tt_uint16 GetStringId(PacketCompressor* pComp, const char* pStr)
+    {
+        auto idx = StringTableGetIndex(pComp->strTable, pStr);
+
+        if (idx.inserted) {
+            writeStringCompressionBuffer(pComp, idx, pStr);
+        }
+
+        return idx.index;
     }
 
     // -----------------------------------
@@ -1221,19 +1257,6 @@ namespace
         addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
     }
 
-    // Processing.
-    tt_uint16 GetStringId(PacketCompressor* pComp, const char* pStr)
-    {
-        auto idx = StringTableGetIndex(pComp->strTable, pStr);
-
-        if (idx.inserted) {
-            writeStringCompressionBuffer(pComp, idx, pStr);
-        }
-
-        return idx.index;
-    }
-
-
     tt_int32 queueProcessZone(PacketCompressor* pComp, const QueueDataZone* pBuf)
     {
         auto& zone = pBuf->zone;
@@ -1626,7 +1649,7 @@ namespace
                 zone.zone.end = end;
                 zone.zone.pFmtStr = "Telem process buffer";
                 zone.zone.sourceInfo.line_ = 0;
-                zone.zone.sourceInfo.pFile_ = "Telem";
+                zone.zone.sourceInfo.pFile_ = TELEM_ZONE_SOURCE_FILE;
                 zone.zone.sourceInfo.pFunction_ = "WorkerThread";
 
                 queueProcessZone(&comp, &zone);
