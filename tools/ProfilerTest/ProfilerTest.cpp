@@ -98,11 +98,15 @@ namespace
 
         for (int i = 0; i < 200; i++)
         {
-            ttZone(ctx, "Aint no camel like me!");
+            ttZone(ctx, "Aint no camel like me! %" PRIi32, i);
 
-            // alloc me baby.
-            ttAlloc(ctx, (void*)0x12345678, 0x300 * (i + 1), "Alloc some data!");
-            ttFree(ctx, (void*)0x12345678);
+            {
+                ttZoneFilterd(ctx, 200, "Sometimes filtered");
+
+                // alloc me baby.
+                ttAlloc(ctx, (void*)0x12345678, 0x300 * (i + 1), "Alloc some data!");
+                ttFree(ctx, (void*)0x12345678);
+            }
 
             for (int x = 0; x < 10; x++)
             {
@@ -118,13 +122,6 @@ namespace
                     total++;
                     core::Thread::sleep(0);
                 }
-
-#if 0
-                {
-                   ttZoneFilterd(ctx, 2, "Sometimes filtered");
-                    core::Thread::sleep(0);
-                }
-#endif
 
                 ttZone(ctx, "Stu is that you?");
 
