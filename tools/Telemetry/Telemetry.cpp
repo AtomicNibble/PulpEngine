@@ -795,7 +795,7 @@ namespace
                     pValues[idx] = offset;
 
                     // TODO: make this sentinal a bit more robust?
-                    if (idx > 1 && precision == MAX_STRING_LEN) {
+                    if (idx > 0 && precision != MAX_STRING_LEN) {
                         pValues[idx-1] = 0;
                     }
                     break;
