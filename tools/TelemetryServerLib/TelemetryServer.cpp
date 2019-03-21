@@ -2041,7 +2041,7 @@ bool Server::handleReqTraceThreadNames(ClientConnection& client, uint8_t* pData)
 
     int32_t num = 0;
 
-    sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, timeTicks, fmtStrId FROM threadNames");
+    sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, timeTicks, fmtStrIdx FROM threadNames");
 
     auto it = qry.begin();
     for (; it != qry.end(); ++it) {
@@ -2098,7 +2098,7 @@ bool Server::handleReqTraceLockNames(ClientConnection& client, uint8_t* pData)
 
     int32_t num = 0;
 
-    sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, timeTicks, fmtStrId FROM lockNames");
+    sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, timeTicks, fmtStrIdx FROM lockNames");
 
     auto it = qry.begin();
     for (; it != qry.end(); ++it) {
