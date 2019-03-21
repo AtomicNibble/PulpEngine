@@ -60,7 +60,7 @@ namespace
 
     const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
 
-    struct ArgDataBuilder
+    struct ArgData
     {
         constexpr static tt_int32 BUF_SIZE = 255;
 
@@ -89,7 +89,7 @@ namespace
     {
         TraceLock lock;
         tt_int32 argDataSize;
-        ArgDataBuilder argData;
+        ArgData argData;
     };
 
     struct TraceLocks
@@ -112,7 +112,7 @@ namespace
     {
         TraceZone zone;
         tt_int32 argDataSize;
-        ArgDataBuilder argData;
+        ArgData argData;
     };
 
 
@@ -709,7 +709,7 @@ namespace
         return i;
     };
 
-    tt_int32 AddStrings(ArgDataBuilder& data, const char* pFmtString, tt_int32 numArgs, uintptr_t* pValues)
+    tt_int32 AddStrings(ArgData& data, const char* pFmtString, tt_int32 numArgs, uintptr_t* pValues)
     {
         // now we need to parse any strings and add them to the buffer.
         const tt_int32 bytesUsed = numArgs * sizeof(uintptr_t);
@@ -814,7 +814,7 @@ namespace
     }
 
     // template<typename T>
-    tt_int32 BuildArgData(ArgDataBuilder& data, const char* pFmtString, tt_int32 numArgs, va_list& l)
+    tt_int32 BuildArgData(ArgData& data, const char* pFmtString, tt_int32 numArgs, va_list& l)
     {
         data.numArgs = static_cast<tt_int8>(numArgs & 0xFF);
         uintptr_t* pValues = reinterpret_cast<uintptr_t*>(data.data);
@@ -874,7 +874,7 @@ namespace
         tt_uint64 time;
         const char* pFmtStr;
 
-        ArgDataBuilder argData;
+        ArgData argData;
     };
 
     TELEM_ALIGNED_SYMBOL(struct QueueDataCallStack, 64) : public QueueDataBase
@@ -889,7 +889,7 @@ namespace
         
         TraceZone zone;
 
-        ArgDataBuilder argData;
+        ArgData argData;
     };
 
     struct QueueDataLockSetName : public QueueDataBase
@@ -898,7 +898,7 @@ namespace
         const char* pFmtStr;
         tt_uint64 time;
 
-        ArgDataBuilder argData;
+        ArgData argData;
     };
 
     struct QueueDataLockTry : public QueueDataBase
@@ -907,7 +907,7 @@ namespace
         TtthreadId threadID;
         const void* pLockPtr;
 
-        ArgDataBuilder argData;
+        ArgData argData;
     };
 
     struct QueueDataLockState : public QueueDataBase
@@ -919,7 +919,7 @@ namespace
         const void* pLockPtr;
         const char* pFmtStr;
 
-        ArgDataBuilder argData;
+        ArgData argData;
     };
 
     struct QueueDataLockCount : public QueueDataBase
@@ -931,7 +931,7 @@ namespace
         const void* pLockPtr;
         const char* pFmtStr;
 
-        ArgDataBuilder argData;
+        ArgData argData;
     };
 
     struct QueueDataMemAlloc : public QueueDataBase
@@ -943,7 +943,7 @@ namespace
         const void* pPtr;
         const char* pFmtStr;
 
-        ArgDataBuilder argData;
+        ArgData argData;
     };
 
     struct QueueDataMemFree : public QueueDataBase
@@ -954,7 +954,7 @@ namespace
         const void* pPtr;
         const char* pFmtStr;
 
-        ArgDataBuilder argData;
+        ArgData argData;
     };
 
     struct QueueDataMessage : public QueueDataBase
@@ -963,7 +963,7 @@ namespace
         tt_uint64 time;
         const char* pFmtStr;
 
-        ArgDataBuilder argData;
+        ArgData argData;
     };
 
     TELEM_PACK_POP
@@ -979,7 +979,7 @@ namespace
     constexpr size_t size7 = sizeof(QueueDataMemFree);
     constexpr size_t size8 = sizeof(QueueDataMessage);
 
-    constexpr size_t size9 = sizeof(ArgDataBuilder);
+    constexpr size_t size9 = sizeof(ArgData);
     
 
     static_assert(64 == GetSizeWithoutArgData<QueueDataThreadSetName>());
