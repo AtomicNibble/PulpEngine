@@ -30,3 +30,5 @@ extern TelemSrvLibArena* g_TelemSrvLibArena;
 #else
 #define TELEM_SRV_EXPORT X_EXPORT
 #endif // X_LIB
+
+#include "sprintf.h"

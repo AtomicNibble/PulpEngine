@@ -1,4 +1,7 @@
 #include "stdafx.h"
+#include "sprintf.h"
+
+X_NAMESPACE_BEGIN(telemetry)
 
 
 namespace
@@ -27,7 +30,7 @@ namespace
     // internal buffer output
     inline void _out_buffer(char character, void* buffer, int32_t idx, int32_t maxlen)
     {
-        if (idx < maxlen) {
+        if (idx < maxlen || maxlen < 0) {
             ((char*)buffer)[idx] = character;
         }
     }
@@ -625,3 +628,16 @@ int32_t _vsnprintf(out_fct_type out, char* buffer, const int32_t maxlen, const c
     return idx;
 }
 
+
+
+int telem_sprintf(char* buffer, const char* format, ...)
+{
+    va_list va;
+    va_start(va, format);
+    const int ret = _vsnprintf(_out_buffer, buffer, -1, format, va);
+    va_end(va);
+    return ret;
+}
+
+
+X_NAMESPACE_END
