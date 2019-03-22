@@ -236,15 +236,15 @@ typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::iterator FixedHashTable
 }
 
 template<typename Key, typename Value, class Hash, class KeyEqual>
-typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::const_iterator FixedHashTableBase<Key, Value, Hash, KeyEqual>::begin() const
-{ 
-    return const_iterator(this); 
-}
-
-template<typename Key, typename Value, class Hash, class KeyEqual>
 typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::iterator FixedHashTableBase<Key, Value, Hash, KeyEqual>::end()
 { 
     return iterator(this, num_); 
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::const_iterator FixedHashTableBase<Key, Value, Hash, KeyEqual>::begin() const
+{
+    return const_iterator(this);
 }
 
 template<typename Key, typename Value, class Hash, class KeyEqual>
@@ -264,6 +264,19 @@ typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::const_iterator FixedHas
 { 
     return const_iterator(this, num_); 
 }
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::iterator FixedHashTableBase<Key, Value, Hash, KeyEqual>::at(size_type idx)
+{
+    return iterator(this, idx);
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::const_iterator FixedHashTableBase<Key, Value, Hash, KeyEqual>::at(size_type idx) const
+{
+    return const_iterator(this, idx);
+}
+
 
 template<typename Key, typename Value, class Hash, class KeyEqual>
 template <typename K, typename... Args>

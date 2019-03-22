@@ -60,6 +60,10 @@ public:
     reference operator*() const { return pHashTable_->pData_[idx_]; }
     pointer operator->() const { return &pHashTable_->pData_[idx_]; }
 
+    size_type getIndex(void) const {
+        return idx_;
+    }
+
 private:
 
     void skipPastEmpty()
@@ -140,12 +144,16 @@ public:
     key_equal key_eq(void) const;
 
     iterator begin();
-    const_iterator begin() const;
     iterator end();
+
+    const_iterator begin() const;
     const_iterator end() const;
 
     const_iterator cbegin() const;
     const_iterator cend() const;
+
+    iterator at(size_type idx);
+    const_iterator at(size_type idx) const;
 
 private:
     template <typename K, typename... Args>
