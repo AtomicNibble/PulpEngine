@@ -14,6 +14,8 @@ TELEM_LINK_LIB("engine_TelemetryCommonLib.lib");
 
 TELEM_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
 
+#define PACKET_COMPRESSION 1
+#define NET_ZONES 1
 
 namespace
 {
@@ -458,8 +460,10 @@ namespace
         }
 #endif // X_DEBUG
 
+#if NET_ZONES
         NetZone nz;
         nz.start = getTicks();
+#endif // NET_ZONES
 
         // send some data...
         // TODO: none blocking?
@@ -469,6 +473,7 @@ namespace
             return;
         }
 
+#if NET_ZONES
         nz.end = getTicks();
         auto& zones = *pCtx->pNetZones;
         if (zones.num < NetZones::NUM_ZONES) {
@@ -477,9 +482,8 @@ namespace
         else {
             writeLog(pCtx, TtLogType::Warning, "Net zone buffer is full");
         }
+#endif // NET_ZONES
     }
-
-#define PACKET_COMPRESSION 1
 
 #if PACKET_COMPRESSION 
     constexpr tt_int32 PACKET_HDR_SIZE = 0;
@@ -648,6 +652,7 @@ namespace
 
         addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
 
+#if NET_ZONES
         // we also add net zones here.
         auto& netZones = *pComp->pCtx->pNetZones;
         if (netZones.num) {
@@ -666,6 +671,7 @@ namespace
 
             netZones.num = 0;
         }
+#endif // NET_ZONES
 
 #else
         TELEM_UNUSED(pComp);
