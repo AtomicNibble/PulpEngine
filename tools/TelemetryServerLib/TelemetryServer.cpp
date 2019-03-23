@@ -1085,7 +1085,7 @@ bool Server::listen(void)
         return false;
     }
 
-    int32_t sock_opt = 1024 * 512;
+    int32_t sock_opt = 1024 * 1024;
     res = platform::setsockopt(listenSocket, SOL_SOCKET, SO_RCVBUF, (char*)&sock_opt, sizeof(sock_opt));
     if (res != 0) {
         X_ERROR("TelemSrv", "Failed to set rcvbuf on socket. Error: %d", platform::WSAGetLastError());
