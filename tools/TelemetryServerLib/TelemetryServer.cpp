@@ -775,7 +775,7 @@ int32_t TraceDB::handleDataPacketLockSetName(const DataPacketLockSetName* pData)
 {
     const int32_t totalSize = getPacketSizeIncArgData(pData);
 
-    auto idxFmt = static_cast<uint16_t>(pData->strIdxFmt);
+    auto idxFmt = getStringIndex(pData->strIdxFmt);
 
     insertLockIfMissing(pData->lockHandle);
 
@@ -797,7 +797,7 @@ int32_t TraceDB::handleDataPacketThreadSetName(const DataPacketThreadSetName* pD
 {
     const int32_t totalSize = getPacketSizeIncArgData(pData);
 
-    auto idxFmt = static_cast<uint16_t>(pData->strIdxFmt);
+    auto idxFmt = getStringIndex(pData->strIdxFmt);
 
     auto& cmd = cmdInsertThreadName;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
@@ -856,7 +856,7 @@ int32_t TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
     info.raw.lineNo = pData->lineNo;
     info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
-    info.raw.idxFmt = 0;
+    info.raw.idxFmt = 0; // TODO: ?
 
     auto& cmd = cmdInsertMemory;
     cmd.bind(1, static_cast<int32_t>(pData->ptr));
