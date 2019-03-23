@@ -395,6 +395,9 @@ namespace telem
 #define ttZone(ctx, pFmtString, ...) telem::ScopedZone __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, TT_SOURCE_INFO, pFmtString, __VA_ARGS__)
 #define ttZoneFilterd(ctx, minMicroSec, pFmtString, ...) telem::ScopedZoneFilterd __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, TT_SOURCE_INFO, minMicroSec, pFmtString, __VA_ARGS__)
 
+#define ttZoneFunction(ctx) ttZone(ctx, __FUNCTION__)
+#define ttZoneFunctionFilterd(ctx, minMicroSec) ttZoneFilterd(ctx, minMicroSec, __FUNCTION__)
+
 #define ttInit() __TELEM_FUNC_NAME(TelemInit)()
 #define ttShutDown() __TELEM_FUNC_NAME(TelemShutDown)()
 
