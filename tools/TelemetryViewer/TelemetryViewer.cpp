@@ -2891,7 +2891,13 @@ bool handleDataSream(Client& client, uint8_t* pData)
         client.cmpBufferOffset = 0;
     }
 
-    for (int32 i = 0; i < origLen; i = origLen) // TODO: handle multiple packets per buf.
+
+    // TODO: handle multiple packets per buf.
+#if 1
+    int32_t i = 0;
+#else
+    for (int32 i = 0; i < origLen; i = origLen) 
+#endif
     {
         auto* pPacket = reinterpret_cast<const DataPacketBaseViewer*>(&pDst[i]);
 
@@ -2922,8 +2928,9 @@ bool handleDataSream(Client& client, uint8_t* pData)
                 X_NO_SWITCH_DEFAULT_ASSERT;
         }
     }
-
+#if X_ENABLE_ASSERTIONS
     return true;
+#endif // X_ENABLE_ASSERTIONS
 }
 
 bool handleAppList(Client& client, uint8_t* pData)
