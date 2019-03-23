@@ -275,7 +275,7 @@ struct DataPacketLockTry : public DataPacketBaseArgData
 
 struct DataPacketLockState : public DataPacketBaseArgData
 {
-    // 4
+    // 1
     TtLockState state;
 
     // 4
@@ -368,7 +368,7 @@ static_assert(sizeof(DataPacketZone) == 32, "Incorrect size");
 static_assert(sizeof(DataPacketThreadSetName) == 16, "Incorrect size");
 static_assert(sizeof(DataPacketLockSetName) == 20, "Incorrect size");
 static_assert(sizeof(DataPacketLockTry) == 40, "Incorrect size");
-static_assert(sizeof(DataPacketLockState) == 34, "Incorrect size");
+static_assert(sizeof(DataPacketLockState) == 31, "Incorrect size");
 static_assert(sizeof(DataPacketLockCount) == 29, "Incorrect size");
 static_assert(sizeof(DataPacketMemAlloc) == 34, "Incorrect size");
 static_assert(sizeof(DataPacketMemFree) == 27, "Incorrect size");
