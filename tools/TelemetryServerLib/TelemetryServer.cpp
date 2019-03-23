@@ -633,6 +633,9 @@ uint16_t TraceDB::getFmtStringIndex(const DataPacketBaseArgData* pPacket, int32_
         if (it == stringMap.end()) {
             strIdx = addString(view);
         }
+        else {
+            strIdx = static_cast<int32_t>(it.getIndex());
+        }
     }
     else {
 
@@ -640,6 +643,7 @@ uint16_t TraceDB::getFmtStringIndex(const DataPacketBaseArgData* pPacket, int32_
         strIdx = indexMap[strIdxFmt];
     }
 
+    X_ASSERT(strIdx != -1, "Failed to get index")(strIdx, pPacket->argDataSize);
     return static_cast<uint16_t>(strIdx);
 }
 
