@@ -164,10 +164,7 @@ namespace
             {
                 case DataStreamType::StringTableAdd:
                 {
-                    auto* pStr = reinterpret_cast<const DataPacketStringTableAdd*>(&pDst[i]);
-                    strm.db.handleDataPacketStringTableAdd(pStr);
-                    i += sizeof(DataPacketStringTableAdd);
-                    i += pStr->length;
+                    i += strm.db.handleDataPacketStringTableAdd(reinterpret_cast<const DataPacketStringTableAdd*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::Zone:
@@ -352,17 +349,18 @@ bool TraceDB::createDB(core::Path<char>& path)
         return false;
     }
 
-    cmdInsertZone.prepare("INSERT INTO zones (threadID, startTick, endTick, packedSourceInfo, stackDepth, argData) VALUES(?,?,?,?,?,?)");
+    cmdInsertZone.prepare("INSERT INTO zones (threadID, startTick, endTick, stackDepth, packedSourceInfo) VALUES(?,?,?,?,?)");
     cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
+    cmdInsertStringDyn.prepare("INSERT INTO strings_dyn (Id, value) VALUES(?, ?)");
     cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, startTick, endTick, startNano, endNano) VALUES(?,?,?,?,?)");
     cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
-    cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, startTick, endTick, result, depth, packedSourceInfo, argData) VALUES(?,?,?,?,?,?,?,?)");
-    cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, timeTicks, state, packedSourceInfo, argData) VALUES(?,?,?,?,?,?)");
-    cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, timeTicks, fmtStrIdx, argData) VALUES(?,?,?,?)");
-    cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, fmtStrIdx, argData) VALUES(?,?,?,?)");
+    cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, startTick, endTick, result, depth, packedSourceInfo) VALUES(?,?,?,?,?,?,?)");
+    cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, timeTicks, state, packedSourceInfo) VALUES(?,?,?,?,?)");
+    cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, timeTicks, fmtStrIdx) VALUES(?,?,?)");
+    cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, fmtStrIdx) VALUES(?,?,?)");
     cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)");
-    cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation, packedSourceInfo, argData) VALUES(?,?,?,?,?,?,?)");
-    cmdInsertMessage.prepare("INSERT INTO messages (timeTicks, type, fmtStrIdx, argData) VALUES(?,?,?,?)");
+    cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation, packedSourceInfo) VALUES(?,?,?,?,?,?)");
+    cmdInsertMessage.prepare("INSERT INTO messages (timeTicks, type, fmtStrIdx) VALUES(?,?,?)");
     return true;
 }
 
@@ -476,7 +474,6 @@ CREATE TABLE IF NOT EXISTS "zones" (
     "endTick"	        INTEGER NOT NULL,
     "packedSourceInfo"	INTEGER NOT NULL,
     "stackDepth"	    INTEGER NOT NULL,
-    "argData"	        BLOB,
     PRIMARY KEY("id"),
     FOREIGN KEY("zoneId") REFERENCES "zoneInfo"("Id")
 );
@@ -491,7 +488,6 @@ CREATE TABLE IF NOT EXISTS "lockNames" (
     "lockId"            INTEGER NOT NULL,
     "timeTicks"         INTEGER NOT NULL,
     "fmtStrIdx"         INTEGER NOT NULL,
-    "argData"	        BLOB,
     PRIMARY KEY("Id")
 );
 
@@ -504,7 +500,6 @@ CREATE TABLE IF NOT EXISTS "lockTry" (
     "depth"	            INTEGER NOT NULL,
     "result"	        INTEGER NOT NULL,
 	"packedSourceInfo"	INTEGER NOT NULL,
-    "argData"	        BLOB,
 	PRIMARY KEY("Id")
 );
 
@@ -515,7 +510,6 @@ CREATE TABLE IF NOT EXISTS "lockStates" (
 	"timeTicks"	        INTEGER NOT NULL,
 	"state"	            INTEGER NOT NULL,
     "packedSourceInfo"	INTEGER NOT NULL,
-    "argData"	        BLOB,
 	PRIMARY KEY("Id")
 );
 
@@ -527,7 +521,6 @@ CREATE TABLE "memory" (
 	"timeTicks"	        INTEGER NOT NULL,
 	"operation"	        INTEGER NOT NULL,
     "packedSourceInfo"	INTEGER NOT NULL,
-    "argData"	        BLOB,
 	PRIMARY KEY("Id")
 );
 
@@ -536,7 +529,6 @@ CREATE TABLE "messages" (
 	"type"	            INTEGER NOT NULL,
 	"timeTicks"	        INTEGER NOT NULL,
 	"fmtStrIdx"	        INTEGER NOT NULL,
-    "argData"	        BLOB,
 	PRIMARY KEY("Id")
 );
 
@@ -584,6 +576,73 @@ void TraceDB::insertLockIfMissing(uint64_t lockHandle)
     cmd.reset();
 }
 
+
+uint16_t TraceDB::addString(core::string_view str)
+{
+    auto it = stringMap.emplace(core::string(str.begin(), str.end()), 0);
+    X_ASSERT(it.second, "Duplicate")();
+    auto idx = static_cast<int32_t>(it.first.getIndex());
+
+    auto& cmd = cmdInsertString;
+    cmd.bind(1, idx);
+    cmd.bind(2, str.data(), str.length());
+
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
+    }
+
+    cmd.reset();
+    return static_cast<uint16_t>(idx);
+}
+
+uint16_t TraceDB::getStringIndex(uint16_t strIdx)
+{
+    return indexMap[strIdx];
+}
+
+template<typename T>
+inline int32_t getPacketSizeIncArgData(T* pPacket)
+{
+    return sizeof(T) + pPacket->argDataSize;
+}
+
+
+uint16_t TraceDB::getFmtStringIndex(const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt)
+{
+    int32_t strIdx = -1;
+
+    if (pPacket->argDataSize)
+    {
+        auto* pArgDataBytes = reinterpret_cast<const uint8_t*>(pPacket) + packetSize;
+        auto* pArgData = reinterpret_cast<const ArgData*>(pArgDataBytes);
+
+        // i need the format string.
+        // don't really have them to hand.
+        auto fmtStrIdx = indexMap[strIdxFmt];
+        auto fmtIt = stringMap.at(fmtStrIdx);
+        auto& fmtStr = fmtIt->first;
+
+        char buf[MAX_STRING_LEN];
+        int32_t length = sprintf_ArgData(buf, sizeof(buf), fmtStr.c_str(), *pArgData);
+
+        core::string_view view(buf, length);
+
+        // now we need to check if this string is unique.
+        auto it = stringMap.find(view);
+        if (it == stringMap.end()) {
+            strIdx = addString(view);
+        }
+    }
+    else {
+
+        // map it to string in the dynamic table.
+        strIdx = indexMap[strIdxFmt];
+    }
+
+    return static_cast<uint16_t>(strIdx);
+}
+
 int32_t TraceDB::handleDataPacketTickInfo(const DataPacketTickInfo* pData)
 {
     auto& cmd = cmdInsertTickInfo;
@@ -604,42 +663,38 @@ int32_t TraceDB::handleDataPacketTickInfo(const DataPacketTickInfo* pData)
 
 int32_t TraceDB::handleDataPacketStringTableAdd(const DataPacketStringTableAdd* pData)
 {
+    const int32_t packetSize = sizeof(std::remove_pointer_t<decltype(pData)>) + pData->length;
     const char* pString = reinterpret_cast<const char*>(pData + 1);
+    
+    core::string_view str(pString, pData->length);
 
-    auto& cmd = cmdInsertString;
-    cmd.bind(1, static_cast<int32_t>(pData->id));
-    cmd.bind(2, pString, static_cast<size_t>(pData->length));
-
-    auto res = cmd.execute();
-    if (res != sql::Result::OK) {
-        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
+    auto it = stringMap.find(str);
+    if (it == stringMap.end()) {
+        auto idx = addString(str);
+        indexMap[pData->id] = idx;
     }
 
-    cmd.reset();
-    return sizeof(std::remove_pointer_t<decltype(pData)>);
+    return packetSize;
 }
 
 int32_t TraceDB::handleDataPacketZone(const DataPacketZone* pData)
 {
-    const int32_t argDataSize = pData->argDataSize;
-    const int32_t totalSize = sizeof(*pData) + argDataSize;
-    auto* pArgData = reinterpret_cast<const void*>(pData + 1);
-
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
-    info.raw.idxFunction = pData->strIdxFunction;
-    info.raw.idxFile = pData->strIdxFile;
-    info.raw.idxFmt = pData->strIdxFmt;
+    info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
+    info.raw.idxFile = getStringIndex(pData->strIdxFile);
 
-    uint64_t sourceInfo = info.packed;
+    // TODO: is 65k strings going to be enouth?
+    // for now yer.. I can see some apps needing more tho.
+    int32_t fmtStrIdx = getFmtStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
+    info.raw.idxFmt = static_cast<uint16_t>(fmtStrIdx);
 
     auto& cmd = cmdInsertZone;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
     cmd.bind(2, static_cast<int64_t>(pData->start));
     cmd.bind(3, static_cast<int64_t>(pData->end));
-    cmd.bind(4, static_cast<int64_t>(sourceInfo));
-    cmd.bind(5, pData->stackDepth);
-    cmd.bind(6, argDataSize ? pArgData : nullptr, argDataSize);
+    cmd.bind(4, pData->stackDepth);
+    cmd.bind(5, static_cast<int64_t>(info.packed));
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -647,22 +702,22 @@ int32_t TraceDB::handleDataPacketZone(const DataPacketZone* pData)
     }
 
     cmd.reset();
-    return totalSize;
+    return sizeof(*pData) + pData->argDataSize;
 }
 
 int32_t TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
 {
-    const int32_t argDataSize = pData->argDataSize;
-    const int32_t totalSize = sizeof(*pData) + argDataSize;
-    auto* pArgData = reinterpret_cast<const void*>(pData + 1);
+    const int32_t totalSize = getPacketSizeIncArgData(pData);
 
     insertLockIfMissing(pData->lockHandle);
 
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
-    info.raw.idxFunction = pData->strIdxFunction;
-    info.raw.idxFile = pData->strIdxFile;
-    info.raw.idxFmt = pData->strIdxFmt;
+    info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
+    info.raw.idxFile = getStringIndex(pData->strIdxFile);
+    
+    int32_t fmtStrIdx = getFmtStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
+    info.raw.idxFmt = static_cast<uint16_t>(fmtStrIdx);
 
     auto& cmd = cmdInsertLockTry;
     cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
@@ -672,7 +727,6 @@ int32_t TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
     cmd.bind(5, static_cast<int32_t>(pData->result));
     cmd.bind(6, static_cast<int64_t>(pData->depth));
     cmd.bind(7, static_cast<int64_t>(info.packed));
-    cmd.bind(8, argDataSize ? pArgData : nullptr, argDataSize);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -685,17 +739,17 @@ int32_t TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
 
 int32_t TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
 {
-    const int32_t argDataSize = pData->argDataSize;
-    const int32_t totalSize = sizeof(*pData) + argDataSize;
-    auto* pArgData = reinterpret_cast<const void*>(pData + 1);
+    const int32_t totalSize = getPacketSizeIncArgData(pData);
 
     insertLockIfMissing(pData->lockHandle);
 
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
-    info.raw.idxFunction = pData->strIdxFunction;
-    info.raw.idxFile = pData->strIdxFile;
-    info.raw.idxFmt = pData->strIdxFmt;
+    info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
+    info.raw.idxFile = getStringIndex(pData->strIdxFile);
+
+    int32_t fmtStrIdx = getFmtStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
+    info.raw.idxFmt = static_cast<uint16_t>(fmtStrIdx);
 
     auto& cmd = cmdInsertLockState;
     cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
@@ -703,7 +757,6 @@ int32_t TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
     cmd.bind(3, static_cast<int64_t>(pData->time));
     cmd.bind(4, static_cast<int64_t>(pData->state));
     cmd.bind(5, static_cast<int64_t>(info.packed));
-    cmd.bind(6, argDataSize ? pArgData : nullptr, argDataSize);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -716,17 +769,16 @@ int32_t TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
 
 int32_t TraceDB::handleDataPacketLockSetName(const DataPacketLockSetName* pData)
 {
-    const int32_t argDataSize = pData->argDataSize;
-    const int32_t totalSize = sizeof(*pData) + argDataSize;
-    auto* pArgData = reinterpret_cast<const void*>(pData + 1);
+    const int32_t totalSize = getPacketSizeIncArgData(pData);
+
+    auto idxFmt = static_cast<uint16_t>(pData->strIdxFmt);
 
     insertLockIfMissing(pData->lockHandle);
 
     auto& cmd = cmdInsertLockName;
     cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
     cmd.bind(2, static_cast<int64_t>(pData->time)); 
-    cmd.bind(3, static_cast<int32_t>(pData->strIdxFmt));
-    cmd.bind(4, argDataSize ? pArgData : nullptr, argDataSize);
+    cmd.bind(3, idxFmt);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -739,15 +791,14 @@ int32_t TraceDB::handleDataPacketLockSetName(const DataPacketLockSetName* pData)
 
 int32_t TraceDB::handleDataPacketThreadSetName(const DataPacketThreadSetName* pData)
 {
-    const int32_t argDataSize = pData->argDataSize;
-    const int32_t totalSize = sizeof(*pData) + argDataSize;
-    auto* pArgData = reinterpret_cast<const void*>(pData + 1);
+    const int32_t totalSize = getPacketSizeIncArgData(pData);
+
+    auto idxFmt = static_cast<uint16_t>(pData->strIdxFmt);
 
     auto& cmd = cmdInsertThreadName;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
     cmd.bind(2, static_cast<int64_t>(pData->time));
-    cmd.bind(3, static_cast<int32_t>(pData->strIdxFmt));
-    cmd.bind(4, argDataSize ? pArgData : nullptr, argDataSize);
+    cmd.bind(3, idxFmt);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -768,15 +819,15 @@ int32_t TraceDB::handleDataPacketLockCount(const DataPacketLockCount* pData)
 
 int32_t TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
 {
-    const int32_t argDataSize = pData->argDataSize;
-    const int32_t totalSize = sizeof(*pData) + argDataSize;
-    auto* pArgData = reinterpret_cast<const void*>(pData + 1);
+    const int32_t totalSize = getPacketSizeIncArgData(pData);
 
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
-    info.raw.idxFunction = pData->strIdxFunction;
-    info.raw.idxFile = pData->strIdxFile;
-    info.raw.idxFmt = pData->strIdxFmt;
+    info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
+    info.raw.idxFile = getStringIndex(pData->strIdxFile);
+
+    int32_t fmtStrIdx = getFmtStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
+    info.raw.idxFmt = static_cast<uint16_t>(fmtStrIdx);
 
     auto& cmd = cmdInsertMemory;
     cmd.bind(1, static_cast<int32_t>(pData->ptr));
@@ -785,7 +836,6 @@ int32_t TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
     cmd.bind(4, static_cast<int64_t>(pData->time));
     cmd.bind(5, static_cast<int32_t>(MemOp::Alloc));
     cmd.bind(6, static_cast<int64_t>(info.packed));
-    cmd.bind(7, argDataSize ? pArgData : nullptr, argDataSize);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -800,8 +850,8 @@ int32_t TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
 {
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
-    info.raw.idxFunction = pData->strIdxFunction;
-    info.raw.idxFile = pData->strIdxFile;
+    info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
+    info.raw.idxFile = getStringIndex(pData->strIdxFile);
     info.raw.idxFmt = 0;
 
     auto& cmd = cmdInsertMemory;
@@ -823,15 +873,14 @@ int32_t TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
 
 int32_t TraceDB::handleDataPacketMessage(const DataPacketMessage* pData)
 {
-    const int32_t argDataSize = pData->argDataSize;
-    const int32_t totalSize = sizeof(*pData) + argDataSize;
-    auto* pArgData = reinterpret_cast<const void*>(pData + 1);
+    const int32_t totalSize = getPacketSizeIncArgData(pData);
+
+    int32_t fmtStrIdx = getFmtStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
 
     auto& cmd = cmdInsertMessage;
     cmd.bind(1, static_cast<int64_t>(pData->time));
     cmd.bind(2, static_cast<int32_t>(pData->logType));
-    cmd.bind(3, static_cast<int32_t>(pData->strIdxFmt));
-    cmd.bind(4, argDataSize ? pArgData : nullptr, argDataSize);
+    cmd.bind(3, fmtStrIdx);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {

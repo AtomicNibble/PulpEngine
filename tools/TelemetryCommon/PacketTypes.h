@@ -176,13 +176,19 @@ struct DataPacketBase
     DataStreamType::Enum type;
 };
 
+struct DataPacketBaseArgData : public DataPacketBase
+{
+    tt_uint8 argDataSize;
+};
+
+
 struct DataPacketStringTableAdd : public DataPacketBase
 {
     tt_uint16 id;
     tt_uint16 length;
 };
 
-struct DataPacketZone : public DataPacketBase
+struct DataPacketZone : public DataPacketBaseArgData
 {
     // 4
     TtthreadId threadID;
@@ -199,7 +205,6 @@ struct DataPacketZone : public DataPacketBase
 
     // 2
     tt_int8 stackDepth;
-    tt_uint8 argDataSize;
     tt_uint8 _pad;
 };
 
@@ -215,7 +220,7 @@ struct DataPacketTickInfo : public DataPacketBase
     tt_uint64 endNano;
 };
 
-struct DataPacketThreadSetName : public DataPacketBase
+struct DataPacketThreadSetName : public DataPacketBaseArgData
 {
     // 8
     tt_uint64 time;
@@ -223,8 +228,6 @@ struct DataPacketThreadSetName : public DataPacketBase
     TtthreadId threadID;
     // 2
     tt_uint16 strIdxFmt;
-    // 1
-    tt_uint8 argDataSize;
 };
 
 struct DataPacketCallStack : public DataPacketBase
@@ -233,7 +236,7 @@ struct DataPacketCallStack : public DataPacketBase
     TtthreadId threadID;
 };
 
-struct DataPacketLockSetName : public DataPacketBase
+struct DataPacketLockSetName : public DataPacketBaseArgData
 {
     // 8
     tt_uint64 time;
@@ -243,10 +246,9 @@ struct DataPacketLockSetName : public DataPacketBase
 
     // 3
     tt_uint16 strIdxFmt;
-    tt_uint8 argDataSize;
 };
 
-struct DataPacketLockTry : public DataPacketBase
+struct DataPacketLockTry : public DataPacketBaseArgData
 {
     // 4
     TtthreadId threadID;
@@ -264,14 +266,13 @@ struct DataPacketLockTry : public DataPacketBase
     tt_uint16 strIdxFile;
     tt_uint16 strIdxFmt;
 
-    // 3
+    // 2
     TtLockResult result;
     tt_uint8 depth;
-    tt_uint8 argDataSize;
 };
 
 
-struct DataPacketLockState : public DataPacketBase
+struct DataPacketLockState : public DataPacketBaseArgData
 {
     // 4
     TtLockState state;
@@ -290,8 +291,6 @@ struct DataPacketLockState : public DataPacketBase
     tt_uint16 strIdxFunction;
     tt_uint16 strIdxFile;
     tt_uint16 strIdxFmt;
-    // 1
-    tt_uint8 argDataSize;
 };
 
 struct DataPacketLockCount : public DataPacketBase
@@ -314,7 +313,7 @@ struct DataPacketLockCount : public DataPacketBase
     tt_uint16 strIdxFile;
 };
 
-struct DataPacketMemAlloc : public DataPacketBase
+struct DataPacketMemAlloc : public DataPacketBaseArgData
 {
     // 4
     TtthreadId threadID;
@@ -333,8 +332,6 @@ struct DataPacketMemAlloc : public DataPacketBase
     tt_uint16 strIdxFunction;
     tt_uint16 strIdxFile;
     tt_uint16 strIdxFmt;
-    // 1
-    tt_uint8 argDataSize;
 };
 
 struct DataPacketMemFree : public DataPacketBase
@@ -354,7 +351,7 @@ struct DataPacketMemFree : public DataPacketBase
     tt_uint16 strIdxFile;
 };
 
-struct DataPacketMessage : public DataPacketBase
+struct DataPacketMessage : public DataPacketBaseArgData
 {
     // 8
     tt_uint64 time;
@@ -362,7 +359,6 @@ struct DataPacketMessage : public DataPacketBase
     // 4
     tt_uint16 strIdxFmt;
     tt_uint8 logType;
-    tt_uint8 argDataSize;
 };
 
 static_assert(sizeof(DataPacketBase) == 1, "Incorrect size");

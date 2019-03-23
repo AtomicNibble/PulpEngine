@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IServer.h"
+#include <Containers/FixedHashTable.h>
 
 X_NAMESPACE_BEGIN(telemetry)
 
@@ -34,9 +35,14 @@ struct TraceDB
 
     static constexpr size_t MAX_LOCKS = 256;
 
+    using StringIdxMap = core::FixedHashTable<core::string, int32_t>;
+    using IndexArr = core::Array<uint16_t>;
+
+public:
     TraceDB() :
         cmdInsertZone(con),
         cmdInsertString(con),
+        cmdInsertStringDyn(con),
         cmdInsertTickInfo(con),
         cmdInsertLock(con),
         cmdInsertLockTry(con),
@@ -45,11 +51,13 @@ struct TraceDB
         cmdInsertLockName(con),
         cmdInsertMeta(con),
         cmdInsertMemory(con),
-        cmdInsertMessage(con)
+        cmdInsertMessage(con),
+        stringMap(g_TelemSrvLibArena, 1024 * 64),
+        indexMap(g_TelemSrvLibArena, 1024 * 8)
     {
+        std::fill(indexMap.begin(), indexMap.end(), std::numeric_limits<uint16_t>::max());
     }
 
-public:
     bool createDB(core::Path<char>& path);
     bool openDB(core::Path<char>& path);
     bool createIndexes(void);
@@ -75,12 +83,18 @@ private:
     bool setPragmas(void);
     bool createTables(void);
 
+    uint16_t addString(core::string_view str);
+
+    uint16_t getStringIndex(uint16_t strIdx);
+    uint16_t getFmtStringIndex(const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt);
+
 public:
     sql::SqlLiteDb con;
 
 private:
     sql::SqlLiteCmd cmdInsertZone;
     sql::SqlLiteCmd cmdInsertString;
+    sql::SqlLiteCmd cmdInsertStringDyn;
     sql::SqlLiteCmd cmdInsertTickInfo;
     sql::SqlLiteCmd cmdInsertLock;
     sql::SqlLiteCmd cmdInsertLockTry;
@@ -92,6 +106,9 @@ private:
     sql::SqlLiteCmd cmdInsertMessage;
 
     core::FixedArray<uint64_t, MAX_LOCKS> lockSet;
+
+    StringIdxMap stringMap;
+    IndexArr indexMap;
 };
 
 struct TraceStream
