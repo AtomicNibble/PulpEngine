@@ -1,6 +1,6 @@
 #pragma once
 
-#include <../TelemetryCommon/Types.h>
+#include "../TelemetryCommon/Types.h"
 #include "../TelemetryCommon/Compiler.h" // for export defs
 
 #ifndef TTELEMETRY_ENABLED
