@@ -2186,6 +2186,7 @@ void TelemSendCallStack(TraceContexHandle ctx, const TtCallStack* pStack)
 
 // ----------- Zones -----------
 
+// TODO: have a overload that don't take args so can skip the conditional? o baby I love it when you remove my branches!
 void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
