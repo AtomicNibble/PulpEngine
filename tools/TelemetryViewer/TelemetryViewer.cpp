@@ -2542,7 +2542,6 @@ bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBa
         auto& zone = pZones[i];
 
         ZoneData zd;
-        // sizeof(zd);
         zd.startTicks = zone.start;
         zd.endTicks = zone.end;
         zd.startNano = view.ticksToNano(zone.start);
