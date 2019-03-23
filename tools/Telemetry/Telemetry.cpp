@@ -1125,11 +1125,18 @@ namespace
             auto waitEnd = getTicks();
             auto ellapsedNano = ticksToNano(pCtx, waitEnd - waitStart);
 
+            // There is a dead lock issue with this if the log function takes a lock
+            // that has tracing.
+#if 0
             // did we have to wait more than 0.1ms?
             if (ellapsedNano > 100'000)
             {
+                
                 writeLog(pCtx, TtLogType::Warning, "Flip stalled for: %lluns", ellapsedNano);
             }
+#else
+            TELEM_UNUSED(ellapsedNano);
+#endif
         }
 
         // the background thread has finished with old buffer.
