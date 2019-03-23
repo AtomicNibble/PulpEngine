@@ -249,8 +249,8 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'" Label="PropertySheets">
     <Import Project="..\..\solutions\_engine.props" />
-    <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_dll.props" />
+    <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_win64_release.props" />
     <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
