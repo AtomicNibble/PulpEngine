@@ -344,6 +344,13 @@ namespace telem
 
     struct ScopedZone
     {
+        // Is having this overload helpful for compile time?
+        inline ScopedZone(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pFormat) :
+            ctx_(ctx)
+        {
+            __TELEM_FUNC_NAME(TelemEnter)(ctx, sourceInfo, pFormat, 0);
+        }
+
         template<typename ... Args>
         inline ScopedZone(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pFormat, Args&& ... args) :
             ctx_(ctx)
@@ -362,6 +369,13 @@ namespace telem
 
     struct ScopedZoneFilterd
     {
+        // Is having this overload helpful for compile time?
+        inline ScopedZoneFilterd(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64 minMicroSec, const char* pFormat) :
+            ctx_(ctx)
+        {
+            __TELEM_FUNC_NAME(TelemEnterEx)(ctx, sourceInfo, matchId_, minMicroSec, pFormat, 0);
+        }
+
         template<typename ... Args>
         inline ScopedZoneFilterd(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64 minMicroSec, const char* pFormat, Args&& ... args) :
             ctx_(ctx)
