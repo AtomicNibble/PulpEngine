@@ -330,6 +330,13 @@ namespace
         return true;
     }
 
+    template<typename T>
+    inline int32_t getPacketSizeIncArgData(T* pPacket)
+    {
+        return sizeof(T) + pPacket->argDataSize;
+    }
+
+
 } // namespace
 
 
@@ -600,13 +607,6 @@ uint16_t TraceDB::getStringIndex(uint16_t strIdx)
 {
     return indexMap[strIdx];
 }
-
-template<typename T>
-inline int32_t getPacketSizeIncArgData(T* pPacket)
-{
-    return sizeof(T) + pPacket->argDataSize;
-}
-
 
 uint16_t TraceDB::getFmtStringIndex(const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt)
 {
