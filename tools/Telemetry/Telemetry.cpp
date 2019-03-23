@@ -2181,7 +2181,7 @@ void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const cha
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = getThreadData(pCtx);
 
-    if (!pCtx->isEnabled || !pThreadData) {
+    if (!pCtx->isEnabled | !pThreadData) {
         return;
     }
 
@@ -2234,7 +2234,7 @@ void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = getThreadData(pCtx);
 
-    if (!pCtx->isEnabled || !pThreadData) {
+    if (!pCtx->isEnabled | !pThreadData) {
         return;
     }
 
