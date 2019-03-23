@@ -34,10 +34,10 @@ struct ZoneData
     int64_t endTicks;
 
     // 8
-    int16_t lineNo;
-    int16_t strIdxFunction;
-    int16_t strIdxFile;
-    int16_t strIdxZone;
+    uint16_t lineNo;
+    uint16_t strIdxFunction;
+    uint16_t strIdxFile;
+    uint16_t strIdxZone;
 
     // 1 :/
     int8_t stackDepth;
@@ -208,8 +208,8 @@ public:
         data.reserve(totalBytes);
     }
 
-    void addString(int16_t id, int16_t len, const char* pData) {
-        auto idx = id - idxOffset;
+    void addString(int32_t id, int16_t len, const char* pData) {
+        int32_t idx = id - idxOffset;
 
         auto offset = safe_static_cast<int32_t>(data.size());
 
@@ -266,7 +266,7 @@ public:
         return core::string_view("???");
     }
 
-    core::string_view getString(int16_t id) const {
+    core::string_view getString(int32_t id) const {
 
         using namespace core::string_view_literals;
 
