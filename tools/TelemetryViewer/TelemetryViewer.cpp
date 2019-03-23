@@ -1296,7 +1296,6 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
                         }
                     }
                 }
-
 #if 0
                 // lock name.
                 auto lockName = view.strings.getLockName(lockHandle);
@@ -1999,7 +1998,7 @@ void DrawZones(TraceView& view)
     {
         auto& segment = view.segments.front();
 
-        for (int32_t threadIdx =0; static_cast<int32_t>(threadIdx<segment.threads.size()); threadIdx++)
+        for (int32_t threadIdx =0; threadIdx < static_cast<int32_t>(segment.threads.size()); threadIdx++)
         {
             auto& thread = segment.threads[threadIdx];
 
@@ -2554,15 +2553,13 @@ bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBa
 
         // want a thread
         int32_t t;
-        for(t =0; t < threadIDs.size(); t++)
-        {
-            if (threadIDs[t] == zone.threadID)
-            {
+        for(t =0; t < static_cast<int32_t>(threadIDs.size()); t++) {
+            if (threadIDs[t] == zone.threadID) {
                 break;
             }
         }
 
-        if (t == threadIDs.size()) {
+        if (t == static_cast<int32_t>(threadIDs.size())) {
             threads.emplace_back(zone.threadID, g_arena);
             threadIDs.push_back(zone.threadID);
         }
@@ -2570,7 +2567,7 @@ bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBa
         auto& thread = threads[t];
 
         // now we select thread.
-        while (thread.levels.size() <= zd.stackDepth) {
+        while (static_cast<int32_t>(thread.levels.size()) <= zd.stackDepth) {
             thread.levels.emplace_back(g_arena);
         }
 
@@ -2610,13 +2607,13 @@ bool handleTraceZoneSegmentLockStates(Client& client, const DataPacketBaseViewer
         auto& state = pStates[i];
 
         int32_t t;
-        for (t = 0; t < threadIDs.size(); t++) {
+        for (t = 0; t < static_cast<int32_t>(threadIDs.size()); t++) {
             if (threadIDs[t] == state.threadID) {
                 break;
             }
         }
 
-        if (t == threadIDs.size()) {
+        if (t == static_cast<int32_t>(threadIDs.size())) {
             threads.emplace_back(state.threadID, g_arena);
             threadIDs.push_back(state.threadID);
         }
@@ -2673,13 +2670,13 @@ bool handleTraceZoneSegmentLockTry(Client& client, const DataPacketBaseViewer* p
         auto& lockTry = pTry[i];
 
         int32_t t;
-        for (t = 0; t < threadIDs.size(); t++) {
+        for (t = 0; t < static_cast<int32_t>(threadIDs.size()); t++) {
             if (threadIDs[t] == lockTry.threadID) {
                 break;
             }
         }
 
-        if (t == threadIDs.size()) {
+        if (t == static_cast<int32_t>(threadIDs.size())) {
             threads.emplace_back(lockTry.threadID, g_arena);
             threadIDs.push_back(lockTry.threadID);
         }
@@ -2927,6 +2924,7 @@ bool handleDataSream(Client& client, uint8_t* pData)
                 X_NO_SWITCH_DEFAULT_ASSERT;
         }
     }
+
 #if X_ENABLE_ASSERTIONS
     return true;
 #endif // X_ENABLE_ASSERTIONS

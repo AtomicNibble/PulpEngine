@@ -228,7 +228,7 @@ public:
 
         const TraceThreadNameData* pData = nullptr;
 
-        for (int32_t i = 0; i < threadNames.size(); i++)
+        for (int32_t i = 0; i < static_cast<int32_t>(threadNames.size()); i++)
         {
             auto& name = threadNames[i];
             if (name.threadId == threadId)
@@ -254,7 +254,7 @@ public:
 
     core::string_view getLockName(uint64_t lockId) const {
 
-        for (int32_t i = 0; i < lockNames.size(); i++)
+        for (int32_t i = 0; i < static_cast<int32_t>(lockNames.size()); i++)
         {
             auto& name = lockNames[i];
             if (name.lockId == lockId)
