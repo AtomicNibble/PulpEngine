@@ -159,16 +159,16 @@ namespace
         X_UNUSED(pMsgNullTerm);
         X_UNUSED(lenWithoutTerm);
 
-#if 0
+#if 1
         switch (type)
         {
-            case LogType::Msg:
+            case TtLogType::Msg:
                 X_LOG0("Telemetry", pMsgNullTerm);
                 break;
-            case LogType::Warning:
+            case TtLogType::Warning:
                 X_WARNING("Telemetry", pMsgNullTerm);
                 break;
-            case LogType::Error:
+            case TtLogType::Error:
                 X_ERROR("Telemetry", pMsgNullTerm);
                 break;
        }
