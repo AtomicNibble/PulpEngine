@@ -87,7 +87,7 @@ namespace
         tt_uint64 end;
 
         const char* pFmtStr;
-        TtLockResult result;
+        TtLockResult::Enum result;
         tt_uint16 depth;
         TtSourceInfo sourceInfo;
 
@@ -1011,7 +1011,7 @@ namespace
 
     struct QueueDataLockState : public QueueDataBase
     {
-        TtLockState state;
+        TtLockState::Enum state;
         TtthreadId threadID;
         tt_uint64 time;
         TtSourceInfo sourceInfo;
@@ -1277,7 +1277,7 @@ namespace
         addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(pLock->argDataSize));
     }
 
-    TELEM_INLINE void queueLockState(TraceContext* pCtx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState state)
+    TELEM_INLINE void queueLockState(TraceContext* pCtx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState::Enum state)
     {
         QueueDataLockState data;
         data.type = QueueDataType::LockState;
@@ -2404,7 +2404,7 @@ void TelemTryLockEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_ui
     }
 }
 
-void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult result)
+void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult::Enum result)
 {
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = gThreadData;
@@ -2426,7 +2426,7 @@ void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult resul
     queueLockTry(pCtx, pThreadData, pPtr, pLock);
 }
 
-void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPtr, TtLockResult result)
+void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPtr, TtLockResult::Enum result)
 {
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = gThreadData;
@@ -2457,7 +2457,7 @@ void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPt
     queueLockTry(pCtx, pThreadData, pPtr, pLock);
 }
 
-void TelemSetLockState(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState state)
+void TelemSetLockState(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState::Enum state)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
@@ -2535,7 +2535,7 @@ void TelemFree(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr
 
 // ----------- Plot stuff -----------
 
-void TelemPlotF32(TraceContexHandle ctx, TtPlotType type, float value, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemPlotF32(TraceContexHandle ctx, TtPlotType::Enum type, float value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     TELEM_UNUSED(ctx);
     TELEM_UNUSED(type);
@@ -2544,7 +2544,7 @@ void TelemPlotF32(TraceContexHandle ctx, TtPlotType type, float value, const cha
     TELEM_UNUSED(numArgs);
 }
 
-void TelemPlotF64(TraceContexHandle ctx, TtPlotType type, double value, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemPlotF64(TraceContexHandle ctx, TtPlotType::Enum type, double value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     TELEM_UNUSED(ctx);
     TELEM_UNUSED(type);
@@ -2553,7 +2553,7 @@ void TelemPlotF64(TraceContexHandle ctx, TtPlotType type, double value, const ch
     TELEM_UNUSED(numArgs);
 }
 
-void TelemPlotI32(TraceContexHandle ctx, TtPlotType type, tt_int32 value, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemPlotI32(TraceContexHandle ctx, TtPlotType::Enum type, tt_int32 value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     TELEM_UNUSED(ctx);
     TELEM_UNUSED(type);
@@ -2562,7 +2562,7 @@ void TelemPlotI32(TraceContexHandle ctx, TtPlotType type, tt_int32 value, const 
     TELEM_UNUSED(numArgs);
 }
 
-void TelemPlotI64(TraceContexHandle ctx, TtPlotType type, tt_int64 value, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemPlotI64(TraceContexHandle ctx, TtPlotType::Enum type, tt_int64 value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     TELEM_UNUSED(ctx);
     TELEM_UNUSED(type);
@@ -2571,7 +2571,7 @@ void TelemPlotI64(TraceContexHandle ctx, TtPlotType type, tt_int64 value, const 
     TELEM_UNUSED(numArgs);
 }
 
-void TelemPlotU32(TraceContexHandle ctx, TtPlotType type, tt_uint32 value, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemPlotU32(TraceContexHandle ctx, TtPlotType::Enum type, tt_uint32 value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     TELEM_UNUSED(ctx);
     TELEM_UNUSED(type);
@@ -2580,7 +2580,7 @@ void TelemPlotU32(TraceContexHandle ctx, TtPlotType type, tt_uint32 value, const
     TELEM_UNUSED(numArgs);
 }
 
-void TelemPlotU64(TraceContexHandle ctx, TtPlotType type, tt_uint64 value, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemPlotU64(TraceContexHandle ctx, TtPlotType::Enum type, tt_uint64 value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     TELEM_UNUSED(ctx);
     TELEM_UNUSED(type);

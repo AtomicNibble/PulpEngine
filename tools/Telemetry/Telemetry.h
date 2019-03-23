@@ -156,21 +156,21 @@ extern "C"
     __TELEM_API_VOID(TelemSetLockName, TraceContexHandle ctx, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...);
     __TELEM_API_VOID(TelemTryLock, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...);
     __TELEM_API_VOID(TelemTryLockEx, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemEndTryLock, TraceContexHandle ctx, const void* pPtr, TtLockResult result);
-    __TELEM_API_VOID(TelemEndTryLockEx, TraceContexHandle ctx, tt_uint64 matchId, const void* pPtr, TtLockResult result);
-    __TELEM_API_VOID(TelemSetLockState, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState state);
+    __TELEM_API_VOID(TelemEndTryLock, TraceContexHandle ctx, const void* pPtr, TtLockResult::Enum result);
+    __TELEM_API_VOID(TelemEndTryLockEx, TraceContexHandle ctx, tt_uint64 matchId, const void* pPtr, TtLockResult::Enum result);
+    __TELEM_API_VOID(TelemSetLockState, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState::Enum state);
     __TELEM_API_VOID(TelemSignalLockCount, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, tt_int32 count);
 
     // Some allocation tracking.
     __TELEM_API_VOID(TelemAlloc, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr, tt_size allocSize, const char* pFmtString, tt_int32 numArgs, ...);
     __TELEM_API_VOID(TelemFree, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr);
 
-    __TELEM_API_VOID(TelemPlotF32, TraceContexHandle ctx, TtPlotType type, float value, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemPlotF64, TraceContexHandle ctx, TtPlotType type, double value, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemPlotI32, TraceContexHandle ctx, TtPlotType type, tt_int32 value, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemPlotI64, TraceContexHandle ctx, TtPlotType type, tt_int64 value, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemPlotU32, TraceContexHandle ctx, TtPlotType type, tt_uint32 value, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemPlotU64, TraceContexHandle ctx, TtPlotType type, tt_uint64 value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotF32, TraceContexHandle ctx, TtPlotType::Enum type, float value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotF64, TraceContexHandle ctx, TtPlotType::Enum type, double value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotI32, TraceContexHandle ctx, TtPlotType::Enum type, tt_int32 value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotI64, TraceContexHandle ctx, TtPlotType::Enum type, tt_int64 value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotU32, TraceContexHandle ctx, TtPlotType::Enum type, tt_uint32 value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotU64, TraceContexHandle ctx, TtPlotType::Enum type, tt_uint64 value, const char* pFmtString, tt_int32 numArgs, ...);
 
     __TELEM_API_VOID(TelemMessage, TraceContexHandle ctx, TtLogType::Enum type, const char* pFmtString, tt_int32 numArgs, ...);
 
@@ -187,7 +187,6 @@ namespace telem
     using ContexHandle = TraceContexHandle;
     using ConnectionType = TtConnectionType;
     using LockResult = TtLockResult;
-    using LockState = TtLockState;
     using LockState = TtLockState;
     using PlotType = TtPlotType;
     using Error = TtError;

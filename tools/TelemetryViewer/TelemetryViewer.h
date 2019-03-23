@@ -57,7 +57,7 @@ struct LockState
     int64_t time;
     int64_t timeNano;
 
-    TtLockState state;
+    TtLockState::Enum state;
     uint16_t threadIdx; // used for colors.
 
     uint32_t threadID; // TODO: can just use threadIdx?
@@ -81,7 +81,7 @@ struct LockTry
     uint32_t threadID; // TODO: can just use threadIdx?
 
     uint16_t threadIdx; // used for colors.
-    TtLockResult result;
+    TtLockResult::Enum result;
 
     // 8
     uint16_t lineNo;

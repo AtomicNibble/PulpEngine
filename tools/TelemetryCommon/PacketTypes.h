@@ -268,7 +268,7 @@ struct DataPacketLockTry : public DataPacketBaseArgData
     tt_uint16 strIdxFmt;
 
     // 2
-    TtLockResult result;
+    TtLockResult::Enum result;
     tt_uint8 depth;
 };
 
@@ -276,7 +276,7 @@ struct DataPacketLockTry : public DataPacketBaseArgData
 struct DataPacketLockState : public DataPacketBaseArgData
 {
     // 1
-    TtLockState state;
+    TtLockState::Enum state;
 
     // 4
     TtthreadId threadID;

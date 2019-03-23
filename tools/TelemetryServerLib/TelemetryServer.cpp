@@ -1832,7 +1832,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
             lockTry.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
             lockTry.start = static_cast<uint64_t>(row.get<int64_t>(2));
             lockTry.end = static_cast<uint64_t>(row.get<int64_t>(3));
-            lockTry.result = static_cast<TtLockResult>(row.get<int32_t>(4));
+            lockTry.result = static_cast<TtLockResult::Enum>(row.get<int32_t>(4));
             lockTry.depth = static_cast<uint8_t>(row.get<int32_t>(5) & 0xFFFF);
 
             TraceDB::PackedSourceInfo info;
@@ -1890,7 +1890,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
             lockState.lockHandle = static_cast<uint64_t>(row.get<int64_t>(0));
             lockState.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
             lockState.time = static_cast<uint64_t>(row.get<int64_t>(2));
-            lockState.state = static_cast<TtLockState>(row.get<int32_t>(3));
+            lockState.state = static_cast<TtLockState::Enum>(row.get<int32_t>(3));
 
             TraceDB::PackedSourceInfo info;
             info.packed = static_cast<uint64_t>(row.get<int64_t>(4));

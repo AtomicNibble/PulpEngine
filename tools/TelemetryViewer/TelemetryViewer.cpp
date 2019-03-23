@@ -664,7 +664,7 @@ void LockStateTooltip(TraceView& view, const LockState& lockState, const LockSta
 
     StringBuf strBuf;
     core::StackString256 str;
-    str.appendFmt("%s -> %s", TtLockStateToString(lockState.state), TtLockStateToString(lockStateNext.state));
+    str.appendFmt("%s -> %s", TtLockState::ToString(lockState.state), TtLockState::ToString(lockStateNext.state));
 
     ImGui::BeginTooltip();
 

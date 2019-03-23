@@ -32,40 +32,49 @@ static_assert(sizeof(tt_uintptr) == sizeof(void*), "Size missmatch");
 
 // TODO: find better home.
 // currently in here since they are used in both Telemetry.h and PacketTypes.h
-enum TtLockResult : tt_uint8
+struct TtLockResult
 {
-    Acquired,
-    Fail
-};
-
-enum TtLockState : tt_uint8
-{
-    Locked,
-    Released
-};
-
-inline const char* TtLockStateToString(TtLockState ls)
-{
-    switch (ls)
+    enum Enum : tt_uint8
     {
-        case Locked:
-            return "Locked";
-        case Released:
-            return "Released";
-        default:
-            return "<ukn>";
+        Acquired,
+        Fail
+    };
+};
+
+struct TtLockState
+{
+    enum Enum : tt_uint8
+    {
+        Locked,
+        Released
+    };
+
+    static inline const char* ToString(Enum ls)
+    {
+        switch (ls)
+        {
+            case Locked:
+                return "Locked";
+            case Released:
+                return "Released";
+            default:
+                return "<ukn>";
+        }
     }
-}
+};
 
 // Plots
-enum TtPlotType : tt_uint8
+struct TtPlotType
 {
-    Time,
-    Time_us,
-    Time_clocks,
-    Time_cycles,
-    Integer,
-    Percentage_computed,
-    Percentage_direct,
-    Untyped
+    enum Enum : tt_uint8
+    {
+        Time,
+        Time_us,
+        Time_clocks,
+        Time_cycles,
+        Integer,
+        Percentage_computed,
+        Percentage_direct,
+        Untyped
+    };
 };
