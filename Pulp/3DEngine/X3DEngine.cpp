@@ -583,7 +583,7 @@ void X3DEngine::renderPrimContex2D(core::FrameData& frame, IPrimativeContext::Mo
         return;
     }
 
-    render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, totalElems * 1024);
+    render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, totalElems * 2048);
     cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
     render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems * 4, viewPort);
 
