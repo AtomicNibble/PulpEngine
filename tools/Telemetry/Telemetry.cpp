@@ -2121,7 +2121,7 @@ void TelemPause(TraceContexHandle ctx, bool pause)
         return;
     }
 
-    handleToContext(ctx)->isEnabled = pause;
+    handleToContext(ctx)->isEnabled = !pause;
 }
 
 bool TelemIsPaused(TraceContexHandle ctx)
