@@ -170,6 +170,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
     <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -179,6 +180,7 @@
     <Import Project="..\..\solutions\_engine_dll.props" />
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -188,6 +190,7 @@
     <Import Project="..\..\solutions\_engine_dll.props" />
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -196,6 +199,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
     <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -204,6 +208,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
     <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -212,6 +217,7 @@
     <Import Project="..\..\solutions\_engine_dll.props" />
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -220,6 +226,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_win32_release.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -229,6 +236,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
     <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -238,6 +246,7 @@
     <Import Project="..\..\solutions\_engine_dll.props" />
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -247,6 +256,7 @@
     <Import Project="..\..\solutions\_engine_dll.props" />
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -255,6 +265,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
     <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -263,6 +274,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
     <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -271,6 +283,7 @@
     <Import Project="..\..\solutions\_engine_dll.props" />
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -279,6 +292,7 @@
     <Import Project="..\..\solutions\_engine_dll.props" />
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -332,7 +346,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">
@@ -344,7 +357,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">
@@ -356,7 +368,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -368,7 +379,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">
@@ -380,7 +390,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">
@@ -392,7 +401,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -406,7 +414,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -422,7 +429,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -438,7 +444,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -454,7 +459,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -470,7 +474,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -486,7 +489,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -502,7 +504,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -518,7 +519,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>

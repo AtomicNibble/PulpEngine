@@ -151,6 +151,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_sdl2.props" />
     <Import Project="..\..\solutions\_engine_inc_imgui.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -160,6 +161,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_sdl2.props" />
     <Import Project="..\..\solutions\_engine_inc_imgui.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -168,6 +170,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_sdl2.props" />
     <Import Project="..\..\solutions\_engine_inc_imgui.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -177,6 +180,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_sdl2.props" />
     <Import Project="..\..\solutions\_engine_inc_imgui.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -185,6 +189,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_sdl2.props" />
     <Import Project="..\..\solutions\_engine_inc_imgui.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -194,6 +199,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_sdl2.props" />
     <Import Project="..\..\solutions\_engine_inc_imgui.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -202,6 +208,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_sdl2.props" />
     <Import Project="..\..\solutions\_engine_inc_imgui.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -211,6 +218,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_sdl2.props" />
     <Import Project="..\..\solutions\_engine_inc_imgui.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -219,6 +227,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_sdl2.props" />
     <Import Project="..\..\solutions\_engine_inc_imgui.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -228,6 +237,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_sdl2.props" />
     <Import Project="..\..\solutions\_engine_inc_imgui.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -236,6 +246,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_sdl2.props" />
     <Import Project="..\..\solutions\_engine_inc_imgui.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -245,6 +256,7 @@
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_inc_sdl2.props" />
     <Import Project="..\..\solutions\_engine_inc_imgui.props" />
+    <Import Project="..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
