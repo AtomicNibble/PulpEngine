@@ -85,10 +85,9 @@ namespace profiler
     class XProfileData
     {
     public:
-        X_DECLARE_ENUM8(Type)
-        (
-            SingleShot,
-            History);
+        X_DECLARE_ENUM8(Type)(
+            SingleShot
+        );
 
     protected:
         XProfileData(ICore* pCore, const core::SourceInfo& sourceInfo, const char* pNickName, SubSys::Enum sys, Type::Enum type) :
@@ -145,49 +144,6 @@ namespace profiler
         return type_;
     }
 
-    class XProfileDataHistory : public XProfileData
-    {
-        typedef ProfilerHistory<uint64_t, X_PROFILE_HISTORY_SIZE> TotalTimes;
-        typedef ProfilerHistory<uint64_t, X_PROFILE_HISTORY_SIZE> SelfTimes;
-        typedef ProfilerHistory<int32_t, X_PROFILE_HISTORY_SIZE> CallCounts;
-
-    public:
-        XProfileDataHistory(ICore* pCore, const core::SourceInfo& sourceInfo, const char* pNickName, SubSys::Enum sys) :
-            XProfileData(pCore, sourceInfo, pNickName, sys, Type::History)
-        {
-            if (gEnv->pProfiler) {
-                gEnv->pProfiler->AddProfileData(this);
-            }
-        }
-
-        X_INLINE void onFrameBegin(void);
-
-    protected:
-        uint64_t sumTime_;     // sum of each frame value
-        uint64_t sumTimeSelf_; // ''
-
-        TotalTimes totalTimeHistory_;
-        SelfTimes selfTimeHistory_;
-        CallCounts callCountHistory_;
-    };
-
-    X_INLINE void XProfileDataHistory::onFrameBegin(void)
-    {
-        // add frame values
-        sumTime_ += time_;
-        sumTimeSelf_ += timeSelf_;
-
-        // log values.
-        totalTimeHistory_.append(time_);
-        selfTimeHistory_.append(timeSelf_);
-        callCountHistory_.append(callCount_);
-
-        // clear frame values
-        time_ = 0llu;
-        timeSelf_ = 0llu;
-        callCount_ = 0;
-    }
-
     class XProfileScope
     {
         X_NO_ASSIGN(XProfileScope);
@@ -226,9 +182,7 @@ namespace profiler
 
 #if X_ENABLE_PROFILER
 
-#define X_PROFILE_BEGIN(pNickName, sys)                                                                   \
-    static core::profiler::XProfileDataHistory __Profiledata(gEnv->pCore, X_SOURCE_INFO, pNickName, sys); \
-    core::profiler::XProfileScope __ProfileLogCall(&__Profiledata);
+#define X_PROFILE_BEGIN(pNickName, sys) X_UNUSED(pNickName, sys);
 
 #define X_PROFILE_NO_HISTORY_BEGIN(pNickName, sys)                                                 \
     static core::profiler::XProfileData __Profiledata(gEnv->pCore, X_SOURCE_INFO, pNickName, sys); \

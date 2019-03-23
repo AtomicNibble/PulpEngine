@@ -119,7 +119,6 @@ namespace profiler
         frameTime_(0),
         totalTime_(0),
         profilerData_(arena),
-        profilerHistoryData_(arena),
         eventListerReg_(false)
 
 #if X_ENABLE_PROFILER_WARNINGS
@@ -275,9 +274,8 @@ namespace profiler
             profilerData_.emplace_back(pData);
         }
         else {
-            auto* pDataHistory = static_cast<decltype(profilerHistoryData_)::Type>(pData);
-            X_ASSERT(profilerHistoryData_.find(pDataHistory) == decltype(profilerHistoryData_)::invalid_index, "Data node already added")();
-            profilerHistoryData_.emplace_back(pDataHistory);
+            // NOt supported anymore.
+            X_ASSERT_UNREACHABLE();
         }
     }
 
@@ -350,9 +348,6 @@ namespace profiler
         frameTime_ = end - frameStartTime_;
         totalTime_ += frameTime_;
         frameTimeHistory_.append(frameTime_);
-
-        // update some time stats.
-        UpdateProfileData();
     }
 
     // ICoreEventListener
@@ -412,13 +407,6 @@ namespace profiler
 
         return true;
 #endif // !X_ENABLE_JOBSYS_PROFILER
-    }
-
-    void XProfileSys::UpdateProfileData(void)
-    {
-        for (auto* pData : profilerHistoryData_) {
-            pData->onFrameBegin();
-        }
     }
 
     Vec2f XProfileSys::Render(engine::IPrimativeContext* pPrim, Vec2f pos, 

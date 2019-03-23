@@ -46,7 +46,6 @@ namespace profiler
         typedef std::array<SubSystemInfo, profiler::SubSys::ENUM_COUNT> SubSystemInfoArr;
         typedef std::array<core::TimeVal::TimeType, profiler::SubSys::ENUM_COUNT> SubSystemTimeArr;
         typedef core::Array<XProfileData*> ProfilerDataPtrArr;
-        typedef core::Array<XProfileDataHistory*> ProfilerDataHistoryPtrArr;
 
         typedef ProfilerHistory<int64_t, 64> FrameTimes;
 
@@ -84,7 +83,6 @@ namespace profiler
         void OnCoreEvent(const CoreEventData& ed) X_FINAL;
 
     private:
-        void UpdateProfileData(void);
         Vec2f RenderStartupData(engine::IPrimativeContext* pPrim, Vec2f pos);
         Vec2f RenderArenaTree(engine::IPrimativeContext* pPrim, Vec2f pos, core::MemoryArenaBase* arena);
         Vec2f RenderStr(engine::IPrimativeContext* pPrim, Vec2f pos, const wchar_t* pTitle, const core::StackString512& str);
@@ -129,7 +127,6 @@ namespace profiler
         FrameTimes frameTimeHistory_;
 
         ProfilerDataPtrArr profilerData_;
-        ProfilerDataHistoryPtrArr profilerHistoryData_;
 
 #if X_ENABLE_PROFILER_WARNINGS
 
