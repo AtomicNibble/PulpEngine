@@ -3426,6 +3426,11 @@ bool run(Client& client)
     SDL_GL_DeleteContext(gl_context);
     SDL_DestroyWindow(pWindow);
     SDL_Quit();
+
+    platform::closesocket(client.socket);
+
+    thread.stop();
+    thread.join();
     return true;
 }
 
