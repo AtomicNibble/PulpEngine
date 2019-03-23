@@ -247,6 +247,8 @@ bool XGame::onInputEvent(const input::InputEvent& event)
 bool XGame::update(core::FrameData& frame)
 {
     X_PROFILE_BEGIN("Update", core::profiler::SubSys::GAME);
+    ttZone(gEnv->ctx, "Game Update");
+
     X_UNUSED(frame);
     // how todo this camera move shit.
     // when the input frames are been called

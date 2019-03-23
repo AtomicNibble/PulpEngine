@@ -39,6 +39,9 @@ bool XCore::Update(void)
     X_PROFILE_BEGIN("CoreUpdate", core::profiler::SubSys::CORE);
     using namespace core::V2;
 
+    ttTick(gEnv->ctx);
+    ttZone(gEnv->ctx, "Update");
+
     ++numFrames_;
 
     if ((numFrames_ & 0xff) == 0 && core::SysTimer::HasFreqChanged()) {

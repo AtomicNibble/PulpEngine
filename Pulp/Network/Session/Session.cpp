@@ -105,6 +105,7 @@ Session::~Session()
 void Session::update(void)
 {
     X_PROFILE_BEGIN("Session", core::profiler::SubSys::NETWORK);
+    ttZone(gEnv->ctx, "NetSession Update");
 
     // do a network tick.
     pPeer_->runUpdate();
@@ -227,6 +228,8 @@ Session::SnapBufferTimeInfo Session::calculateSnapShotBufferTime(void) const
 
 void Session::processSnapShot(void)
 {
+    ttZone(gEnv->ctx, "Process SnapShot");
+
     if (recivedSnaps_.isEmpty()) {
         X_ERROR("Session", "No snapshot to process");
         return;
@@ -237,8 +240,7 @@ void Session::processSnapShot(void)
     snapTime_.rotate(snap.getTimeMS());
     snapRecvTime_.rotate(snap.getRecvTimeMS());
 
-    if (vars_.snapDebug())
-    {
+    if (vars_.snapDebug()) {
         X_LOG0("Session", "Processing snapshot. ServerDelta: %" PRIi32 " RecvDelta %" PRIi32, snapTime_.deltaMS, snapRecvTime_.deltaMS);
     }
 
@@ -434,6 +436,8 @@ void Session::sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::
         return;
     }
 
+    ttZone(gEnv->ctx, "Send UserCmds");
+
     auto rateMS = vars_.userCmdRateMs();
     nextUserCmdSendTime_ = timeInfo.startTimeRealative + core::TimeVal::fromMS(rateMS);
 
@@ -458,6 +462,7 @@ void Session::sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::
 void Session::sendSnapShot(core::FrameTimeData& timeInfo)
 {
     X_ASSERT(state_ == SessionState::InGame, "Should only send snapshot if in game")(state_);
+    ttZone(gEnv->ctx, "Send SnapShot");
 
     if (timeInfo.startTimeRealative < nextSnapshotSendTime_) {
         return;

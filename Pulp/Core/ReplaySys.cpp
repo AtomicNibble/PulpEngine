@@ -143,6 +143,8 @@ void ReplaySys::update(FrameInput& inputFrame)
         return;
     }
 
+    ttZone(gEnv->ctx, "ReplaySys Update");
+
     static_assert(input::MAX_INPUT_EVENTS_PER_FRAME <= std::numeric_limits<uint8_t>::max(), "Can't store max number of events");
 
     if (mode_ == Mode::RECORD) {

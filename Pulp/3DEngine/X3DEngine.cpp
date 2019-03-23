@@ -330,6 +330,7 @@ void X3DEngine::clearPersistent(void)
 void X3DEngine::update(core::FrameData& frame)
 {
     X_PROFILE_BEGIN("3DUpdate", core::profiler::SubSys::ENGINE3D);
+    ttZone(gEnv->ctx, "3dEngine Update");
 
     pTextureManager_->scheduleStreaming();
 
@@ -346,6 +347,7 @@ void X3DEngine::update(core::FrameData& frame)
 void X3DEngine::onFrameBegin(core::FrameData& frame)
 {
     X_PROFILE_BEGIN("3DFrameBegin", core::profiler::SubSys::ENGINE3D);
+    ttZone(gEnv->ctx, "3dEngine FrameBegin");
 
     // draw the emitters into prim context.
     for (auto* pWorld : worlds_) {

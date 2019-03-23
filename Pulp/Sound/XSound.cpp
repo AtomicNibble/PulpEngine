@@ -544,6 +544,7 @@ Vec2f XSound::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
 void XSound::update(core::FrameData& frame)
 {
     X_PROFILE_BEGIN("SoundUpdate", core::profiler::SubSys::SOUND);
+    ttZone(gEnv->ctx, "SoundSys Update");
 
     if (AK::SoundEngine::IsInitialized()) {
         if (vars_.EnableCulling()) {

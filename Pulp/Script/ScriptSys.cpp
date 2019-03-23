@@ -204,6 +204,7 @@ bool XScriptSys::asyncInitFinalize(void)
 void XScriptSys::update(const core::FrameData& frame)
 {
     X_PROFILE_BEGIN("ScriptUpdate", core::profiler::SubSys::SCRIPT);
+    ttZone(gEnv->ctx, "ScriptSys Update");
 
     const auto ti = frame.timeInfo;
 
@@ -221,6 +222,8 @@ void XScriptSys::update(const core::FrameData& frame)
 
     {
         X_PROFILE_BEGIN("Lua GC", core::profiler::SubSys::SCRIPT);
+        ttZone(gEnv->ctx, "Lua GC Step");
+
         state::gc_step(L, vars_.gcStepSize());
     }
 }
