@@ -603,7 +603,7 @@ uint16_t TraceDB::addString(core::string_view str)
     return static_cast<uint16_t>(idx);
 }
 
-uint16_t TraceDB::getStringIndex(uint16_t strIdx)
+uint16_t TraceDB::getStringIndex(uint16_t strIdx) const
 {
     return indexMap[strIdx];
 }
