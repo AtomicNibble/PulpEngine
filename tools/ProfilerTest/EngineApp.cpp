@@ -60,6 +60,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
     params.pCoreArena = &arena_;
     params.bThreadSafeStringAlloc = false;
     params.consoleDesc.pTitle = X_ENGINE_NAME " - ProfilerTest Log";
+    params.bTelem = true;
 
 #ifdef X_LIB
 

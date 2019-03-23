@@ -190,110 +190,68 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     g_arena = &arena;
 
-
     {
-        if (!ttLoadLibary()) {
-            return 1;
-        }
+        EngineApp engine;
 
-        // Setup telem.
-        if (!ttInit()) {
-            return 1;
-        }
+        if (engine.Init(hInstance, lpCmdLine)) {
+            X_ASSERT_NOT_NULL(gEnv);
+            X_ASSERT_NOT_NULL(gEnv->pCore);
 
+            ctx = gEnv->ctx;
 
-#if TTELEMETRY_ENABLED
+            // now engine logging is init redirect logs here.
+            ttSetContextLogFunc(ctx, LogFunc, nullptr);
 
-        const size_t telemBufSize = 1024 * 1024 * 2;
-        auto telemBuf = core::makeUnique<uint8_t[]>(&arena, telemBufSize, 64);
+            gEnv->pConsoleWnd->redirectSTD();
 
-        ttInitializeContext(ctx, telemBuf.ptr(), telemBufSize);
+            const int32_t numThreads = 4;
 
-        auto res = ttOpen(ctx, 
-            X_ENGINE_NAME " - Engine", 
-            X_BUILD_STRING " Version: " X_ENGINE_VERSION_STR " Rev: " X_ENGINE_BUILD_REF_STR,
-            "127.0.0.1",
-            8001,
-            telem::ConnectionType::Tcp,
-            1000);
+            core::Thread thread[numThreads];
+            const char* threadNames[numThreads] = {
+                "Worker 0",
+                "Worker 1",
+                "Worker 2",
+                "Worker 3",
+            };
 
-        if (res != telem::Error::Ok) {
-            // rip
-            return -1;
-        }
+            ttLog(ctx, "Hello stu!");
+            ttWarning(ctx, "Can't find stu");
+            ttError(ctx, "Goat has no boat %" PRIi32 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %f %f %s",
+                124_i32, 5226262_i64, 16_i64, 32_i64, 64_i64, 0.353f, 515125.0203503557575, "meow meow");
 
-#endif // TTELEMETRY_ENABLED
+            ttPlot(ctx, TtPlotType::Integer, 1, "meow?");
+            ttPlotF32(ctx, TtPlotType::Integer, 1, "cow?");
+            ttPlotF64(ctx, TtPlotType::Integer, 1, "pickle?");
+            ttPlotI32(ctx, TtPlotType::Integer, 1, "nickle?");
+            ttPlotI64(ctx, TtPlotType::Integer, 1, "pizza?");
+            ttPlotU32(ctx, TtPlotType::Integer, 1, "noodles?");
+            ttPlotU64(ctx, TtPlotType::Integer, 1, "bananan?");
 
-        {
-            EngineApp engine;
+            for (int32_t i = 0; i < numThreads; i++) {
+                thread[i].create(threadNames[i]);
+                thread[i].start(threadFunc);
 
-            if (engine.Init(hInstance, lpCmdLine)) {
-                X_ASSERT_NOT_NULL(gEnv);
-                X_ASSERT_NOT_NULL(gEnv->pCore);
-
-                // now engine logging is init redirect logs here.
-                ttSetContextLogFunc(ctx, LogFunc, nullptr);
-
-                gEnv->pConsoleWnd->redirectSTD();
-
-                const int32_t numThreads = 4;
-
-                core::Thread thread[numThreads];
-                const char* threadNames[numThreads] = {
-                    "Worker 0",
-                    "Worker 1",
-                    "Worker 2",
-                    "Worker 3",
-                };
-
-                ttSetThreadName(ctx, core::Thread::getCurrentID(), "Main");
-                ttLog(ctx, "Hello stu!");
-                ttWarning(ctx, "Can't find stu");
-                ttError(ctx, "Goat has no boat %" PRIi32 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %f %f %s",
-                    124_i32, 5226262_i64, 16_i64, 32_i64, 64_i64, 0.353f, 515125.0203503557575, "meow meow");
-
-
-                ttPlot(ctx, TtPlotType::Integer, 1, "meow?");
-                ttPlotF32(ctx, TtPlotType::Integer, 1, "cow?");
-                ttPlotF64(ctx, TtPlotType::Integer, 1, "pickle?");
-                ttPlotI32(ctx, TtPlotType::Integer, 1, "nickle?");
-                ttPlotI64(ctx, TtPlotType::Integer, 1, "pizza?");
-                ttPlotU32(ctx, TtPlotType::Integer, 1, "noodles?");
-                ttPlotU64(ctx, TtPlotType::Integer, 1, "bananan?");
-
-                for (int32_t i = 0; i < numThreads; i++)
-                {
-                    thread[i].create(threadNames[i]);
-                    thread[i].start(threadFunc);
-
-                    // TODO: Support dynamic strings.
-                    ttSetThreadName(ctx, thread[i].getID(), threadNames[i]);
-                }
-
-                // main loop
-                for(int32_t i=0;i<16;i++)
-                {
-                    ttTick(ctx);
-                    ttZone(ctx, "Frame");
-
-                    core::Thread::sleep(32);
-                    X_LOG0("Main", "tick");
-                }
-
-                for (int32_t i = 0; i < numThreads; i++)
-                {
-                    thread[i].join();
-                    thread[i].destroy();
-                }
-
-                gEnv->pConsoleWnd->pressToContinue();
+                // TODO: Support dynamic strings.
+                ttSetThreadName(ctx, thread[i].getID(), threadNames[i]);
             }
+
+            // main loop
+            for (int32_t i = 0; i < 16; i++) {
+                ttTick(ctx);
+                ttZone(ctx, "Frame");
+
+                core::Thread::sleep(32);
+                X_LOG0("Main", "tick");
+            }
+
+            for (int32_t i = 0; i < numThreads; i++) {
+                thread[i].join();
+                thread[i].destroy();
+            }
+
+            gEnv->pConsoleWnd->pressToContinue();
         }
-
-        ttShutdownContext(ctx);
     }
-
-    ttShutDown();
 
     return 0;
 }
