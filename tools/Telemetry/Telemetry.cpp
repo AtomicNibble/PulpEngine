@@ -234,7 +234,7 @@ namespace
         NetZones* pNetZones;
         tt_uint8 _lanePad2[8];
 
-        X86_PAD(24)
+        X86_PAD(28)
 
         // -- Cace lane boundry --
 

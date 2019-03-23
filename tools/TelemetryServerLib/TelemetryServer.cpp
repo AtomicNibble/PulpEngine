@@ -2044,7 +2044,7 @@ bool Server::handleReqTraceStrings(ClientConnection& client, uint8_t* pData)
             strHdr.id = static_cast<uint16_t>(id);
             strHdr.length = static_cast<uint16_t>(strLen);
 
-            if (getCompressionBufferSpace(client) < sizeof(strHdr) + strLen)
+            if (getCompressionBufferSpace(client) < static_cast<int32_t>(sizeof(strHdr)) + strLen)
             {
                 pStringsHdr->num = num;
                 num = 0;
