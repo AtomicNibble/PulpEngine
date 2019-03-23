@@ -61,6 +61,12 @@ namespace
         return __rdtsc();
     }
 
+    template<typename T>
+    TELEM_INLINE constexpr bool IsPowerOfTwo(T x)
+    {
+        return (x & (x - 1)) == 0;
+    }
+
     const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
 
     struct ArgData
@@ -165,6 +171,26 @@ namespace
         ::OutputDebugStringA("\n");
     }
 
+    struct NetZone
+    {
+        tt_uint64 start;
+        tt_uint64 end;
+    };
+
+    TELEM_ALIGNED_SYMBOL(struct NetZones, 64)
+    {
+        static constexpr int32_t NUM_ZONES = 16;
+        static_assert(IsPowerOfTwo(NUM_ZONES), "Must be pow2");
+
+        NetZones() {
+            num = 0;
+            zero_object(zones);
+        }
+
+        int32_t num;
+        NetZone zones[NUM_ZONES];
+    };
+
     // This is padded to 64bit to make placing TraceThread data on it's own boundy more simple.
     TELEM_ALIGNED_SYMBOL(struct TraceContext, 64)
     {
@@ -203,7 +229,8 @@ namespace
         volatile tt_int32 shutDownFlag;
         platform::SOCKET socket;
 
-        tt_uint8 _lanePad2[16];
+        NetZones* pNetZones;
+        tt_uint8 _lanePad2[8];
 
         X86_PAD(24)
 
@@ -217,7 +244,6 @@ namespace
         void* pUserData;
 
         // -- Cace lane boundry --
-
     };
 
  //   constexpr size_t size0 = sizeof(TraceContext);
@@ -432,12 +458,24 @@ namespace
         }
 #endif // X_DEBUG
 
+        NetZone nz;
+        nz.start = getTicks();
+
         // send some data...
         // TODO: none blocking?
         int res = platform::send(pCtx->socket, reinterpret_cast<const char*>(pData), len, 0);
         if (res == SOCKET_ERROR) {
             writeLog(pCtx, TtLogType::Error, "Socket: send failed with error: %d", platform::WSAGetLastError());
             return;
+        }
+
+        nz.end = getTicks();
+        auto& zones = *pCtx->pNetZones;
+        if (zones.num < NetZones::NUM_ZONES) {
+            zones.zones[zones.num++] = nz;
+        }
+        else {
+            writeLog(pCtx, TtLogType::Warning, "Net zone buffer is full");
         }
     }
 
@@ -609,6 +647,25 @@ namespace
         packet.argDataSize = 0;
 
         addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
+
+        // we also add net zones here.
+        auto& netZones = *pComp->pCtx->pNetZones;
+        if (netZones.num) {
+
+            packet.stackDepth = 2;
+            packet.strIdxFunction = GetStringId(pComp, "SendToServer");
+            packet.strIdxFmt = GetStringId(pComp, "Socket send");
+
+            for (int32_t i = 0; i < netZones.num; i++) {
+                auto& zone = netZones.zones[i];
+
+                packet.start = toRelativeTicks(pComp->pCtx, zone.start);
+                packet.end = toRelativeTicks(pComp->pCtx, zone.end);
+                addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
+            }
+
+            netZones.num = 0;
+        }
 
 #else
         TELEM_UNUSED(pComp);
@@ -1536,8 +1593,8 @@ namespace
         }
 #endif // !PACKET_COMPRESSION
 
-        static_assert(sizeof(comp) + BACKGROUND_THREAD_STACK_SIZE_BASE >= BACKGROUND_THREAD_STACK_SIZE,
-            "Thread stack is to small");
+        // TODO: this seams wrong?
+        // static_assert(sizeof(comp) + BACKGROUND_THREAD_STACK_SIZE_BASE >= BACKGROUND_THREAD_STACK_SIZE, "Thread stack is to small");
 
         for (;;)
         {
@@ -1728,8 +1785,9 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     // send packets this size?
     constexpr tt_size contexSize = sizeof(TraceContext);
     constexpr tt_size threadDataSize = sizeof(TraceThread) * MAX_ZONE_THREADS;
+    constexpr tt_size netZonesSize = sizeof(NetZones);
     constexpr tt_size minBufferSize = 1024 * 10; // 10kb.. enougth?
-    constexpr tt_size internalSize = contexSize + threadDataSize;
+    constexpr tt_size internalSize = contexSize + threadDataSize + netZonesSize;
     if (bufLen < internalSize + minBufferSize) {
         return TtError::ArenaTooSmall;
     }
@@ -1748,7 +1806,8 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     
     tt_uint8* pBufU8 = reinterpret_cast<tt_uint8*>(pBuf);
     tt_uint8* pThreadDataBuf = pBufU8 + contexSize;
-    tt_uint8* pTickBuffer0 = reinterpret_cast<tt_uint8*>(AlignTop(pThreadDataBuf + threadDataSize, 64));
+    tt_uint8* pNetZoneBuffer = pThreadDataBuf + threadDataSize;
+    tt_uint8* pTickBuffer0 = reinterpret_cast<tt_uint8*>(AlignTop(pNetZoneBuffer + netZonesSize, 64));
     tt_uint8* pTickBuffer1 = pTickBuffer0 + tickBufferSize;
 
     // retard check.
@@ -1772,6 +1831,7 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     pCtx->ticksPerMicro = gTicksPerMicro;
     pCtx->baseTicks = pCtx->lastTick;
     pCtx->baseNano = pCtx->lastTickNano;
+    pCtx->pNetZones = new (pNetZoneBuffer) NetZones();
 
     pCtx->activeTickBufIdx = 0;
     pCtx->tickBuffers[0].pTickBuf = pTickBuffer0;
