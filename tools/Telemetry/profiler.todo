@@ -7,8 +7,19 @@ Runtime:
       ☐ Linking callstacks with zones.
       ☐ Send callstacks to server
 
+   ☐ Have each thread store a format string cache.
+     Dunno how big this will be rip, but it basically needs to tell me
+     ☐ if we have any format specifiers
+     ☐ if any of them are strings and the indexes (also need to support length prefix)
+
+     could have like some bit flag?
+     32bits one bit if string another if length prefixed.
+
+      then maybe have a last seen format string so lookup can be skipped for tight loops.
+
     Misc:
-      ☐ Support dynamic strings
+     ☐ Support dynamic strings
+     ✔ Support printf @done (19-03-21 23:34)
 
     ✔ Capture and send program command line @done (19-02-15 17:05)
     ☐ Implement plots
@@ -25,6 +36,10 @@ ServerLib:
 
   ✔ Have a api for querying data for a given client @done (19-03-17 12:45)
      ✔ Also support a REST like api, so remote viewers can connect. @done (19-03-17 12:45)
+
+ ✔ Prosess format specifiers on ingest, anding new ones to db. @done (19-03-23 10:59)
+   ✔ Might have to map plain strings to new indexes since the set will be much bigger. @done (19-03-23 10:59)
+
 
 Server:
 
