@@ -16,6 +16,15 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include <array>
 #include <charconv> // TODO: try remove? (used by stringUtil)
 
+// Telem
+#define TTELEMETRY_ENABLED 1
+#include <../../tools/Telemetry/TelemetryLib.h>
+
+#if TTELEMETRY_LINK
+X_LINK_ENGINE_LIB("TelemetryLib")
+#endif // !TTELEMETRY_LINK
+
+
 // Util
 #include "Util\UserLiterals.h"
 #include "Util\ClassMacros.h"

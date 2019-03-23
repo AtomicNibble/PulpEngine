@@ -276,6 +276,8 @@ bool XCore::FreeConverterModule(IConverterModule* pConvertModule)
 
 bool XCore::IntializeEngineModule(const char* pDllName, const char* pModuleClassName, const CoreInitParams& initParams)
 {
+    ttZone(gEnv->ctx, "ModuleInit %s", pDllName);
+
     X_PROFILE_NO_HISTORY_BEGIN("ModuleInit", core::profiler::SubSys::CORE);
 
     core::Path<char> path(pDllName);
@@ -342,6 +344,53 @@ bool XCore::Init(CoreInitParams& startupParams)
 {
     core::StopWatch time;
 
+    // TELEM ME !
+    // link me like a slut.
+    if (!ttLoadLibary()) {
+        return false;
+    }
+
+    // Setup telem.
+    if (!ttInit()) {
+        return false;
+    }
+
+#if TTELEMETRY_ENABLED
+
+    const size_t telemBufSize = 1024 * 1024 * 4;
+    telemBuf_ = core::makeUnique<uint8_t[]>(g_coreArena, telemBufSize, 64);
+
+    ttInitializeContext(gEnv->ctx, telemBuf_.ptr(), telemBufSize);
+
+    if (startupParams.bTelem)
+    {
+        auto res = ttOpen(gEnv->ctx,
+            X_ENGINE_NAME " - Engine",
+            X_BUILD_STRING " Version: " X_ENGINE_VERSION_STR " Rev: " X_ENGINE_BUILD_REF_STR,
+            "127.0.0.1",
+            8001,
+            telem::ConnectionType::Tcp,
+            1000
+        );
+
+        if (res != telem::Error::Ok) {
+            // rip
+            return false;
+        }
+
+        ttSetThreadName(gEnv->ctx, core::Thread::getCurrentID(), "Main");
+
+    }
+    else
+    {
+        ttPause(gEnv->ctx, true);
+    }
+
+#endif // TTELEMETRY_ENABLED
+
+
+    ttZone(gEnv->ctx, "Core Init");
+
     // init the system baby!
     gEnv->mainThreadId = core::Thread::getCurrentID();
     gEnv->seed == startupParams.seed;
@@ -362,6 +411,7 @@ bool XCore::Init(CoreInitParams& startupParams)
 
     if (startupParams.loadSymbols()) {
         X_PROFILE_NO_HISTORY_BEGIN("SymResInit", core::profiler::SubSys::CORE);
+        ttZone(gEnv->ctx, "SymRes Init");
 
         core::symbolResolution::Startup();
     }
@@ -468,6 +518,7 @@ bool XCore::Init(CoreInitParams& startupParams)
     // Load the default config.
     if (!startupParams.isCoreOnly()) {
         X_PROFILE_NO_HISTORY_BEGIN("ConfigLoad", core::profiler::SubSys::CORE);
+        ttZone(gEnv->ctx, "Load config");
 
         if (!env_.pConsole->loadAndExecConfigFile("default.cfg"_sv)) {
             return false;
@@ -677,6 +728,7 @@ bool XCore::Init(CoreInitParams& startupParams)
 
     if (startupParams.loadSymbols()) {
         X_PROFILE_NO_HISTORY_BEGIN("SymResRefresh", core::profiler::SubSys::CORE);
+        ttZone(gEnv->ctx, "Refresh symbols");
         core::symbolResolution::Refresh();
     }
 
@@ -704,6 +756,7 @@ bool XCore::Init(CoreInitParams& startupParams)
 
 bool XCore::InitAsyncWait(void)
 {
+    ttZone(gEnv->ctx, "AsynInit wait");
     X_PROFILE_NO_HISTORY_BEGIN("AsyncInitFin", core::profiler::SubSys::CORE);
 
     X_LOG1("Core", "AsynInit wait");
@@ -813,6 +866,8 @@ bool XCore::parseSeed(Vec4i seed)
 
 bool XCore::InitFileSys(const CoreInitParams& initParams)
 {
+    ttZoneFunction(gEnv->ctx);
+
     X_UNUSED(initParams);
     env_.pFileSys = X_NEW_ALIGNED(core::xFileSys, g_coreArena, "FileSys", 8)(g_coreArena);
 
@@ -831,6 +886,8 @@ bool XCore::InitFileSys(const CoreInitParams& initParams)
 //////////////////////////////////////////////////////////////////////////
 bool XCore::InitLogging(const CoreInitParams& initParams)
 {
+    ttZoneFunction(gEnv->ctx);
+
     env_.pLog = X_NEW_ALIGNED(core::XLog, g_coreArena, "LogSystem", 8);
 
 #if X_ENABLE_LOGGING
@@ -842,8 +899,10 @@ bool XCore::InitLogging(const CoreInitParams& initParams)
         if (initParams.bConsoleLog) {
 
             const auto& desc = initParams.consoleDesc;
-            
-            pConsole_ = X_NEW(core::Console, g_coreArena, "ExternalConsoleLog")(core::string_view(desc.pTitle));
+            {
+                ttZone(gEnv->ctx, "Create Console window");
+                pConsole_ = X_NEW(core::Console, g_coreArena, "ExternalConsoleLog")(core::string_view(desc.pTitle));
+            }
             pConsole_->setSize(desc.windowWidth, desc.windowHeight, desc.numLines);
             pConsole_->moveTo(desc.x, desc.y);
             
@@ -888,6 +947,8 @@ bool XCore::InitFileLogging(const CoreInitParams& initParams)
 
 bool XCore::InitConsole(const CoreInitParams& initParams)
 {
+    ttZoneFunction(gEnv->ctx);
+
     // console can load it's render resources now.
     if (!initParams.basicConsole()) {
         if (!env_.pConsole->loadRenderResources()) {
@@ -900,6 +961,8 @@ bool XCore::InitConsole(const CoreInitParams& initParams)
 
 bool XCore::InitInput(const CoreInitParams& initParams)
 {
+    ttZoneFunction(gEnv->ctx);
+
     if (initParams.bSkipInput) {
         env_.pInput = X_NEW(input::XNullInput, g_coreArena, "NullInput");
         return true;
@@ -924,6 +987,8 @@ bool XCore::InitInput(const CoreInitParams& initParams)
 
 bool XCore::InitFont(const CoreInitParams& initParams)
 {
+    ttZoneFunction(gEnv->ctx);
+
     if (!IntializeEngineModule(DLL_FONT, "Engine_Font", initParams)) {
         return false;
     }
@@ -943,6 +1008,8 @@ bool XCore::InitFont(const CoreInitParams& initParams)
 
 bool XCore::InitSound(const CoreInitParams& initParams)
 {
+    ttZoneFunction(gEnv->ctx);
+
     if (initParams.bSkipSound) {
         env_.pSound = nullptr;
         return true;
@@ -967,6 +1034,8 @@ bool XCore::InitSound(const CoreInitParams& initParams)
 
 bool XCore::InitPhysics(const CoreInitParams& initParams)
 {
+    ttZoneFunction(gEnv->ctx);
+
     if (!IntializeEngineModule(DLL_PHYSICS, "Engine_Physics", initParams)) {
         return false;
     }
@@ -981,6 +1050,8 @@ bool XCore::InitPhysics(const CoreInitParams& initParams)
 
 bool XCore::InitNet(const CoreInitParams& initParams)
 {
+    ttZoneFunction(gEnv->ctx);
+
     if (!IntializeEngineModule(DLL_NET, "Engine_Network", initParams)) {
         return false;
     }
@@ -1000,6 +1071,8 @@ bool XCore::InitNet(const CoreInitParams& initParams)
 
 bool XCore::InitVideo(const CoreInitParams& initParams)
 {
+    ttZoneFunction(gEnv->ctx);
+
     if (!IntializeEngineModule(DLL_VIDEO, "Engine_Video", initParams)) {
         return false;
     }
@@ -1019,6 +1092,8 @@ bool XCore::InitVideo(const CoreInitParams& initParams)
 
 bool XCore::InitScriptSys(const CoreInitParams& initParams)
 {
+    ttZoneFunction(gEnv->ctx);
+
     if (!IntializeEngineModule(DLL_SCRIPT, "Engine_Script", initParams)) {
         return false;
     }
@@ -1038,6 +1113,8 @@ bool XCore::InitScriptSys(const CoreInitParams& initParams)
 
 bool XCore::InitRenderSys(const CoreInitParams& initParams)
 {
+    ttZoneFunction(gEnv->ctx);
+
     if (initParams.bTesting) {
         if (!IntializeEngineModule(DLL_RENDER_NULL, "Engine_RenderNull", initParams)) {
             return false;
@@ -1091,6 +1168,8 @@ bool XCore::InitRenderSys(const CoreInitParams& initParams)
 
 bool XCore::Init3DEngine(const CoreInitParams& initParams)
 {
+    ttZoneFunction(gEnv->ctx);
+
     if (!IntializeEngineModule(DLL_3D_ENGINE, "Engine_3DEngine", initParams)) {
         return false;
     }
@@ -1114,6 +1193,8 @@ bool XCore::Init3DEngine(const CoreInitParams& initParams)
 
 bool XCore::InitGameDll(const CoreInitParams& initParams)
 {
+    ttZoneFunction(gEnv->ctx);
+
     if (!IntializeEngineModule(DLL_GAME_DLL, "Engine_Game", initParams)) {
         return false;
     }

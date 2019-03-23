@@ -228,6 +228,9 @@ private:
     CmdArgs args_;
 
     core::AssetLoader assetLoader_;
+
+    // Telem
+    core::UniquePointer<uint8_t[]> telemBuf_;
 };
 
 X_NAMESPACE_BEGIN(core)

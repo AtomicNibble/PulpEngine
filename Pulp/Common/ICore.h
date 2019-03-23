@@ -195,6 +195,7 @@ struct CoreInitParams
     bool bFileLog;
     bool bPauseShutdown;
     bool bIsGame;
+    bool bTelem;
 
     Vec4i seed;
 
@@ -258,6 +259,7 @@ struct CoreInitParams
         bPauseShutdown(true),
         bIsGame(false),
         bFileLog(false),
+        bTelem(false),
 
 #if X_DEBUG
         bVsLog(true),
@@ -281,6 +283,8 @@ struct CoreGlobals // obbject is zerod on start.
         STARTING,
         RUNNING,
         CLOSING);
+
+    telem::ContexHandle ctx;
 
     ICore* pCore;
     input::IInput* pInput;
@@ -317,6 +321,7 @@ struct CoreGlobals // obbject is zerod on start.
 
     X_INLINE CoreGlobals()
     {
+        ctx = INVALID_TRACE_CONTEX;
         pCore = nullptr;
         pInput = nullptr;
         pTimer = nullptr;
