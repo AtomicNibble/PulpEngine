@@ -82,11 +82,12 @@ constexpr tt_size MAX_ZONE_THREADS = 32;
 constexpr tt_size MAX_ZONE_DEPTH = 32;
 constexpr tt_size MAX_LOCKS_HELD_PER_THREAD = 16;
 constexpr tt_size MAX_LOCKS = 128; // max locks we can track
+constexpr tt_size MAX_STATIC_STRINGS = 1024 * 4;
 
 constexpr tt_size COMPRESSION_MAX_INPUT_SIZE = 1024 * 8;
 constexpr tt_size COMPRESSION_RING_BUFFER_SIZE = 1024 * 64;
 
-constexpr tt_size STRING_TABLE_BUF_SIZE = sizeof(void*) * 1024; // TODO: ?
+constexpr tt_size STRING_TABLE_BUF_SIZE = sizeof(void*) * MAX_STATIC_STRINGS;
 
 constexpr tt_size BACKGROUND_THREAD_STACK_SIZE_BASE = 1024 * 8; // base size for anything that's not a compression buffer.
 constexpr tt_size BACKGROUND_THREAD_STACK_SIZE = Internal::RoundUpToMultiple<tt_size>(
