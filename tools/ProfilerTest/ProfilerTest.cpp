@@ -63,18 +63,12 @@ namespace
         inline explicit ScopedLockTelemetry(ThreadPolicy& policy) :
             policy_(policy)
         {
-            ttTryLock(ctx, &policy_, "Lock!");
-
             policy_.Enter();
-
-            ttEndTryLock(ctx, &policy_, TtLockResult::Acquired);
-            ttSetLockState(ctx, &policy_, TtLockState::Locked);
         }
 
         inline ~ScopedLockTelemetry(void) 
         {
             policy_.Leave();
-            ttSetLockState(ctx, &policy_, TtLockState::Released);
         }
 
     private:
