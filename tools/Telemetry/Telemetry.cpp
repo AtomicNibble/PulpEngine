@@ -1635,6 +1635,9 @@ namespace
             const auto* pBuf = pBegin;
 
             if (size == 0) {
+                if (pCtx->shutDownFlag) {
+                    continue;
+                }
                 ::DebugBreak();
             }
 
