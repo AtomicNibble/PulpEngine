@@ -53,8 +53,10 @@ bool XCore::Update(void)
         frameData.flags.Set(core::FrameFlag::HAS_FOCUS);
     }
 
-    assetLoader_.dispatchPendingLoads();
-    assetLoader_.update();
+    if (assetLoader_) {
+        assetLoader_->dispatchPendingLoads();
+        assetLoader_->update();
+    }
 
     // get time deltas for this frame.
     time_.OnFrameBegin(frameData.timeInfo);

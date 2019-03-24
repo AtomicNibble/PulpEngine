@@ -111,9 +111,7 @@ XCore::XCore() :
 
     strAlloc_(1 << 24, core::VirtualMem::GetPageSize() * 2,
         StrArena::getMemoryAlignmentRequirement(8),
-        StrArena::getMemoryOffsetRequirement() + 12),
-
-    assetLoader_(g_coreArena, g_coreArena)
+        StrArena::getMemoryOffsetRequirement() + 12)
 {
     X_ASSERT_NOT_NULL(g_coreArena);
 
@@ -147,6 +145,8 @@ XCore::XCore() :
 
     env_.client_ = true;
     env_.dedicated_ = false;
+
+    assetLoader_ = core::makeUnique<core::AssetLoader>(g_coreArena, g_coreArena, g_coreArena);
 
     // created in coreInit.
     //	env_.pJobSys = X_NEW(core::JobSystem, g_coreArena, "JobSystem");
@@ -487,9 +487,9 @@ bool XCore::OnFileChange(core::IDirectoryWatcher::Action::Enum action,
         return false;
     }
 
-    if (action == core::IDirectoryWatcher::Action::MODIFIED) 
+    if (action == core::IDirectoryWatcher::Action::MODIFIED && assetLoader_)
     {
-        assetLoader_.onFileChanged(pName);
+        assetLoader_->onFileChanged(pName);
     }
 
     return true;

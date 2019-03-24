@@ -227,7 +227,7 @@ private:
     // args
     CmdArgs args_;
 
-    core::AssetLoader assetLoader_;
+    core::UniquePointer<core::AssetLoader> assetLoader_;
 
     // Telem
     core::UniquePointer<uint8_t[]> telemBuf_;

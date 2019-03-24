@@ -86,7 +86,7 @@ X_INLINE core::Window* XCore::GetGameWindow(void)
 
 X_INLINE core::AssetLoader* XCore::GetAssetLoader(void)
 {
-    return &assetLoader_;
+    return assetLoader_.get();
 }
 
 X_INLINE CoreGlobals* XCore::GetGlobalEnv(void)

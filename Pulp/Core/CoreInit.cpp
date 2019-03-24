@@ -1220,7 +1220,9 @@ void XCore::registerVars(const CoreInitParams& initParams)
 {
     vars_.registerVars();
 
-    assetLoader_.registerVars();
+    if (assetLoader_) {
+        assetLoader_->registerVars();
+    }
 
     if (!initParams.isCoreOnly() || initParams.basicConsole()) {
         core::ConsoleVarFunc del;
@@ -1242,7 +1244,9 @@ void XCore::registerCmds(void)
 {
     using namespace core;
 
-    assetLoader_.registerCmds();
+    if (assetLoader_) {
+        assetLoader_->registerCmds();
+    }
 
     ADD_COMMAND_MEMBER("listProgramArgs", this, XCore, &XCore::Cmd_ListProgramArgs, VarFlag::SYSTEM,
         "Lists the processed command line arguments parsed to the program");
