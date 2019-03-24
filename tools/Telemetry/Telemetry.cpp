@@ -1178,20 +1178,6 @@ namespace
 
     TELEM_NO_INLINE void tickBufferFull(TraceContext* pCtx)
     {
-        // we are full.
-        // in order to flip we need to make everythread has finished writing to the tick buffer
-        // and is ready for the flip.
-        // but then again, I don't do any of this for normal flips.
-        // shit.
-
-        // I was thinking of looking at all the threads and make sure they are outside this module or also waiting for 
-        // flip.
-
-        // but can't be doing that every tick.
-        // so think i will need to keep like a tail and head value
-        // so i update the tail after write is finished.
-        // that way the background thread can know the writes are finished.
-
         flipBuffer(pCtx, true, false);
     }
 
