@@ -96,7 +96,7 @@ X_INLINE void ThreadMember<T>::start(FunctionDelagate delagate)
         X_ERROR("Thread", "failed to start thread. Erorr: %s", lastError::ToString(Dsc));
     }
 
-    Thread::setName(getID(), name_.c_str());
+    Thread::setName(name_.c_str());
 }
 
 template<class T>

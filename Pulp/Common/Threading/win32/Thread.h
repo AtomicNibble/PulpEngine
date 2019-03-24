@@ -96,13 +96,14 @@ public:
     X_INLINE static void backOff(int32_t backoffCount);
     X_INLINE static uint32_t getCurrentID(void);
     static void join(uint32_t threadId);
-    static void setName(uint32_t threadId, const char* name);
+    static void setName(uint32_t threadId, const char* pName);
 
     static Priority::Enum getPriority(void);
     static bool setPriority(Priority::Enum priority);
     static void setFPE(uint32_t threadId, FPE::Enum fpe);
 
 protected:
+    void setName(const char* pName);
     bool createThreadInternal(uint32_t stackSize, LPTHREAD_START_ROUTINE func);
 
 private:

@@ -13,6 +13,8 @@ namespace
 {
     const DWORD MS_VC_EXCEPTION = 0x406D1388;
 
+    using pSetThreadDescription = HRESULT(*)(HANDLE hThread, PCWSTR lpThreadDescription);
+
     X_PACK_PUSH(8)
     struct THREADNAME_INFO
     {
@@ -23,11 +25,11 @@ namespace
     };
     X_PACK_POP;
 
-    void setThreadName(DWORD dwThreadID, const char* threadName)
+    void setThreadName(HANDLE hThread, DWORD dwThreadID, const char* pThreadName)
     {
         THREADNAME_INFO info;
         info.dwType = 0x1000;
-        info.szName = threadName;
+        info.szName = pThreadName;
         info.dwThreadID = dwThreadID;
         info.dwFlags = 0;
 
@@ -35,6 +37,20 @@ namespace
             RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
         }
         __except (EXCEPTION_EXECUTE_HANDLER) {
+        }
+
+        if (hThread != NULL) {
+            HMODULE hMod = ::GetModuleHandleW(L"kernel32.dll");
+
+            auto pFunc = (pSetThreadDescription)::GetProcAddress(hMod, "SetThreadDescription");
+            if (pFunc) {
+                core::StackStringW256 name(pThreadName);
+
+                auto hr = pFunc(hThread, name.c_str());
+                if (FAILED(hr)) {
+                    X_ERROR("Thread", "Failed to SetThreadDescription. Err: %" PRIi32, hr);
+                }
+            }
         }
     }
 
@@ -81,7 +97,7 @@ void Thread::start(Function::Pointer function)
         X_ERROR("Thread", "failed to start thread. Erorr: %s", lastError::ToString(Dsc));
     }
 
-    setThreadName(getID(), name_.c_str());
+    setThreadName(handle_, getID(), name_.c_str());
 }
 
 void Thread::stop(void)
@@ -171,7 +187,15 @@ void Thread::join(uint32_t threadId)
 
 void Thread::setName(uint32_t threadId, const char* name)
 {
-    setThreadName(threadId, name);
+    HANDLE handle = OpenThread(
+        THREAD_SET_LIMITED_INFORMATION,
+        FALSE,
+        threadId
+    );
+
+    setThreadName(handle, threadId, name);
+
+    ::CloseHandle(handle);
 }
 
 Thread::Priority::Enum Thread::getPriority(void)
@@ -373,6 +397,11 @@ void Thread::setFPE(uint32_t threadId, FPE::Enum fpe)
     CloseHandle(hThread);
 }
 
+void Thread::setName(const char* pName)
+{
+    setThreadName(handle_, id_, pName);
+}
+
 bool Thread::createThreadInternal(uint32_t stackSize, LPTHREAD_START_ROUTINE func)
 {
     X_ASSERT(handle_ == NULL, "Thread has already been created")(handle_, id_);
@@ -405,9 +434,9 @@ ThreadAbstract::~ThreadAbstract()
     thread_.destroy();
 }
 
-void ThreadAbstract::create(const char* name, uint32_t stackSize)
+void ThreadAbstract::create(const char* pName, uint32_t stackSize)
 {
-    thread_.create(name ? name : "AbstractThread", stackSize);
+    thread_.create(pName ? pName : "AbstractThread", stackSize);
     thread_.setData(this);
 }
 
