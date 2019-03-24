@@ -44,43 +44,6 @@ using namespace core::string_view_literals;
 #include <conio.h>
 #endif // !X_PLATFORM_WIN32
 
-namespace
-{
-#if X_ENABLE_MEMORY_DEBUG_POLICIES
-
-    typedef core::MemoryArena<
-        core::GrowingGenericAllocator,
-        core::MultiThreadPolicy<core::Spinlock>,
-        core::SimpleBoundsChecking,
-        core::SimpleMemoryTracking,
-        core::SimpleMemoryTagging>
-        StrArena;
-
-#else
-
-    typedef core::MemoryArena<
-        core::GrowingGenericAllocator,
-        core::MultiThreadPolicy<core::Spinlock>,
-        core::NoBoundsChecking,
-#if X_ENABLE_MEMORY_SIMPLE_TRACKING
-        core::SimpleMemoryTracking,
-#else
-        core::NoMemoryTracking,
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-        core::NoMemoryTagging>
-        StrArena;
-
-#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES
-
-    typedef core::MemoryArena<
-        StrArena::AllocationPolicy,
-        core::SingleThreadPolicy,
-        StrArena::BoundsCheckingPolicy,
-        StrArena::MemoryTrackingPolicy,
-        StrArena::MemoryTaggingPolicy>
-        StrArenaST;
-
-} // namespace
 
 CoreGlobals XCore::env_;
 
@@ -130,27 +93,10 @@ XCore::XCore() :
     env_.pCore = this;
     env_.pTimer = &time_;
     env_.pDirWatcher = pDirWatcher_;
-    //	env_.pMalloc = &g_coreArena;
     env_.pArena = g_coreArena;
-
-    if (initParams_.bThreadSafeStringAlloc) {
-        env_.pStrArena = X_NEW(StrArena, g_coreArena, "StrArena")(&strAlloc_, "StrArena");
-    }
-    else {
-        env_.pStrArena = X_NEW(StrArenaST, g_coreArena, "StrArena")(&strAlloc_, "StrArenaST");
-    }
-
-    static_assert(StrArena::IS_THREAD_SAFE, "Str arena must be thread safe");
-    static_assert(!StrArenaST::IS_THREAD_SAFE, "Single thread StrArean don't need to be thread safe");
 
     env_.client_ = true;
     env_.dedicated_ = false;
-
-    assetLoader_ = core::makeUnique<core::AssetLoader>(g_coreArena, g_coreArena, g_coreArena);
-
-    // created in coreInit.
-    //	env_.pJobSys = X_NEW(core::JobSystem, g_coreArena, "JobSystem");
-    //env_.pJobSys = X_NEW(core::V2::JobSystem, g_coreArena, "JobSystem");
 
     if (pDirWatcher_) {
         pDirWatcher_->registerListener(this);

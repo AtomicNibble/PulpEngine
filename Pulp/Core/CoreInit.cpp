@@ -391,6 +391,16 @@ bool XCore::Init(CoreInitParams& startupParams)
 
     ttZone(gEnv->ctx, "Core Init");
 
+    static_assert(StrArena::IS_THREAD_SAFE, "Str arena must be thread safe");
+    static_assert(!StrArenaST::IS_THREAD_SAFE, "Single thread StrArean don't need to be thread safe");
+
+    if (initParams_.bThreadSafeStringAlloc) {
+        env_.pStrArena = X_NEW(StrArena, g_coreArena, "StrArena")(&strAlloc_, "StrArena");
+    }
+    else {
+        env_.pStrArena = X_NEW(StrArenaST, g_coreArena, "StrArena")(&strAlloc_, "StrArenaST");
+    }
+
     // init the system baby!
     gEnv->mainThreadId = core::Thread::getCurrentID();
     gEnv->seed == startupParams.seed;
@@ -572,6 +582,9 @@ bool XCore::Init(CoreInitParams& startupParams)
 
             env_.pLocalisation = loc.release();
         }
+
+        // #------------------------- AssetLoader ------------------------
+        assetLoader_ = core::makeUnique<core::AssetLoader>(g_coreArena, g_coreArena, g_coreArena);
 
         // #------------------------- Input ------------------------
         if (!InitInput(startupParams)) {
