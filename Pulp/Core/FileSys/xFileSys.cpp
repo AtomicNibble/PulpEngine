@@ -1443,6 +1443,8 @@ void xFileSys::updatePendingOpsStats(void)
 
 Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 {
+    ttSetThreadName(gEnv->ctx, 0, "FileSys Worker");
+
     gEnv->pJobSys->CreateQueForCurrentThread();
 
     xFileSys& fileSys = *this;
@@ -1519,6 +1521,8 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
             // we have a request.
         }
+
+        ttZone(gEnv->ctx, "FileSys Process");
 
         core::UniquePointer<IoRequestBase> requestPtr(ioQueueDataArena_, pRequest);
         const auto type = pRequest->getType();

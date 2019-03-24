@@ -177,6 +177,7 @@ namespace V2
         X_ASSERT_NOT_NULL(gEnv->pCore);
         X_ASSERT_NOT_NULL(gEnv->pConsole);
         X_PROFILE_NO_HISTORY_BEGIN("JobSysInit", core::profiler::SubSys::CORE);
+        ttZone(gEnv->ctx, "JobSys Init");
 
         if (threadCount == AUTO_THREAD_COUNT) {
             ICore* pCore = gEnv->pCore;
@@ -327,12 +328,15 @@ namespace V2
         uint32_t i;
         for (i = 0; i < numThreads_; i++) {
             core::StackString<64> name;
-            name.appendFmt("JobSystemV2::Worker_%" PRIu32, i);
+            name.appendFmt("JobSys::Worker_%" PRIu32, i);
             threads_[i].setData(this);
             threads_[i].create(name.c_str()); // default stack size.
 
             threadId = threads_[i].getID();
             CreateThreadObjects(threadId);
+
+            // TODO: support dynamic string?
+            ttSetThreadName(gEnv->ctx, threadId, "%", name.c_str());
         }
         for (i = 0; i < numThreads_; i++) {
             threads_[i].start(ThreadRun_s);

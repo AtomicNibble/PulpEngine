@@ -282,6 +282,7 @@ bool XSound::init(void)
 {
     X_LOG0("SoundSys", "Starting");
     X_PROFILE_NO_HISTORY_BEGIN("SoundInit", core::profiler::SubSys::SOUND);
+    ttZone(gEnv->ctx, "Sound Init");
 
     gEnv->pCore->GetCoreEventDispatcher()->RegisterListener(this);
 
@@ -414,6 +415,7 @@ bool XSound::init(void)
     // If I decide to never store banks in packages, I could make it async.
     {
         X_PROFILE_NO_HISTORY_BEGIN("SoundPckLoad", core::profiler::SubSys::SOUND);
+        ttZone(gEnv->ctx, "Sound LoadPacks");
 
         if (!loadPackage("streamed.pck")) {
             return false;
@@ -685,6 +687,7 @@ void XSound::cullObjects(void)
 {
     // so we can only cull objects that are not playing anything.
     // and as soon as we want to play something on it we need to re-register it.
+    ttZone(gEnv->ctx, "Sound Cull");
 
     // work out what objects we can register.
     core::CriticalSection::ScopedLock lock(cs_);
@@ -715,6 +718,8 @@ void XSound::performOcclusionChecks(void)
     if (occlusion_.isEmpty()) {
         return;
     }
+
+    ttZone(gEnv->ctx, "Sound Occlusion");
 
     physics::IScene* pScene = pScene_;
     if (!pScene) {

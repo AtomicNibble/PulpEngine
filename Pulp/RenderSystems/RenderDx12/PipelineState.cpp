@@ -64,6 +64,8 @@ void PSODeviceCache::destoryAll(void)
 
 bool PSODeviceCache::compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, ID3D12PipelineState** pPSO)
 {
+    ttZone(gEnv->ctx, "Compile PSO");
+
     HashVal hash = getHash(gpsoDesc);
 
     ID3D12PipelineState** pPSORef = nullptr;
