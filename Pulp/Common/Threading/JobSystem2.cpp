@@ -328,7 +328,7 @@ namespace V2
         uint32_t i;
         for (i = 0; i < numThreads_; i++) {
             core::StackString<64> name;
-            name.appendFmt("JobSys::Worker_%" PRIu32, i);
+            name.appendFmt("JobSys_%" PRIu32, i);
             threads_[i].setData(this);
             threads_[i].create(name.c_str()); // default stack size.
 
