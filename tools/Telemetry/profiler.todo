@@ -1,28 +1,36 @@
 
 Runtime:
 
-    ☐ CallStacks
-      ☐ PDB / Symbol for callstacks
-      ☐ Callstack cache
-      ☐ Linking callstacks with zones.
-      ☐ Send callstacks to server
+  CallStacks:
+    ☐ PDB / Symbol for callstacks
+    ☐ Callstack cache
+    ☐ Linking callstacks with zones.
+    ☐ Send callstacks to server
 
-   ☐ Have each thread store a format string cache.
+  Performance:
+    ☐ Have each thread store a format string cache.
      Dunno how big this will be rip, but it basically needs to tell me
      ☐ if we have any format specifiers
      ☐ if any of them are strings and the indexes (also need to support length prefix)
+         the length prefix can be fixed or dynamic, if it's fixed we don't care.
 
-     could have like some bit flag?
-     32bits one bit if string another if length prefixed.
+     ☐ Explore having a mini string format cache on each thread to improve tight loop performance.
 
-      then maybe have a last seen format string so lookup can be skipped for tight loops.
+  Zones:
+    ☐ Build total time and counts for each zone.
 
-    Misc:
-     ☐ Support dynamic strings
+  Strings:
      ✔ Support printf @done (19-03-21 23:34)
+     ☐ Support dynamic strings
+     ☐ Validate format strings
 
+  Misc:
     ✔ Capture and send program command line @done (19-02-15 17:05)
+
+  Plots:
     ☐ Implement plots
+
+  Polish:
     ☐ Get rid of the CRT (low priority)
 
 
@@ -49,4 +57,4 @@ Architecture:
   - Server that can just run all the time collecting logs from the network.
   - Multiple viewers can connect to the server and look at traces
   - Viewer can be started with local server
-  - Both local and remove viewing should support realtime view.
+  - Both local and remote viewing should support realtime view.
