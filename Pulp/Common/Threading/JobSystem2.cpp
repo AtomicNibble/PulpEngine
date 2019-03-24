@@ -603,6 +603,8 @@ namespace V2
     void JobSystem::Execute(Job* pJob, size_t threadIdx)
     {
 #if X_ENABLE_JOBSYS_PROFILER
+        ttZone(gEnv->ctx, "Job");
+
         auto* pTimeLine = pTimeLines_[threadIdx];
         const int32_t currentHistoryIdx = currentHistoryIdx_;
         auto& history = pTimeLine->getCurFrameHistory();
