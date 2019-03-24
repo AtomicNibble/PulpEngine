@@ -604,7 +604,9 @@ uint16_t TraceDB::addString(core::string_view str)
 
 uint16_t TraceDB::getStringIndex(uint16_t strIdx) const
 {
-    return indexMap[strIdx];
+    auto idx = indexMap[strIdx];
+    X_ASSERT(idx != -1, "Index not valid")(strIdx, idx);
+    return idx;
 }
 
 uint16_t TraceDB::getFmtStringIndex(const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt)
@@ -643,7 +645,7 @@ uint16_t TraceDB::getFmtStringIndex(const DataPacketBaseArgData* pPacket, int32_
     }
 
     X_ASSERT(strIdx != -1, "Failed to get index")(strIdx, pPacket->argDataSize);
-    return static_cast<uint16_t>(strIdx);
+    return safe_static_cast<uint16_t>(strIdx);
 }
 
 int32_t TraceDB::handleDataPacketTickInfo(const DataPacketTickInfo* pData)
