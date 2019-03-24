@@ -633,6 +633,7 @@ void LockTryTooltip(TraceView& view, const LockTry& lock)
         }
         ImGui::Separator();
         ImGui::TextUnformatted(strDesc.begin(), strDesc.end());
+        TextFocusedFmt("Handle", "0x%" PRIX64, lock.lockHandle);
         ImGui::Separator();
         ImGui::TextUnformatted(strFunc.begin(), strFunc.end());
         ImGui::Text("%s:%i", strFile.data(), lock.lineNo);
