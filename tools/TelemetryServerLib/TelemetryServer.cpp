@@ -797,12 +797,12 @@ int32_t TraceDB::handleDataPacketThreadSetName(const DataPacketThreadSetName* pD
 {
     const int32_t totalSize = getPacketSizeIncArgData(pData);
 
-    auto idxFmt = getStringIndex(pData->strIdxFmt);
+    int32_t fmtStrIdx = getFmtStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
 
     auto& cmd = cmdInsertThreadName;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
     cmd.bind(2, static_cast<int64_t>(pData->time));
-    cmd.bind(3, idxFmt);
+    cmd.bind(3, fmtStrIdx);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {

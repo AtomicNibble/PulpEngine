@@ -140,7 +140,7 @@ extern "C"
     __TELEM_API_BOOL(TelemIsPaused, TraceContexHandle ctx);
 
     // Thread
-    __TELEM_API_VOID(TelemSetThreadName, TraceContexHandle ctx, tt_uint32 threadID, const char* pName);
+    __TELEM_API_VOID(TelemSetThreadName, TraceContexHandle ctx, tt_uint32 threadID, const char* pFmtString, tt_int32 numArgs, ...);
 
     // Callstack
     __TELEM_API_BOOL(TelemGetCallStack, TraceContexHandle ctx, TtCallStack& stackOut);
@@ -434,7 +434,7 @@ namespace telem
 #define ttIsPaused(ctx) __TELEM_FUNC_NAME(TelemIsPaused)(ctx)
 
 // Thread
-#define ttSetThreadName(ctx, threadID, pName) __TELEM_FUNC_NAME(TelemSetThreadName)(ctx, threadID, pName)
+#define ttSetThreadName(ctx, threadID, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetThreadName)(ctx, threadID, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 
 #define ttGetCallStack(ctx, stackOut) __TELEM_FUNC_NAME(TelemGetCallStack)(ctx, stackOut)
 #define ttSendCallStack(ctx, pStack) __TELEM_FUNC_NAME(TelemSendCallStack)(ctx, pStack)

@@ -1230,18 +1230,6 @@ namespace
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
-    TELEM_INLINE void queueThreadSetName(TraceContext* pCtx, tt_uint32 threadID, const char* pName)
-    {
-        QueueDataThreadSetName data;
-        data.type = QueueDataType::ThreadSetName;
-        data.argDataSize = 0;
-        data.time = getRelativeTicks(pCtx);
-        data.threadID = threadID;
-        data.pFmtStr = pName;
-
-        addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
-    }
-
     TELEM_INLINE void queueCallStack(TraceContext* pCtx, const TtCallStack& stack)
     {
         QueueDataCallStack data;
@@ -2143,14 +2131,41 @@ bool TelemIsPaused(TraceContexHandle ctx)
     return handleToContext(ctx)->isEnabled;
 }
 
-void TelemSetThreadName(TraceContexHandle ctx, tt_uint32 threadID, const char* pName)
+void TelemSetThreadName(TraceContexHandle ctx, tt_uint32 threadID, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
         return;
     }
 
-    queueThreadSetName(pCtx, threadID, pName);
+    if (threadID == 0) {
+        threadID = getThreadID();
+    }
+
+    QueueDataThreadSetName data;
+    data.type = QueueDataType::ThreadSetName;
+    data.time = getRelativeTicks(pCtx);
+    data.threadID = threadID;
+    data.pFmtStr = pFmtString;
+
+    if (!numArgs)
+    {
+        constexpr auto size = GetSizeWithoutArgData<decltype(data)>();
+        data.argDataSize = 0;
+        addToTickBuffer(pCtx, &data, size);
+    }
+    else
+    {
+        va_list l;
+        va_start(l, numArgs);
+
+        auto argDataSize = BuildArgData(data.argData, pFmtString, numArgs, l);
+        data.argDataSize = static_cast<tt_int8>(argDataSize & 0xFF);
+
+        va_end(l);
+
+        addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(argDataSize));
+    }
 }
 
 bool TelemGetCallStack(TraceContexHandle ctx, TtCallStack& stackOut)
