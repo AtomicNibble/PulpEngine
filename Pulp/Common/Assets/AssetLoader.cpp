@@ -421,6 +421,12 @@ void AssetLoader::processData(AssetLoadRequest* pRequest)
     auto* pAsset = pRequest->pAsset;
     auto type = pAsset->getType();
 
+#if TTELEMETRY_ENABLED
+    auto& name = pAsset->getName();
+    ttZone(gEnv->ctx, "ProcessAsset %s -> \"%s\"", assetDb::AssetType::ToString(type), name.c_str());
+
+#endif // TTELEMETRY_ENABLED
+
     pRequest->processBegin = gEnv->pTimer->GetTimeNowReal();
 
 #if X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
