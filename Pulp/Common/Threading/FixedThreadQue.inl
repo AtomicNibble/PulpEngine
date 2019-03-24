@@ -2,6 +2,12 @@
 X_NAMESPACE_BEGIN(core)
 
 template<typename T, size_t N, typename SynchronizationPrimitive>
+FixedThreadQueBase<T, N, SynchronizationPrimitive>::FixedThreadQueBase()
+{
+    ttSetLockName(gEnv->ctx, &primitive_, "FixedThreadQueueLock");
+}
+
+template<typename T, size_t N, typename SynchronizationPrimitive>
 void FixedThreadQueBase<T, N, SynchronizationPrimitive>::clear(void)
 {
     SynchronizationPrimitive::ScopedLock lock(primitive_);

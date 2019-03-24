@@ -23,6 +23,8 @@ public:
     typedef core::FixedFifo<T, N> FixedQue;
 
 public:
+    FixedThreadQueBase();
+
     void clear(void);
     void free(void);
 

@@ -50,6 +50,7 @@ ContextManager::ContextManager(core::MemoryArenaBase* arena, ID3D12Device* pDevi
     contextPool_{arena, arena, arena, arena},
     availableContexts_{arena, arena, arena, arena}
 {
+    ttSetLockName(gEnv->ctx, &cs_, "ContextManagerLock");
 }
 
 ContextManager::~ContextManager()

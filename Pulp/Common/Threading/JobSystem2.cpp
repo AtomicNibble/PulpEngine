@@ -158,6 +158,8 @@ namespace V2
     JobSystem::JobSystem(core::MemoryArenaBase* arena) :
         arena_(arena)
     {
+        ttSetLockName(gEnv->ctx, &condCS_, "JobSystem CondCS");
+
         numThreads_ = 0;
         numQueue_ = 0;
         core::zero_object(pThreadQues_);

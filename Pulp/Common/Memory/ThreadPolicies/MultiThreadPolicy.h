@@ -13,6 +13,8 @@ public:
     static const char* const TYPE_NAME;
     static const bool IS_THREAD_SAFE = true;
 
+    MultiThreadPolicy();
+
     inline void Enter(void);
     inline void Leave(void);
 

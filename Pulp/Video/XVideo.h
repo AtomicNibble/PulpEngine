@@ -256,6 +256,8 @@ private:
             core::zero_object(vorbisComment);
             core::zero_object(vorbisDsp);
             core::zero_object(vorbisBlock);
+
+            ttSetLockName(gEnv->ctx, &audioCs, "VideoAudioLock");
         }
 
         core::V2::Job* pDecodeJob;

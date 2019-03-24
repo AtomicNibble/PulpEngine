@@ -236,6 +236,9 @@ XSound::XSound(core::MemoryArenaBase* arena) :
     pScriptBinds_(nullptr)
 {
     objects_.reserve(128);
+
+    ttSetLockName(gEnv->ctx, &cs_, "SoundLock");
+    ttSetLockName(gEnv->ctx, &memStreamCS_, "SoundMemStreamLock");
 }
 
 XSound::~XSound()

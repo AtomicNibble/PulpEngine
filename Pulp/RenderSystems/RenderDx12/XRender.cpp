@@ -71,6 +71,10 @@ XRender::XRender(core::MemoryArenaBase* arena) :
     pShaderMan_ = X_NEW(shader::XShaderManager, arena_, "ShaderMan")(arena_);
 
     adapters_.setGranularity(2);
+
+#if PSO_HOT_RELOAD
+    ttSetLockName(gEnv->ctx, &dsCS_, "DeviceStatesLock");
+#endif // !PSO_HOT_RELOAD
 }
 
 XRender::~XRender()

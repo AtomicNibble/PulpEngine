@@ -81,6 +81,7 @@ LoggerConsoleWritePolicy::LoggerConsoleWritePolicy(const Console& console) :
     console_(console.getNativeConsole()),
     cs_(50)
 {
+    ttSetLockName(gEnv->ctx, &cs_, "ConsoleLogLock");
 }
 
 void LoggerConsoleWritePolicy::Init(void)

@@ -390,6 +390,8 @@ XConsole::XConsole() :
     repeatEventTimer_ = TimeVal(0ll);
     repeatEventInterval_ = TimeVal(0.025f);
     repeatEventInitialDelay_ = TimeVal(0.5f);
+
+    ttSetLockName(gEnv->ctx, &historyFileLock_, "HistoryFileLock");
 }
 
 XConsole::~XConsole()

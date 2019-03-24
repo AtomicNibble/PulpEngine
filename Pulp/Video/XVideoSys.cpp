@@ -21,6 +21,7 @@ XVideoSys::XVideoSys(core::MemoryArenaBase* arena) :
     videos_(arena, sizeof(VideoResource), X_ALIGN_OF(VideoResource), "VideoPool"),
     pendingRequests_(arena)
 {
+    ttSetLockName(gEnv->ctx, &loadReqLock_, "VideoLoadReqLock");
 }
 
 void XVideoSys::registerVars(void)

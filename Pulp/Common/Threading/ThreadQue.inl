@@ -5,12 +5,14 @@ template<typename QueT, typename SynchronizationPrimitive>
 ThreadQueBase<QueT, SynchronizationPrimitive>::ThreadQueBase(core::MemoryArenaBase* arena) :
     que_(arena)
 {
+    ttSetLockName(gEnv->ctx, &primitive_, "ThreadQueueLock");
 }
 
 template<typename QueT, typename SynchronizationPrimitive>
 ThreadQueBase<QueT, SynchronizationPrimitive>::ThreadQueBase(core::MemoryArenaBase* arena, size_type num) :
     que_(arena, num)
 {
+    ttSetLockName(gEnv->ctx, &primitive_, "ThreadQueueLock");
 }
 
 template<typename QueT, typename SynchronizationPrimitive>

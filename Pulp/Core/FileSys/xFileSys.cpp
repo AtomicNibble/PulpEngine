@@ -187,6 +187,8 @@ xFileSys::xFileSys(core::MemoryArenaBase* arena) :
     arena->addChildArena(&asyncOpPoolArena_);
     arena->addChildArena(&virtualDirArena_);
     arena->addChildArena(&memFileArena_);
+
+    ttSetLockName(gEnv->ctx, &requestLock_, "FileSysReqLock");
 }
 
 xFileSys::~xFileSys()

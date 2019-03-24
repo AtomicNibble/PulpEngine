@@ -278,6 +278,8 @@ XPeer::XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaB
     recvDataQue_.reserve(256);
 
     connectionReqs_.setGranularity(8);
+
+    ttSetLockName(gEnv->ctx, &connectionReqsCS_, "ConnectionReqLock");
 }
 
 XPeer::~XPeer()

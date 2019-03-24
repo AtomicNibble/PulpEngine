@@ -47,6 +47,8 @@ AssetLoader::AssetLoader(core::MemoryArenaBase* arena, core::MemoryArenaBase* bl
     pendingRequests_(arena),
     pendingReloads_(arena)
 {
+    ttSetLockName(gEnv->ctx, &loadReqLock_, "AssetLdrReqLock");
+
     requestQueue_.reserve(64);
     pendingRequests_.setGranularity(32);
 
