@@ -686,7 +686,7 @@ int32_t TraceDB::handleDataPacketStringTableAdd(const DataPacketStringTableAdd* 
         indexMap[pData->id] = idx;
 
         // log warning.
-        X_WARNING_EVERY_N(10, "TelemSrv", "Recived duplicate string \"%*.s\" check string pooling is on", str.length(), str.data());
+        X_WARNING_EVERY_N(10, "TelemSrv", "Recived duplicate string \"%.*s\" check string pooling is on", str.length(), str.data());
     }
 
     return packetSize;
