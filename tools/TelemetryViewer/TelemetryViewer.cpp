@@ -2362,6 +2362,7 @@ void DrawFrame(Client& client, float ww, float wh)
                                 client.sendDataToServer(&ot, sizeof(ot));
                             }
 
+                            ImGui::Text("Locks Taken: %s", HumanNumber::toString(numStr, stats.numLockTry));
                             ImGui::Text("Allocations: %" PRId64, 0_i64);
                             ImGui::SameLine();
                             ImGui::Button("Open");
