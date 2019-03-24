@@ -13,10 +13,6 @@ namespace
 {
     typedef BOOL(WINAPI* GetProcessMemoryInfoProc)(HANDLE, PPROCESS_MEMORY_COUNTERS, DWORD);
 
-    core::CriticalSection g_lock;
-
-    core::Module::Handle g_hPSAPI = 0;
-    GetProcessMemoryInfoProc g_pGetProcessMemoryInfo = nullptr;
 } // namespace
 
 bool GetProcessMemInfo(XProcessMemInfo& info)
@@ -36,36 +32,40 @@ bool GetProcessMemInfo(XProcessMemInfo& info)
     info.TotalPhysicalMemory = mem.ullTotalPhys;
     info.FreePhysicalMemory = mem.ullAvailPhys;
 
-    core::CriticalSection::ScopedLock lock(g_lock);
+    // why do i lock here?
+    static core::CriticalSection cs;
+    core::CriticalSection::ScopedLock lock(cs);
+    
+    static core::Module::Handle hPSAPI = core::Module::Load(L"psapi.dll");
 
-    if (!g_hPSAPI) {
-        g_hPSAPI = core::Module::Load(L"psapi.dll");
-    }
-
-    if (g_hPSAPI) {
-        if (!g_pGetProcessMemoryInfo) {
-            g_pGetProcessMemoryInfo = reinterpret_cast<GetProcessMemoryInfoProc>(
-                core::Module::GetProc(g_hPSAPI, "GetProcessMemoryInfo"));
-        }
-
-        if (g_pGetProcessMemoryInfo) {
-            if (g_pGetProcessMemoryInfo(GetCurrentProcess(), &pc, sizeof(pc))) {
-                info.PageFaultCount = pc.PageFaultCount;
-                info.PeakWorkingSetSize = pc.PeakWorkingSetSize;
-                info.WorkingSetSize = pc.WorkingSetSize;
-                info.QuotaPeakPagedPoolUsage = pc.QuotaPeakPagedPoolUsage;
-                info.QuotaPagedPoolUsage = pc.QuotaPagedPoolUsage;
-                info.QuotaPeakNonPagedPoolUsage = pc.QuotaPeakNonPagedPoolUsage;
-                info.QuotaNonPagedPoolUsage = pc.QuotaNonPagedPoolUsage;
-                info.PagefileUsage = pc.PagefileUsage;
-                info.PeakPagefileUsage = pc.PeakPagefileUsage;
-                return true;
-            }
-        }
-    }
-    else {
+    if (!hPSAPI) {
         X_WARNING("Mem", "Failed to load 'psapi.dll'");
+        return false;
     }
+
+        
+    static auto pGetProcessMemoryInfo = reinterpret_cast<GetProcessMemoryInfoProc>(core::Module::GetProc(hPSAPI, "GetProcessMemoryInfo"));
+    if (!pGetProcessMemoryInfo) {
+        X_WARNING("Mem", "Failed to resolve 'GetProcessMemoryInfo'");
+        return false;
+    }
+
+    if (!pGetProcessMemoryInfo(GetCurrentProcess(), &pc, sizeof(pc))) {
+        X_WARNING("Mem", "Failed to get process memory info");
+        return false;
+    }
+
+    info.PageFaultCount = pc.PageFaultCount;
+    info.PeakWorkingSetSize = pc.PeakWorkingSetSize;
+    info.WorkingSetSize = pc.WorkingSetSize;
+    info.QuotaPeakPagedPoolUsage = pc.QuotaPeakPagedPoolUsage;
+    info.QuotaPagedPoolUsage = pc.QuotaPagedPoolUsage;
+    info.QuotaPeakNonPagedPoolUsage = pc.QuotaPeakNonPagedPoolUsage;
+    info.QuotaNonPagedPoolUsage = pc.QuotaNonPagedPoolUsage;
+    info.PagefileUsage = pc.PagefileUsage;
+    info.PeakPagefileUsage = pc.PeakPagefileUsage;
+    return true;
+    
 #endif
     return false;
 }
