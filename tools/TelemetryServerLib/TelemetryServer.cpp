@@ -358,7 +358,6 @@ bool TraceDB::createDB(core::Path<char>& path)
 
     cmdInsertZone.prepare("INSERT INTO zones (threadID, startTick, endTick, stackDepth, packedSourceInfo) VALUES(?,?,?,?,?)");
     cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
-    cmdInsertStringDyn.prepare("INSERT INTO strings_dyn (Id, value) VALUES(?, ?)");
     cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, startTick, endTick, startNano, endNano) VALUES(?,?,?,?,?)");
     cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
     cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, startTick, endTick, result, depth, packedSourceInfo) VALUES(?,?,?,?,?,?,?)");

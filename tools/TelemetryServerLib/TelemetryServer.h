@@ -42,7 +42,6 @@ public:
     TraceDB() :
         cmdInsertZone(con),
         cmdInsertString(con),
-        cmdInsertStringDyn(con),
         cmdInsertTickInfo(con),
         cmdInsertLock(con),
         cmdInsertLockTry(con),
@@ -93,7 +92,6 @@ public:
 private:
     sql::SqlLiteCmd cmdInsertZone;
     sql::SqlLiteCmd cmdInsertString;
-    sql::SqlLiteCmd cmdInsertStringDyn;
     sql::SqlLiteCmd cmdInsertTickInfo;
     sql::SqlLiteCmd cmdInsertLock;
     sql::SqlLiteCmd cmdInsertLockTry;
