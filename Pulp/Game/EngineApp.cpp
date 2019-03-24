@@ -66,6 +66,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
     params.bProfileSysEnabled = true;
     params.bIsGame = true;
     params.pCoreArena = pArena_;
+    params.bTelem = true;
 
     // enable loggers
 #if 0
