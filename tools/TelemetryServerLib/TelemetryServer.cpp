@@ -673,10 +673,21 @@ int32_t TraceDB::handleDataPacketStringTableAdd(const DataPacketStringTableAdd* 
     
     core::string_view str(pString, pData->length);
 
+    // Ah we have a problem in that if you don't have string pooling on.
+    // we end up with matching strings here that have diffrent pData->id.
+    // so we just need to make the other instances point at first one
+
     auto it = stringMap.find(str);
     if (it == stringMap.end()) {
         auto idx = addString(str);
         indexMap[pData->id] = idx;
+    }
+    else if(indexMap[pData->id] == -1) { 
+        auto idx = safe_static_cast<uint16_t>(it.getIndex());
+        indexMap[pData->id] = idx;
+
+        // log warning.
+        X_WARNING_EVERY_N(10, "TelemSrv", "Recived duplicate string \"%*.s\" check string pooling is on", str.length(), str.data());
     }
 
     return packetSize;
