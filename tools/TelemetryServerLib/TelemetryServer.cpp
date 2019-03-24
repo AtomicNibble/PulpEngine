@@ -454,7 +454,6 @@ CREATE TABLE IF NOT EXISTS "threadNames" (
     "threadId"          INTEGER NOT NULL,
     "timeTicks"         INTEGER NOT NULL,
     "fmtStrIdx"         INTEGER NOT NULL,
-    "argData"	        BLOB,
     PRIMARY KEY("Id")
 );
 
