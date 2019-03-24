@@ -493,6 +493,8 @@ void XGame::onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs)
 
 void XGame::buildSnapShot(net::SnapShot& snap)
 {
+    ttZone(gEnv->ctx, "Build Snap");
+
     snap.setTime(gameTimeMS_);
     snap.setUserCmdTimes(lastUserCmdRunTime_);
     snap.setPlayerGuids(userNetMap_.lobbyUserGuids);
@@ -509,6 +511,8 @@ void XGame::buildSnapShot(net::SnapShot& snap)
 
 void XGame::applySnapShot(const net::SnapShot& snap)
 {
+    ttZone(gEnv->ctx, "Apply Snap");
+
     // set the game state.
     {
         X_ASSERT_NOT_NULL(pMultiplayerGame_.ptr());
@@ -640,6 +644,8 @@ void XGame::setInterpolation(float fraction, int32_t serverGameTimeMS, int32_t s
 
 void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
 {
+    ttZone(gEnv->ctx, "Run UserCmd");
+
     auto dt = frame.timeInfo.deltas[core::Timer::GAME];
 
     // if the player is local

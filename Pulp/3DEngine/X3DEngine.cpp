@@ -553,6 +553,8 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
 
 void X3DEngine::renderPrimContex2D(core::FrameData& frame, IPrimativeContext::Mode mode)
 {
+    ttZone(gEnv->ctx, "Render PrimContext2D");
+
     PrimativeContextArr prims;
 
     getPrimsWithData(prims, mode);
@@ -604,6 +606,8 @@ void X3DEngine::renderPrimContex2D(core::FrameData& frame, IPrimativeContext::Mo
 void X3DEngine::addPrimsToBucket(core::FrameData& frame, render::CommandBucket<uint32_t>& primBucket,
     IPrimativeContext::Mode mode, core::span<PrimativeContext*> prims)
 {
+    ttZone(gEnv->ctx, "addPrimsToBucket");
+
     const auto is2D = mode == IPrimativeContext::Mode::Mode2D;
 
     auto* pRender = gEnv->pRender;

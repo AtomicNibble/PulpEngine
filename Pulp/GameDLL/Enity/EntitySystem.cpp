@@ -67,6 +67,8 @@ namespace entity
     {
         static_assert(decltype(reg_)::NUM_COMP == 19, "More components? add a sensible reserve call");
 
+        ttZoneFunction(gEnv->ctx);
+
         reg_.entIdReserve(MAX_ENTS);
         reg_.freelistReserve(64);
         reg_.compReserve<TransForm>(MAX_ENTS);
@@ -237,6 +239,7 @@ namespace entity
         const NetInterpolationState& netInterpolState, EntityId localPlayerId)
     {
         X_UNUSED(userCmdMan);
+        ttZoneFunction(gEnv->ctx);
 
         reg_.update(frame.timeInfo.deltas[core::Timer::GAME]);
 
