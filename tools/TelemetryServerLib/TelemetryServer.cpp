@@ -604,7 +604,7 @@ uint16_t TraceDB::addString(core::string_view str)
 uint16_t TraceDB::getStringIndex(uint16_t strIdx) const
 {
     auto idx = indexMap[strIdx];
-    X_ASSERT(idx != -1, "Index not valid")(strIdx, idx);
+    X_ASSERT(idx != std::numeric_limits<uint16_t>::max(), "Index not valid")(strIdx, idx);
     return idx;
 }
 
@@ -681,7 +681,7 @@ int32_t TraceDB::handleDataPacketStringTableAdd(const DataPacketStringTableAdd* 
         auto idx = addString(str);
         indexMap[pData->id] = idx;
     }
-    else if(indexMap[pData->id] == -1) { 
+    else if(indexMap[pData->id] == std::numeric_limits<uint16_t>::max()) {
         auto idx = safe_static_cast<uint16_t>(it.getIndex());
         indexMap[pData->id] = idx;
 
