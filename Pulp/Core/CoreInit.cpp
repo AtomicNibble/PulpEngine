@@ -759,7 +759,9 @@ bool XCore::InitAsyncWait(void)
     ttZone(gEnv->ctx, "AsynInit wait");
     X_PROFILE_NO_HISTORY_BEGIN("AsyncInitFin", core::profiler::SubSys::CORE);
 
-    X_LOG1("Core", "AsynInit wait");
+    if (gEnv->pLog) {
+        X_LOG1("Core", "AsynInit wait");
+    }
 
     // we should call all even if one fails.
     // aka we must wait for all to finish even if some fail.
