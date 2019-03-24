@@ -337,6 +337,57 @@ namespace
         return pLock;
     }
 
+    TELEM_NO_INLINE void resolveThreadName(TraceContext* pCtx)
+    {
+#if _WIN32
+        auto id = getThreadID();
+
+        HANDLE handle = OpenThread(
+            THREAD_QUERY_LIMITED_INFORMATION,
+            FALSE,
+            id
+        );
+
+        if (handle == NULL) {
+            return;
+        }
+
+        using pGetThreadDescription = HRESULT (*)(HANDLE hThread, PWSTR * ppszThreadDescription);
+
+        HMODULE hMod = ::GetModuleHandleW(L"kernel32.dll");
+
+        auto pFunc = (pGetThreadDescription)::GetProcAddress(hMod, "GetThreadDescription");
+        if (pFunc) {
+            PWSTR name;
+            auto hr = pFunc(handle, &name);
+            if (SUCCEEDED(hr)) {
+                // make it narrow.
+                char buf[MAX_STRING_LEN];
+
+                const int32_t narrowLen = WideCharToMultiByte(
+                    CP_UTF8,
+                    0,
+                    name,
+                    -1,
+                    buf,
+                    sizeof(buf),
+                    nullptr,
+                    nullptr);
+
+                if (narrowLen > 1) {
+                    ttSetThreadName(contextToHandle(pCtx), id, "%s", buf);
+                }
+
+                LocalFree(name);
+            }
+
+            ::CloseHandle(handle);
+        }
+#else
+        TELEM_UNUSED(pCtx);
+#endif // _WIN32
+    }
+
     TELEM_NO_INLINE TraceThread* addThreadData(TraceContext* pCtx)
     {
         if (pCtx->numThreadData == MAX_ZONE_THREADS) {
@@ -348,6 +399,8 @@ namespace
         auto* pThreadData = new (&pCtx->pThreadData[pCtx->numThreadData]) TraceThread();
         // set the TLS value.
         gThreadData = pThreadData;
+
+        resolveThreadName(pCtx);
 
         return pThreadData;
     }
