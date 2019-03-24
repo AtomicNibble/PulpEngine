@@ -276,7 +276,7 @@ bool XCore::FreeConverterModule(IConverterModule* pConvertModule)
 
 bool XCore::IntializeEngineModule(const char* pDllName, const char* pModuleClassName, const CoreInitParams& initParams)
 {
-    ttZone(gEnv->ctx, "ModuleInit %s", pDllName);
+    ttZone(gEnv->ctx, "ModuleInit \"%s\"", pDllName);
 
     X_PROFILE_NO_HISTORY_BEGIN("ModuleInit", core::profiler::SubSys::CORE);
 
