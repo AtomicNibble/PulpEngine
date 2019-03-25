@@ -76,6 +76,7 @@ XCore::XCore() :
 
     pCpuInfo_(nullptr),
     pCrc32_(nullptr),
+    pReplaySys_(nullptr),
 
     numFrames_(0),
 
@@ -88,7 +89,6 @@ XCore::XCore() :
     pProfiler_(nullptr),
 #endif //!X_ENABLE_PROFILER
 
-    pReplaySys_(nullptr),
     pCoreEventDispatcher_(nullptr),
 
     strAlloc_(1 << 24, core::VirtualMem::GetPageSize() * 2,
@@ -97,29 +97,6 @@ XCore::XCore() :
     args_(&coreArena_)
 {
 
-#if X_ENABLE_DIR_WATCHER
-    pDirWatcher_ = X_NEW(core::XDirectoryWatcher, &coreArena_, "CoreDirectoryWatcher")(&coreArena_);
-#else
-    pDirWatcher_ = nullptr;
-#endif // !X_ENABLE_DIR_WATCHER
-
-    pReplaySys_ = X_NEW(core::ReplaySys, &coreArena_, "ReplaySys")(&coreArena_);
-
-    pCoreEventDispatcher_ = X_NEW(core::XCoreEventDispatcher, &coreArena_, "CoreEventDispatch")(vars_, &coreArena_);
-    pCoreEventDispatcher_->RegisterListener(this);
-
-    env_.state_ = CoreGlobals::State::STARTING;
-    env_.pCore = this;
-    env_.pTimer = &time_;
-    env_.pDirWatcher = pDirWatcher_;
-    env_.pArena = &coreArena_;
-
-    env_.client_ = true;
-    env_.dedicated_ = false;
-
-    if (pDirWatcher_) {
-        pDirWatcher_->registerListener(this);
-    }
 }
 
 XCore::~XCore()

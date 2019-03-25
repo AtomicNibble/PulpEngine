@@ -64,6 +64,8 @@
 #include "FileSys\xFileSys.h"
 
 #include "SystemTimer.h"
+#include "CoreEventDispatcher.h"
+#include "ReplaySys.h"
 
 using namespace core::string_view_literals;
 
@@ -392,6 +394,28 @@ bool XCore::Init(CoreInitParams& startupParams)
 
     ttZone(gEnv->ctx, "Core Init");
 
+
+#if X_ENABLE_DIR_WATCHER
+    pDirWatcher_ = X_NEW(core::XDirectoryWatcher, &coreArena_, "CoreDirectoryWatcher")(&coreArena_);
+    pDirWatcher_->registerListener(this);
+#endif // !X_ENABLE_DIR_WATCHER
+
+    // don't want this all the time.
+    pReplaySys_ = X_NEW(core::ReplaySys, &coreArena_, "ReplaySys")(&coreArena_);
+
+    
+    pCoreEventDispatcher_ = X_NEW(core::XCoreEventDispatcher, &coreArena_, "CoreEventDispatch")(vars_, &coreArena_);
+    pCoreEventDispatcher_->RegisterListener(this);
+
+    env_.state_ = CoreGlobals::State::STARTING;
+    env_.pCore = this;
+    env_.pTimer = &time_;
+    env_.pDirWatcher = pDirWatcher_;
+    env_.pArena = &coreArena_;
+    env_.client_ = true;
+    env_.dedicated_ = false;
+
+
     static_assert(StrArena::IS_THREAD_SAFE, "Str arena must be thread safe");
     static_assert(!StrArenaST::IS_THREAD_SAFE, "Single thread StrArean don't need to be thread safe");
 
@@ -445,7 +469,6 @@ bool XCore::Init(CoreInitParams& startupParams)
     if (!ParseCmdArgs(startupParams)) {
         return false;
     }
-
 
     // #------------------------- Logging -----------------------
     if (!InitLogging(startupParams)) {
