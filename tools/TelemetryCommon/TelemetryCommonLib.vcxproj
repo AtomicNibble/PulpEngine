@@ -461,7 +461,6 @@
   <ItemGroup>
     <ClCompile Include="StringCompress.cpp" />
     <ClCompile Include="SysTimer.cpp" />
-    <ClCompile Include="TelemetryCommon.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Create</PrecompiledHeader>

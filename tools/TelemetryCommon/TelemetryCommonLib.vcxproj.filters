@@ -46,9 +46,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TelemetryCommon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="StringCompress.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
