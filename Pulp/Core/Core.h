@@ -258,13 +258,13 @@ private:
     core::GrowingGenericAllocator strAlloc_;
     core::MallocFreeAllocator malloc_;
 
-    // args
-    CmdArgs args_;
-
     core::UniquePointer<core::AssetLoader> assetLoader_;
 
     // Telem
     core::UniquePointer<uint8_t[]> telemBuf_;
+
+    // args - this is really big.
+    CmdArgs args_;
 };
 
 X_NAMESPACE_BEGIN(core)
