@@ -7,6 +7,8 @@ before_script:
   - git submodule sync --recursive
   - git submodule update --init 3rdparty/Physx_libs
   - git submodule update --init 3rdparty/Wwise_libs
+  - git submodule update --init 3rdparty/SDL2
+  - git submodule update --init 3rdparty/imgui
   - "echo off"
   - 'call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsDevCmd.bat"'
   - echo.
