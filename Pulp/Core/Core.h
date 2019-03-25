@@ -146,7 +146,6 @@ public:
     X_INLINE core::AssetLoader* GetAssetLoader(void) X_FINAL;
 
     X_INLINE CoreGlobals* GetGlobalEnv(void) X_FINAL;
-    X_INLINE core::MallocFreeAllocator* GetGlobalMalloc(void) X_FINAL;
 
     IEngineFactoryRegistry* GetFactoryRegistry(void) const X_FINAL;
 

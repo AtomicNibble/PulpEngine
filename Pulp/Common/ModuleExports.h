@@ -16,11 +16,9 @@
 
 #if defined(X_LIB) && !defined(_LAUNCHER)
 extern CoreGlobals* gEnv;
-extern core::MallocFreeAllocator* gMalloc;
 #else // !X_LIB
 
 CoreGlobals* gEnv = nullptr;
-core::MallocFreeAllocator* gMalloc = nullptr;
 
 #if !defined(X_LIB)
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
@@ -47,7 +45,6 @@ extern "C" DLL_EXPORT void LinkModule(ICore* pCore, const char* moduleName)
 
     if (pCore) {
         gEnv = pCore->GetGlobalEnv();
-        gMalloc = pCore->GetGlobalMalloc();
     }
 
 #if !defined(X_LIB)

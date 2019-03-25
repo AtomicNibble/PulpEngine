@@ -428,7 +428,6 @@ struct ICore
     virtual IEngineFactoryRegistry* GetFactoryRegistry(void) const X_ABSTRACT;
 
     virtual CoreGlobals* GetGlobalEnv(void) X_ABSTRACT;
-    virtual core::MallocFreeAllocator* GetGlobalMalloc(void) X_ABSTRACT;
 
     virtual core::ITimer* GetITimer(void) X_ABSTRACT;
     virtual input::IInput* GetIInput(void) X_ABSTRACT;
@@ -460,7 +459,6 @@ struct ICore
 };
 
 extern CoreGlobals* gEnv;
-extern core::MallocFreeAllocator* gMalloc;
 
 #if defined(X_CVAR_NO_DESCRIPTION) && X_CVAR_NO_DESCRIPTION == 1
 #define CVAR_DESC(_desc) core::string_view()

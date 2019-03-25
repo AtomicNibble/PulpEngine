@@ -93,8 +93,3 @@ X_INLINE CoreGlobals* XCore::GetGlobalEnv(void)
 {
     return &env_;
 }
-
-X_INLINE core::MallocFreeAllocator* XCore::GetGlobalMalloc(void)
-{
-    return &malloc_;
-}
