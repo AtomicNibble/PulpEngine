@@ -478,7 +478,7 @@ bool XCore::Init(CoreInitParams& startupParams)
 
     // #------------------------- Create Console ----------------
     if (!startupParams.isCoreOnly() || startupParams.basicConsole()) {
-        env_.pConsole = X_NEW(core::XConsole, g_coreArena, "ConsoleSys");
+        env_.pConsole = X_NEW(core::XConsole, g_coreArena, "ConsoleSys")(g_coreArena);
         // register the commands so they can be used before Console::Init
         env_.pConsole->registerVars();
         env_.pConsole->registerCmds();

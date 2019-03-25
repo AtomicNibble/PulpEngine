@@ -160,7 +160,7 @@ public:
     typedef consoleState consoleState;
 
 public:
-    XConsole();
+    XConsole(core::MemoryArenaBase* arena);
 
     ~XConsole() X_FINAL;
 
@@ -313,6 +313,7 @@ private:
     void Command_SaveModifiedVars(IConsoleCmdArgs* Cmd);
 
 private:
+    core::MemoryArenaBase* arena_;
     core::HeapArea varHeap_;
     core::PoolAllocator varAllocator_;
     VarPool varArena_;

@@ -346,7 +346,8 @@ XConsole::Cursor::Cursor() :
 
 //////////////////////////////////////////////////////////////////////////
 
-XConsole::XConsole() :
+XConsole::XConsole(core::MemoryArenaBase* arena) :
+    arena_(arena),
     varHeap_(
         bitUtil::RoundUpToMultiple<size_t>(
             VarPool::getMemoryRequirement(VAR_ALLOCATION_SIZE) * MAX_CONSOLE_VAR,
@@ -356,24 +357,24 @@ XConsole::XConsole() :
         VarPool::getMemoryAlignmentRequirement(VAR_ALLOCATION_ALIGNMENT),
         VarPool::getMemoryOffsetRequirement()),
     varArena_(&varAllocator_, "VarArena"),
-    cmdHistory_(g_coreArena),
-    consoleLog_(g_coreArena),
-    varMap_(g_coreArena, bitUtil::NextPowerOfTwo(MAX_CONSOLE_VAR * 2)),
-    cmdMap_(g_coreArena, bitUtil::NextPowerOfTwo(MAX_CONSOLE_CMD * 2)),
-    binds_(g_coreArena, bitUtil::NextPowerOfTwo(MAX_CONSOLE_BINS * 2)),
-    configCmds_(g_coreArena, 256),
-    varArchive_(g_coreArena, 256),
-    pendingCmdsQueue_(g_coreArena),
+    cmdHistory_(arena_),
+    consoleLog_(arena_),
+    varMap_(arena_, bitUtil::NextPowerOfTwo(MAX_CONSOLE_VAR * 2)),
+    cmdMap_(arena_, bitUtil::NextPowerOfTwo(MAX_CONSOLE_CMD * 2)),
+    binds_(arena_, bitUtil::NextPowerOfTwo(MAX_CONSOLE_BINS * 2)),
+    configCmds_(arena_, 256),
+    varArchive_(arena_, 256),
+    pendingCmdsQueue_(arena_),
     coreEventListernRegd_(false),
     historyLoadPending_(false),
     historyFileSize_(0),
-    historyFileBuf_(g_coreArena)
+    historyFileBuf_(arena_)
 {
     historyPos_ = 0;
     cursorPos_ = 0;
     scrollPos_ = 0;
 
-    g_coreArena->addChildArena(&varArena_);
+    arena_->addChildArena(&varArena_);
 
     consoleState_ = consoleState::CLOSED;
 
@@ -396,7 +397,7 @@ XConsole::XConsole() :
 
 XConsole::~XConsole()
 {
-    g_coreArena->removeChildArena(&varArena_);
+    arena_->removeChildArena(&varArena_);
 }
 
 void XConsole::registerVars(void)
@@ -589,8 +590,8 @@ void XConsole::saveChangedVars(void)
     // so it won't get saved out into the new one.
     // so i'm going to parse the exsisting config and keep any var sets that are for vars that don't currently exsist.
 
-    core::Array<char> buf(g_coreArena);
-    core::ArrayGrowMultiply<core::StringRange<char>> keep(g_coreArena);
+    core::Array<char> buf(arena_);
+    core::ArrayGrowMultiply<core::StringRange<char>> keep(arena_);
 
     if (gEnv->pFileSys->fileExists(userConfigPath, core::VirtualDirectory::SAVE)) {
         if (file.openFile(userConfigPath, FileFlag::READ | FileFlag::SHARE, core::VirtualDirectory::SAVE)) {
@@ -630,7 +631,7 @@ void XConsole::saveChangedVars(void)
         }
     }
 
-    core::ByteStream stream(g_coreArena);
+    core::ByteStream stream(arena_);
     stream.reserve(4096);
     stream.write("// auto generated\n", sizeof("// auto generated\n") - 1);
 
@@ -924,7 +925,7 @@ bool XConsole::loadAndExecConfigFile(core::string_view fileName)
         return true;
     }
 
-    core::Array<char, core::ArrayAlignedAllocator<char>> data(g_coreArena);
+    core::Array<char, core::ArrayAlignedAllocator<char>> data(arena_);
     data.getAllocator().setBaseAlignment(16);
     data.resize(bytes + 2);
 
@@ -1642,7 +1643,7 @@ void XConsole::saveCmdHistory(void) const
     X_ASSERT_NOT_NULL(gEnv);
     X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-    core::ByteStream stream(g_coreArena);
+    core::ByteStream stream(arena_);
     stream.reserve(0x100);
 
     for (auto& str : cmdHistory_) {
@@ -1683,7 +1684,7 @@ void XConsole::loadCmdHistory(bool async)
         open.callback.Bind<XConsole, &XConsole::historyIoRequestCallback>(this);
         open.mode = mode;
         open.path = CMD_HISTORY_FILE_NAME;
-        open.arena = g_coreArena;
+        open.arena = arena_;
 
         gEnv->pFileSys->AddIoRequestToQue(open);
     }
@@ -2554,7 +2555,7 @@ void XConsole::OnCoreEvent(const CoreEventData& ed)
 
 void XConsole::listCommands(core::string_view searchPattern)
 {
-    core::Array<const ConsoleCommand*> sorted_cmds(g_coreArena);
+    core::Array<const ConsoleCommand*> sorted_cmds(arena_);
     sorted_cmds.setGranularity(cmdMap_.size());
 
     for (const auto& it : cmdMap_) {
@@ -2579,7 +2580,7 @@ void XConsole::listCommands(core::string_view searchPattern)
 
 void XConsole::listVariables(core::string_view searchPattern)
 {
-    core::Array<const ICVar*> sorted_vars(g_coreArena);
+    core::Array<const ICVar*> sorted_vars(arena_);
     sorted_vars.setGranularity(varMap_.size());
 
     for (const auto& it : varMap_) {
@@ -2607,7 +2608,7 @@ void XConsole::listVariables(core::string_view searchPattern)
 
 void XConsole::listVariablesValues(core::string_view searchPattern)
 {
-    core::Array<const ICVar*> sorted_vars(g_coreArena);
+    core::Array<const ICVar*> sorted_vars(arena_);
     sorted_vars.setGranularity(varMap_.size());
 
     for (const auto& it : varMap_) {
