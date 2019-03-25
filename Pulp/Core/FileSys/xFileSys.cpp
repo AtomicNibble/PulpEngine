@@ -250,7 +250,7 @@ void xFileSys::shutDown(void)
                 X_DELETE_AND_NULL(pCur->pPak->pFile, &filePoolArena_);
             }
 
-            X_DELETE(pCur->pPak, g_coreArena);
+            X_DELETE(pCur->pPak, arena_);
         }
         X_DELETE(pCur, &virtualDirArena_);
     }
@@ -1850,7 +1850,7 @@ bool xFileSys::openPak(const PathT& relPath)
     const size_t stringBlockSize = hdr.entryTableOffset - hdr.stringDataOffset;
     const size_t dataSize = safe_static_cast<size_t>(pakMode == PakMode::MEMORY ? hdr.size : hdr.dataOffset);
 
-    auto pPak = core::makeUnique<Pak>(g_coreArena, g_coreArena);
+    auto pPak = core::makeUnique<Pak>(arena_, arena_);
     pPak->name.set(relPath.fileName());
     pPak->mode = pakMode;
     pPak->pFile = pFile;
