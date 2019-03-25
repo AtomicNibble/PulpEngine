@@ -28,8 +28,7 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 }
 #endif // !X_LIB
 
-extern "C" {
-IPCORE_API ICore* CreateCoreInterface(CoreInitParams& startupParams)
+extern "C" IPCORE_API ICore* CreateCoreInterface(CoreInitParams& startupParams)
 {
     X_ASSERT_NOT_NULL(startupParams.pCoreArena);
 
@@ -64,5 +63,4 @@ IPCORE_API ICore* CreateCoreInterface(CoreInitParams& startupParams)
     }
 
     return pCore;
-}
 }
