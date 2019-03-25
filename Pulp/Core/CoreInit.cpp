@@ -358,7 +358,7 @@ bool XCore::Init(CoreInitParams& startupParams)
 #if TTELEMETRY_ENABLED
 
     const size_t telemBufSize = 1024 * 1024 * 4;
-    telemBuf_ = core::makeUnique<uint8_t[]>(g_coreArena, telemBufSize, 64);
+    telemBuf_ = core::makeUnique<uint8_t[]>(&coreArena_, telemBufSize, 64);
 
     ttInitializeContext(gEnv->ctx, telemBuf_.ptr(), telemBufSize);
 
@@ -395,10 +395,10 @@ bool XCore::Init(CoreInitParams& startupParams)
     static_assert(!StrArenaST::IS_THREAD_SAFE, "Single thread StrArean don't need to be thread safe");
 
     if (initParams_.bThreadSafeStringAlloc) {
-        env_.pStrArena = X_NEW(StrArena, g_coreArena, "StrArena")(&strAlloc_, "StrArena");
+        env_.pStrArena = X_NEW(StrArena, &coreArena_, "StrArena")(&strAlloc_, "StrArena");
     }
     else {
-        env_.pStrArena = X_NEW(StrArenaST, g_coreArena, "StrArena")(&strAlloc_, "StrArenaST");
+        env_.pStrArena = X_NEW(StrArenaST, &coreArena_, "StrArena")(&strAlloc_, "StrArenaST");
     }
 
     // init the system baby!
@@ -411,7 +411,7 @@ bool XCore::Init(CoreInitParams& startupParams)
 
     if (startupParams.bProfileSysEnabled) {
 #if X_ENABLE_PROFILER
-        pProfiler_ = X_NEW(core::profiler::XProfileSys, g_coreArena, "ProfileSys")(g_coreArena);
+        pProfiler_ = X_NEW(core::profiler::XProfileSys, &coreArena_, "ProfileSys")(&coreArena_);
 
         env_.pProfiler = pProfiler_;
 #endif // !X_ENABLE_PROFILER
@@ -463,7 +463,7 @@ bool XCore::Init(CoreInitParams& startupParams)
 
     // #------------------------- JOB SYSTEM ------------------------
     if (startupParams.jobSystemEnabled()) {
-        env_.pJobSys = X_NEW(core::V2::JobSystem, g_coreArena, "JobSystem")(g_coreArena);
+        env_.pJobSys = X_NEW(core::V2::JobSystem, &coreArena_, "JobSystem")(&coreArena_);
     }
 
     // #------------------------- FileSystem --------------------
@@ -478,7 +478,7 @@ bool XCore::Init(CoreInitParams& startupParams)
 
     // #------------------------- Create Console ----------------
     if (!startupParams.isCoreOnly() || startupParams.basicConsole()) {
-        env_.pConsole = X_NEW(core::XConsole, g_coreArena, "ConsoleSys")(g_coreArena);
+        env_.pConsole = X_NEW(core::XConsole, &coreArena_, "ConsoleSys")(&coreArena_);
         // register the commands so they can be used before Console::Init
         env_.pConsole->registerVars();
         env_.pConsole->registerCmds();
@@ -490,7 +490,7 @@ bool XCore::Init(CoreInitParams& startupParams)
         // use a null console saves me adding a branch
         // for every var register command.
         // and i'm still able to detect var registers before core is init. :)
-        env_.pConsole = X_NEW(core::XConsoleNULL, g_coreArena, "NullConsole");
+        env_.pConsole = X_NEW(core::XConsoleNULL, &coreArena_, "NullConsole");
     }
 
     // we always register the vars even if console null.
@@ -540,9 +540,9 @@ bool XCore::Init(CoreInitParams& startupParams)
     }
 
     // #------------------------- CPU Info ----------------------
-    pCpuInfo_ = X_NEW(core::CpuInfo, g_coreArena, "CpuInfo");
+    pCpuInfo_ = X_NEW(core::CpuInfo, &coreArena_, "CpuInfo");
     // #------------------------- Crc32 ----------------------
-    pCrc32_ = X_NEW(core::Crc32, g_coreArena, "Crc32");
+    pCrc32_ = X_NEW(core::Crc32, &coreArena_, "Crc32");
 
     // Call init on objects from before so they can register vars.
     env_.pLog->Init();
@@ -570,7 +570,7 @@ bool XCore::Init(CoreInitParams& startupParams)
 
         // #------------------------- Locale ------------------------
         {
-            auto loc = core::makeUnique<locale::Localisation>(g_coreArena, g_coreArena);
+            auto loc = core::makeUnique<locale::Localisation>(&coreArena_, &coreArena_);
 
             // TODO: support other langs :D
             core::Path<char> path("strings/english/str.json");
@@ -584,7 +584,7 @@ bool XCore::Init(CoreInitParams& startupParams)
         }
 
         // #------------------------- AssetLoader ------------------------
-        assetLoader_ = core::makeUnique<core::AssetLoader>(g_coreArena, g_coreArena, g_coreArena);
+        assetLoader_ = core::makeUnique<core::AssetLoader>(&coreArena_, &coreArena_, &coreArena_);
 
         // #------------------------- Input ------------------------
         if (!InitInput(startupParams)) {
@@ -644,7 +644,7 @@ bool XCore::Init(CoreInitParams& startupParams)
 
     if (!startupParams.bTesting && !startupParams.isCoreOnly()) {
         // create a window
-        pWindow_ = X_NEW(core::Window, g_coreArena, "GameWindow");
+        pWindow_ = X_NEW(core::Window, &coreArena_, "GameWindow");
 
         wchar_t titleW[128];
         const char* pTitle = X_ENGINE_NAME " Engine " X_CPUSTRING
@@ -884,7 +884,7 @@ bool XCore::InitFileSys(const CoreInitParams& initParams)
     ttZoneFunction(gEnv->ctx);
 
     X_UNUSED(initParams);
-    env_.pFileSys = X_NEW_ALIGNED(core::xFileSys, g_coreArena, "FileSys", 8)(g_coreArena);
+    env_.pFileSys = X_NEW_ALIGNED(core::xFileSys, &coreArena_, "FileSys", 8)(&coreArena_);
 
     if (env_.pFileSys) {
         if (!env_.pFileSys->init(initParams)) {
@@ -903,12 +903,12 @@ bool XCore::InitLogging(const CoreInitParams& initParams)
 {
     ttZoneFunction(gEnv->ctx);
 
-    env_.pLog = X_NEW_ALIGNED(core::XLog, g_coreArena, "LogSystem", 8);
+    env_.pLog = X_NEW_ALIGNED(core::XLog, &coreArena_, "LogSystem", 8);
 
 #if X_ENABLE_LOGGING
     if (env_.pLog) {
         if (initParams.bVsLog) {
-            pVsLogger_ = X_NEW(VisualStudioLogger, g_coreArena, "VSLogger");
+            pVsLogger_ = X_NEW(VisualStudioLogger, &coreArena_, "VSLogger");
             env_.pLog->AddLogger(pVsLogger_);
         }
         if (initParams.bConsoleLog) {
@@ -916,14 +916,14 @@ bool XCore::InitLogging(const CoreInitParams& initParams)
             const auto& desc = initParams.consoleDesc;
             {
                 ttZone(gEnv->ctx, "Create Console window");
-                pConsole_ = X_NEW(core::Console, g_coreArena, "ExternalConsoleLog")(core::string_view(desc.pTitle));
+                pConsole_ = X_NEW(core::Console, &coreArena_, "ExternalConsoleLog")(core::string_view(desc.pTitle));
             }
             pConsole_->setSize(desc.windowWidth, desc.windowHeight, desc.numLines);
             pConsole_->moveTo(desc.x, desc.y);
             
             env_.pConsoleWnd = pConsole_;
 
-            pConsoleLogger_ = X_NEW(ConsoleLogger, g_coreArena, "ConsoleLogger")(
+            pConsoleLogger_ = X_NEW(ConsoleLogger, &coreArena_, "ConsoleLogger")(
                 ConsoleLogger::FilterPolicy(2, "console"),
                 ConsoleLogger::FormatPolicy(),
                 ConsoleLogger::WritePolicy(*pConsole_));
@@ -945,7 +945,7 @@ bool XCore::InitFileLogging(const CoreInitParams& initParams)
 
         core::Path<> path("log.txt");
 
-        pFileLogger_ = X_NEW(FileLogger, g_coreArena, "FileLogger")(
+        pFileLogger_ = X_NEW(FileLogger, &coreArena_, "FileLogger")(
             FileLogger::FilterPolicy(),
             FileLogger::FormatPolicy(),
             FileLogger::WritePolicy(env_.pFileSys, path));
@@ -979,7 +979,7 @@ bool XCore::InitInput(const CoreInitParams& initParams)
     ttZoneFunction(gEnv->ctx);
 
     if (initParams.bSkipInput) {
-        env_.pInput = X_NEW(input::XNullInput, g_coreArena, "NullInput");
+        env_.pInput = X_NEW(input::XNullInput, &coreArena_, "NullInput");
         return true;
     }
 

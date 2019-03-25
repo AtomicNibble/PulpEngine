@@ -37,10 +37,11 @@ namespace
 
 } // namespace
 
-XPakFileAsync::XPakFileAsync(Pak* pPack, const AssetPak::APakEntry& entry, core::MemoryArenaBase* asyncOpArena) :
+XPakFileAsync::XPakFileAsync(Pak* pPack, const AssetPak::APakEntry& entry, core::MemoryArenaBase* asyncOpArena, core::MemoryArenaBase* inflationArena) :
+    overlappedArena_(asyncOpArena),
+    inflationArena_(inflationArena),
     pPak_(pPack),
-    entry_(entry),
-    overlappedArena_(asyncOpArena)
+    entry_(entry)
 {
     ++pPak_->openHandles;
 }
@@ -97,7 +98,7 @@ XFileAsyncOperation XPakFileAsync::readAsync(void* pBuffer, size_t length, uint6
 
         if (entry_.isCompressed()) {
             InflateJobData data;
-            data.arena = g_coreArena;
+            data.arena = inflationArena_; // TODO: change to something thats thread safe?
             data.pBuffer = pSrc;
             data.length = entry_.size;
             data.pDst = pBuffer;

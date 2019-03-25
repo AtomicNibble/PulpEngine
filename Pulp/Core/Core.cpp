@@ -25,9 +25,12 @@
 #include <Platform\MessageBox.h>
 #include <Debugging\InvalidParameterHandler.h>
 #include <Debugging\CallStack.h>
-#include <Memory\VirtualMem.h>
 #include <String\HumanSize.h>
 #include <Time\StopWatch.h>
+
+#include <Memory/VirtualMem.h>
+#include <Memory/AllocationPolicies/LinearAllocator.h>
+#include <Memory/SimpleMemoryArena.h>
 
 #include <Console.h>
 
@@ -45,9 +48,25 @@ using namespace core::string_view_literals;
 #endif // !X_PLATFORM_WIN32
 
 
+namespace
+{
+    char buf[core::bitUtil::RoundUpToMultiple<size_t>(sizeof(XCore), 128)];
+
+    core::LinearAllocator linera(buf, buf + sizeof(buf));
+    core::SimpleMemoryArena<decltype(linera)> coreInstArena(&linera, "CoreAllocator");
+
+} // namespace
+
+
 CoreGlobals XCore::env_;
 
+XCore* XCore::CreateInstance(void)
+{
+    return X_NEW_ALIGNED(XCore, &coreInstArena, "XCore", core::Max(X_ALIGN_OF(XCore), 64_sz));
+}
+
 XCore::XCore() :
+    coreArena_(&coreMalloc_, "CoreAlloc"),
     pWindow_(nullptr),
     pConsole_(nullptr),
 
@@ -60,10 +79,10 @@ XCore::XCore() :
 
     numFrames_(0),
 
-    moduleDLLHandles_(g_coreArena),
-    moduleInterfaces_(g_coreArena),
-    converterInterfaces_(g_coreArena),
-    assertHandlers_(g_coreArena),
+    moduleDLLHandles_(&coreArena_),
+    moduleInterfaces_(&coreArena_),
+    converterInterfaces_(&coreArena_),
+    assertHandlers_(&coreArena_),
 
 #if X_ENABLE_PROFILER
     pProfiler_(nullptr),
@@ -74,26 +93,26 @@ XCore::XCore() :
 
     strAlloc_(1 << 24, core::VirtualMem::GetPageSize() * 2,
         StrArena::getMemoryAlignmentRequirement(8),
-        StrArena::getMemoryOffsetRequirement() + 12)
+        StrArena::getMemoryOffsetRequirement() + 12),
+    args_(&coreArena_)
 {
-    X_ASSERT_NOT_NULL(g_coreArena);
 
 #if X_ENABLE_DIR_WATCHER
-    pDirWatcher_ = X_NEW(core::XDirectoryWatcher, g_coreArena, "CoreDirectoryWatcher")(g_coreArena);
+    pDirWatcher_ = X_NEW(core::XDirectoryWatcher, &coreArena_, "CoreDirectoryWatcher")(&coreArena_);
 #else
     pDirWatcher_ = nullptr;
 #endif // !X_ENABLE_DIR_WATCHER
 
-    pReplaySys_ = X_NEW(core::ReplaySys, g_coreArena, "ReplaySys")(g_coreArena);
+    pReplaySys_ = X_NEW(core::ReplaySys, &coreArena_, "ReplaySys")(&coreArena_);
 
-    pCoreEventDispatcher_ = X_NEW(core::XCoreEventDispatcher, g_coreArena, "CoreEventDispatch")(vars_, g_coreArena);
+    pCoreEventDispatcher_ = X_NEW(core::XCoreEventDispatcher, &coreArena_, "CoreEventDispatch")(vars_, &coreArena_);
     pCoreEventDispatcher_->RegisterListener(this);
 
     env_.state_ = CoreGlobals::State::STARTING;
     env_.pCore = this;
     env_.pTimer = &time_;
     env_.pDirWatcher = pDirWatcher_;
-    env_.pArena = g_coreArena;
+    env_.pArena = &coreArena_;
 
     env_.client_ = true;
     env_.dedicated_ = false;
@@ -115,7 +134,7 @@ XCore::~XCore()
 
 void XCore::Release()
 {
-    X_DELETE(this, g_coreArena);
+    X_DELETE(this, &coreInstArena);
 }
 
 void XCore::ShutDown()
@@ -140,7 +159,7 @@ void XCore::ShutDown()
 
     if (pDirWatcher_) {
         pDirWatcher_->shutDown();
-        X_DELETE(pDirWatcher_, g_coreArena);
+        X_DELETE(pDirWatcher_, &coreArena_);
     }
 
     // save the vars before we start deleting things.
@@ -150,7 +169,7 @@ void XCore::ShutDown()
 
     if (env_.pJobSys) {
         env_.pJobSys->ShutDown();
-        core::Mem::DeleteAndNull(env_.pJobSys, g_coreArena);
+        core::Mem::DeleteAndNull(env_.pJobSys, &coreArena_);
     }
 
     if (env_.pGame) {
@@ -202,30 +221,30 @@ void XCore::ShutDown()
     }
 
     if (env_.pLocalisation) {
-        core::Mem::DeleteAndNull(env_.pLocalisation, g_coreArena);
+        core::Mem::DeleteAndNull(env_.pLocalisation, &coreArena_);
     }
 
     if (pWindow_) {
         pWindow_->Destroy();
-        core::Mem::DeleteAndNull(pWindow_, g_coreArena);
+        core::Mem::DeleteAndNull(pWindow_, &coreArena_);
     }
 
     if (pCpuInfo_) {
-        core::Mem::DeleteAndNull(pCpuInfo_, g_coreArena);
+        core::Mem::DeleteAndNull(pCpuInfo_, &coreArena_);
     }
 
     if (pCrc32_) {
-        core::Mem::DeleteAndNull(pCrc32_, g_coreArena);
+        core::Mem::DeleteAndNull(pCrc32_, &coreArena_);
     }
 
     if (pReplaySys_) {
-        core::Mem::DeleteAndNull(pReplaySys_, g_coreArena);
+        core::Mem::DeleteAndNull(pReplaySys_, &coreArena_);
     }
 
 #if X_ENABLE_PROFILER
     if (pProfiler_) {
         pProfiler_->shutDown();
-        core::Mem::DeleteAndNull(pProfiler_, g_coreArena);
+        core::Mem::DeleteAndNull(pProfiler_, &coreArena_);
     }
 #endif // !X_ENABLE_PROFILER
 
@@ -236,12 +255,12 @@ void XCore::ShutDown()
             env_.pLog->RemoveLogger(pFileLogger_);
         }
 
-        X_DELETE(pFileLogger_, g_coreArena);
+        X_DELETE(pFileLogger_, &coreArena_);
     }
 
     if (env_.pFileSys) {
         env_.pFileSys->shutDown();
-        core::Mem::DeleteAndNull(env_.pFileSys, g_coreArena);
+        core::Mem::DeleteAndNull(env_.pFileSys, &coreArena_);
     }
 
     // needs to be done after engine, since it has input listners.
@@ -284,11 +303,11 @@ void XCore::ShutDown()
 
     if (env_.pConsole) {
         env_.pConsole->shutDown();
-        core::Mem::DeleteAndNull(env_.pConsole, g_coreArena);
+        core::Mem::DeleteAndNull(env_.pConsole, &coreArena_);
     }
 
     if (env_.pStrArena) {
-        core::Mem::DeleteAndNull(env_.pStrArena, g_coreArena);
+        core::Mem::DeleteAndNull(env_.pStrArena, &coreArena_);
     }
 
     // Loggers last.
@@ -306,16 +325,16 @@ void XCore::ShutDown()
 
         //	system("PAUSE");
 
-        X_DELETE(pVsLogger_, g_coreArena);
-        X_DELETE(pConsoleLogger_, g_coreArena);
-        X_DELETE(pConsole_, g_coreArena);
+        X_DELETE(pVsLogger_, &coreArena_);
+        X_DELETE(pConsoleLogger_, &coreArena_);
+        X_DELETE(pConsole_, &coreArena_);
 
-        core::Mem::DeleteAndNull(env_.pLog, g_coreArena);
+        core::Mem::DeleteAndNull(env_.pLog, &coreArena_);
     }
 
     if (pCoreEventDispatcher_) {
         pCoreEventDispatcher_->RemoveListener(this);
-        core::Mem::DeleteAndNull(pCoreEventDispatcher_, g_coreArena);
+        core::Mem::DeleteAndNull(pCoreEventDispatcher_, &coreArena_);
     }
 
     for (size_t i = 0; i < moduleDLLHandles_.size(); i++) {
@@ -643,9 +662,9 @@ void XCore::LogSystemInfo(void) const
     X_LOG0("Core", "TimerFreq: %" PRIi64, core::SysTimer::GetTickPerSec());
 }
 
-void XCore::ListDisplayDevices(bool verbose) const
+void XCore::ListDisplayDevices(bool verbose)
 {
-    core::SysInfo::DisplayDeviceArr devices(g_coreArena);
+    core::SysInfo::DisplayDeviceArr devices(&coreArena_);
     core::SysInfo::GetDisplayDevices(devices);
 
     X_LOG0("SysInfo", "DisplayDevices: %" PRIuS, devices.size());

@@ -1,10 +1,7 @@
 #include "StdAfx.h"
-
-#include <ModuleExports.h>
-
 #include "Core.h"
 
-core::MemoryArenaBase* g_coreArena = nullptr;
+#include <ModuleExports.h>
 
 #if !defined(X_LIB)
 BOOL APIENTRY DllMain(HANDLE hModule,
@@ -30,15 +27,10 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 
 extern "C" IPCORE_API ICore* CreateCoreInterface(CoreInitParams& startupParams)
 {
-    X_ASSERT_NOT_NULL(startupParams.pCoreArena);
-
-    g_coreArena = startupParams.pCoreArena;
-
-    if (!g_coreArena) {
+    auto* pCore = XCore::CreateInstance();
+    if (!pCore) {
         return nullptr;
     }
-
-    auto* pCore = X_NEW_ALIGNED(XCore, startupParams.pCoreArena, "XCore", core::Max<size_t>(X_ALIGN_OF(XCore), 16));
 
     LinkModule(pCore, "Core");
 

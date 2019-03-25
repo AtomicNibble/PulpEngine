@@ -410,7 +410,7 @@ XFileAsync* xFileSys::openFileAsync(const PathT& relPath, FileFlags mode, Virtua
             }
 
             auto& entry = pPak->pEntires[idx];
-            return X_NEW(XPakFileAsync, &filePoolArena_, "PakFile")(pPak, entry, &asyncOpPoolArena_);
+            return X_NEW(XPakFileAsync, &filePoolArena_, "PakFile")(pPak, entry, &asyncOpPoolArena_, arena_);
         },
         [&](const PathWT& osPath, FileFlags mode) -> XFileAsync* {
             if (isDebug()) {

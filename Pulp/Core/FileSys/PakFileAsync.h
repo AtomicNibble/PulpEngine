@@ -64,7 +64,8 @@ The behaviour of this is diffrent for the following cases:
 class XPakFileAsync : public XFileAsync
 {
 public:
-    XPakFileAsync(Pak* pPack, const AssetPak::APakEntry& entry, core::MemoryArenaBase* asyncOpArena);
+    XPakFileAsync(Pak* pPack, const AssetPak::APakEntry& entry, 
+        core::MemoryArenaBase* asyncOpArena, core::MemoryArenaBase* inflationArena);
     ~XPakFileAsync() X_FINAL;
 
     bool valid(void) const;
@@ -100,6 +101,7 @@ private:
 
 private:
     core::MemoryArenaBase* overlappedArena_;
+    core::MemoryArenaBase* inflationArena_;
     Pak* pPak_;
     const AssetPak::APakEntry& entry_;
 };

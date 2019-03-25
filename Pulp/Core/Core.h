@@ -75,6 +75,20 @@ typedef core::MemoryArena<
     StrArena::MemoryTaggingPolicy>
     StrArenaST;
 
+typedef core::MemoryArena<
+    core::MallocFreeAllocator,
+    core::MultiThreadPolicy<core::CriticalSection>,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+    core::SimpleBoundsChecking,
+    core::SimpleMemoryTracking,
+    core::SimpleMemoryTagging
+#else
+    core::NoBoundsChecking,
+    core::NoMemoryTracking,
+    core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+    >
+    CoreArena;
 
 class XCore : public ICore
     , public core::IDirectoryWatcherListener
@@ -104,11 +118,13 @@ class XCore : public ICore
     
     typedef core::Array<core::string> HotRelodIgnoreArr;
     typedef core::CmdArgs<1024, wchar_t> CmdArg;
-    typedef core::FixedArray<CmdArg, MAX_CMD_ARS> CmdArgs;
+    typedef core::Array<CmdArg> CmdArgs;
 
 public:
     XCore();
     ~XCore() X_FINAL;
+
+    static XCore* CreateInstance(void);
 
     bool Init(CoreInitParams& startupParams) X_FINAL;
     bool InitAsyncWait(void) X_FINAL;
@@ -198,7 +214,7 @@ private:
 
     void ListProgramArgs(void);
     void LogSystemInfo(void) const;
-    void ListDisplayDevices(bool verbose) const;
+    void ListDisplayDevices(bool verbose);
 
     void Job_DirectoryWatcher(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
@@ -222,6 +238,10 @@ private:
     static CoreGlobals env_;
 
 private:
+    // Need to be at top.
+    core::MallocFreeAllocator coreMalloc_;
+    CoreArena coreArena_;
+
     core::CoreVars vars_;
     core::Window* pWindow_;
     core::Console* pConsole_;
@@ -255,15 +275,16 @@ private:
     CoreInitParams initParams_;
 
     core::GrowingGenericAllocator strAlloc_;
-    core::MallocFreeAllocator malloc_;
 
     core::UniquePointer<core::AssetLoader> assetLoader_;
 
+    // args
+    CmdArgs args_;
+
+#if TTELEMETRY_ENABLED
     // Telem
     core::UniquePointer<uint8_t[]> telemBuf_;
-
-    // args - this is really big.
-    CmdArgs args_;
+#endif // TTELEMTRY_ENABLED
 };
 
 X_NAMESPACE_BEGIN(core)
