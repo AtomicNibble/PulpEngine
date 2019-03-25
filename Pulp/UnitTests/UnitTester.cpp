@@ -70,17 +70,18 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 {
     int nRes = -1; // if we never run the tests that is also a fail.
 
-    core::MallocFreeAllocator allocator;
-    UnitTestArena arena(&allocator, "UintTestArena");
-
-    g_arena = &arena;
-
     {
         EngineApp engine;
 
-        if (engine.Init(hInstance, lpCmdLine)) 
+        if (engine.Init(hInstance, lpCmdLine))
         {
             gEnv->pConsoleWnd->redirectSTD();
+
+            core::MallocFreeAllocator allocator;
+            UnitTestArena arena(&allocator, "UintTestArena");
+
+            g_arena = &arena;
+
             {
                 X_ASSERT_NOT_NULL(gEnv);
                 X_ASSERT_NOT_NULL(gEnv->pCore);
