@@ -4,6 +4,8 @@
 #include <Time\TimeVal.h>
 #include <Threading\Signal.h>
 
+#include <IInput.h>
+
 X_NAMESPACE_BEGIN(core)
 
 struct XFileAsync;
