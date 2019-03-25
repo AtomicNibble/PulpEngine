@@ -11,7 +11,7 @@ public:
 	EngineApp();
 	~EngineApp() X_OVERRIDE;
 
-	bool Init(const wchar_t* sInCmdLine);
+	bool Init(HINSTANCE hInstance, const wchar_t* sInCmdLine);
 	bool ShutDown(void);
 
 private:
@@ -19,6 +19,7 @@ private:
 	virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_OVERRIDE;
 
 private:
+    static void Error(core::string_view errorText);
 
 private:
 	core::Module::Handle hSystemHandle_;

@@ -11,8 +11,6 @@
 #include <ModuleExports.h>
 
 
-HINSTANCE g_hInstance = 0;
-
 #ifdef X_LIB
 
 struct XRegFactoryNode* g_pHeadToRegFactories = 0;
@@ -116,7 +114,7 @@ int main(int argc, char *argv[])
 	{
 		EngineApp app; // needs to clear up before arena.
 
-		if (app.Init(::GetCommandLineW()))
+		if (app.Init(GetModuleHandleW(nullptr), ::GetCommandLineW()))
 		{
 #if REDIRECT_QT_LOGGS 
 			const QtMessageHandler oldMsgHandler = qInstallMessageHandler(redirectQtMsgToEngineLog);

@@ -1,18 +1,15 @@
 #include "stdafx.h"
 #include "EngineApp.h"
 
+#include <Platform\Module.h>
+#include <Platform\MessageBox.h>
 
+using namespace core::string_view_literals;
 
-extern HINSTANCE g_hInstance;
-
-void Error(const char* sErrorText)
-{
-	MessageBoxA(0, sErrorText, X_ENGINE_NAME" Start Error", MB_OK | MB_DEFAULT_DESKTOP_ONLY);
-}
 
 EngineApp::EngineApp() :
 	pICore_(nullptr),
-	hSystemHandle_(NULL)
+	hSystemHandle_(core::Module::NULL_HANDLE)
 {
 }
 
@@ -27,10 +24,10 @@ EngineApp::~EngineApp()
 }
 
 
-bool EngineApp::Init(const wchar_t* sInCmdLine)
+bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine)
 {
 	CoreInitParams params;
-	params.hInstance = g_hInstance;
+	params.hInstance = hInstance;
 	params.pCmdLine = sInCmdLine;
 	params.bSkipInput = true;
 	params.bSkipSound = true;
@@ -59,7 +56,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 
 	if (!hSystemHandle_)
 	{
-		Error(CORE_DLL_NAME" Loading Failed");
+		Error(CORE_DLL_NAME" Loading Failed"_sv);
 		return false;
 	}
 
@@ -69,7 +66,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 
 	if (!pfnCreateCoreInterface)
 	{
-		Error(CORE_DLL_NAME" not valid");
+		Error(CORE_DLL_NAME" not valid"_sv);
 		return false;
 	}
 
@@ -79,7 +76,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 
 	if (!pICore_)
 	{
-		Error("Engine Init Failed");
+		Error("Engine Init Failed"_sv);
 		return false;
 	}
 
@@ -123,6 +120,13 @@ bool EngineApp::ShutDown(void)
 	return true;
 }
 
+void EngineApp::Error(core::string_view errorText)
+{
+    core::msgbox::show(errorText,
+        X_ENGINE_NAME " Start Error"_sv,
+        core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
+        core::msgbox::Buttons::OK);
+}
 
 void EngineApp::OnAssert(const core::SourceInfo& sourceInfo)
 {
