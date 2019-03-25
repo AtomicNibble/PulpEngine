@@ -346,8 +346,6 @@ void XCore::ShutDown()
 #if TTELEMETRY_ENABLED
     ttShutdownContext(gEnv->ctx);
     ttShutDown();
-
-    telemBuf_.reset();
 #endif // TTELEMETRY_ENABLED
 
     //	core::invalidParameterHandler::Shutdown();

@@ -357,10 +357,11 @@ bool XCore::Init(CoreInitParams& startupParams)
 
 #if TTELEMETRY_ENABLED
 
+    // i need to make this from something.
     const size_t telemBufSize = 1024 * 1024 * 4;
-    telemBuf_ = core::makeUnique<uint8_t[]>(&coreArena_, telemBufSize, 64);
+    static uint8_t telemBuf[telemBufSize];
 
-    ttInitializeContext(gEnv->ctx, telemBuf_.ptr(), telemBufSize);
+    ttInitializeContext(gEnv->ctx, telemBuf, sizeof(telemBuf));
 
     if (startupParams.bTelem)
     {

@@ -280,11 +280,6 @@ private:
 
     // args
     CmdArgs args_;
-
-#if TTELEMETRY_ENABLED
-    // Telem
-    core::UniquePointer<uint8_t[]> telemBuf_;
-#endif // TTELEMTRY_ENABLED
 };
 
 X_NAMESPACE_BEGIN(core)
