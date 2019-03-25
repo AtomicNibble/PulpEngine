@@ -832,8 +832,9 @@ bool XCore::ParseCmdArgs(CoreInitParams& initParams)
     size_t num = args.getArgc();
 
     for (i = 0; i < num; i++) {
-        if (args_.size() >= args_.capacity()) {
-            X_WARNING("Core", "Ignoring %" PRIuS " remaning command args, max reached: %" PRIuS, num - args_.size(), args_.capacity());
+        if (args_.size() >= MAX_CMD_ARS) {
+            // logging is not enabled here, rip.
+            // X_WARNING("Core", "Ignoring %" PRIuS " remaning command args, max reached: %" PRIuS, num - args_.size(), args_.capacity());
             break;
         }
 
