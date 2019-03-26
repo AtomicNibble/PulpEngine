@@ -908,7 +908,7 @@ bool XCore::InitFileSys(const CoreInitParams& initParams)
     ttZoneFunction(gEnv->ctx);
 
     X_UNUSED(initParams);
-    env_.pFileSys = X_NEW_ALIGNED(core::xFileSys, &coreArena_, "FileSys", 8)(&coreArena_);
+    env_.pFileSys = X_NEW(core::xFileSys, &coreArena_, "FileSys")(&coreArena_);
 
     if (env_.pFileSys) {
         if (!env_.pFileSys->init(initParams)) {
@@ -927,7 +927,7 @@ bool XCore::InitLogging(const CoreInitParams& initParams)
 {
     ttZoneFunction(gEnv->ctx);
 
-    env_.pLog = X_NEW_ALIGNED(core::XLog, &coreArena_, "LogSystem", 8);
+    env_.pLog = X_NEW(core::XLog, &coreArena_, "LogSystem");
 
 #if X_ENABLE_LOGGING
     if (env_.pLog) {
