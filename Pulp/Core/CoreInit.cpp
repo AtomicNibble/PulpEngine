@@ -374,8 +374,15 @@ bool XCore::Init(CoreInitParams& startupParams)
 
     if (startupParams.bTelem)
     {
-        auto res = ttOpen(gEnv->ctx,
-            X_ENGINE_NAME " - Engine",
+        const char* pApp = X_ENGINE_NAME " - Engine";
+
+        if (startupParams.consoleDesc.pTitle) {
+            pApp = startupParams.consoleDesc.pTitle;
+        }
+
+        auto res = ttOpen(
+            gEnv->ctx,
+            pApp,
             X_BUILD_STRING " Version: " X_ENGINE_VERSION_STR " Rev: " X_ENGINE_BUILD_REF_STR,
             "127.0.0.1",
             8001,
@@ -383,6 +390,7 @@ bool XCore::Init(CoreInitParams& startupParams)
             1000
         );
 
+        // should we try do stuff like auto start a local server?
         if (res != telem::Error::Ok) {
             // rip
             return false;
