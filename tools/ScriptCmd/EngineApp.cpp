@@ -39,7 +39,6 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena, const wc
     params.bCoreOnly = true;
     params.bEnableBasicConsole = false;
     params.bEnableJobSystem = false;
-    params.pCoreArena = arena;
     // params.bFileSysWorkingDir = true;
     params.bScriptSystem = true;
     params.consoleDesc.pTitle = X_ENGINE_NAME " - ScriptCmd";

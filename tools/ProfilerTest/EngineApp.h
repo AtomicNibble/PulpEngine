@@ -4,8 +4,6 @@
 #include <Platform\Console.h>
 #include <Platform\Module.h>
 
-#include <Memory\SimpleMemoryArena.h>
-
 class AssetHandler : public IAssertHandler
 {
 public:
@@ -19,10 +17,6 @@ private:
 
 class EngineApp
 {
-    typedef core::SimpleMemoryArena<
-        core::MallocFreeAllocator>
-        Arena;
-
 public:
     EngineApp();
     ~EngineApp();
@@ -34,9 +28,6 @@ private:
     static void Error(core::string_view errorText);
 
 private:
-    core::MallocFreeAllocator allocator_;
-    Arena arena_;
-
     AssetHandler assertCallback_;
     core::Module::Handle hSystemHandle_;
     ICore* pICore_;

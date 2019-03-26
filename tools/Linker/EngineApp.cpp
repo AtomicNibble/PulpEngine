@@ -40,7 +40,6 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
     params.bCoreOnly = true;
     params.bEnableBasicConsole = false;
     params.bEnableJobSystem = true;
-    params.pCoreArena = arena;
     params.bFileSysWorkingDir = true;
     params.consoleDesc.pTitle = X_ENGINE_NAME " - Linker";
 

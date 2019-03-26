@@ -151,18 +151,17 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
     using namespace core::string_view_literals;
 
-    {
-        core::MallocFreeAllocator allocator;
-        LvlBuilderArena arena(&allocator, "LevelBuilderArena");
-
-        level::g_arena = &arena;
-
         {
             EngineApp engine;
 
             // we need the engine for Assets, Logging, Profiling, FileSystem.
-            if (engine.Init(hInstance, lpCmdLine, &arena)) 
+            if (engine.Init(hInstance, lpCmdLine)) 
             {
+                core::MallocFreeAllocator allocator;
+                LvlBuilderArena arena(&allocator, "LevelBuilderArena");
+
+                level::g_arena = &arena;
+
                 {
                     core::ICVar* pLogVerbosity = gEnv->pConsole->getCVar("log_verbosity"_sv);
                     X_ASSERT_NOT_NULL(pLogVerbosity);
@@ -172,11 +171,11 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                 if (Run(arena, engine.GetPhysCooking())) {
                     res = 0;
                 }
+
+                level::g_arena = nullptr;
             }
 
-            level::g_arena = nullptr;
         }
-    }
 
     return res;
 }

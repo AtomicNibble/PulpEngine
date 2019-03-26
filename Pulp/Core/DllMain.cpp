@@ -50,7 +50,7 @@ extern "C" IPCORE_API ICore* CreateCoreInterface(CoreInitParams& startupParams)
             X_ERROR("Core", "Failed to init core");
         }
 
-        X_DELETE(pCore, startupParams.pCoreArena);
+        pCore->Release();
         return nullptr;
     }
 

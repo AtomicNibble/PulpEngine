@@ -156,14 +156,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     using namespace core::Hash::Literals;
 
     {
-        core::MallocFreeAllocator allocator;
-        ServerTestArena arena(&allocator, "NetworkTestArena");
-        g_arena = &arena;
-
         EngineApp engine;
 
         if (engine.Init(hInstance, lpCmdLine)) 
         {
+            core::MallocFreeAllocator allocator;
+            ServerTestArena arena(&allocator, "NetworkTestArena");
+            g_arena = &arena;
+
+
             auto& console = *gEnv->pConsoleWnd;
             console.redirectSTD();
 

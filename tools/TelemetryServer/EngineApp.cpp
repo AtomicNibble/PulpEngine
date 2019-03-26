@@ -26,7 +26,7 @@ EngineApp::~EngineApp()
     gEnv = nullptr;
 }
 
-bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena, const wchar_t* pInCmdLine)
+bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
 {
     CoreInitParams params;
     params.hInstance = hInstance;
@@ -39,7 +39,6 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena, const wc
     params.bCoreOnly = true;
     params.bEnableBasicConsole = false;
     params.bEnableJobSystem = false;
-    params.pCoreArena = arena;
     params.bFileSysWorkingDir = true;
     params.bPauseShutdown = false;
     params.consoleDesc.pTitle = X_ENGINE_NAME " - TelemetryServer";

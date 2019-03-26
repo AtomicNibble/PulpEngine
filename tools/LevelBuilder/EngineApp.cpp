@@ -26,8 +26,7 @@ EngineApp::~EngineApp()
     gEnv = nullptr;
 }
 
-bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine,
-    core::MemoryArenaBase* arena)
+bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
 {
     CoreInitParams params;
     params.hInstance = hInstance;
@@ -35,7 +34,6 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine,
     params.bVsLog = false;
     params.bConsoleLog = true;
     params.bCoreOnly = true;
-    params.pCoreArena = arena;
     params.bEnableBasicConsole = true;
     params.bFileSysWorkingDir = true;
     params.consoleDesc.pTitle = X_ENGINE_NAME " - Level Compiler";

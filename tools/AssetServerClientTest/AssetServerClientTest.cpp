@@ -117,9 +117,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_ int nCmdShow)
 {
     {
-        core::MallocFreeAllocator allocator;
-        AssetServerTestArena arena(&allocator, "AssetServerTestArena");
-        g_arena = &arena;
 
         bool res = false;
 
@@ -128,6 +125,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         if (engine.Init(hInstance, lpCmdLine))
         {
             gEnv->pConsoleWnd->redirectSTD();
+
+            core::MallocFreeAllocator allocator;
+            AssetServerTestArena arena(&allocator, "AssetServerTestArena");
+            g_arena = &arena;
 
             core::IPC::Pipe pipe;
 
@@ -335,8 +336,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             // muh consolas!
             gEnv->pConsoleWnd->pressToContinue();
         }
-
-        engine.ShutDown();
     }
 
     return 0;

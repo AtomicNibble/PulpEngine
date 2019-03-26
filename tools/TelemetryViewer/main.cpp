@@ -53,17 +53,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     X_UNUSED(hPrevInstance);
     X_UNUSED(nCmdShow);
 
-    TelemetryViewerArena::AllocationPolicy allocator;
-    TelemetryViewerArena arena(&allocator, "TelemetryViewerArena");
-
-    g_arena = &arena;
-
     {
         EngineApp app;
 
-        if (!app.Init(hInstance, &arena, lpCmdLine)) {
+        if (!app.Init(hInstance, lpCmdLine)) {
             return 1;
         }
+
+        TelemetryViewerArena::AllocationPolicy allocator;
+        TelemetryViewerArena arena(&allocator, "TelemetryViewerArena");
+
+        g_arena = &arena;
 
         if (!winSockInit()) {
             return 1;

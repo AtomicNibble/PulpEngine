@@ -179,17 +179,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
     X_UNUSED(hPrevInstance, nCmdShow);
 
-    BenchmarkArena::AllocationPolicy allocator;
-    BenchmarkArena arena(&allocator, "ProfileTestArena");
-
-    g_arena = &arena;
-
     {
         EngineApp engine;
 
         if (engine.Init(hInstance, lpCmdLine)) {
             X_ASSERT_NOT_NULL(gEnv);
             X_ASSERT_NOT_NULL(gEnv->pCore);
+
+            BenchmarkArena::AllocationPolicy allocator;
+            BenchmarkArena arena(&allocator, "ProfileTestArena");
+
+            g_arena = &arena;
 
             ctx = gEnv->ctx;
 

@@ -174,8 +174,6 @@ struct CoreInitParams
     PLATFORM_HWND hWnd;
     const wchar_t* pCmdLine;
 
-    core::MemoryArenaBase* pCoreArena;
-
     // these should be turned into flags.
     bool bTesting;
     bool bSkipInput;
@@ -240,9 +238,6 @@ struct CoreInitParams
         hInstance(nullptr),
         hWnd(nullptr),
         pCmdLine(nullptr),
-
-        pCoreArena(nullptr),
-
         bTesting(false),
         bSkipInput(false),
         bSkipSound(false),

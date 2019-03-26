@@ -28,8 +28,7 @@ void AssetHandler::OnAssertVariable(const core::SourceInfo& sourceInfo)
 
 EngineApp::EngineApp() :
     pICore_(nullptr),
-    hSystemHandle_(core::Module::NULL_HANDLE),
-    arena_(&allocator_, "BenchMarkCoreArena")
+    hSystemHandle_(core::Module::NULL_HANDLE)
 {
 }
 
@@ -57,7 +56,6 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
     params.bCoreOnly = true;
     params.bEnableJobSystem = false;
     params.bProfileSysEnabled = false;
-    params.pCoreArena = &arena_;
     params.bThreadSafeStringAlloc = false;
     params.consoleDesc.pTitle = X_ENGINE_NAME " - Benchmark Log";
 

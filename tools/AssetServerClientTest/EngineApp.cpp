@@ -38,7 +38,6 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
     params.bCoreOnly = true;
     params.bEnableBasicConsole = false;
     params.bEnableJobSystem = true; // some converters make use of the job system.
-    params.pCoreArena = g_arena;
     params.bFileSysWorkingDir = true;
     params.consoleDesc.pTitle = X_ENGINE_NAME " - AssetServer Test Client";
 

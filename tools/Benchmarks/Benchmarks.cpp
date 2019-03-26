@@ -68,11 +68,6 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance,
 {
     X_UNUSED(hPrevInstance, nCmdShow);
 
-    BenchmarkArena::AllocationPolicy allocator;
-    BenchmarkArena arena(&allocator, "BenchmarkArena");
-
-    g_arena = &arena;
-
     {
         EngineApp engine;
 
@@ -80,6 +75,11 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance,
         {
             X_ASSERT_NOT_NULL(gEnv);
             X_ASSERT_NOT_NULL(gEnv->pCore);
+
+            BenchmarkArena::AllocationPolicy allocator;
+            BenchmarkArena arena(&allocator, "BenchmarkArena");
+
+            g_arena = &arena;
 
             gEnv->pConsoleWnd->redirectSTD();
 

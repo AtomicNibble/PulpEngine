@@ -48,15 +48,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     X_UNUSED(hPrevInstance);
     X_UNUSED(nCmdShow);
 
-    TelemetryServerArena::AllocationPolicy allocator;
-    TelemetryServerArena arena(&allocator, "TelemetryServerArena");
-
     {
         EngineApp app;
 
-        if (!app.Init(hInstance, &arena, lpCmdLine)) {
+        if (!app.Init(hInstance, lpCmdLine)) {
             return 1;
         }
+
+        TelemetryServerArena::AllocationPolicy allocator;
+        TelemetryServerArena arena(&allocator, "TelemetryServerArena");
 
         // create the server.
         auto srv = telemetry::createServer(&arena);
@@ -66,6 +66,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         if (!srv->listen()) {
             return 1;
         }
+
+        // TODO: cleanup server?
     }
 
     return 0;
