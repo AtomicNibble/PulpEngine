@@ -778,6 +778,7 @@ namespace entity
     bool EnititySystem::loadEntites(const char* pJsonBegin, const char* pJsonEnd)
     {
         // TODO: bother checking we clear? 
+        ttZone(gEnv->ctx, "LoadEntites");
 
         if (!parseEntites(pJsonBegin, pJsonEnd)) {
             X_ERROR("Ents", "Failed to parse ents");
@@ -844,6 +845,8 @@ namespace entity
 
     bool EnititySystem::postLoad(void)
     {
+        ttZone(gEnv->ctx, "EntSys postload");
+
         if (!physSys_.createColliders(reg_, pPhysics_, pPhysScene_)) {
             return false;
         }

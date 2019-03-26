@@ -574,6 +574,8 @@ void ReliabilityLayer::clearPacketQueues(void)
 bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, core::TimeVal time, uint32_t mtuSize,
     PacketPriority::Enum priority, PacketReliability::Enum reliability, OrderingChannelIdx orderingChannel, SendReceipt receipt, bool ownData)
 {
+    ttZone(gEnv->ctx, "Net reliability send");
+
     X_ASSERT_NOT_NULL(pData);
     X_ASSERT(lengthBits > 0, "Must call with alreast some bits")();
 
@@ -664,6 +666,8 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& socket,
     SystemAddressEx& systemAddress, core::TimeVal time, uint32_t mtuSize)
 {
+    ttZone(gEnv->ctx, "Net reliability recv");
+
     X_LOG0_IF(vars_.debugDatagramEnabled(), "NetRel", "Recived datagram size: ^5%" PRIuS "^7 numbits: ^5%" PRIuS, length, core::bitUtil::bytesToBits(length));
 
     // last time we got data.
@@ -1003,6 +1007,8 @@ void ReliabilityLayer::addPacketToRecivedQueue(ReliablePacket* pPacket, core::Ti
 void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, SystemAddressEx& systemAddress, int32_t MTUSize,
     core::TimeVal time)
 {
+    ttZone(gEnv->ctx, "Net reliability update");
+
     // delay list, these are packets that have already been sent, but are having artifical latency added.
     if (delayedPackets_.isNotEmpty()) {
         while (delayedPackets_.isNotEmpty() && delayedPackets_.peek().sendTime < time) {
@@ -1430,6 +1436,8 @@ void ReliabilityLayer::freeSplitPacketChannel(SplitPacketChannel* pSPC)
 
 bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
 {
+    ttZone(gEnv->ctx, "Net reliability split packet");
+
     const auto lengthBytes = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
     const size_t maxDataSizeBytes = maxDataGramSizeExcHdr() - ReliablePacket::getMaxHeaderLength();
     const bool splitRequired = lengthBytes > maxDataSizeBytes;

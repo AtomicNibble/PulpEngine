@@ -287,6 +287,8 @@ namespace PSD
     {
         X_ASSERT_NOT_NULL(file);
 
+        ttZone(gEnv->ctx, "Load Texture PSD");
+
         uint32_t Length, i;
         uint16_t CompressionType;
 

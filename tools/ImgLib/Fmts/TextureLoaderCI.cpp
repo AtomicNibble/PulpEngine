@@ -75,6 +75,8 @@ namespace CI
         X_ASSERT_NOT_NULL(gEnv->pLog);
         X_ASSERT_NOT_NULL(file);
 
+        ttZone(gEnv->ctx, "Load Texture CI");
+
         CITexureHeader hdr;
 
         // file system will report read error in log.

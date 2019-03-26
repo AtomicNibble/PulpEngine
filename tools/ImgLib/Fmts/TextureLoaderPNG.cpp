@@ -215,6 +215,8 @@ namespace PNG
         X_ASSERT_NOT_NULL(gEnv);
         X_ASSERT_NOT_NULL(gEnv->pCore);
 
+        ttZone(gEnv->ctx, "Load Texture PNG");
+
         core::Crc32* pCrc = gEnv->pCore->GetCrc32();
 
         Png_Header hdr;

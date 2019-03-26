@@ -633,6 +633,8 @@ namespace DDS
         X_ASSERT_NOT_NULL(file);
         X_UNUSED(swapArena);
 
+        ttZone(gEnv->ctx, "Load Texture DDS");
+
         DDS_header hdr;
         DDS_DX10_header dx10Hdr;
         uint32_t num_mip_maps, num_faces;

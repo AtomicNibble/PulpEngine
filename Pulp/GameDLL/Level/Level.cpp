@@ -210,6 +210,8 @@ void Level::processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
 
     X_ASSERT(levelData_, "Level data pointer is not valid")(levelData_);
 
+    ttZone(gEnv->ctx, "Level process data");
+
     core::XFileAsync* pFile = static_cast<core::XFileAsync*>(pData);
 
     if (!processData()) {
@@ -448,6 +450,8 @@ void World::removePlayer(int32_t playerIdx)
 
 bool World::createPhysicsScene(physics::IPhysics* pPhys)
 {
+    ttZone(gEnv->ctx, "World create physics scene");
+
     if (pScene_) {
         pPhys->releaseScene(pScene_);
     }

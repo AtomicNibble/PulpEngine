@@ -936,6 +936,8 @@ void Video::decodeAudio_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
 {
     X_UNUSED(jobSys, threadIdx, pJob, pData);
 
+    ttZone(gEnv->ctx, "Decode Audio");
+
     auto& audioQueue = io_.trackQueues[TrackType::Audio];
     auto& channel0 = audio_.audioRingBuffers[0];
 
@@ -1080,6 +1082,8 @@ retry:
 void Video::decodeVideo_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
 {
     X_UNUSED(jobSys, threadIdx, pJob, pData);
+
+    ttZone(gEnv->ctx, "Decode Video");
 
     io_.cs.Enter();
 

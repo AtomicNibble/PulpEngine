@@ -182,6 +182,8 @@ namespace JPG
         X_ASSERT_NOT_NULL(file);
         X_UNUSED(swapArena);
 
+        ttZone(gEnv->ctx, "Load Texture JPG");
+
         struct jpeg_decompress_struct cinfo;
         struct my_error_mgr jerr;
         struct jpeg_xfile_src_mgr file_reader;
