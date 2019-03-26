@@ -50,7 +50,7 @@ using namespace core::string_view_literals;
 
 namespace
 {
-    char buf[core::bitUtil::RoundUpToMultiple<size_t>(sizeof(XCore), 128)];
+    char buf[core::bitUtil::RoundUpToMultiple<size_t>(sizeof(XCore) + 64, 128)];
 
     core::LinearAllocator linera(buf, buf + sizeof(buf));
     core::SimpleMemoryArena<decltype(linera)> coreInstArena(&linera, "CoreAllocator");
