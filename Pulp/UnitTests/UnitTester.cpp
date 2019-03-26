@@ -68,7 +68,7 @@ const char* googleTestResTostr(int nRes)
 
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
-    int nRes = -1; // if we never run the tests that is also a fail.
+    int nRes = 1; // if we never run the tests that is also a fail.
 
     {
         EngineApp engine;
