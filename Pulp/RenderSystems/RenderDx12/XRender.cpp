@@ -1096,7 +1096,7 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
                     context.transitionResource(gpuResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
                     // HACK: spin till valid.
-                    auto srv = pTex->getSRV();
+                    auto& srv = pTex->getSRV();
                     if(srv.ptr == render::D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
                     {
                         int backOff = 0;
