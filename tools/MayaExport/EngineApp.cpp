@@ -54,7 +54,6 @@ bool EngineApp::Init(void)
     params.bEnableBasicConsole = false;
     params.bEnableJobSystem = true; // model compiler uses job system.
 //    params.pConsoleWnd = nullptr;
-    params.pCoreArena = g_arena;
     params.bLoadSymbols = false;
     params.bFileSysWorkingDir = true;
 
