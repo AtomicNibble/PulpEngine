@@ -400,10 +400,6 @@ bool XCore::Init(CoreInitParams& startupParams)
     pDirWatcher_->registerListener(this);
 #endif // !X_ENABLE_DIR_WATCHER
 
-    // don't want this all the time.
-    pReplaySys_ = X_NEW(core::ReplaySys, &coreArena_, "ReplaySys")(&coreArena_);
-
-    
     pCoreEventDispatcher_ = X_NEW(core::XCoreEventDispatcher, &coreArena_, "CoreEventDispatch")(vars_, &coreArena_);
     pCoreEventDispatcher_->RegisterListener(this);
 
@@ -606,6 +602,9 @@ bool XCore::Init(CoreInitParams& startupParams)
 
             env_.pLocalisation = loc.release();
         }
+
+        // #------------------------- ReplaySys ------------------------
+        pReplaySys_ = X_NEW(core::ReplaySys, &coreArena_, "ReplaySys")(&coreArena_);
 
         // #------------------------- AssetLoader ------------------------
         assetLoader_ = core::makeUnique<core::AssetLoader>(&coreArena_, &coreArena_, &coreArena_);
