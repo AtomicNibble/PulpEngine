@@ -9,6 +9,7 @@
 
 #include "NullImplementation\ConsoleNULL.h"
 #include "NullImplementation\NullInput.h"
+#include "NullImplementation/NullLog.h"
 
 #include <Debugging\InvalidParameterHandler.h>
 #include <Debugging\SymbolResolution.h>
