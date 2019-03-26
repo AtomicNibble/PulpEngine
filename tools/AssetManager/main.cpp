@@ -104,18 +104,16 @@ int main(int argc, char *argv[])
 	app.setStyleSheet(style_str);
 #endif
 
-
-	// this is a engine app now :)
-	core::MallocFreeAllocator allocator;
-	AssetManagerArena arena(&allocator, "AssetManagerArena");
-	g_arena = &arena;
-
-	int32_t res = -1;
+	int32_t res = 1;
 	{
 		EngineApp app; // needs to clear up before arena.
 
 		if (app.Init(GetModuleHandleW(nullptr), ::GetCommandLineW()))
 		{
+            core::MallocFreeAllocator allocator;
+            AssetManagerArena arena(&allocator, "AssetManagerArena");
+            g_arena = &arena;
+
 #if REDIRECT_QT_LOGGS 
 			const QtMessageHandler oldMsgHandler = qInstallMessageHandler(redirectQtMsgToEngineLog);
 #endif // REDIRECT_QT_LOGGS 
@@ -129,8 +127,9 @@ int main(int argc, char *argv[])
 			qInstallMessageHandler(oldMsgHandler);
 #endif // !REDIRECT_QT_LOGGS 
 		}
+
+	    g_arena = nullptr;
 	}
 
-	g_arena = nullptr;
 	return res;
 }

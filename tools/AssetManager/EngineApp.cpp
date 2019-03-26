@@ -42,7 +42,6 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine)
 	params.bEnableBasicConsole = false;
 	params.bEnableJobSystem = true; 
 //	params.pConsoleWnd = nullptr;
-	params.pCoreArena = g_arena;
 	params.bFileSysWorkingDir = true;
 
 
