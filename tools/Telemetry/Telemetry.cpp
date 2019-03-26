@@ -352,7 +352,7 @@ namespace
             return;
         }
 
-        using pGetThreadDescription = HRESULT (*)(HANDLE hThread, PWSTR * ppszThreadDescription);
+        using pGetThreadDescription = HRESULT (WINAPI *)(HANDLE hThread, PWSTR * ppszThreadDescription);
 
         HMODULE hMod = ::GetModuleHandleW(L"kernel32.dll");
 

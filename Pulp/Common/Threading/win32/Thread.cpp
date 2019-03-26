@@ -13,7 +13,7 @@ namespace
 {
     const DWORD MS_VC_EXCEPTION = 0x406D1388;
 
-    using pSetThreadDescription = HRESULT(*)(HANDLE hThread, PCWSTR lpThreadDescription);
+    using pSetThreadDescription = HRESULT(WINAPI *)(HANDLE hThread, PCWSTR lpThreadDescription);
 
     X_PACK_PUSH(8)
     struct THREADNAME_INFO
