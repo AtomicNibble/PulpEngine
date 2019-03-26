@@ -1102,7 +1102,7 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
                         int backOff = 0;
                         while (srv.ptr == render::D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
                         {
-                            core::Thread::backOff(backOff);
+                            core::Thread::backOff(backOff++);
                         }
                     }
 
