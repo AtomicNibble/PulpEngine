@@ -403,8 +403,11 @@ bool XCore::Init(CoreInitParams& startupParams)
     pCoreEventDispatcher_ = X_NEW(core::XCoreEventDispatcher, &coreArena_, "CoreEventDispatch")(vars_, &coreArena_);
     pCoreEventDispatcher_->RegisterListener(this);
 
+    static core::NullLog nullLogInst;
+
     env_.state_ = CoreGlobals::State::STARTING;
     env_.pCore = this;
+    env_.pLog = &nullLogInst;
     env_.pTimer = &time_;
     env_.pDirWatcher = pDirWatcher_;
     env_.pArena = &coreArena_;
@@ -930,36 +933,37 @@ bool XCore::InitLogging(const CoreInitParams& initParams)
     env_.pLog = X_NEW(core::XLog, &coreArena_, "LogSystem");
 
 #if X_ENABLE_LOGGING
-    if (env_.pLog) {
-        if (initParams.bVsLog) {
-            pVsLogger_ = X_NEW(VisualStudioLogger, &coreArena_, "VSLogger");
-            env_.pLog->AddLogger(pVsLogger_);
-        }
-        if (initParams.bConsoleLog) {
-
-            const auto& desc = initParams.consoleDesc;
-            {
-                ttZone(gEnv->ctx, "Create Console window");
-                pConsole_ = X_NEW(core::Console, &coreArena_, "ExternalConsoleLog")(core::string_view(desc.pTitle));
-            }
-            pConsole_->setSize(desc.windowWidth, desc.windowHeight, desc.numLines);
-            pConsole_->moveTo(desc.x, desc.y);
-            
-            env_.pConsoleWnd = pConsole_;
-
-            pConsoleLogger_ = X_NEW(ConsoleLogger, &coreArena_, "ConsoleLogger")(
-                ConsoleLogger::FilterPolicy(2, "console"),
-                ConsoleLogger::FormatPolicy(),
-                ConsoleLogger::WritePolicy(*pConsole_));
-
-            env_.pLog->AddLogger(pConsoleLogger_);
-        }
+    
+    if (initParams.bVsLog) {
+        pVsLogger_ = X_NEW(VisualStudioLogger, &coreArena_, "VSLogger");
+        env_.pLog->AddLogger(pVsLogger_);
     }
+    if (initParams.bConsoleLog) {
 
+        const auto& desc = initParams.consoleDesc;
+        {
+            ttZone(gEnv->ctx, "Create Console window");
+            pConsole_ = X_NEW(core::Console, &coreArena_, "ExternalConsoleLog")(core::string_view(desc.pTitle));
+        }
+        pConsole_->setSize(desc.windowWidth, desc.windowHeight, desc.numLines);
+        pConsole_->moveTo(desc.x, desc.y);
+        
+        env_.pConsoleWnd = pConsole_;
+
+        pConsoleLogger_ = X_NEW(ConsoleLogger, &coreArena_, "ConsoleLogger")(
+            ConsoleLogger::FilterPolicy(2, "console"),
+            ConsoleLogger::FormatPolicy(),
+            ConsoleLogger::WritePolicy(*pConsole_));
+
+        env_.pLog->AddLogger(pConsoleLogger_);
+    }
+    
 #else
     X_UNUSED(initParams);
 #endif
-    return env_.pLog != nullptr;
+
+    X_ASSERT_NOT_NULL(env_.pLog);
+    return true;
 }
 
 bool XCore::InitFileLogging(const CoreInitParams& initParams)
