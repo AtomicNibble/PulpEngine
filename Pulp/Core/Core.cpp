@@ -60,6 +60,9 @@ namespace
 
 CoreGlobals XCore::env_;
 
+core::NullLog XCore::s_nullLogInst;
+
+
 XCore* XCore::CreateInstance(void)
 {
     return X_NEW_ALIGNED(XCore, &coreInstArena, "XCore", core::Max(X_ALIGN_OF(XCore), 64_sz));
@@ -306,7 +309,10 @@ void XCore::ShutDown()
         X_DELETE(pConsoleLogger_, &coreArena_);
         X_DELETE(pConsole_, &coreArena_);
 
-        core::Mem::DeleteAndNull(env_.pLog, &coreArena_);
+        // if this is not null log.
+        if (env_.pLog != &s_nullLogInst) {
+            core::Mem::DeleteAndNull(env_.pLog, &coreArena_);
+        }
     }
 
     if (pCoreEventDispatcher_) {

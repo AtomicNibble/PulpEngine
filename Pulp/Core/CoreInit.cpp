@@ -347,6 +347,12 @@ bool XCore::Init(CoreInitParams& startupParams)
 {
     core::StopWatch time;
 
+    env_.state_ = CoreGlobals::State::STARTING;
+    env_.pCore = this;
+    env_.pLog = &s_nullLogInst;
+    env_.client_ = true;
+    env_.dedicated_ = false;
+
     // TELEM ME !
     // link me like a slut.
     if (!ttLoadLibary()) {
@@ -404,17 +410,9 @@ bool XCore::Init(CoreInitParams& startupParams)
     pCoreEventDispatcher_ = X_NEW(core::XCoreEventDispatcher, &coreArena_, "CoreEventDispatch")(vars_, &coreArena_);
     pCoreEventDispatcher_->RegisterListener(this);
 
-    static core::NullLog nullLogInst;
-
-    env_.state_ = CoreGlobals::State::STARTING;
-    env_.pCore = this;
-    env_.pLog = &nullLogInst;
     env_.pTimer = &time_;
     env_.pDirWatcher = pDirWatcher_;
     env_.pArena = &coreArena_;
-    env_.client_ = true;
-    env_.dedicated_ = false;
-
 
     static_assert(StrArena::IS_THREAD_SAFE, "Str arena must be thread safe");
     static_assert(!StrArenaST::IS_THREAD_SAFE, "Single thread StrArean don't need to be thread safe");
@@ -799,9 +797,7 @@ bool XCore::InitAsyncWait(void)
     ttZone(gEnv->ctx, "AsynInit wait");
     X_PROFILE_NO_HISTORY_BEGIN("AsyncInitFin", core::profiler::SubSys::CORE);
 
-    if (gEnv->pLog) {
-        X_LOG1("Core", "AsynInit wait");
-    }
+    X_LOG1("Core", "AsynInit wait");
 
     // we should call all even if one fails.
     // aka we must wait for all to finish even if some fail.

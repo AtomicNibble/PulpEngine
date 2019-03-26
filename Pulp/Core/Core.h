@@ -27,6 +27,8 @@
 
 #include <Assets\AssetLoader.h>
 
+#include <NullImplementation/NullLog.h>
+
 struct IEngineFactoryRegistryImpl;
 struct IEngineModule;
 
@@ -236,6 +238,7 @@ private:
 
 private:
     static CoreGlobals env_;
+    static core::NullLog s_nullLogInst;
 
 private:
     // Need to be at top.
