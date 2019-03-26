@@ -388,7 +388,7 @@ bool XCore::Init(CoreInitParams& startupParams)
             return false;
         }
 
-        ttSetThreadName(gEnv->ctx, core::Thread::getCurrentID(), "Main");
+        ttSetThreadName(gEnv->ctx, 0, "Main");
 
     }
     else
