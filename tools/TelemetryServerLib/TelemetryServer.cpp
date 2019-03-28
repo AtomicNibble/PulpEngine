@@ -373,11 +373,11 @@ bool TraceDB::createDB(core::Path<char>& path)
     cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
     cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, startTick, endTick, result, depth, packedSourceInfo) VALUES(?,?,?,?,?,?,?)");
     cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, timeTicks, state, packedSourceInfo) VALUES(?,?,?,?,?)");
-    cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, timeTicks, fmtStrIdx) VALUES(?,?,?)");
-    cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, fmtStrIdx) VALUES(?,?,?)");
+    cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, timeTicks, strIdx) VALUES(?,?,?)");
+    cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, strIdx) VALUES(?,?,?)");
     cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)");
     cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation, packedSourceInfo) VALUES(?,?,?,?,?,?)");
-    cmdInsertMessage.prepare("INSERT INTO messages (timeTicks, type, fmtStrIdx) VALUES(?,?,?)");
+    cmdInsertMessage.prepare("INSERT INTO messages (timeTicks, type, strIdx) VALUES(?,?,?)");
     return true;
 }
 
@@ -464,7 +464,7 @@ CREATE TABLE IF NOT EXISTS "threadNames" (
     "Id"                INTEGER,
     "threadId"          INTEGER NOT NULL,
     "timeTicks"         INTEGER NOT NULL,
-    "fmtStrIdx"         INTEGER NOT NULL,
+    "strIdx"            INTEGER NOT NULL,
     PRIMARY KEY("Id")
 );
 
@@ -503,7 +503,7 @@ CREATE TABLE IF NOT EXISTS "lockNames" (
     "Id"                INTEGER,
     "lockId"            INTEGER NOT NULL,
     "timeTicks"         INTEGER NOT NULL,
-    "fmtStrIdx"         INTEGER NOT NULL,
+    "strIdx"            INTEGER NOT NULL,
     PRIMARY KEY("Id")
 );
 
@@ -544,7 +544,7 @@ CREATE TABLE "messages" (
 	"Id"	            INTEGER,
 	"type"	            INTEGER NOT NULL,
 	"timeTicks"	        INTEGER NOT NULL,
-	"fmtStrIdx"	        INTEGER NOT NULL,
+	"strIdx"	        INTEGER NOT NULL,
 	PRIMARY KEY("Id")
 );
 
@@ -2116,7 +2116,7 @@ bool Server::handleReqTraceThreadNames(ClientConnection& client, uint8_t* pData)
 
     int32_t num = 0;
 
-    sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, timeTicks, fmtStrIdx FROM threadNames");
+    sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, timeTicks, strIdx FROM threadNames");
 
     auto it = qry.begin();
     for (; it != qry.end(); ++it) {
@@ -2173,7 +2173,7 @@ bool Server::handleReqTraceLockNames(ClientConnection& client, uint8_t* pData)
 
     int32_t num = 0;
 
-    sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, timeTicks, fmtStrIdx FROM lockNames");
+    sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, timeTicks, strIdx FROM lockNames");
 
     auto it = qry.begin();
     for (; it != qry.end(); ++it) {
