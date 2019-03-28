@@ -1316,16 +1316,18 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     dbPath.ensureSlash();
     dbPath.append(pApp->appName.begin(), pApp->appName.end());
     dbPath.ensureSlash();
-    // want like hostname or everything in on folder?
-    dbPath.append("telem_");
-    dbPath.append(date.toString(dateStr));
-    dbPath.setExtension("db");
 
     if (!gEnv->pFileSys->directoryExists(dbPath, core::VirtualDirectory::BASE)) {
         if (!gEnv->pFileSys->createDirectoryTree(dbPath, core::VirtualDirectory::BASE)) {
             return false;
         }
     }
+
+    // add filename,
+    dbPath.append("telem_");
+    dbPath.append(date.toString(dateStr));
+    dbPath.setExtension("db");
+
 
     trace.dbPath = dbPath;
     trace.hostName = client.hostName;
