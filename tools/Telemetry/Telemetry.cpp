@@ -1961,6 +1961,8 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
         return TtError::InvalidParam;
     }
 
+    auto* pCtx = handleToContext(ctx);
+
     TELEM_UNUSED(timeoutMS);
 
     // need to connect to the server :O
@@ -1976,6 +1978,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     // Resolve the server address and port
     auto res = platform::getaddrinfo(pServerAddress, portStr, &hints, &servinfo);
     if (res != 0) {
+        writeLog(pCtx, TtLogType::Error, "Failed to getaddrinfo. Error: %d", platform::WSAGetLastError());
         return TtError::Error;
     }
 
@@ -2004,8 +2007,6 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     if (connectSocket == INV_SOCKET) {
         return TtError::Error;
     }
-
-    auto* pCtx = handleToContext(ctx);
 
     // how big?
     tt_int32 sock_opt = 1024 * 16;
