@@ -69,20 +69,26 @@ namespace exceptionHandler
                 }
                 else {
                     if (code > 0x8FFFFF00) {
-                        if (code == 0x8FFFFF01)
+                        if (code == 0x8FFFFF01) {
                             return "EXCEPTION_PURE_VIRTUAL_FUNCTION_CALLED";
-                        if (code == 0x8FFFFF02)
+                        }
+                        if (code == 0x8FFFFF02) {
                             return "EXCEPTION_CRT_INVALID_PARAMETER_CALL";
+                        }
                     }
                     else {
-                        if (code == 0x8FFFFF00)
+                        if (code == 0x8FFFFF00) {
                             return "EXCEPTION_ABORT_CALLED";
-                        if (code == 0x80000002)
+                        }
+                        if (code == 0x80000002) {
                             return "EXCEPTION_DATATYPE_MISALIGNMENT";
-                        if (code == 0x80000001)
+                        }
+                        if (code == 0x80000001) {
                             return "EXCEPTION_BREAKPOINT";
-                        if (code == 0x80000000)
+                        }
+                        if (code == 0x80000000) {
                             return "EXCEPTION_SINGLE_STEP";
+                        }
                     }
                 }
             }
@@ -154,20 +160,26 @@ namespace exceptionHandler
                 }
                 else {
                     if (code > 0x8FFFFF00) {
-                        if (code == 0x8FFFFF01)
+                        if (code == 0x8FFFFF01) {
                             return "A pure virtual function has been called.";
-                        if (code == 0x8FFFFF02)
+                        }
+                        if (code == 0x8FFFFF02) {
                             return "A CRT function has been called with an invalid parameter.";
+                        }
                     }
                     else {
-                        if (code == 0x8FFFFF00)
+                        if (code == 0x8FFFFF00) {
                             return "abort() has been called.";
-                        if (code == 0x80000002)
+                        }
+                        if (code == 0x80000002) {
                             return "The thread tried to read or write data that is misaligned.";
-                        if (code == 0x80000001)
+                        }
+                        if (code == 0x80000001) {
                             return "A breakpoint was encountered.";
-                        if (code == 0x80000000)
+                        }
+                        if (code == 0x80000000) {
                             return "A trace trap or other single-instruction mechanism signaled that one instruction has been executed.";
+                        }
                     }
                 }
             }
