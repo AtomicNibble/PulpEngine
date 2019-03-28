@@ -2081,6 +2081,8 @@ bool TelemClose(TraceContexHandle ctx)
 {
     auto* pCtx = handleToContext(ctx);
 
+    TelemFlush(ctx);
+
 #if 0 // TODO: needed?
     int res = platform::shutdown(pCtx->socket, SD_BOTH);
     if (res == SOCKET_ERROR) {
