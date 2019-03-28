@@ -485,6 +485,7 @@
     <ClCompile Include="tests\ecs.cpp" />
     <ClCompile Include="tests\half.cpp" />
     <ClCompile Include="tests\memcpy.cpp" />
+    <ClCompile Include="tests\profiler.cpp" />
     <ClCompile Include="tests\quaternion.cpp" />
     <ClCompile Include="tests\random.cpp" />
     <ClCompile Include="tests\string.cpp" />

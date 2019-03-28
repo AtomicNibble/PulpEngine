@@ -68,6 +68,9 @@
     <ClCompile Include="hashtable.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
+    <ClCompile Include="tests\profiler.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Benchmarks.rc">
