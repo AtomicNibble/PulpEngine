@@ -941,7 +941,7 @@ namespace
                     memcpy(pStrData, pStr, len);
 
                     pStrData += len;
-                    bytesLeft -= len;
+                    bytesLeft -= (len + sizeof(tt_uint8));
 
                     // replace this with offset, should also compress better
                     pValues[idx] = offset;
