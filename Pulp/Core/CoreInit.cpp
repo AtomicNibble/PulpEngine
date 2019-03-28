@@ -374,15 +374,13 @@ bool XCore::Init(CoreInitParams& startupParams)
 
     if (startupParams.bTelem)
     {
-        const char* pApp = X_ENGINE_NAME " - Engine";
-
-        if (startupParams.consoleDesc.pTitle) {
-            pApp = startupParams.consoleDesc.pTitle;
+        if (!startupParams.pTelemAppName) {
+            return false;
         }
 
         auto res = ttOpen(
             gEnv->ctx,
-            pApp,
+            startupParams.pTelemAppName,
             X_BUILD_STRING " Version: " X_ENGINE_VERSION_STR " Rev: " X_ENGINE_BUILD_REF_STR,
             "127.0.0.1",
             8001,

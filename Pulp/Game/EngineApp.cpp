@@ -66,6 +66,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
     params.bProfileSysEnabled = true;
     params.bIsGame = true;
     params.bTelem = true;
+    params.pTelemAppName = X_ENGINE_NAME " - Engine";
 
     // enable loggers
 #if 0

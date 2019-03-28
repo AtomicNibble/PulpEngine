@@ -173,6 +173,7 @@ struct CoreInitParams
     void* hInstance;
     PLATFORM_HWND hWnd;
     const wchar_t* pCmdLine;
+    const char* pTelemAppName;
 
     // these should be turned into flags.
     bool bTesting;
@@ -238,6 +239,7 @@ struct CoreInitParams
         hInstance(nullptr),
         hWnd(nullptr),
         pCmdLine(nullptr),
+        pTelemAppName(nullptr),
         bTesting(false),
         bSkipInput(false),
         bSkipSound(false),
