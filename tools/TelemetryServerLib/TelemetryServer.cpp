@@ -367,16 +367,16 @@ bool TraceDB::createDB(core::Path<char>& path)
         return false;
     }
 
-    cmdInsertZone.prepare("INSERT INTO zones (threadID, startTick, endTick, stackDepth, packedSourceInfo) VALUES(?,?,?,?,?)");
+    cmdInsertZone.prepare("INSERT INTO zones (threadID, startTick, endTick, packedSourceInfo, strIdx) VALUES(?,?,?,?,?)");
     cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
     cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, startTick, endTick, startNano, endNano) VALUES(?,?,?,?,?)");
     cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
-    cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, startTick, endTick, result, depth, packedSourceInfo) VALUES(?,?,?,?,?,?,?)");
-    cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, timeTicks, state, packedSourceInfo) VALUES(?,?,?,?,?)");
+    cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, startTick, endTick, result, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?,?)");
+    cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, timeTicks, state, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?)");
     cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, timeTicks, strIdx) VALUES(?,?,?)");
     cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, strIdx) VALUES(?,?,?)");
     cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)");
-    cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation, packedSourceInfo) VALUES(?,?,?,?,?,?)");
+    cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?,?)");
     cmdInsertMessage.prepare("INSERT INTO messages (timeTicks, type, strIdx) VALUES(?,?,?)");
     return true;
 }
@@ -489,7 +489,7 @@ CREATE TABLE IF NOT EXISTS "zones" (
     "startTick"	        INTEGER NOT NULL,
     "endTick"	        INTEGER NOT NULL,
     "packedSourceInfo"	INTEGER NOT NULL,
-    "stackDepth"	    INTEGER NOT NULL,
+	"strIdx"	        INTEGER NOT NULL,
     PRIMARY KEY("id"),
     FOREIGN KEY("zoneId") REFERENCES "zoneInfo"("Id")
 );
@@ -513,9 +513,9 @@ CREATE TABLE IF NOT EXISTS "lockTry" (
     "threadId"	        INTEGER NOT NULL,
 	"startTick"	        INTEGER NOT NULL,
 	"endTick"	        INTEGER NOT NULL,
-    "depth"	            INTEGER NOT NULL,
     "result"	        INTEGER NOT NULL,
 	"packedSourceInfo"	INTEGER NOT NULL,
+	"strIdx"	        INTEGER NOT NULL,
 	PRIMARY KEY("Id")
 );
 
@@ -526,6 +526,7 @@ CREATE TABLE IF NOT EXISTS "lockStates" (
 	"timeTicks"	        INTEGER NOT NULL,
 	"state"	            INTEGER NOT NULL,
     "packedSourceInfo"	INTEGER NOT NULL,
+	"strIdx"	        INTEGER NOT NULL,
 	PRIMARY KEY("Id")
 );
 
@@ -537,6 +538,7 @@ CREATE TABLE "memory" (
 	"timeTicks"	        INTEGER NOT NULL,
 	"operation"	        INTEGER NOT NULL,
     "packedSourceInfo"	INTEGER NOT NULL,
+	"strIdx"	        INTEGER NOT NULL,
 	PRIMARY KEY("Id")
 );
 
@@ -709,18 +711,16 @@ int32_t TraceDB::handleDataPacketZone(const DataPacketZone* pData)
     info.raw.lineNo = pData->lineNo;
     info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
+    info.raw.depth = pData->stackDepth;
 
-    // TODO: is 65k strings going to be enouth?
-    // for now yer.. I can see some apps needing more tho.
     int32_t fmtStrIdx = getFmtStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
-    info.raw.idxFmt = static_cast<uint16_t>(fmtStrIdx);
 
     auto& cmd = cmdInsertZone;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
     cmd.bind(2, static_cast<int64_t>(pData->start));
     cmd.bind(3, static_cast<int64_t>(pData->end));
-    cmd.bind(4, pData->stackDepth);
-    cmd.bind(5, static_cast<int64_t>(info.packed));
+    cmd.bind(4, static_cast<int64_t>(info.packed));
+    cmd.bind(5, fmtStrIdx);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -741,9 +741,9 @@ int32_t TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
     info.raw.lineNo = pData->lineNo;
     info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
-    
+    info.raw.depth = pData->depth;
+
     int32_t fmtStrIdx = getFmtStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
-    info.raw.idxFmt = static_cast<uint16_t>(fmtStrIdx);
 
     auto& cmd = cmdInsertLockTry;
     cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
@@ -751,8 +751,8 @@ int32_t TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
     cmd.bind(3, static_cast<int64_t>(pData->start));
     cmd.bind(4, static_cast<int64_t>(pData->end));
     cmd.bind(5, static_cast<int32_t>(pData->result));
-    cmd.bind(6, static_cast<int64_t>(pData->depth));
-    cmd.bind(7, static_cast<int64_t>(info.packed));
+    cmd.bind(6, static_cast<int64_t>(info.packed));
+    cmd.bind(7, fmtStrIdx);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -773,9 +773,9 @@ int32_t TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
     info.raw.lineNo = pData->lineNo;
     info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
+    info.raw.depth = 0;
 
     int32_t fmtStrIdx = getFmtStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
-    info.raw.idxFmt = static_cast<uint16_t>(fmtStrIdx);
 
     auto& cmd = cmdInsertLockState;
     cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
@@ -783,6 +783,7 @@ int32_t TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
     cmd.bind(3, static_cast<int64_t>(pData->time));
     cmd.bind(4, static_cast<int64_t>(pData->state));
     cmd.bind(5, static_cast<int64_t>(info.packed));
+    cmd.bind(6, fmtStrIdx);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -851,9 +852,9 @@ int32_t TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
     info.raw.lineNo = pData->lineNo;
     info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
+    info.raw.depth = 0;
 
     int32_t fmtStrIdx = getFmtStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
-    info.raw.idxFmt = static_cast<uint16_t>(fmtStrIdx);
 
     auto& cmd = cmdInsertMemory;
     cmd.bind(1, static_cast<int32_t>(pData->ptr));
@@ -862,6 +863,7 @@ int32_t TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
     cmd.bind(4, static_cast<int64_t>(pData->time));
     cmd.bind(5, static_cast<int32_t>(MemOp::Alloc));
     cmd.bind(6, static_cast<int64_t>(info.packed));
+    cmd.bind(7, fmtStrIdx);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -878,7 +880,7 @@ int32_t TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
     info.raw.lineNo = pData->lineNo;
     info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
-    info.raw.idxFmt = 0; // TODO: ?
+    info.raw.depth = 0;
 
     auto& cmd = cmdInsertMemory;
     cmd.bind(1, static_cast<int32_t>(pData->ptr));
@@ -887,6 +889,7 @@ int32_t TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
     cmd.bind(4, static_cast<int64_t>(pData->time));
     cmd.bind(5, static_cast<int32_t>(MemOp::Free));
     cmd.bind(6, static_cast<int64_t>(info.packed));
+    cmd.bind(7);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -1784,7 +1787,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
 
         int32_t numZones = 0;
 
-        sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, stackDepth, packedSourceInfo FROM zones WHERE startTick >= ? AND startTick < ?");
+        sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, packedSourceInfo, strIdx FROM zones WHERE startTick >= ? AND startTick < ?");
         qry.bind(1, static_cast<int64_t>(start));
         qry.bind(2, static_cast<int64_t>(end));
 
@@ -1797,15 +1800,17 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
             zone.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
             zone.start = static_cast<uint64_t>(row.get<int64_t>(1));
             zone.end = static_cast<uint64_t>(row.get<int64_t>(2));
-            zone.stackDepth = static_cast<tt_int8>(row.get<int32_t>(3));
 
             TraceDB::PackedSourceInfo info;
-            info.packed = static_cast<uint64_t>(row.get<int64_t>(4));
+            info.packed = static_cast<uint64_t>(row.get<int64_t>(3));
 
             zone.lineNo = info.raw.lineNo;
             zone.strIdxFunction = info.raw.idxFunction;
             zone.strIdxFile = info.raw.idxFile;
-            zone.strIdxFmt = info.raw.idxFmt;
+            zone.stackDepth = static_cast<uint8_t>(info.raw.depth & 0xFF);
+
+            // TODO: support sending 32bit id to viewer.
+            zone.strIdxFmt = static_cast<uint16_t>(row.get<int32_t>(4) & 0xFFFF);
 
             if (getCompressionBufferSpace(client) < sizeof(zone))
             {
@@ -1833,7 +1838,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
     }
 
     {
-        sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, threadId, startTick, endTick, result, depth, packedSourceInfo FROM lockTry WHERE startTick >= ? AND startTick < ?");
+        sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, threadId, startTick, endTick, result, packedSourceInfo, strIdx FROM lockTry WHERE startTick >= ? AND startTick < ?");
         qry.bind(1, static_cast<int64_t>(start));
         qry.bind(2, static_cast<int64_t>(end));
 
@@ -1855,15 +1860,17 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
             lockTry.start = static_cast<uint64_t>(row.get<int64_t>(2));
             lockTry.end = static_cast<uint64_t>(row.get<int64_t>(3));
             lockTry.result = static_cast<TtLockResult::Enum>(row.get<int32_t>(4));
-            lockTry.depth = static_cast<uint8_t>(row.get<int32_t>(5) & 0xFFFF);
 
             TraceDB::PackedSourceInfo info;
-            info.packed = static_cast<uint64_t>(row.get<int64_t>(6));
+            info.packed = static_cast<uint64_t>(row.get<int64_t>(5));
 
             lockTry.lineNo = info.raw.lineNo;
             lockTry.strIdxFunction = info.raw.idxFunction;
             lockTry.strIdxFile = info.raw.idxFile;
-            lockTry.strIdxFmt = info.raw.idxFmt;
+            lockTry.depth = static_cast<uint8_t>(info.raw.depth & 0xFF);
+
+            // TODO: support sending 32bit id to viewer.
+            lockTry.strIdxFmt = static_cast<uint16_t>(row.get<int32_t>(6) & 0xFFFF);
 
             if (getCompressionBufferSpace(client) < sizeof(lockTry))
             {
