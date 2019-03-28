@@ -119,212 +119,216 @@ void XCore::Release()
 
 void XCore::ShutDown()
 {
-    X_LOG0("Core", "Shutting Down");
-    env_.state_ = CoreGlobals::State::CLOSING;
+    {
+        ttZone(gEnv->ctx, "Core shutdown");
 
-    if (vars_.getCoreFastShutdown()) {
-        X_LOG0("Core", "Fast shutdown, skipping cleanup");
+        X_LOG0("Core", "Shutting Down");
+        env_.state_ = CoreGlobals::State::CLOSING;
 
-        // still save modified vars.
+        if (vars_.getCoreFastShutdown()) {
+            X_LOG0("Core", "Fast shutdown, skipping cleanup");
+
+            // still save modified vars.
+            if (env_.pConsole && !initParams_.basicConsole()) {
+                env_.pConsole->saveChangedVars();
+            }
+
+            moduleInterfaces_.free();
+            converterInterfaces_.free();
+            return;
+        }
+
+        core::StopWatch timer;
+
+        if (pDirWatcher_) {
+            pDirWatcher_->shutDown();
+            X_DELETE(pDirWatcher_, &coreArena_);
+        }
+
+        // save the vars before we start deleting things.
         if (env_.pConsole && !initParams_.basicConsole()) {
             env_.pConsole->saveChangedVars();
         }
 
+        if (env_.pJobSys) {
+            env_.pJobSys->ShutDown();
+            core::Mem::DeleteAndNull(env_.pJobSys, &coreArena_);
+        }
+
+        if (env_.pGame) {
+            env_.pGame->shutDown();
+            core::SafeRelease(env_.pGame);
+        }
+
+        if (env_.pConsole) {
+            env_.pConsole->freeRenderResources();
+        }
+
+        if (env_.p3DEngine) {
+            env_.p3DEngine->shutDown();
+            core::SafeRelease(env_.p3DEngine);
+        }
+
+        if (env_.pRender) {
+            //	env_.pRender->ShutDown();
+        }
+
+        if (env_.pPhysics) {
+            env_.pPhysics->shutDown();
+            core::SafeRelease(env_.pPhysics);
+        }
+
+        if (env_.pVideoSys) {
+            env_.pVideoSys->shutDown();
+            core::SafeRelease(env_.pVideoSys);
+        }
+
+        if (env_.pSound) {
+            env_.pSound->shutDown();
+            core::SafeRelease(env_.pSound);
+        }
+
+        if (env_.pFontSys) {
+            env_.pFontSys->shutDown();
+            core::SafeRelease(env_.pFontSys);
+        }
+
+        if (env_.pScriptSys) {
+            env_.pScriptSys->shutDown();
+            core::SafeRelease(env_.pScriptSys);
+        }
+
+        if (env_.pNet) {
+            env_.pNet->shutDown();
+            core::SafeRelease(env_.pNet);
+        }
+
+        if (env_.pLocalisation) {
+            core::Mem::DeleteAndNull(env_.pLocalisation, &coreArena_);
+        }
+
+        if (pWindow_) {
+            pWindow_->Destroy();
+            core::Mem::DeleteAndNull(pWindow_, &coreArena_);
+        }
+
+        if (pCpuInfo_) {
+            core::Mem::DeleteAndNull(pCpuInfo_, &coreArena_);
+        }
+
+        if (pCrc32_) {
+            core::Mem::DeleteAndNull(pCrc32_, &coreArena_);
+        }
+
+        if (pReplaySys_) {
+            core::Mem::DeleteAndNull(pReplaySys_, &coreArena_);
+        }
+
+    #if X_ENABLE_PROFILER
+        if (pProfiler_) {
+            pProfiler_->shutDown();
+            core::Mem::DeleteAndNull(pProfiler_, &coreArena_);
+        }
+    #endif // !X_ENABLE_PROFILER
+
+        // clean up file logger, now
+        if (pFileLogger_) {
+
+            if (env_.pLog) {
+                env_.pLog->RemoveLogger(pFileLogger_);
+            }
+
+            X_DELETE(pFileLogger_, &coreArena_);
+        }
+
+        if (env_.pFileSys) {
+            env_.pFileSys->shutDown();
+            core::Mem::DeleteAndNull(env_.pFileSys, &coreArena_);
+        }
+
+        // needs to be done after engine, since it has input listners.
+        if (env_.pInput) {
+            env_.pInput->shutDown();
+            core::SafeRelease(env_.pInput);
+        }
+
+        if (env_.pRender) {
+            env_.pRender->shutDown();
+
+            core::SafeRelease(env_.pRender);
+        }
+
+        // shut down interfaces before logging is removed.
+        for (auto& it : moduleInterfaces_) {
+            auto* pModule = it.pModule.get();
+            if (!pModule->ShutDown()) {
+                X_ERROR("Core", "error shuting down engine module");
+            }
+        }
+        for (const auto& it : converterInterfaces_) {
+            auto* conModule = it.pConModule.get();
+            const auto& instance = it.pConverter;
+            if (!conModule->ShutDown(instance)) {
+                X_ERROR("Core", "error shuting down converter module");
+            }
+        }
+
         moduleInterfaces_.free();
         converterInterfaces_.free();
-        return;
-    }
 
-    core::StopWatch timer;
+        X_LOG0("Core", "primary shutdown took: 6%gms", timer.GetMilliSeconds());
 
-    if (pDirWatcher_) {
-        pDirWatcher_->shutDown();
-        X_DELETE(pDirWatcher_, &coreArena_);
-    }
+    #if X_ENABLE_LOGGING
+        if (!initParams_.bTesting && initParams_.bPauseShutdown && pConsole_) { // don't pause when testing.
+            pConsole_->pressToContinue();
+        }
+    #endif // !X_ENABLE_LOGGING
 
-    // save the vars before we start deleting things.
-    if (env_.pConsole && !initParams_.basicConsole()) {
-        env_.pConsole->saveChangedVars();
-    }
+        if (env_.pConsole) {
+            env_.pConsole->shutDown();
+            core::Mem::DeleteAndNull(env_.pConsole, &coreArena_);
+        }
 
-    if (env_.pJobSys) {
-        env_.pJobSys->ShutDown();
-        core::Mem::DeleteAndNull(env_.pJobSys, &coreArena_);
-    }
+        if (env_.pStrArena) {
+            core::Mem::DeleteAndNull(env_.pStrArena, &coreArena_);
+        }
 
-    if (env_.pGame) {
-        env_.pGame->shutDown();
-        core::SafeRelease(env_.pGame);
-    }
-
-    if (env_.pConsole) {
-        env_.pConsole->freeRenderResources();
-    }
-
-    if (env_.p3DEngine) {
-        env_.p3DEngine->shutDown();
-        core::SafeRelease(env_.p3DEngine);
-    }
-
-    if (env_.pRender) {
-        //	env_.pRender->ShutDown();
-    }
-
-    if (env_.pPhysics) {
-        env_.pPhysics->shutDown();
-        core::SafeRelease(env_.pPhysics);
-    }
-
-    if (env_.pVideoSys) {
-        env_.pVideoSys->shutDown();
-        core::SafeRelease(env_.pVideoSys);
-    }
-
-    if (env_.pSound) {
-        env_.pSound->shutDown();
-        core::SafeRelease(env_.pSound);
-    }
-
-    if (env_.pFontSys) {
-        env_.pFontSys->shutDown();
-        core::SafeRelease(env_.pFontSys);
-    }
-
-    if (env_.pScriptSys) {
-        env_.pScriptSys->shutDown();
-        core::SafeRelease(env_.pScriptSys);
-    }
-
-    if (env_.pNet) {
-        env_.pNet->shutDown();
-        core::SafeRelease(env_.pNet);
-    }
-
-    if (env_.pLocalisation) {
-        core::Mem::DeleteAndNull(env_.pLocalisation, &coreArena_);
-    }
-
-    if (pWindow_) {
-        pWindow_->Destroy();
-        core::Mem::DeleteAndNull(pWindow_, &coreArena_);
-    }
-
-    if (pCpuInfo_) {
-        core::Mem::DeleteAndNull(pCpuInfo_, &coreArena_);
-    }
-
-    if (pCrc32_) {
-        core::Mem::DeleteAndNull(pCrc32_, &coreArena_);
-    }
-
-    if (pReplaySys_) {
-        core::Mem::DeleteAndNull(pReplaySys_, &coreArena_);
-    }
-
-#if X_ENABLE_PROFILER
-    if (pProfiler_) {
-        pProfiler_->shutDown();
-        core::Mem::DeleteAndNull(pProfiler_, &coreArena_);
-    }
-#endif // !X_ENABLE_PROFILER
-
-    // clean up file logger, now
-    if (pFileLogger_) {
-
+        // Loggers last.
         if (env_.pLog) {
-            env_.pLog->RemoveLogger(pFileLogger_);
+            //  No need to remove them, if log system is closing.
+            //	if (pVsLogger_)
+            //		env_.pLog->RemoveLogger(pVsLogger_);
+            //	if (pConsoleLogger_)
+            //		env_.pLog->RemoveLogger(pConsoleLogger_);
+
+            env_.pLog->ShutDown();
+
+            //if (pConsole)
+            //	pConsole->Show(false);
+
+            //	system("PAUSE");
+
+            X_DELETE(pVsLogger_, &coreArena_);
+            X_DELETE(pConsoleLogger_, &coreArena_);
+            X_DELETE(pConsole_, &coreArena_);
+
+            // if this is not null log.
+            if (env_.pLog != &s_nullLogInst) {
+                core::Mem::DeleteAndNull(env_.pLog, &coreArena_);
+            }
         }
 
-        X_DELETE(pFileLogger_, &coreArena_);
-    }
-
-    if (env_.pFileSys) {
-        env_.pFileSys->shutDown();
-        core::Mem::DeleteAndNull(env_.pFileSys, &coreArena_);
-    }
-
-    // needs to be done after engine, since it has input listners.
-    if (env_.pInput) {
-        env_.pInput->shutDown();
-        core::SafeRelease(env_.pInput);
-    }
-
-    if (env_.pRender) {
-        env_.pRender->shutDown();
-
-        core::SafeRelease(env_.pRender);
-    }
-
-    // shut down interfaces before logging is removed.
-    for (auto& it : moduleInterfaces_) {
-        auto* pModule = it.pModule.get();
-        if (!pModule->ShutDown()) {
-            X_ERROR("Core", "error shuting down engine module");
+        if (pCoreEventDispatcher_) {
+            pCoreEventDispatcher_->RemoveListener(this);
+            core::Mem::DeleteAndNull(pCoreEventDispatcher_, &coreArena_);
         }
-    }
-    for (const auto& it : converterInterfaces_) {
-        auto* conModule = it.pConModule.get();
-        const auto& instance = it.pConverter;
-        if (!conModule->ShutDown(instance)) {
-            X_ERROR("Core", "error shuting down converter module");
+
+        for (size_t i = 0; i < moduleDLLHandles_.size(); i++) {
+            core::Module::UnLoad(moduleDLLHandles_[i]);
         }
+
+        moduleDLLHandles_.free();
     }
-
-    moduleInterfaces_.free();
-    converterInterfaces_.free();
-
-    X_LOG0("Core", "primary shutdown took: 6%gms", timer.GetMilliSeconds());
-
-#if X_ENABLE_LOGGING
-    if (!initParams_.bTesting && initParams_.bPauseShutdown && pConsole_) { // don't pause when testing.
-        pConsole_->pressToContinue();
-    }
-#endif // !X_ENABLE_LOGGING
-
-    if (env_.pConsole) {
-        env_.pConsole->shutDown();
-        core::Mem::DeleteAndNull(env_.pConsole, &coreArena_);
-    }
-
-    if (env_.pStrArena) {
-        core::Mem::DeleteAndNull(env_.pStrArena, &coreArena_);
-    }
-
-    // Loggers last.
-    if (env_.pLog) {
-        //  No need to remove them, if log system is closing.
-        //	if (pVsLogger_)
-        //		env_.pLog->RemoveLogger(pVsLogger_);
-        //	if (pConsoleLogger_)
-        //		env_.pLog->RemoveLogger(pConsoleLogger_);
-
-        env_.pLog->ShutDown();
-
-        //if (pConsole)
-        //	pConsole->Show(false);
-
-        //	system("PAUSE");
-
-        X_DELETE(pVsLogger_, &coreArena_);
-        X_DELETE(pConsoleLogger_, &coreArena_);
-        X_DELETE(pConsole_, &coreArena_);
-
-        // if this is not null log.
-        if (env_.pLog != &s_nullLogInst) {
-            core::Mem::DeleteAndNull(env_.pLog, &coreArena_);
-        }
-    }
-
-    if (pCoreEventDispatcher_) {
-        pCoreEventDispatcher_->RemoveListener(this);
-        core::Mem::DeleteAndNull(pCoreEventDispatcher_, &coreArena_);
-    }
-
-    for (size_t i = 0; i < moduleDLLHandles_.size(); i++) {
-        core::Module::UnLoad(moduleDLLHandles_[i]);
-    }
-
-    moduleDLLHandles_.free();
 
 #if TTELEMETRY_ENABLED
     ttShutdownContext(gEnv->ctx);

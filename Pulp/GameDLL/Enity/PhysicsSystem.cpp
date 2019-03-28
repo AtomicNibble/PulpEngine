@@ -28,6 +28,8 @@ namespace entity
 
     void PhysicsSystem::update(core::FrameData& frame, ECS& reg)
     {
+        ttZone(gEnv->ctx, "ECS Update Physics");
+
         X_UNUSED(frame, reg);
 
         core::span<const physics::ActiveTransform> transforms;

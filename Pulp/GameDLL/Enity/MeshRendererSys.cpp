@@ -22,6 +22,8 @@ namespace entity
 
     void MeshRendererSys::update(core::FrameData& frame, ECS& reg)
     {
+        ttZone(gEnv->ctx, "ECS Update RendMesh");
+
         X_UNUSED(frame, reg);
     }
 

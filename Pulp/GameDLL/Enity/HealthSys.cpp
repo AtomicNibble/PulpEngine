@@ -18,7 +18,11 @@ namespace entity
 
     void HealthSystem::update(core::FrameTimeData& frame, ECS& reg)
     {
+        ttZone(gEnv->ctx, "ECS Update Health");
+
+
         X_UNUSED(frame, reg);
+
     }
 
     void HealthSystem::onMsg(ECS& reg, const MsgDamage& msg)

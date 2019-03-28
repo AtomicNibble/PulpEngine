@@ -25,6 +25,8 @@ namespace entity
     void AnimatedSystem::update(core::FrameTimeData& time, ECS& reg,
         engine::IWorld3D* p3DWorld)
     {
+        ttZone(gEnv->ctx, "ECS Update Animated");
+
         X_UNUSED(time, reg, p3DWorld);
 
         Matrix33f rotation;

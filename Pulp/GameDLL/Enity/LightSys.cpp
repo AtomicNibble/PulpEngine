@@ -22,6 +22,8 @@ namespace entity
 
     void LightSystem::update(const core::FrameData& frame, ECS& reg)
     {
+        ttZone(gEnv->ctx, "ECS Update Lights");
+
         X_UNUSED(frame, reg);
     }
 

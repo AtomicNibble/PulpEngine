@@ -75,6 +75,8 @@ namespace entity
 
     void PlayerSystem::update(core::FrameTimeData& timeInfo, ECS& reg)
     {
+        ttZone(gEnv->ctx, "ECS Update Players");
+
         X_UNUSED(timeInfo);
         
         auto view = reg.view<Player, TransForm>();
