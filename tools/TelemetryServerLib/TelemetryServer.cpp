@@ -1324,7 +1324,11 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     }
 
     // add filename,
+    core::Guid::GuidStr guidStr;
+
     dbPath.append("telem_");
+    dbPath.append(trace.guid.toString(guidStr));
+    dbPath.append("_");
     dbPath.append(date.toString(dateStr));
     dbPath.setExtension("db");
 
@@ -1341,7 +1345,6 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     bool setMeta = true;
 
     VersionInfo::Description verStr;
-    core::Guid::GuidStr guidStr;
     setMeta &= strm.db.setMeta("guid", trace.guid.toString(guidStr));
     setMeta &= strm.db.setMeta("appName", core::string_view(pApp->appName));
     setMeta &= strm.db.setMeta("hostName", core::string_view(client.hostName));
