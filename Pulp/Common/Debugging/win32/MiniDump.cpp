@@ -54,12 +54,12 @@ namespace debugging
     bool WriteMiniDump(const Path<wchar_t>& filename, DumpType type, EXCEPTION_POINTERS* exceptionPointers)
     {
 #if X_ENABLE_MINI_DUMP
-        MINIDUMP_EXCEPTION_INFORMATION miniDumpInfo;
 
         MINIDUMP_TYPE DumpType = static_cast<MINIDUMP_TYPE>(getDumpType(type));
         PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam = nullptr;
         PMINIDUMP_CALLBACK_INFORMATION CallbackParam = nullptr;
 
+        MINIDUMP_EXCEPTION_INFORMATION miniDumpInfo;
         miniDumpInfo.ThreadId = core::Thread::getCurrentID();
         miniDumpInfo.ExceptionPointers = exceptionPointers;
         miniDumpInfo.ClientPointers = FALSE;
