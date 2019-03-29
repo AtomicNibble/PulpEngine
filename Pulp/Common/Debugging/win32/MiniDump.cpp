@@ -18,10 +18,24 @@ namespace debugging
         {
             switch (type) {
                 case DumpType::Full:
-                    return MiniDumpWithDataSegs | MiniDumpWithHandleData | MiniDumpWithFullMemory | MiniDumpWithFullMemoryInfo | MiniDumpWithThreadInfo | MiniDumpWithProcessThreadData | MiniDumpWithUnloadedModules | MiniDumpWithPrivateReadWriteMemory;
+                    return MiniDumpWithFullMemory |
+                        MiniDumpWithDataSegs |
+                        MiniDumpWithHandleData |
+                        MiniDumpWithFullMemory |
+                        MiniDumpWithFullMemoryInfo |
+                        MiniDumpWithThreadInfo |
+                        MiniDumpWithProcessThreadData |
+                        MiniDumpWithUnloadedModules |
+                        MiniDumpWithPrivateReadWriteMemory;
 
                 case DumpType::Medium:
-                    return MiniDumpWithDataSegs | MiniDumpWithFullMemory | MiniDumpWithFullMemoryInfo | MiniDumpWithThreadInfo | MiniDumpWithProcessThreadData | MiniDumpWithUnloadedModules | MiniDumpWithPrivateReadWriteMemory;
+                    return MiniDumpWithDataSegs |
+                        MiniDumpWithFullMemory |
+                        MiniDumpWithFullMemoryInfo |
+                        MiniDumpWithThreadInfo |
+                        MiniDumpWithProcessThreadData |
+                        MiniDumpWithUnloadedModules |
+                        MiniDumpWithPrivateReadWriteMemory;
 
                 case DumpType::Small:
                     return MiniDumpNormal;
