@@ -122,7 +122,7 @@ bool XRender::init(PLATFORM_HWND hWnd, texture::Texturefmt::Enum depthFmt, bool 
 {
     X_ASSERT(vars_.varsRegisterd(), "Vars must be init before calling XRender::Init()")(vars_.varsRegisterd());
     X_PROFILE_NO_HISTORY_BEGIN("RenderInit", core::profiler::SubSys::RENDER);
-    ttZone(gEnv->ctx, "RenderInit");
+    ttZone(gEnv->ctx, "(Render) Init");
 
     if (hWnd == static_cast<HWND>(0)) {
         X_ERROR("Dx12", "target window is not valid");
@@ -527,7 +527,7 @@ void XRender::renderBegin(void)
 
 void XRender::renderEnd(void)
 {
-    ttZone(gEnv->ctx, "RenderEnd");
+    ttZone(gEnv->ctx, "(Render) End");
 
     GraphicsContext* pContext = pContextMan_->allocateGraphicsContext();
 
@@ -558,7 +558,7 @@ void XRender::renderEnd(void)
 
 CommandListHandle XRender::createCommandLists(CommandBucket<uint32_t>& cmdBucket)
 {
-    ttZone(gEnv->ctx, "CreateCommandList");
+    ttZone(gEnv->ctx, "(Render) CreateCommandList");
 
 #if RENDER_STATS
     ++stats_.numBatches;
@@ -1479,7 +1479,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
     const StateDesc& desc,
     const SamplerState* pStaticSamplers, size_t numStaticSamplers)
 {
-    ttZone(gEnv->ctx, "CreateState");
+    ttZone(gEnv->ctx, "(Render) CreateState");
 
     X_ASSERT_NOT_NULL(pPerm);
 

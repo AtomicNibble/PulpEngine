@@ -1304,7 +1304,7 @@ void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
                 bytesTransferd, pAsyncReq->pBuf);
         }
 
-        ttZone(gEnv->ctx, "FileSys Callback - Read");
+        ttZone(gEnv->ctx, "(Core/FileSys) Callback - Read");
         pAsyncReq->callback.Invoke(*this, pAsyncReq, pReqFile, bytesTransferd);
     }
     else if (asyncOp.getType() == IoRequest::WRITE) {
@@ -1322,7 +1322,7 @@ void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
                 bytesTransferd, pAsyncReq->pBuf);
         }
 
-        ttZone(gEnv->ctx, "FileSys Callback - Write");
+        ttZone(gEnv->ctx, "(Core/FileSys) Callback - Write");
         pAsyncReq->callback.Invoke(*this, pAsyncReq, pReqFile, bytesTransferd);
     }
     else if (asyncOp.getType() == IoRequest::OPEN_READ_ALL) {
@@ -1341,7 +1341,7 @@ void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
         }
 
         {
-            ttZone(gEnv->ctx, "FileSys Callback - OpenReadAll");
+            ttZone(gEnv->ctx, "(Core/FileSys) Callback - OpenReadAll");
 
             if (pAsyncReq->dataSize != bytesTransferd) {
                 X_ERROR("FileSys", "Failed to read whole file contents. requested: %" PRIu32 " got %" PRIu32,
@@ -1374,7 +1374,7 @@ void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
         }
 
         {
-            ttZone(gEnv->ctx, "FileSys Callback - OpenWriteAll");
+            ttZone(gEnv->ctx, "(Core/FileSys) Callback - OpenWriteAll");
 
             if (pAsyncReq->data.size() != bytesTransferd) {
                 X_ERROR("FileSys", "Failed to write whole file contents. requested: %" PRIu32 " got %" PRIu32,
@@ -1467,7 +1467,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
     auto checkForCompletedOps = [&] {
         if (pendingOps_.isNotEmpty()) {
-            ttZone(gEnv->ctx, "FileSys - Process compelted ops");
+            ttZone(gEnv->ctx, "(Core/FileSys) Process compelted ops");
 
             for (size_t i = 0; i < pendingOps_.size(); i++) {
                 uint32_t bytesTrans = 0;
@@ -1535,7 +1535,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
             // we have a request.
         }
 
-        ttZone(gEnv->ctx, "FileSys Process");
+        ttZone(gEnv->ctx, "(Core/FileSys) Worker Process");
 
         core::UniquePointer<IoRequestBase> requestPtr(ioQueueDataArena_, pRequest);
         const auto type = pRequest->getType();
@@ -1548,7 +1548,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
             IoRequestOpen* pOpen = static_cast<IoRequestOpen*>(pRequest);
             XFileAsync* pFile = openFileAsync(pOpen->path, pOpen->mode, VirtualDirectory::BASE);
 
-            ttZone(gEnv->ctx, "FileSys Callback - Open");
+            ttZone(gEnv->ctx, "(Core/FileSys) Callback - Open");
             pOpen->callback.Invoke(fileSys, pOpen, pFile, 0);
         }
         else if (type == IoRequest::OPEN_READ_ALL) {
@@ -1673,7 +1673,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
             stats_.NumBytesRead += pRead->dataSize;
 #endif // !X_ENABLE_FILE_STATS
 
-            ttZone(gEnv->ctx, "FileSys Dispatch - Read");
+            ttZone(gEnv->ctx, "(Core/FileSys) Dispatch - Read");
 
             if (fileType == XFileAsync::Type::DISK) {
                 XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(pRead->pFile);
@@ -1725,7 +1725,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
             stats_.NumBytesWrite += pWrite->dataSize;
 #endif // !X_ENABLE_FILE_STATS
 
-            ttZone(gEnv->ctx, "FileSys Dispatch - Write");
+            ttZone(gEnv->ctx, "(Core/FileSys) Dispatch - Write");
 
             XFileAsyncOperationCompiltion operation = pFile->writeAsync(
                 pWrite->pBuf,

@@ -142,7 +142,7 @@ XScene::~XScene()
 
 bool XScene::createPxScene(physx::PxSceneDesc& pxDesc)
 {
-    ttZone(gEnv->ctx, "createPxScene");
+    ttZone(gEnv->ctx, "(Physics) createPxScene");
 
     X_ASSERT(pScene_ == nullptr, "Scenen alread created")();
     X_ASSERT(pControllerManager_ == nullptr, "Scenen alread created")();

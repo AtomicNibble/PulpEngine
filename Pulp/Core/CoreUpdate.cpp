@@ -40,7 +40,7 @@ bool XCore::Update(void)
     using namespace core::V2;
 
     ttTick(gEnv->ctx);
-    ttZone(gEnv->ctx, "Update");
+    ttZone(gEnv->ctx, "(Core) Update");
 
     ++numFrames_;
 

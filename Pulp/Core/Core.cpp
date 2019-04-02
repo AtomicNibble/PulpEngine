@@ -120,7 +120,7 @@ void XCore::Release()
 void XCore::ShutDown()
 {
     {
-        ttZone(gEnv->ctx, "Core shutdown");
+        ttZone(gEnv->ctx, "(Core) Shutdown");
 
         X_LOG0("Core", "Shutting Down");
         env_.state_ = CoreGlobals::State::CLOSING;

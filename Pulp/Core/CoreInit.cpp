@@ -279,7 +279,7 @@ bool XCore::FreeConverterModule(IConverterModule* pConvertModule)
 
 bool XCore::IntializeEngineModule(const char* pDllName, const char* pModuleClassName, const CoreInitParams& initParams)
 {
-    ttZone(gEnv->ctx, "ModuleInit \"%s\"", pDllName);
+    ttZone(gEnv->ctx, "(Core) ModuleInit \"%s\"", pDllName);
 
     X_PROFILE_NO_HISTORY_BEGIN("ModuleInit", core::profiler::SubSys::CORE);
 
@@ -405,7 +405,7 @@ bool XCore::Init(CoreInitParams& startupParams)
 #endif // TTELEMETRY_ENABLED
 
 
-    ttZone(gEnv->ctx, "Core Init");
+    ttZone(gEnv->ctx, "(Core) Init");
 
 
 #if X_ENABLE_DIR_WATCHER
@@ -450,7 +450,7 @@ bool XCore::Init(CoreInitParams& startupParams)
 
     if (startupParams.loadSymbols()) {
         X_PROFILE_NO_HISTORY_BEGIN("SymResInit", core::profiler::SubSys::CORE);
-        ttZone(gEnv->ctx, "SymRes Init");
+        ttZone(gEnv->ctx, "(Core/SymRes) Init");
 
         core::symbolResolution::Startup();
     }
@@ -556,7 +556,7 @@ bool XCore::Init(CoreInitParams& startupParams)
     // Load the default config.
     if (!startupParams.isCoreOnly()) {
         X_PROFILE_NO_HISTORY_BEGIN("ConfigLoad", core::profiler::SubSys::CORE);
-        ttZone(gEnv->ctx, "Load config");
+        ttZone(gEnv->ctx, "(Core) Load config");
 
         if (!env_.pConsole->loadAndExecConfigFile("default.cfg"_sv)) {
             return false;
@@ -772,7 +772,7 @@ bool XCore::Init(CoreInitParams& startupParams)
 
     if (startupParams.loadSymbols()) {
         X_PROFILE_NO_HISTORY_BEGIN("SymResRefresh", core::profiler::SubSys::CORE);
-        ttZone(gEnv->ctx, "Refresh symbols");
+        ttZone(gEnv->ctx, "(Core/SymRes) Refresh");
         core::symbolResolution::Refresh();
     }
 
@@ -800,7 +800,7 @@ bool XCore::Init(CoreInitParams& startupParams)
 
 bool XCore::InitAsyncWait(void)
 {
-    ttZone(gEnv->ctx, "AsynInit wait");
+    ttZone(gEnv->ctx, "(Core) AsynInit wait");
     X_PROFILE_NO_HISTORY_BEGIN("AsyncInitFin", core::profiler::SubSys::CORE);
 
     X_LOG1("Core", "AsynInit wait");
@@ -945,7 +945,7 @@ bool XCore::InitLogging(const CoreInitParams& initParams)
 
         const auto& desc = initParams.consoleDesc;
         {
-            ttZone(gEnv->ctx, "Create Console window");
+            ttZone(gEnv->ctx, "(Core) Create Console window");
             pConsole_ = X_NEW(core::Console, &coreArena_, "ExternalConsoleLog")(core::string_view(desc.pTitle));
         }
         pConsole_->setSize(desc.windowWidth, desc.windowHeight, desc.numLines);

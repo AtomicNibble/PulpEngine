@@ -294,7 +294,7 @@ XPeer::~XPeer()
 // TODO: make this handle been called multiple times better.
 StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketDescriptor> socketDescriptors)
 {
-    ttZone(gEnv->ctx, "Net peer init");
+    ttZone(gEnv->ctx, "(Net) peer init");
 
     if (maxConnections < 1) {
         return StartupResult::InvalidMaxCon;
@@ -527,7 +527,7 @@ void XPeer::shutdown(core::TimeVal blockDuration, OrderingChannel::Enum ordering
 
 void XPeer::runUpdate(void)
 {
-    ttZone(gEnv->ctx, "Net peer update");
+    ttZone(gEnv->ctx, "(Net) peer update");
 
     BitStreamMTU updateBS;
     core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();

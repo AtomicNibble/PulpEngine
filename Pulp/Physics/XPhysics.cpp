@@ -174,7 +174,7 @@ bool XPhysics::init(const ToleranceScale& scale)
     X_LOG0("PhysicsSys", "Starting");
     X_PROFILE_NO_HISTORY_BEGIN("PhysicsInit", core::profiler::SubSys::PHYSICS);
 
-    ttZone(gEnv->ctx, "Physics Init");
+    ttZone(gEnv->ctx, "(Physics) Init");
 
 #if X_DEBUG
     gDelayLoadHook.forceConfig(DelayLoadHook::Config::Checked);
@@ -361,7 +361,7 @@ void XPhysics::release(void)
 
 void XPhysics::onTickPreRender(core::TimeVal dtime, const AABB& debugVisCullBounds)
 {
-    ttZone(gEnv->ctx, "Physics pre render");
+    ttZone(gEnv->ctx, "(Physics) pre render");
 
     stepperType_ = vars_.getStepperType();
 
@@ -407,7 +407,7 @@ void XPhysics::onTickPreRender(core::TimeVal dtime, const AABB& debugVisCullBoun
 
 void XPhysics::onTickPostRender(core::TimeVal dtime)
 {
-    ttZone(gEnv->ctx, "Physics post render");
+    ttZone(gEnv->ctx, "(Physics) post render");
 
     if (!IsPaused() && waitForResults_ && activeScenes_.isNotEmpty()) {
         XScene* pScene = activeScenes_.front();
