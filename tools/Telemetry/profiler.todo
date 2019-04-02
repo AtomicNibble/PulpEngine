@@ -36,6 +36,9 @@ Runtime:
 
 ServerLib:
 
+  ✔ Support clients creating multiple traces per second. @done (19-04-02 22:24)
+    Currently this don't work since db names clash.
+
   ☐ Create nice api for the server exe to just run.
   ☐ Support multiple client connections / data streams
 
