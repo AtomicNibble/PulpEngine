@@ -35,7 +35,6 @@ void BM_telem_zone(benchmark::State& state)
         ttLeave(ctx);
     }
 
-    ttFlush(ctx);
     ttClose(ctx);
 
     ttShutdownContext(ctx);
