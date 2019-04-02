@@ -43,5 +43,3 @@ void BM_telem_zone(benchmark::State& state)
 }
 
 BENCHMARK(BM_telem_zone);
-
-BENCHMARK(BM_telem_zone);
