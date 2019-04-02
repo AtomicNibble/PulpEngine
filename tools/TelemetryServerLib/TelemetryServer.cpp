@@ -621,7 +621,7 @@ uint16_t TraceDB::getStringIndex(uint16_t strIdx) const
     return idx;
 }
 
-uint16_t TraceDB::getFmtStringIndex(const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt)
+uint16_t TraceDB::getStringIndex(const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt)
 {
     int32_t strIdx = -1;
 
@@ -713,14 +713,14 @@ int32_t TraceDB::handleDataPacketZone(const DataPacketZone* pData)
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
     info.raw.depth = pData->stackDepth;
 
-    int32_t fmtStrIdx = getFmtStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
+    int32_t strIdx = getStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
 
     auto& cmd = cmdInsertZone;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
     cmd.bind(2, static_cast<int64_t>(pData->start));
     cmd.bind(3, static_cast<int64_t>(pData->end));
     cmd.bind(4, static_cast<int64_t>(info.packed));
-    cmd.bind(5, fmtStrIdx);
+    cmd.bind(5, strIdx);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -743,7 +743,7 @@ int32_t TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
     info.raw.depth = pData->depth;
 
-    int32_t fmtStrIdx = getFmtStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
+    int32_t strIdx = getStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
 
     auto& cmd = cmdInsertLockTry;
     cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
@@ -752,7 +752,7 @@ int32_t TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
     cmd.bind(4, static_cast<int64_t>(pData->end));
     cmd.bind(5, static_cast<int32_t>(pData->result));
     cmd.bind(6, static_cast<int64_t>(info.packed));
-    cmd.bind(7, fmtStrIdx);
+    cmd.bind(7, strIdx);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -775,7 +775,7 @@ int32_t TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
     info.raw.depth = 0;
 
-    int32_t fmtStrIdx = getFmtStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
+    int32_t strIdx = getStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
 
     auto& cmd = cmdInsertLockState;
     cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
@@ -783,7 +783,7 @@ int32_t TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
     cmd.bind(3, static_cast<int64_t>(pData->time));
     cmd.bind(4, static_cast<int64_t>(pData->state));
     cmd.bind(5, static_cast<int64_t>(info.packed));
-    cmd.bind(6, fmtStrIdx);
+    cmd.bind(6, strIdx);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -820,12 +820,12 @@ int32_t TraceDB::handleDataPacketThreadSetName(const DataPacketThreadSetName* pD
 {
     const int32_t totalSize = getPacketSizeIncArgData(pData);
 
-    int32_t fmtStrIdx = getFmtStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
+    int32_t strIdx = getStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
 
     auto& cmd = cmdInsertThreadName;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
     cmd.bind(2, static_cast<int64_t>(pData->time));
-    cmd.bind(3, fmtStrIdx);
+    cmd.bind(3, strIdx);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -854,7 +854,7 @@ int32_t TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
     info.raw.depth = 0;
 
-    int32_t fmtStrIdx = getFmtStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
+    int32_t strIdx = getStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
 
     auto& cmd = cmdInsertMemory;
     cmd.bind(1, static_cast<int32_t>(pData->ptr));
@@ -863,7 +863,7 @@ int32_t TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
     cmd.bind(4, static_cast<int64_t>(pData->time));
     cmd.bind(5, static_cast<int32_t>(MemOp::Alloc));
     cmd.bind(6, static_cast<int64_t>(info.packed));
-    cmd.bind(7, fmtStrIdx);
+    cmd.bind(7, strIdx);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -904,12 +904,12 @@ int32_t TraceDB::handleDataPacketMessage(const DataPacketMessage* pData)
 {
     const int32_t totalSize = getPacketSizeIncArgData(pData);
 
-    int32_t fmtStrIdx = getFmtStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
+    int32_t strIdx = getStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
 
     auto& cmd = cmdInsertMessage;
     cmd.bind(1, static_cast<int64_t>(pData->time));
     cmd.bind(2, static_cast<int32_t>(pData->logType));
-    cmd.bind(3, fmtStrIdx);
+    cmd.bind(3, strIdx);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
