@@ -332,6 +332,36 @@ void ZoneTree::addZone(const StringBuf& buf, const DataPacketZone* pData)
     // now sure could be a lot of them..
 }
 
+void ZoneTree::getNodes(NodeFlatArr& arr) const
+{
+    arr.clear();
+
+    addNodes_r(arr, -1, &root_);
+}
+
+void ZoneTree::addNodes_r(NodeFlatArr& arr, int32_t parIdx, const Node* pNode) const
+{
+    if (!pNode) {
+        return;
+    }
+
+    auto idx = static_cast<int32_t>(arr.size());
+    auto& node = arr.AddOne();
+    node.parentIdx = parIdx;
+    node.info = pNode->info;
+
+    if (pNode->pFirstChild) {
+        addNodes_r(arr, idx, pNode->pFirstChild);
+    }
+
+    // now need to print all nodes on same level.
+    pNode = pNode->pNextsibling;
+    while (pNode) {
+        addNodes_r(arr, parIdx, pNode);
+        pNode = pNode->pNextsibling;
+    }
+}
+
 void ZoneTree::print(void) const
 {
     print_r(core::string(""), &root_);

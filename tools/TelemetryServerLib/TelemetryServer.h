@@ -42,6 +42,14 @@ struct ZoneTree
         ZoneInfo info;
     };
 
+    struct NodeFlat
+    {
+        int32_t parentIdx;
+        ZoneInfo info;
+    };
+
+    using NodeFlatArr = core::Array<NodeFlat>;
+
     static constexpr int32_t MAX_NODES = 1024;
 
 public:
@@ -49,11 +57,13 @@ public:
     ~ZoneTree();
 
     void addZone(const StringBuf& buf, const DataPacketZone* pData);
+
+    void getNodes(NodeFlatArr& arr) const;
     void print(void) const;
 
 private:
+    void addNodes_r(NodeFlatArr& arr, int32_t parIdx, const Node* pNode) const;
     void print_r(const core::string& prefix, const Node* pNode) const;
-
     void free_r(const Node* pNode);
 
 private:
