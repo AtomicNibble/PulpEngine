@@ -142,7 +142,7 @@ private:
 
     uint16_t addString(core::string_view str);
     uint16_t getStringIndex(uint16_t strIdx) const;
-    uint16_t getStringIndex(const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt);
+    uint16_t getStringIndex(StringBuf& buf, const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt);
 
 public:
     sql::SqlLiteDb con;

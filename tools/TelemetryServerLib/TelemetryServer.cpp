@@ -769,8 +769,10 @@ uint16_t TraceDB::getStringIndex(uint16_t strIdx) const
     return idx;
 }
 
-uint16_t TraceDB::getStringIndex(const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt)
+uint16_t TraceDB::getStringIndex(StringBuf& buf_, const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt)
 {
+    X_UNUSED(buf_);
+
     int32_t strIdx = -1;
 
     if (pPacket->argDataSize)
@@ -855,13 +857,14 @@ int32_t TraceDB::handleDataPacketStringTableAdd(const DataPacketStringTableAdd* 
 
 int32_t TraceDB::handleDataPacketZone(const DataPacketZone* pData)
 {
+    StringBuf strBuf;
+    int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxFmt);
+
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
     info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
     info.raw.depth = pData->stackDepth;
-
-    int32_t strIdx = getStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
 
     auto& cmd = cmdInsertZone;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
@@ -881,17 +884,16 @@ int32_t TraceDB::handleDataPacketZone(const DataPacketZone* pData)
 
 int32_t TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
 {
-    const int32_t totalSize = getPacketSizeIncArgData(pData);
-
     insertLockIfMissing(pData->lockHandle);
+
+    StringBuf strBuf;
+    int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxFmt);
 
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
     info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
     info.raw.depth = pData->depth;
-
-    int32_t strIdx = getStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
 
     auto& cmd = cmdInsertLockTry;
     cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
@@ -908,22 +910,21 @@ int32_t TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
     }
 
     cmd.reset();
-    return totalSize;
+    return getPacketSizeIncArgData(pData);
 }
 
 int32_t TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
 {
-    const int32_t totalSize = getPacketSizeIncArgData(pData);
-
     insertLockIfMissing(pData->lockHandle);
+
+    StringBuf strBuf;
+    int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxFmt);
 
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
     info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
     info.raw.depth = 0;
-
-    int32_t strIdx = getStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
 
     auto& cmd = cmdInsertLockState;
     cmd.bind(1, static_cast<int64_t>(pData->lockHandle));
@@ -939,13 +940,11 @@ int32_t TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
     }
 
     cmd.reset();
-    return totalSize;
+    return getPacketSizeIncArgData(pData);
 }
 
 int32_t TraceDB::handleDataPacketLockSetName(const DataPacketLockSetName* pData)
 {
-    const int32_t totalSize = getPacketSizeIncArgData(pData);
-
     auto idxFmt = getStringIndex(pData->strIdxFmt);
 
     insertLockIfMissing(pData->lockHandle);
@@ -961,14 +960,13 @@ int32_t TraceDB::handleDataPacketLockSetName(const DataPacketLockSetName* pData)
     }
 
     cmd.reset();
-    return totalSize;
+    return getPacketSizeIncArgData(pData);
 }
 
 int32_t TraceDB::handleDataPacketThreadSetName(const DataPacketThreadSetName* pData)
 {
-    const int32_t totalSize = getPacketSizeIncArgData(pData);
-
-    int32_t strIdx = getStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
+    StringBuf strBuf;
+    int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxFmt);
 
     auto& cmd = cmdInsertThreadName;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
@@ -981,7 +979,7 @@ int32_t TraceDB::handleDataPacketThreadSetName(const DataPacketThreadSetName* pD
     }
 
     cmd.reset();
-    return totalSize;
+    return getPacketSizeIncArgData(pData);
 }
 
 int32_t TraceDB::handleDataPacketLockCount(const DataPacketLockCount* pData)
@@ -994,15 +992,14 @@ int32_t TraceDB::handleDataPacketLockCount(const DataPacketLockCount* pData)
 
 int32_t TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
 {
-    const int32_t totalSize = getPacketSizeIncArgData(pData);
+    StringBuf strBuf;
+    int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxFmt);
 
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
     info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
     info.raw.depth = 0;
-
-    int32_t strIdx = getStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
 
     auto& cmd = cmdInsertMemory;
     cmd.bind(1, static_cast<int32_t>(pData->ptr));
@@ -1019,7 +1016,7 @@ int32_t TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
     }
 
     cmd.reset();
-    return totalSize;
+    return getPacketSizeIncArgData(pData);
 }
 
 int32_t TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
@@ -1050,9 +1047,8 @@ int32_t TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
 
 int32_t TraceDB::handleDataPacketMessage(const DataPacketMessage* pData)
 {
-    const int32_t totalSize = getPacketSizeIncArgData(pData);
-
-    int32_t strIdx = getStringIndex(pData, sizeof(*pData), pData->strIdxFmt);
+    StringBuf strBuf;
+    int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxFmt);
 
     auto& cmd = cmdInsertMessage;
     cmd.bind(1, static_cast<int64_t>(pData->time));
@@ -1065,7 +1061,7 @@ int32_t TraceDB::handleDataPacketMessage(const DataPacketMessage* pData)
     }
 
     cmd.reset();
-    return totalSize;
+    return getPacketSizeIncArgData(pData);
 }
 
 int32_t TraceDB::handleDataPacketCallStack(const DataPacketCallStack* pData)
