@@ -351,6 +351,154 @@ namespace
 } // namespace
 
 
+ZoneTree::ZoneTree() :
+    root_(core::string_view("root")),
+    heap_(
+        core::bitUtil::RoundUpToMultiple<size_t>(sizeof(Node) * MAX_NODES,
+        core::VirtualMem::GetPageSize())
+    ),
+    allocator_(heap_.start(), heap_.end()),
+    arena_(&allocator_, "ZoneNodeAllocator")
+{
+}
+
+ZoneTree::~ZoneTree()
+{
+    free_r(&root_);
+}
+
+void ZoneTree::addZone(const StringBuf& buf, const DataPacketZone* pData)
+{
+    const auto timeTicks = pData->end - pData->start;
+
+    // always add time to root?
+    auto* pNode = &root_;
+    pNode->info.totalTicks += timeTicks; // add time to root.
+
+    if (buf.isEmpty()) {
+        return;
+    }
+
+    if (buf[0] != '(') {
+        return;
+    }
+
+    // need to find either / or )
+    // want to build like a range also.
+    const char* pBegin = buf.begin() + 1;
+    const char* pCur = pBegin;
+
+    while (1)
+    {
+        while (pCur < buf.end() && *pCur != '/' && *pCur != ')') {
+            ++pCur;
+        }
+
+        if (pCur == buf.end()) {
+            X_ERROR("TelemSrv", "Unexpected end of path \"%s\"", buf.c_str());
+            return;
+        }
+
+        core::string_view path(pBegin, pCur);
+
+        // we want to search the nodes children.
+        // if node has no children we just add it.
+        if (!pNode->pFirstChild)
+        {
+            pNode->pFirstChild = X_NEW(Node, &arena_, "PathTreeNode")(path);
+            pNode = pNode->pFirstChild;
+        }
+        else
+        {
+            // we have atleast one child already search the children for duplicates adding if not found.
+            pNode = pNode->pFirstChild;
+
+            while (1)
+            {
+                if (pNode->name.compare(path.begin(), path.length())) {
+                    break;
+                }
+
+                if (!pNode->pNextsibling) {
+                    pNode->pNextsibling = X_NEW(Node, &arena_, "PathTreeNode")(path);
+                    pNode = pNode->pNextsibling;
+                    break;
+                }
+
+                pNode = pNode->pNextsibling;
+            }
+        }
+
+        // we should have a node here that is correct.
+        X_ASSERT(pNode && pNode->name.compare(path.begin(), path.length()), "Incorrect node")();
+
+        // add time all the way down the tree, so we get aggregation.
+        pNode->info.totalTicks += timeTicks;
+
+        if (*pCur == ')') {
+            break;
+        }
+
+        ++pCur;
+        pBegin = pCur;
+    }
+
+    // TODO: add leafs?
+    // now sure could be a lot of them..
+}
+
+void ZoneTree::print(void) const
+{
+    print_r(core::string(""), &root_);
+}
+
+void ZoneTree::print_r(const core::string& prefix, const Node* pNode) const
+{
+    if (!pNode) {
+        return;
+    }
+
+    core::StackString<128, char> buf;
+    buf.append(prefix.begin(), prefix.length());
+    buf.append("-");
+    buf.append(pNode->name.begin(), pNode->name.length());
+    buf.appendFmt(" %" PRIu64, pNode->info.totalTicks);
+
+    X_LOG0("zoneTree", buf.c_str());
+
+    if (pNode->pFirstChild) {
+        print_r(prefix + "|   ", pNode->pFirstChild);
+    }
+
+    // now need to print all nodes on same level.
+    pNode = pNode->pNextsibling;
+    while (pNode) {
+        print_r(prefix, pNode);
+        pNode = pNode->pNextsibling;
+    }
+}
+
+void ZoneTree::free_r(const Node* pNode)
+{
+    if (!pNode) {
+        return;
+    }
+
+    if (pNode->pFirstChild) {
+        free_r(pNode->pFirstChild);
+    }
+
+    pNode = pNode->pNextsibling;
+    while (pNode) {
+        free_r(pNode);
+        pNode = pNode->pNextsibling;
+    }
+
+    // This is a no-op when we using the LinearAllocator
+    X_DELETE(pNode, &arena_);
+}
+
+// -----------------------------------------------
 
 bool TraceDB::createDB(core::Path<char>& path)
 {

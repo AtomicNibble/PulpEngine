@@ -3,9 +3,67 @@
 #include "IServer.h"
 #include <Containers/FixedHashTable.h>
 
+#include <Memory/AllocationPolicies/LinearAllocator.h>
+#include <Memory/SimpleMemoryArena.h>
+#include <Memory/VirtualMem.h>
+
 X_NAMESPACE_BEGIN(telemetry)
 
 const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
+
+using StringBuf = core::StackString<MAX_STRING_LEN, char>;
+
+
+struct ZoneTree
+{
+    struct ZoneInfo
+    {
+        ZoneInfo() {
+            totalTicks = 0_ui64;
+        }
+
+        uint64_t totalTicks;
+    };
+
+    struct Node
+    {
+        Node(core::string_view name) :
+            name(name.begin(), name.length())
+        {
+            pFirstChild = nullptr;
+            pNextsibling = nullptr;
+        }
+
+        Node* pFirstChild;
+        Node* pNextsibling;
+
+        core::string name;
+
+        ZoneInfo info;
+    };
+
+    static constexpr int32_t MAX_NODES = 1024;
+
+public:
+    ZoneTree();
+    ~ZoneTree();
+
+    void addZone(const StringBuf& buf, const DataPacketZone* pData);
+    void print(void) const;
+
+private:
+    void print_r(const core::string& prefix, const Node* pNode) const;
+
+    void free_r(const Node* pNode);
+
+private:
+    Node root_;
+
+    // want a pool for these bad boys.
+    core::HeapArea heap_;
+    core::LinearAllocator allocator_;
+    core::SimpleMemoryArena<decltype(allocator_)> arena_;
+};
 
 
 struct TraceDB
@@ -106,6 +164,8 @@ private:
 
     StringIdxMap stringMap;
     IndexArr indexMap;
+
+    // ZoneTree zoneTree;
 };
 
 struct TraceStream
