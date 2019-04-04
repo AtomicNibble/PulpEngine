@@ -68,6 +68,36 @@ private:
 
 struct TraceDB
 {
+    bool openDB(core::Path<char>& path);
+
+    bool setPragmas(void);
+
+    static bool getStats(sql::SqlLiteDb& db, TraceStats& stats);
+    static bool getMetaStr(sql::SqlLiteDb& db, const char* pName, core::string& strOut);
+    static bool getMetaUInt64(sql::SqlLiteDb& db, const char* pName, uint64_t& valOut);
+
+
+public:
+    sql::SqlLiteDb con;
+};
+
+struct TraceStream : public TraceDB
+{
+    TraceStream(TraceStream&& oth) :
+        TraceDB(std::move(oth)),
+        pTrace(std::move(oth.pTrace))
+    {
+    }
+    TraceStream() :
+        pTrace(nullptr)
+    {
+    }
+
+    const Trace* pTrace;
+};
+
+struct TraceBuilder : public TraceDB
+{
     // maybe drop this and just use -1?
     enum class MemOp
     {
@@ -97,7 +127,8 @@ struct TraceDB
     using IndexArr = core::Array<uint16_t>;
 
 public:
-    TraceDB() :
+    TraceBuilder() :
+        pTrace(nullptr),
         cmdInsertZone(con),
         cmdInsertString(con),
         cmdInsertTickInfo(con),
@@ -137,15 +168,16 @@ public:
     int32_t handleDataPacketCallStack(const DataPacketCallStack* pData);
 
 private:
-    bool setPragmas(void);
     bool createTables(void);
 
     uint16_t addString(core::string_view str);
     uint16_t getStringIndex(uint16_t strIdx) const;
     uint16_t getStringIndex(StringBuf& buf, const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt);
 
+    void accumulateZoneData(const StringBuf& buf, int32_t strIdx, const DataPacketZone* pData);
+
 public:
-    sql::SqlLiteDb con;
+    const Trace* pTrace;
 
 private:
     sql::SqlLiteCmd cmdInsertZone;
@@ -165,24 +197,7 @@ private:
     StringIdxMap stringMap;
     IndexArr indexMap;
 
-    // ZoneTree zoneTree;
-};
-
-struct TraceStream
-{
-    TraceStream(TraceStream&& oth) :
-        pTrace(std::move(oth.pTrace)),
-        db(std::move(oth.db))
-    {
-    }
-    TraceStream() :
-        pTrace(nullptr)
-    {
-    }
-
-    const Trace* pTrace;
-
-    TraceDB db;
+    ZoneTree zoneTree;
 };
 
 enum class ClientType
@@ -217,7 +232,7 @@ struct ClientConnection
     ClientType type;
 
     TraceStreamArr traces;
-    TraceStream traceStrm;
+    TraceBuilder traceBuilder;
 
     // this is used for both incoming and outgoing streams.
     // depending on if it'sincoming trace data or a viewer connection.

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "TelemetryServer.h"
 
 #include <Time/DateTimeStamp.h>
@@ -151,8 +151,8 @@ namespace
             client.cmpBufBegin = 0;
         }
 
-        auto& strm = client.traceStrm;
-        sql::SqlLiteTransaction trans(strm.db.con);
+        auto& strm = client.traceBuilder;
+        sql::SqlLiteTransaction trans(strm.con);
 
         // process this data?
         for (int32 i = 0; i < origLen; )
@@ -164,62 +164,62 @@ namespace
             {
                 case DataStreamType::StringTableAdd:
                 {
-                    i += strm.db.handleDataPacketStringTableAdd(reinterpret_cast<const DataPacketStringTableAdd*>(&pDst[i]));
+                    i += strm.handleDataPacketStringTableAdd(reinterpret_cast<const DataPacketStringTableAdd*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::Zone:
                 {
-                    i += strm.db.handleDataPacketZone(reinterpret_cast<const DataPacketZone*>(&pDst[i]));
+                    i += strm.handleDataPacketZone(reinterpret_cast<const DataPacketZone*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::TickInfo:
                 {
-                    i += strm.db.handleDataPacketTickInfo(reinterpret_cast<const DataPacketTickInfo*>(&pDst[i]));
+                    i += strm.handleDataPacketTickInfo(reinterpret_cast<const DataPacketTickInfo*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::ThreadSetName:
                 {
-                    i += strm.db.handleDataPacketThreadSetName(reinterpret_cast<const DataPacketThreadSetName*>(&pDst[i]));
+                    i += strm.handleDataPacketThreadSetName(reinterpret_cast<const DataPacketThreadSetName*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::CallStack:
                 {
-                    i += strm.db.handleDataPacketCallStack(reinterpret_cast<const DataPacketCallStack*>(&pDst[i]));
+                    i += strm.handleDataPacketCallStack(reinterpret_cast<const DataPacketCallStack*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::LockSetName:
                 {
-                    i += strm.db.handleDataPacketLockSetName(reinterpret_cast<const DataPacketLockSetName*>(&pDst[i]));
+                    i += strm.handleDataPacketLockSetName(reinterpret_cast<const DataPacketLockSetName*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::LockTry:
                 {
-                    i += strm.db.handleDataPacketLockTry(reinterpret_cast<const DataPacketLockTry*>(&pDst[i]));
+                    i += strm.handleDataPacketLockTry(reinterpret_cast<const DataPacketLockTry*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::LockState:
                 {
-                    i += strm.db.handleDataPacketLockState(reinterpret_cast<const DataPacketLockState*>(&pDst[i]));
+                    i += strm.handleDataPacketLockState(reinterpret_cast<const DataPacketLockState*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::LockCount:
                 {
-                    i += strm.db.handleDataPacketLockCount(reinterpret_cast<const DataPacketLockCount*>(&pDst[i]));
+                    i += strm.handleDataPacketLockCount(reinterpret_cast<const DataPacketLockCount*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::MemAlloc:
                 {
-                    i += strm.db.handleDataPacketMemAlloc(reinterpret_cast<const DataPacketMemAlloc*>(&pDst[i]));
+                    i += strm.handleDataPacketMemAlloc(reinterpret_cast<const DataPacketMemAlloc*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::MemFree:
                 {
-                    i += strm.db.handleDataPacketMemFree(reinterpret_cast<const DataPacketMemFree*>(&pDst[i]));
+                    i += strm.handleDataPacketMemFree(reinterpret_cast<const DataPacketMemFree*>(&pDst[i]));
                     break;
                 }
                 case DataStreamType::Message:
                 {
-                    i += strm.db.handleDataPacketMessage(reinterpret_cast<const DataPacketMessage*>(&pDst[i]));
+                    i += strm.handleDataPacketMessage(reinterpret_cast<const DataPacketMessage*>(&pDst[i]));
                     break;
                 }
 
@@ -233,113 +233,6 @@ namespace
         return true;
     }
 
-    bool getStats(sql::SqlLiteDb& db, TraceStats& stats)
-    {
-        // These need to be fast even when there is 10 million rows etc..
-
-        {
-            sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM strings LIMIT 1");
-            auto it = qry.begin();
-            if (it == qry.end()) {
-                X_ERROR("TelemSrv", "Failed to load string count");
-                return false;
-            }
-
-            stats.numStrings = (*it).get<int64_t>(0);
-        }
-
-        {
-            sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM zones LIMIT 1");
-            auto it = qry.begin();
-            if (it == qry.end()) {
-                X_ERROR("TelemSrv", "Failed to load zone count");
-                return false;
-            }
-
-            stats.numZones = (*it).get<int64_t>(0);
-        }
-
-        {
-            sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM ticks LIMIT 1");
-            auto it = qry.begin();
-            if (it == qry.end()) {
-                X_ERROR("TelemSrv", "Failed to load tick count");
-                return false;
-            }
-
-            stats.numTicks = (*it).get<int64_t>(0);
-        }
-
-        {
-            sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM lockTry LIMIT 1");
-            auto it = qry.begin();
-            if (it == qry.end()) {
-                X_ERROR("TelemSrv", "Failed to load lock try count");
-                return false;
-            }
-
-            stats.numLockTry = (*it).get<int64_t>(0);
-        }
-
-        {
-            sql::SqlLiteQuery qry(db, "SELECT endNano FROM ticks WHERE _rowid_ = (SELECT MAX(_rowid_) FROM ticks)");
-            auto it = qry.begin();
-            if (it == qry.end()) {
-                X_ERROR("TelemSrv", "Failed to load last tick");
-                return false;
-            }
-
-            stats.durationNano = (*it).get<int64_t>(0);
-        }
-
-
-        {
-            // simular performance.
-            // SELECT * FROM zones WHERE _rowid_ = (SELECT MAX(_rowid_) FROM zones);
-            // SELECT * FROM zones ORDER BY Id DESC LIMIT 1;
-            //sql::SqlLiteQuery qry(db, "SELECT * FROM zones WHERE _rowid_ = (SELECT MAX(_rowid_) FROM zones)");
-
-        }
-
-        return true;
-    }
-
-    bool getMetaStr(sql::SqlLiteDb& db, const char* pName, core::string& strOut)
-    {
-        sql::SqlLiteQuery qry(db, "SELECT value FROM meta WHERE name = ?");
-        qry.bind(1, pName);
-
-        auto it = qry.begin();
-        if (it == qry.end()) {
-            X_ERROR("TelemSrv", "Failed to load meta entry \"%s\"", pName);
-            return false;
-        }
-
-        auto row = *it;
-
-        auto* pStr = row.get<const char*>(0);
-        auto strLen = row.columnBytes(0);
-
-        strOut.assign(pStr, strLen);
-        return true;
-    }
-
-    bool getMetaUInt64(sql::SqlLiteDb& db, const char* pName, uint64_t& valOut)
-    {
-        sql::SqlLiteQuery qry(db, "SELECT value FROM meta WHERE name = ?");
-        qry.bind(1, pName);
-
-        auto it = qry.begin();
-        if (it == qry.end()) {
-            X_ERROR("TelemSrv", "Failed to load meta entry \"%s\"", pName);
-            return false;
-        }
-
-        auto row = *it;
-
-        valOut = static_cast<uint64_t>(row.get<int64_t>(0));
-        return true;
-    }
 
     template<typename T>
     inline int32_t getPacketSizeIncArgData(T* pPacket)
@@ -375,16 +268,11 @@ void ZoneTree::addZone(const StringBuf& buf, const DataPacketZone* pData)
     auto* pNode = &root_;
     pNode->info.totalTicks += timeTicks; // add time to root.
 
-    if (buf.isEmpty()) {
-        return;
-    }
-
-    if (buf[0] != '(') {
+    if (buf.isEmpty() || buf[0] != '(') {
         return;
     }
 
     // need to find either / or )
-    // want to build like a range also.
     const char* pBegin = buf.begin() + 1;
     const char* pCur = pBegin;
 
@@ -401,8 +289,7 @@ void ZoneTree::addZone(const StringBuf& buf, const DataPacketZone* pData)
 
         core::string_view path(pBegin, pCur);
 
-        // we want to search the nodes children.
-        // if node has no children we just add it.
+        // add it as a child.
         if (!pNode->pFirstChild)
         {
             pNode->pFirstChild = X_NEW(Node, &arena_, "PathTreeNode")(path);
@@ -410,7 +297,6 @@ void ZoneTree::addZone(const StringBuf& buf, const DataPacketZone* pData)
         }
         else
         {
-            // we have atleast one child already search the children for duplicates adding if not found.
             pNode = pNode->pFirstChild;
 
             while (1)
@@ -429,7 +315,6 @@ void ZoneTree::addZone(const StringBuf& buf, const DataPacketZone* pData)
             }
         }
 
-        // we should have a node here that is correct.
         X_ASSERT(pNode && pNode->name.compare(path.begin(), path.length()), "Incorrect node")();
 
         // add time all the way down the tree, so we get aggregation.
@@ -500,7 +385,138 @@ void ZoneTree::free_r(const Node* pNode)
 
 // -----------------------------------------------
 
-bool TraceDB::createDB(core::Path<char>& path)
+bool TraceDB::openDB(core::Path<char>& path)
+{
+    // TODO: drop write when not needed
+    if (!con.connect(path.c_str(), sql::OpenFlag::WRITE)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool TraceDB::setPragmas(void)
+{
+    return con.execute(R"(
+        PRAGMA synchronous = OFF;
+        PRAGMA page_size = 4096;
+        PRAGMA cache_size = -4000;
+        PRAGMA journal_mode = MEMORY;
+        PRAGMA foreign_keys = ON;
+    )");
+}
+
+bool TraceDB::getStats(sql::SqlLiteDb& db, TraceStats& stats)
+{
+    // These need to be fast even when there is 10 million rows etc..
+
+    {
+        sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM strings LIMIT 1");
+        auto it = qry.begin();
+        if (it == qry.end()) {
+            X_ERROR("TelemSrv", "Failed to load string count");
+            return false;
+        }
+
+        stats.numStrings = (*it).get<int64_t>(0);
+    }
+
+    {
+        sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM zones LIMIT 1");
+        auto it = qry.begin();
+        if (it == qry.end()) {
+            X_ERROR("TelemSrv", "Failed to load zone count");
+            return false;
+        }
+
+        stats.numZones = (*it).get<int64_t>(0);
+    }
+
+    {
+        sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM ticks LIMIT 1");
+        auto it = qry.begin();
+        if (it == qry.end()) {
+            X_ERROR("TelemSrv", "Failed to load tick count");
+            return false;
+        }
+
+        stats.numTicks = (*it).get<int64_t>(0);
+    }
+
+    {
+        sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM lockTry LIMIT 1");
+        auto it = qry.begin();
+        if (it == qry.end()) {
+            X_ERROR("TelemSrv", "Failed to load lock try count");
+            return false;
+        }
+
+        stats.numLockTry = (*it).get<int64_t>(0);
+    }
+
+    {
+        sql::SqlLiteQuery qry(db, "SELECT endNano FROM ticks WHERE _rowid_ = (SELECT MAX(_rowid_) FROM ticks)");
+        auto it = qry.begin();
+        if (it == qry.end()) {
+            X_ERROR("TelemSrv", "Failed to load last tick");
+            return false;
+        }
+
+        stats.durationNano = (*it).get<int64_t>(0);
+    }
+
+
+    {
+        // simular performance.
+        // SELECT * FROM zones WHERE _rowid_ = (SELECT MAX(_rowid_) FROM zones);
+        // SELECT * FROM zones ORDER BY Id DESC LIMIT 1;
+        //sql::SqlLiteQuery qry(db, "SELECT * FROM zones WHERE _rowid_ = (SELECT MAX(_rowid_) FROM zones)");
+
+    }
+
+    return true;
+}
+
+bool TraceDB::getMetaStr(sql::SqlLiteDb& db, const char* pName, core::string& strOut)
+{
+    sql::SqlLiteQuery qry(db, "SELECT value FROM meta WHERE name = ?");
+    qry.bind(1, pName);
+
+    auto it = qry.begin();
+    if (it == qry.end()) {
+        X_ERROR("TelemSrv", "Failed to load meta entry \"%s\"", pName);
+        return false;
+    }
+
+    auto row = *it;
+
+    auto* pStr = row.get<const char*>(0);
+    auto strLen = row.columnBytes(0);
+
+    strOut.assign(pStr, strLen);
+    return true;
+}
+
+bool TraceDB::getMetaUInt64(sql::SqlLiteDb& db, const char* pName, uint64_t& valOut)
+{
+    sql::SqlLiteQuery qry(db, "SELECT value FROM meta WHERE name = ?");
+    qry.bind(1, pName);
+
+    auto it = qry.begin();
+    if (it == qry.end()) {
+        X_ERROR("TelemSrv", "Failed to load meta entry \"%s\"", pName);
+        return false;
+    }
+
+    auto row = *it;
+
+    valOut = static_cast<uint64_t>(row.get<int64_t>(0));
+    return true;
+}
+
+// -----------------------------------------------
+
+bool TraceBuilder::createDB(core::Path<char>& path)
 {
     if (!con.connect(path.c_str(), sql::OpenFlag::CREATE | sql::OpenFlag::WRITE)) {
         return false;
@@ -529,32 +545,7 @@ bool TraceDB::createDB(core::Path<char>& path)
     return true;
 }
 
-bool TraceDB::openDB(core::Path<char>& path)
-{
-    // TODO: drop write when not needed
-    if (!con.connect(path.c_str(), sql::OpenFlag::WRITE)) {
-        return false;
-    }
-
-    if (!createIndexes()) {
-        return false;
-    }
-
-    return true;
-}
-
-bool TraceDB::setPragmas(void)
-{
-    return con.execute(R"(
-        PRAGMA synchronous = OFF;
-        PRAGMA page_size = 4096;
-        PRAGMA cache_size = -4000;
-        PRAGMA journal_mode = MEMORY;
-        PRAGMA foreign_keys = ON;
-    )");
-}
-
-bool TraceDB::createIndexes(void)
+bool TraceBuilder::createIndexes(void)
 {
     sql::SqlLiteTransaction trans(con);
 
@@ -586,8 +577,7 @@ bool TraceDB::createIndexes(void)
     return true;
 }
 
-
-bool TraceDB::createTables(void)
+bool TraceBuilder::createTables(void)
 {
     if (!con.execute(R"(
 
@@ -707,7 +697,7 @@ CREATE TABLE "messages" (
 }
 
 template<typename T>
-bool TraceDB::setMeta(const char* pName, T value)
+bool TraceBuilder::setMeta(const char* pName, T value)
 {
     auto& cmd = cmdInsertMeta;
     cmd.reset();
@@ -722,7 +712,7 @@ bool TraceDB::setMeta(const char* pName, T value)
     return true;
 }
 
-void TraceDB::insertLockIfMissing(uint64_t lockHandle)
+void TraceBuilder::insertLockIfMissing(uint64_t lockHandle)
 {
     // look up the lock.
     if (std::binary_search(lockSet.begin(), lockSet.end(), lockHandle)) {
@@ -743,7 +733,7 @@ void TraceDB::insertLockIfMissing(uint64_t lockHandle)
 }
 
 
-uint16_t TraceDB::addString(core::string_view str)
+uint16_t TraceBuilder::addString(core::string_view str)
 {
     auto it = stringMap.emplace(core::string(str.begin(), str.end()), 0);
     X_ASSERT(it.second, "Duplicate")();
@@ -762,14 +752,14 @@ uint16_t TraceDB::addString(core::string_view str)
     return static_cast<uint16_t>(idx);
 }
 
-uint16_t TraceDB::getStringIndex(uint16_t strIdx) const
+uint16_t TraceBuilder::getStringIndex(uint16_t strIdx) const
 {
     auto idx = indexMap[strIdx];
     X_ASSERT(idx != std::numeric_limits<uint16_t>::max(), "Index not valid")(strIdx, idx);
     return idx;
 }
 
-uint16_t TraceDB::getStringIndex(StringBuf& buf_, const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt)
+uint16_t TraceBuilder::getStringIndex(StringBuf& buf_, const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt)
 {
     X_UNUSED(buf_);
 
@@ -810,7 +800,7 @@ uint16_t TraceDB::getStringIndex(StringBuf& buf_, const DataPacketBaseArgData* p
     return safe_static_cast<uint16_t>(strIdx);
 }
 
-int32_t TraceDB::handleDataPacketTickInfo(const DataPacketTickInfo* pData)
+int32_t TraceBuilder::handleDataPacketTickInfo(const DataPacketTickInfo* pData)
 {
     auto& cmd = cmdInsertTickInfo;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
@@ -828,7 +818,7 @@ int32_t TraceDB::handleDataPacketTickInfo(const DataPacketTickInfo* pData)
     return sizeof(std::remove_pointer_t<decltype(pData)>);
 }
 
-int32_t TraceDB::handleDataPacketStringTableAdd(const DataPacketStringTableAdd* pData)
+int32_t TraceBuilder::handleDataPacketStringTableAdd(const DataPacketStringTableAdd* pData)
 {
     const int32_t packetSize = sizeof(std::remove_pointer_t<decltype(pData)>) + pData->length;
     const char* pString = reinterpret_cast<const char*>(pData + 1);
@@ -855,7 +845,14 @@ int32_t TraceDB::handleDataPacketStringTableAdd(const DataPacketStringTableAdd* 
     return packetSize;
 }
 
-int32_t TraceDB::handleDataPacketZone(const DataPacketZone* pData)
+void TraceBuilder::accumulateZoneData(const StringBuf& buf, int32_t strIdx, const DataPacketZone* pData)
+{
+    X_UNUSED(strIdx);
+    
+    zoneTree.addZone(buf,  pData);
+}
+
+int32_t TraceBuilder::handleDataPacketZone(const DataPacketZone* pData)
 {
     StringBuf strBuf;
     int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxFmt);
@@ -879,10 +876,13 @@ int32_t TraceDB::handleDataPacketZone(const DataPacketZone* pData)
     }
 
     cmd.reset();
+
+    accumulateZoneData(strBuf, strIdx, pData);
+
     return sizeof(*pData) + pData->argDataSize;
 }
 
-int32_t TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
+int32_t TraceBuilder::handleDataPacketLockTry(const DataPacketLockTry* pData)
 {
     insertLockIfMissing(pData->lockHandle);
 
@@ -913,7 +913,7 @@ int32_t TraceDB::handleDataPacketLockTry(const DataPacketLockTry* pData)
     return getPacketSizeIncArgData(pData);
 }
 
-int32_t TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
+int32_t TraceBuilder::handleDataPacketLockState(const DataPacketLockState* pData)
 {
     insertLockIfMissing(pData->lockHandle);
 
@@ -943,7 +943,7 @@ int32_t TraceDB::handleDataPacketLockState(const DataPacketLockState* pData)
     return getPacketSizeIncArgData(pData);
 }
 
-int32_t TraceDB::handleDataPacketLockSetName(const DataPacketLockSetName* pData)
+int32_t TraceBuilder::handleDataPacketLockSetName(const DataPacketLockSetName* pData)
 {
     auto idxFmt = getStringIndex(pData->strIdxFmt);
 
@@ -963,7 +963,7 @@ int32_t TraceDB::handleDataPacketLockSetName(const DataPacketLockSetName* pData)
     return getPacketSizeIncArgData(pData);
 }
 
-int32_t TraceDB::handleDataPacketThreadSetName(const DataPacketThreadSetName* pData)
+int32_t TraceBuilder::handleDataPacketThreadSetName(const DataPacketThreadSetName* pData)
 {
     StringBuf strBuf;
     int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxFmt);
@@ -982,7 +982,7 @@ int32_t TraceDB::handleDataPacketThreadSetName(const DataPacketThreadSetName* pD
     return getPacketSizeIncArgData(pData);
 }
 
-int32_t TraceDB::handleDataPacketLockCount(const DataPacketLockCount* pData)
+int32_t TraceBuilder::handleDataPacketLockCount(const DataPacketLockCount* pData)
 {
     X_UNUSED(pData);
     // not sure how best to store this just yet.
@@ -990,7 +990,7 @@ int32_t TraceDB::handleDataPacketLockCount(const DataPacketLockCount* pData)
     return sizeof(*pData);
 }
 
-int32_t TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
+int32_t TraceBuilder::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
 {
     StringBuf strBuf;
     int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxFmt);
@@ -1019,7 +1019,7 @@ int32_t TraceDB::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
     return getPacketSizeIncArgData(pData);
 }
 
-int32_t TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
+int32_t TraceBuilder::handleDataPacketMemFree(const DataPacketMemFree* pData)
 {
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
@@ -1045,7 +1045,7 @@ int32_t TraceDB::handleDataPacketMemFree(const DataPacketMemFree* pData)
     return sizeof(*pData);
 }
 
-int32_t TraceDB::handleDataPacketMessage(const DataPacketMessage* pData)
+int32_t TraceBuilder::handleDataPacketMessage(const DataPacketMessage* pData)
 {
     StringBuf strBuf;
     int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxFmt);
@@ -1064,7 +1064,7 @@ int32_t TraceDB::handleDataPacketMessage(const DataPacketMessage* pData)
     return getPacketSizeIncArgData(pData);
 }
 
-int32_t TraceDB::handleDataPacketCallStack(const DataPacketCallStack* pData)
+int32_t TraceBuilder::handleDataPacketCallStack(const DataPacketCallStack* pData)
 {
     X_UNUSED(pData);
 
@@ -1184,13 +1184,13 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
         core::string guidStr;
         core::string dateStr;
 
-        loaded &= getMetaStr(db, "guid", guidStr);
-        loaded &= getMetaStr(db, "dateStamp", dateStr);
-        loaded &= getMetaStr(db, "hostName", trace.hostName);
-        loaded &= getMetaStr(db, "buildInfo", trace.buildInfo);
-        loaded &= getMetaStr(db, "cmdLine", trace.cmdLine);
-        loaded &= getMetaUInt64(db, "tickPerMicro", trace.ticksPerMicro);
-        loaded &= getMetaUInt64(db, "tickPerMs", trace.ticksPerMs);
+        loaded &= TraceDB::getMetaStr(db, "guid", guidStr);
+        loaded &= TraceDB::getMetaStr(db, "dateStamp", dateStr);
+        loaded &= TraceDB::getMetaStr(db, "hostName", trace.hostName);
+        loaded &= TraceDB::getMetaStr(db, "buildInfo", trace.buildInfo);
+        loaded &= TraceDB::getMetaStr(db, "cmdLine", trace.cmdLine);
+        loaded &= TraceDB::getMetaUInt64(db, "tickPerMicro", trace.ticksPerMicro);
+        loaded &= TraceDB::getMetaUInt64(db, "tickPerMs", trace.ticksPerMs);
 
         if (!loaded) {
             X_ERROR("TelemSrv", "Failed to load meta for: \"%s\"", trace.dbPath.c_str());
@@ -1318,7 +1318,7 @@ bool Server::listen(void)
 
         // TEMP: add index if needed
         if (client.type == ClientType::TraceStream) {
-            client.traceStrm.db.createIndexes();
+            client.traceBuilder.createIndexes();
         }
 
         platform::closesocket(clientSocket);
@@ -1481,24 +1481,24 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     trace.hostName = client.hostName;
 
     // open a trace stream for the conneciton.
-    auto& strm = client.traceStrm;
-    if (!strm.db.createDB(dbPath)) {
+    auto& strm = client.traceBuilder;
+    if (!strm.createDB(dbPath)) {
         return false;
     }
 
     bool setMeta = true;
 
     VersionInfo::Description verStr;
-    setMeta &= strm.db.setMeta("guid", trace.guid.toString(guidStr));
-    setMeta &= strm.db.setMeta("appName", core::string_view(pApp->appName));
-    setMeta &= strm.db.setMeta("hostName", core::string_view(client.hostName));
-    setMeta &= strm.db.setMeta("buildInfo", trace.buildInfo);
-    setMeta &= strm.db.setMeta("cmdLine", trace.cmdLine);
-    setMeta &= strm.db.setMeta("dateStamp", dateStr);
-    setMeta &= strm.db.setMeta("clientVer", client.clientVer.toString(verStr));
-    setMeta &= strm.db.setMeta("serverVer", serverVer.toString(verStr));
-    setMeta &= strm.db.setMeta<int64_t>("tickPerMicro", static_cast<int64_t>(trace.ticksPerMicro));
-    setMeta &= strm.db.setMeta<int64_t>("tickPerMs", static_cast<int64_t>(trace.ticksPerMs));
+    setMeta &= strm.setMeta("guid", trace.guid.toString(guidStr));
+    setMeta &= strm.setMeta("appName", core::string_view(pApp->appName));
+    setMeta &= strm.setMeta("hostName", core::string_view(client.hostName));
+    setMeta &= strm.setMeta("buildInfo", trace.buildInfo);
+    setMeta &= strm.setMeta("cmdLine", trace.cmdLine);
+    setMeta &= strm.setMeta("dateStamp", dateStr);
+    setMeta &= strm.setMeta("clientVer", client.clientVer.toString(verStr));
+    setMeta &= strm.setMeta("serverVer", serverVer.toString(verStr));
+    setMeta &= strm.setMeta<int64_t>("tickPerMicro", static_cast<int64_t>(trace.ticksPerMicro));
+    setMeta &= strm.setMeta<int64_t>("tickPerMs", static_cast<int64_t>(trace.ticksPerMs));
 
     if (!setMeta) {
         return false;
@@ -1636,7 +1636,7 @@ bool Server::handleQueryTraceInfo(ClientConnection& client, uint8_t* pData)
                 }
 
                 TraceStats stats;
-                if (getStats(db, stats))
+                if (TraceDB::getStats(db, stats))
                 {
                     QueryTraceInfoResp resp;
                     resp.type = PacketType::QueryTraceInfoResp;
@@ -1682,7 +1682,7 @@ bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
         {
             X_WARNING("TelemSrv", "Client opened a trace they already have open");
 
-            if (!getStats(trace.db.con, otr.stats))
+            if (!TraceDB::getStats(trace.con, otr.stats))
             {
                 X_ERROR("TelemSrv", "Failed to get stats for openDb request");
                 return true;
@@ -1706,9 +1706,9 @@ bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
                     // we found it !
                     TraceStream ts;
                     ts.pTrace = &trace;
-                    if (ts.db.openDB(trace.dbPath)) 
+                    if (ts.openDB(trace.dbPath)) 
                     {
-                        if (!getStats(ts.db.con, otr.stats))
+                        if (!TraceDB::getStats(ts.con, otr.stats))
                         {
                             X_ERROR("TelemSrv", "Failed to get stats for openDb request");
                             return true;
@@ -1862,7 +1862,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
         auto begin = ts.pTrace->nanoToTicks(pHdr->startNano);
         auto end = ts.pTrace->nanoToTicks(pHdr->endNano);
 
-        sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, startNano, endNano FROM ticks WHERE startTick >= ? AND startTick < ?");
+        sql::SqlLiteQuery qry(ts.con, "SELECT threadId, startTick, endTick, startNano, endNano FROM ticks WHERE startTick >= ? AND startTick < ?");
         qry.bind(1, begin);
         qry.bind(2, end);
 
@@ -1936,7 +1936,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
 
         int32_t numZones = 0;
 
-        sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, startTick, endTick, packedSourceInfo, strIdx FROM zones WHERE startTick >= ? AND startTick < ?");
+        sql::SqlLiteQuery qry(ts.con, "SELECT threadId, startTick, endTick, packedSourceInfo, strIdx FROM zones WHERE startTick >= ? AND startTick < ?");
         qry.bind(1, static_cast<int64_t>(start));
         qry.bind(2, static_cast<int64_t>(end));
 
@@ -1950,7 +1950,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
             zone.start = static_cast<uint64_t>(row.get<int64_t>(1));
             zone.end = static_cast<uint64_t>(row.get<int64_t>(2));
 
-            TraceDB::PackedSourceInfo info;
+            TraceBuilder::PackedSourceInfo info;
             info.packed = static_cast<uint64_t>(row.get<int64_t>(3));
 
             zone.lineNo = info.raw.lineNo;
@@ -1987,7 +1987,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
     }
 
     {
-        sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, threadId, startTick, endTick, result, packedSourceInfo, strIdx FROM lockTry WHERE startTick >= ? AND startTick < ?");
+        sql::SqlLiteQuery qry(ts.con, "SELECT lockId, threadId, startTick, endTick, result, packedSourceInfo, strIdx FROM lockTry WHERE startTick >= ? AND startTick < ?");
         qry.bind(1, static_cast<int64_t>(start));
         qry.bind(2, static_cast<int64_t>(end));
 
@@ -2010,7 +2010,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
             lockTry.end = static_cast<uint64_t>(row.get<int64_t>(3));
             lockTry.result = static_cast<TtLockResult::Enum>(row.get<int32_t>(4));
 
-            TraceDB::PackedSourceInfo info;
+            TraceBuilder::PackedSourceInfo info;
             info.packed = static_cast<uint64_t>(row.get<int64_t>(5));
 
             lockTry.lineNo = info.raw.lineNo;
@@ -2048,7 +2048,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
 
     {
         // lockStates?
-        sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, threadId, timeTicks, state, packedSourceInfo FROM lockStates WHERE timeTicks >= ? AND timeTicks < ?");
+        sql::SqlLiteQuery qry(ts.con, "SELECT lockId, threadId, timeTicks, state, packedSourceInfo FROM lockStates WHERE timeTicks >= ? AND timeTicks < ?");
         qry.bind(1, static_cast<int64_t>(start));
         qry.bind(2, static_cast<int64_t>(end));
 
@@ -2070,7 +2070,7 @@ bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
             lockState.time = static_cast<uint64_t>(row.get<int64_t>(2));
             lockState.state = static_cast<TtLockState::Enum>(row.get<int32_t>(3));
 
-            TraceDB::PackedSourceInfo info;
+            TraceBuilder::PackedSourceInfo info;
             info.packed = static_cast<uint64_t>(row.get<int64_t>(4));
 
             lockState.lineNo = info.raw.lineNo;
@@ -2128,7 +2128,7 @@ bool Server::handleReqTraceLocks(ClientConnection& client, uint8_t* pData)
 
     int32_t num = 0;
 
-    sql::SqlLiteQuery qry(ts.db.con, "SELECT id FROM locks");
+    sql::SqlLiteQuery qry(ts.con, "SELECT id FROM locks");
 
     auto it = qry.begin();
     for (; it != qry.end(); ++it) {
@@ -2181,7 +2181,7 @@ bool Server::handleReqTraceStrings(ClientConnection& client, uint8_t* pData)
     {
         // lets just count it will be cheap.    
         // TODO: pretty easy to calculate this in ingest if it becomes slow.
-        sql::SqlLiteQuery qry(ts.db.con, "SELECT COUNT(_rowid_), SUM(LENGTH(value)), MIN(Id), MAX(Id) FROM strings");
+        sql::SqlLiteQuery qry(ts.con, "SELECT COUNT(_rowid_), SUM(LENGTH(value)), MIN(Id), MAX(Id) FROM strings");
         auto it = qry.begin();
         if (it == qry.end()) {
             X_ERROR("TelemSrv", "Failed to load string count");
@@ -2208,7 +2208,7 @@ bool Server::handleReqTraceStrings(ClientConnection& client, uint8_t* pData)
 
     if (info.num > 0)
     {
-        sql::SqlLiteQuery qry(ts.db.con, "SELECT id, value FROM strings");
+        sql::SqlLiteQuery qry(ts.con, "SELECT id, value FROM strings");
 
         auto it = qry.begin();
         for (; it != qry.end(); ++it) {
@@ -2272,7 +2272,7 @@ bool Server::handleReqTraceThreadNames(ClientConnection& client, uint8_t* pData)
 
     int32_t num = 0;
 
-    sql::SqlLiteQuery qry(ts.db.con, "SELECT threadId, timeTicks, strIdx FROM threadNames");
+    sql::SqlLiteQuery qry(ts.con, "SELECT threadId, timeTicks, strIdx FROM threadNames");
 
     auto it = qry.begin();
     for (; it != qry.end(); ++it) {
@@ -2329,7 +2329,7 @@ bool Server::handleReqTraceLockNames(ClientConnection& client, uint8_t* pData)
 
     int32_t num = 0;
 
-    sql::SqlLiteQuery qry(ts.db.con, "SELECT lockId, timeTicks, strIdx FROM lockNames");
+    sql::SqlLiteQuery qry(ts.con, "SELECT lockId, timeTicks, strIdx FROM lockNames");
 
     auto it = qry.begin();
     for (; it != qry.end(); ++it) {
