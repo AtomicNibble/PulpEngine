@@ -648,7 +648,7 @@ CREATE TABLE IF NOT EXISTS "zones" (
     "startTick"	        INTEGER NOT NULL,
     "endTick"	        INTEGER NOT NULL,
     "packedSourceInfo"	INTEGER NOT NULL,
-	"strIdx"	        INTEGER NOT NULL,
+    "strIdx"	        INTEGER NOT NULL,
     PRIMARY KEY("id"),
 );
 
