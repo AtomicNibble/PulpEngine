@@ -612,24 +612,14 @@ CREATE TABLE IF NOT EXISTS "strings" (
 	PRIMARY KEY("Id")
 );
 
-CREATE TABLE IF NOT EXISTS "zoneInfo" (
-    "id"                INTEGER,
-    "totalTime"         INTEGER NOT NULL,
-    "childTime"         INTEGER NOT NULL,
-    "hitCount"          INTEGER NOT NULL,
-    PRIMARY KEY("id")
-);
-
 CREATE TABLE IF NOT EXISTS "zones" (
     "id"	            INTEGER,
-    "zoneId"	        INTEGER,
     "threadId"	        INTEGER NOT NULL,
     "startTick"	        INTEGER NOT NULL,
     "endTick"	        INTEGER NOT NULL,
     "packedSourceInfo"	INTEGER NOT NULL,
 	"strIdx"	        INTEGER NOT NULL,
     PRIMARY KEY("id"),
-    FOREIGN KEY("zoneId") REFERENCES "zoneInfo"("Id")
 );
 
 CREATE TABLE IF NOT EXISTS "locks" (
