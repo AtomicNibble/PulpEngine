@@ -157,7 +157,6 @@ public:
     }
 
     bool createDB(core::Path<char>& path);
-    bool openDB(core::Path<char>& path);
     bool createIndexes(void);
 
     template<typename T>
