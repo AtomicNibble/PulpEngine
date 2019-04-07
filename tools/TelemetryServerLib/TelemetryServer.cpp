@@ -1577,9 +1577,9 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     core::Guid::GuidStr guidStr;
 
     dbPath.append("telem_");
-    dbPath.append(trace.guid.toString(guidStr));
-    dbPath.append("_");
     dbPath.append(date.toString(dateStr));
+    dbPath.append("_");
+    dbPath.append(trace.guid.toString(guidStr));
     dbPath.setExtension("db");
 
 
