@@ -346,19 +346,30 @@ void ZoneTree::addNodes_r(NodeFlatArr& arr, int32_t parIdx, const Node* pNode) c
     }
 
     auto idx = static_cast<int32_t>(arr.size());
-    auto& node = arr.AddOne();
-    node.parentIdx = parIdx;
-    node.info = pNode->info;
-    node.name = pNode->name;
+    {
+        auto& node = arr.AddOne();
+        node.parentIdx = parIdx;
+        node.info = pNode->info;
+        node.name = pNode->name;
+    }
 
     if (pNode->pFirstChild) {
         addNodes_r(arr, idx, pNode->pFirstChild);
     }
 
-    // now need to print all nodes on same level.
     pNode = pNode->pNextsibling;
     while (pNode) {
-        addNodes_r(arr, parIdx, pNode);
+
+        idx = static_cast<int32_t>(arr.size());
+        auto& node = arr.AddOne();
+        node.parentIdx = parIdx;
+        node.info = pNode->info;
+        node.name = pNode->name;
+
+        if (pNode->pFirstChild) {
+            addNodes_r(arr, idx, pNode->pFirstChild);
+        }
+
         pNode = pNode->pNextsibling;
     }
 }
@@ -375,21 +386,33 @@ void ZoneTree::print_r(const core::string& prefix, const Node* pNode) const
     }
 
     core::StackString<128, char> buf;
-    buf.append(prefix.begin(), prefix.length());
+    buf.set(prefix.begin(), prefix.length());
     buf.append("-");
     buf.append(pNode->name.begin(), pNode->name.length());
     buf.appendFmt(" %" PRIu64, pNode->info.totalTicks);
 
     X_LOG0("zoneTree", buf.c_str());
 
+    const auto subPrefix = prefix + "|   ";
+
     if (pNode->pFirstChild) {
-        print_r(prefix + "|   ", pNode->pFirstChild);
+        print_r(subPrefix, pNode->pFirstChild);
     }
 
-    // now need to print all nodes on same level.
     pNode = pNode->pNextsibling;
     while (pNode) {
-        print_r(prefix, pNode);
+
+        buf.set(prefix.begin(), prefix.length());
+        buf.append("-");
+        buf.append(pNode->name.begin(), pNode->name.length());
+        buf.appendFmt(" %" PRIu64, pNode->info.totalTicks);
+
+        X_LOG0("zoneTree", buf.c_str());
+
+        if (pNode->pFirstChild) {
+            print_r(subPrefix, pNode->pFirstChild);
+        }
+
         pNode = pNode->pNextsibling;
     }
 }
