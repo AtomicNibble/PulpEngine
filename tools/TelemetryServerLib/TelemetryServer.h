@@ -46,6 +46,7 @@ struct ZoneTree
     {
         int32_t parentIdx;
         ZoneInfo info;
+        core::string name;
     };
 
     using NodeFlatArr = core::Array<NodeFlat>;
@@ -150,6 +151,7 @@ public:
         cmdInsertMeta(con),
         cmdInsertMemory(con),
         cmdInsertMessage(con),
+        cmdInsertZoneNode(con),
         stringMap(g_TelemSrvLibArena, 1024 * 64),
         indexMap(g_TelemSrvLibArena, 1024 * 8)
     {
@@ -158,6 +160,7 @@ public:
 
     bool createDB(core::Path<char>& path);
     bool createIndexes(void);
+    void flushZoneTree(void);
 
     template<typename T>
     bool setMeta(const char* pName, T value);
@@ -185,6 +188,7 @@ private:
     uint16_t getStringIndex(StringBuf& buf, const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt);
 
     void accumulateZoneData(const StringBuf& buf, int32_t strIdx, const DataPacketZone* pData);
+    void writeZoneTree(const ZoneTree& zoneTree, int32_t setID);
 
 public:
     const Trace* pTrace;
@@ -201,13 +205,14 @@ private:
     sql::SqlLiteCmd cmdInsertMeta;
     sql::SqlLiteCmd cmdInsertMemory;
     sql::SqlLiteCmd cmdInsertMessage;
+    sql::SqlLiteCmd cmdInsertZoneNode;
 
     core::FixedArray<uint64_t, MAX_LOCKS> lockSet;
 
     StringIdxMap stringMap;
     IndexArr indexMap;
 
-    ZoneTree zoneTree;
+    ZoneTree zoneTree_;
 };
 
 enum class ClientType

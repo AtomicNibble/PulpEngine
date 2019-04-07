@@ -349,6 +349,7 @@ void ZoneTree::addNodes_r(NodeFlatArr& arr, int32_t parIdx, const Node* pNode) c
     auto& node = arr.AddOne();
     node.parentIdx = parIdx;
     node.info = pNode->info;
+    node.name = pNode->name;
 
     if (pNode->pFirstChild) {
         addNodes_r(arr, idx, pNode->pFirstChild);
@@ -574,6 +575,7 @@ bool TraceBuilder::createDB(core::Path<char>& path)
     okay &= (sql::Result::OK == cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)"));
     okay &= (sql::Result::OK == cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertMessage.prepare("INSERT INTO messages (timeTicks, type, strIdx) VALUES(?,?,?)"));
+    okay &= (sql::Result::OK == cmdInsertZoneNode.prepare("INSERT INTO zoneNodes (setId, parentId, totalTick, strIdx) VALUES(?,?,?,?)"));
 
     return okay;
 }
@@ -651,6 +653,15 @@ CREATE TABLE IF NOT EXISTS "zones" (
     "startTick"	        INTEGER NOT NULL,
     "endTick"	        INTEGER NOT NULL,
     "packedSourceInfo"	INTEGER NOT NULL,
+    "strIdx"	        INTEGER NOT NULL,
+    PRIMARY KEY("id")
+);
+
+CREATE TABLE IF NOT EXISTS "zoneNodes" (
+    "id"	            INTEGER,
+    "setId"	            INTEGER NOT NULL,
+    "parentId"	        INTEGER NOT NULL,
+    "totalTick"	        INTEGER NOT NULL,
     "strIdx"	        INTEGER NOT NULL,
     PRIMARY KEY("id")
 );
@@ -881,8 +892,43 @@ void TraceBuilder::accumulateZoneData(const StringBuf& buf, int32_t strIdx, cons
 {
     X_UNUSED(strIdx);
     
-    zoneTree.addZone(buf,  pData);
+    zoneTree_.addZone(buf,  pData);
 }
+
+void TraceBuilder::flushZoneTree(void)
+{
+
+    writeZoneTree(zoneTree_, -1);
+}
+
+void TraceBuilder::writeZoneTree(const ZoneTree& zoneTree, int32_t setID)
+{
+    ZoneTree::NodeFlatArr arr(g_TelemSrvLibArena);
+    zoneTree.getNodes(arr);
+
+    if (!arr.isNotEmpty()) {
+        return;
+    }
+
+    for (auto& node : arr)
+    {
+        auto strIdx = indexForString(core::string_view(node.name));
+    
+        auto& cmd = cmdInsertZoneNode;
+        cmd.bind(1, setID);
+        cmd.bind(2, node.parentIdx);
+        cmd.bind(3, static_cast<int64_t>(node.info.totalTicks));
+        cmd.bind(4, strIdx);
+    
+        auto res = cmd.execute();
+        if (res != sql::Result::OK) {
+            X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
+        }
+    
+        cmdInsertZoneNode.reset();
+    }
+}
+
 
 int32_t TraceBuilder::handleDataPacketZone(const DataPacketZone* pData)
 {
@@ -1350,6 +1396,7 @@ bool Server::listen(void)
 
         // TEMP: add index if needed
         if (client.type == ClientType::TraceStream) {
+            client.traceBuilder.flushZoneTree();
             client.traceBuilder.createIndexes();
         }
 
