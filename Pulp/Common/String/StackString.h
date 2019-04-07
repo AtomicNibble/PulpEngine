@@ -48,7 +48,7 @@ public:
     /// Constructs a string by copying the given range.
     StackString(const TChar* const beginInclusive, const TChar* const endExclusive);
 
-    /// Appends a character a certain amount of times.
+    void append(TChar ch);
     void append(TChar ch, size_t count);
     /// Appends a string.
     inline void append(const TChar* str);
@@ -177,6 +177,7 @@ public:
 
     StackString(const wchar_t* const beginInclusive, const wchar_t* const endExclusive);
 
+    void append(wchar_t ch);
     void append(wchar_t ch, size_t count);
     inline void append(const wchar_t* str);
     void append(const wchar_t* str, size_t length);

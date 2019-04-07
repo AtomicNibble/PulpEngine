@@ -184,11 +184,23 @@ StackString<N, TChar>::StackString(const __int64 u) :
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template<size_t N, typename TChar>
+void StackString<N, TChar>::append(TChar ch)
+{
+    X_ASSERT(len_ + 1 < N, "Cannot append character. Not enough space left.")(len_, N);
+    str_[len_++] = ch;
+    str_[len_] = 0;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+template<size_t N, typename TChar>
 void StackString<N, TChar>::append(TChar ch, size_t count)
 {
     if (count == 0) {
         return;
     }
+
+    X_ASSERT(len_ + count < N, "Cannot append %d character(s). Not enough space left.", count)(len_, N);
 
     memset(str_ + len_, ch, count);
     len_ += count;
