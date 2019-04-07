@@ -561,18 +561,21 @@ bool TraceBuilder::createDB(core::Path<char>& path)
         return false;
     }
 
-    cmdInsertZone.prepare("INSERT INTO zones (threadID, startTick, endTick, packedSourceInfo, strIdx) VALUES(?,?,?,?,?)");
-    cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)");
-    cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, startTick, endTick, startNano, endNano) VALUES(?,?,?,?,?)");
-    cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)");
-    cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, startTick, endTick, result, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?,?)");
-    cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, timeTicks, state, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?)");
-    cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, timeTicks, strIdx) VALUES(?,?,?)");
-    cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, strIdx) VALUES(?,?,?)");
-    cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)");
-    cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?,?)");
-    cmdInsertMessage.prepare("INSERT INTO messages (timeTicks, type, strIdx) VALUES(?,?,?)");
-    return true;
+    bool okay = true;
+
+    okay &= (sql::Result::OK == cmdInsertZone.prepare("INSERT INTO zones (threadID, startTick, endTick, packedSourceInfo, strIdx) VALUES(?,?,?,?,?)"));
+    okay &= (sql::Result::OK == cmdInsertString.prepare("INSERT INTO strings (Id, value) VALUES(?, ?)"));
+    okay &= (sql::Result::OK == cmdInsertTickInfo.prepare("INSERT INTO ticks (threadId, startTick, endTick, startNano, endNano) VALUES(?,?,?,?,?)"));
+    okay &= (sql::Result::OK == cmdInsertLock.prepare("INSERT INTO locks (Id) VALUES(?)"));
+    okay &= (sql::Result::OK == cmdInsertLockTry.prepare("INSERT INTO lockTry (lockId, threadId, startTick, endTick, result, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?,?)"));
+    okay &= (sql::Result::OK == cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, timeTicks, state, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?)"));
+    okay &= (sql::Result::OK == cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, timeTicks, strIdx) VALUES(?,?,?)"));
+    okay &= (sql::Result::OK == cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, strIdx) VALUES(?,?,?)"));
+    okay &= (sql::Result::OK == cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)"));
+    okay &= (sql::Result::OK == cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?,?)"));
+    okay &= (sql::Result::OK == cmdInsertMessage.prepare("INSERT INTO messages (timeTicks, type, strIdx) VALUES(?,?,?)"));
+
+    return okay;
 }
 
 bool TraceBuilder::createIndexes(void)
