@@ -161,8 +161,9 @@ void _ntoa_format(SprintfStrBuf& buf, char* tmpBuf, int32_t len, bool negative,
 
     // pad spaces up to given width
     if (!(flags & ParseFlag::Left) && !(flags & ParseFlag::Zeropad)) {
-        auto num = width - len;
-        buf.append(' ', num);
+        for (int32_t i = len; i < width; i++) {
+            buf.append(' ');
+        }
     }
 
     // reverse string
@@ -351,8 +352,9 @@ void _ftoa(SprintfStrBuf& buf, double value, int32_t prec, int32_t width, uint32
 
     // pad spaces up to given width
     if (!(flags & ParseFlag::Left) && !(flags & ParseFlag::Zeropad)) {
-        auto padLen = width - len;
-        buf.append(' ', padLen);
+        for (int32_t i = len; i < width; i++) {
+            buf.append(' ');
+        }
     }
 
     // reverse string
