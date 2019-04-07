@@ -67,7 +67,7 @@ namespace entity
     {
         static_assert(decltype(reg_)::NUM_COMP == 19, "More components? add a sensible reserve call");
 
-        ttZoneFunction(gEnv->ctx);
+        ttZone(gEnv->ctx, "(Game/ECS) Init");
 
         reg_.entIdReserve(MAX_ENTS);
         reg_.freelistReserve(64);
@@ -239,7 +239,7 @@ namespace entity
         const NetInterpolationState& netInterpolState, EntityId localPlayerId)
     {
         X_UNUSED(userCmdMan);
-        ttZoneFunction(gEnv->ctx);
+        ttZone(gEnv->ctx, "(Game/ECS) Update");
 
         reg_.update(frame.timeInfo.deltas[core::Timer::GAME]);
 
@@ -778,7 +778,7 @@ namespace entity
     bool EnititySystem::loadEntites(const char* pJsonBegin, const char* pJsonEnd)
     {
         // TODO: bother checking we clear? 
-        ttZone(gEnv->ctx, "LoadEntites");
+        ttZone(gEnv->ctx, "(Game) LoadEntites");
 
         if (!parseEntites(pJsonBegin, pJsonEnd)) {
             X_ERROR("Ents", "Failed to parse ents");
@@ -845,7 +845,7 @@ namespace entity
 
     bool EnititySystem::postLoad(void)
     {
-        ttZone(gEnv->ctx, "EntSys postload");
+        ttZone(gEnv->ctx, "(Game) EntSys postload");
 
         if (!physSys_.createColliders(reg_, pPhysics_, pPhysScene_)) {
             return false;

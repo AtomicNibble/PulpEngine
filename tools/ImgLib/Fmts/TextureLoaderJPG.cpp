@@ -182,7 +182,7 @@ namespace JPG
         X_ASSERT_NOT_NULL(file);
         X_UNUSED(swapArena);
 
-        ttZone(gEnv->ctx, "Load Texture JPG");
+        ttZone(gEnv->ctx, "(Texture) Load JPG");
 
         struct jpeg_decompress_struct cinfo;
         struct my_error_mgr jerr;

@@ -43,7 +43,7 @@ namespace entity
 
     void WeaponSystem::update(core::FrameData& frame, ECS& reg)
     {
-        ttZone(gEnv->ctx, "ECS Update Weapons");
+        ttZone(gEnv->ctx, "(Game/ECS) Update Weapons");
 
         auto curTime = frame.timeInfo.ellapsed[core::Timer::GAME];
 

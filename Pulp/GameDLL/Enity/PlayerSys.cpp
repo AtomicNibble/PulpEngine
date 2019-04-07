@@ -75,7 +75,7 @@ namespace entity
 
     void PlayerSystem::update(core::FrameTimeData& timeInfo, ECS& reg)
     {
-        ttZone(gEnv->ctx, "ECS Update Players");
+        ttZone(gEnv->ctx, "(Game/ECS) Update Players");
 
         X_UNUSED(timeInfo);
         

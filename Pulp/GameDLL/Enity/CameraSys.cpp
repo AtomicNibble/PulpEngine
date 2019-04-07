@@ -66,7 +66,7 @@ namespace entity
 
     void CameraSystem::update(core::FrameData& frame, EnitiyRegister& reg, physics::IScene* pPhysScene)
     {
-        ttZone(gEnv->ctx, "ECS Update Camera");
+        ttZone(gEnv->ctx, "(Game/ECS) Update Camera");
         X_UNUSED(pPhysScene);
 
         Matrix33f mat33;

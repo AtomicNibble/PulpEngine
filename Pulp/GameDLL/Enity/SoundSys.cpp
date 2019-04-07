@@ -19,7 +19,7 @@ namespace entity
 
     void SoundSystem::update(core::FrameData& frame, ECS& reg)
     {
-        ttZone(gEnv->ctx, "ECS Update Sounds");
+        ttZone(gEnv->ctx, "(Game/ECS) Update Sounds");
 
         X_UNUSED(frame, reg);
     }

@@ -87,7 +87,7 @@ void XWinInput::release(void)
 void XWinInput::update(core::FrameInput& inputFrame)
 {
     X_PROFILE_BEGIN("Win32RawInput", core::profiler::SubSys::INPUT);
-    ttZone(gEnv->ctx, "Win32Input Update");
+    ttZone(gEnv->ctx, "(Input/Win32) Update");
 
     inputFrame.cusorPos = core::Window::GetCursorPos();
     auto* pWindow = gEnv->pCore->GetGameWindow();

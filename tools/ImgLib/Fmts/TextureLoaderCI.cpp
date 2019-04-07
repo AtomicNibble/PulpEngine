@@ -75,7 +75,7 @@ namespace CI
         X_ASSERT_NOT_NULL(gEnv->pLog);
         X_ASSERT_NOT_NULL(file);
 
-        ttZone(gEnv->ctx, "Load Texture CI");
+        ttZone(gEnv->ctx, "(Texture) Load CI");
 
         CITexureHeader hdr;
 

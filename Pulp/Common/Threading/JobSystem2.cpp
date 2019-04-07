@@ -179,7 +179,7 @@ namespace V2
         X_ASSERT_NOT_NULL(gEnv->pCore);
         X_ASSERT_NOT_NULL(gEnv->pConsole);
         X_PROFILE_NO_HISTORY_BEGIN("JobSysInit", core::profiler::SubSys::CORE);
-        ttZone(gEnv->ctx, "JobSys Init");
+        ttZone(gEnv->ctx, "(Core/JobSys) Init");
 
         if (threadCount == AUTO_THREAD_COUNT) {
             ICore* pCore = gEnv->pCore;

@@ -247,7 +247,7 @@ bool XGame::onInputEvent(const input::InputEvent& event)
 bool XGame::update(core::FrameData& frame)
 {
     X_PROFILE_BEGIN("Update", core::profiler::SubSys::GAME);
-    ttZone(gEnv->ctx, "Game Update");
+    ttZone(gEnv->ctx, "(Game) Update");
 
     X_UNUSED(frame);
     // how todo this camera move shit.
@@ -493,7 +493,7 @@ void XGame::onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs)
 
 void XGame::buildSnapShot(net::SnapShot& snap)
 {
-    ttZone(gEnv->ctx, "Build Snap");
+    ttZone(gEnv->ctx, "(Game/Net) Build Snap");
 
     snap.setTime(gameTimeMS_);
     snap.setUserCmdTimes(lastUserCmdRunTime_);
@@ -511,7 +511,7 @@ void XGame::buildSnapShot(net::SnapShot& snap)
 
 void XGame::applySnapShot(const net::SnapShot& snap)
 {
-    ttZone(gEnv->ctx, "Apply Snap");
+    ttZone(gEnv->ctx, "(Game/Net) Apply Snap");
 
     // set the game state.
     {
@@ -644,7 +644,7 @@ void XGame::setInterpolation(float fraction, int32_t serverGameTimeMS, int32_t s
 
 void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
 {
-    ttZone(gEnv->ctx, "Run UserCmd");
+    ttZone(gEnv->ctx, "(Game/Net) Run UserCmd");
 
     auto dt = frame.timeInfo.deltas[core::Timer::GAME];
 

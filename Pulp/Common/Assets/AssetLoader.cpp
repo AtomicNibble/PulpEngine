@@ -425,7 +425,7 @@ void AssetLoader::processData(AssetLoadRequest* pRequest)
 
 #if TTELEMETRY_ENABLED
     auto& name = pAsset->getName();
-    ttZone(gEnv->ctx, "ProcessAsset %s -> \"%s\"", assetDb::AssetType::ToString(type), name.c_str());
+    ttZone(gEnv->ctx, "(Asset) ProcessData %s -> \"%s\"", assetDb::AssetType::ToString(type), name.c_str());
 
 #endif // TTELEMETRY_ENABLED
 

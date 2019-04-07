@@ -18,7 +18,7 @@ namespace entity
 
     void HealthSystem::update(core::FrameTimeData& frame, ECS& reg)
     {
-        ttZone(gEnv->ctx, "ECS Update Health");
+        ttZone(gEnv->ctx, "(Game/ECS) Update Health");
 
 
         X_UNUSED(frame, reg);

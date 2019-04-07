@@ -123,7 +123,7 @@ namespace TGA
         X_ASSERT_NOT_NULL(file);
         X_UNUSED(swapArena);
 
-        ttZone(gEnv->ctx, "Load Texture TGA");
+        ttZone(gEnv->ctx, "(Texture) Load TGA");
 
         Tga_Header hdr;
         if (file->readObj(hdr) != sizeof(hdr)) {

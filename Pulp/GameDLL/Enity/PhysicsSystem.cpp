@@ -28,7 +28,7 @@ namespace entity
 
     void PhysicsSystem::update(core::FrameData& frame, ECS& reg)
     {
-        ttZone(gEnv->ctx, "ECS Update Physics");
+        ttZone(gEnv->ctx, "(Game/ECS) Update Physics");
 
         X_UNUSED(frame, reg);
 
