@@ -710,7 +710,7 @@ CREATE TABLE "memory" (
 	"timeTicks"	        INTEGER NOT NULL,
 	"operation"	        INTEGER NOT NULL,
     "packedSourceInfo"	INTEGER NOT NULL,
-	"strIdx"	        INTEGER NOT NULL,
+	"strIdx"	        INTEGER,
 	PRIMARY KEY("Id")
 );
 
