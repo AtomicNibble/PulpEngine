@@ -752,8 +752,7 @@ void TraceBuilder::insertLockIfMissing(uint64_t lockHandle)
     cmd.reset();
 }
 
-
-uint16_t TraceBuilder::addString(core::string_view str)
+int32_t TraceBuilder::addString(core::string_view str)
 {
     auto it = stringMap.emplace(core::string(str.begin(), str.end()), 0);
     X_ASSERT(it.second, "Duplicate")();
@@ -769,7 +768,17 @@ uint16_t TraceBuilder::addString(core::string_view str)
     }
 
     cmd.reset();
-    return static_cast<uint16_t>(idx);
+    return static_cast<int32_t>(idx);
+}
+
+int32_t TraceBuilder::indexForString(core::string_view str)
+{
+    auto it = stringMap.find(str);
+    if (it != stringMap.end()) {
+        return static_cast<int32_t>(it.getIndex());
+    }
+
+    return addString(str);
 }
 
 uint16_t TraceBuilder::getStringIndex(uint16_t strIdx) const
@@ -852,7 +861,7 @@ int32_t TraceBuilder::handleDataPacketStringTableAdd(const DataPacketStringTable
     auto it = stringMap.find(str);
     if (it == stringMap.end()) {
         auto idx = addString(str);
-        indexMap[pData->id] = idx;
+        indexMap[pData->id] = safe_static_cast<uint16_t>(idx);
     }
     else if(indexMap[pData->id] == std::numeric_limits<uint16_t>::max()) {
         auto idx = safe_static_cast<uint16_t>(it.getIndex());

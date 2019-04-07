@@ -179,7 +179,8 @@ public:
 private:
     bool createTables(void);
 
-    uint16_t addString(core::string_view str);
+    int32_t addString(core::string_view str);
+    int32_t indexForString(core::string_view str);
     uint16_t getStringIndex(uint16_t strIdx) const;
     uint16_t getStringIndex(StringBuf& buf, const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt);
 
