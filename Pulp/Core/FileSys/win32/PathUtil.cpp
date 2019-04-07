@@ -395,6 +395,13 @@ namespace PathUtil
         _wfinddata64_t fi;
         intptr_t handle = ::_wfindfirst64(path.c_str(), &fi);
         if (handle == -1) {
+            auto err = errno;
+            if (err == ENOENT) {
+                // if it don't exsist return valid?
+                // seams resonable.
+                return{ INVALID_FIND_HANDLE, true };
+            }
+
             return{ INVALID_FIND_HANDLE, false };
         }
 
