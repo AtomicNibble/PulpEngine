@@ -820,7 +820,7 @@ int32_t TraceBuilder::indexForString(core::string_view str)
 
 uint16_t TraceBuilder::getStringIndex(uint16_t strIdx) const
 {
-    auto idx = indexMap[strIdx];
+    auto idx = indexMap[strIdx].idx;
     X_ASSERT(idx != std::numeric_limits<uint16_t>::max(), "Index not valid")(strIdx, idx);
     return idx;
 }
@@ -836,7 +836,7 @@ uint16_t TraceBuilder::getStringIndex(StringBuf& buf, const DataPacketBaseArgDat
 
         // i need the format string.
         // don't really have them to hand.
-        auto fmtStrIdx = indexMap[strIdxFmt];
+        auto fmtStrIdx = indexMap[strIdxFmt].idx;
         auto fmtIt = stringMap.at(fmtStrIdx);
         auto& fmtStr = fmtIt->first;
 
@@ -856,7 +856,14 @@ uint16_t TraceBuilder::getStringIndex(StringBuf& buf, const DataPacketBaseArgDat
     else {
 
         // map it to string in the dynamic table.
-        strIdx = indexMap[strIdxFmt];
+        auto str = indexMap[strIdxFmt];
+
+        strIdx = str.idx;
+
+        // we can lookup the string.
+        // think ideally this should just return a view maybe?
+        // currently i'm going to have to copy the string each call :(
+        buf.set(str.str.data(), str.str.length());
     }
 
     X_ASSERT(strIdx != -1, "Failed to get index")(strIdx, pPacket->argDataSize);
@@ -895,11 +902,11 @@ int32_t TraceBuilder::handleDataPacketStringTableAdd(const DataPacketStringTable
     auto it = stringMap.find(str);
     if (it == stringMap.end()) {
         auto idx = addString(str);
-        indexMap[pData->id] = safe_static_cast<uint16_t>(idx);
+        indexMap[pData->id] = { safe_static_cast<uint16_t>(idx), core::string(str.begin(), str.length()) };
     }
-    else if(indexMap[pData->id] == std::numeric_limits<uint16_t>::max()) {
+    else if(indexMap[pData->id].idx == std::numeric_limits<uint16_t>::max()) {
         auto idx = safe_static_cast<uint16_t>(it.getIndex());
-        indexMap[pData->id] = idx;
+        indexMap[pData->id] = { idx, core::string(str.begin(), str.length()) };
 
         // log warning.
         X_WARNING_EVERY_N(10, "TelemSrv", "Recived duplicate string \"%.*s\" check string pooling is on", str.length(), str.data());
@@ -908,11 +915,11 @@ int32_t TraceBuilder::handleDataPacketStringTableAdd(const DataPacketStringTable
     return packetSize;
 }
 
-void TraceBuilder::accumulateZoneData(const StringBuf& buf, int32_t strIdx, const DataPacketZone* pData)
+inline void TraceBuilder::accumulateZoneData(const StringBuf& buf, int32_t strIdx, const DataPacketZone* pData)
 {
     X_UNUSED(strIdx);
-    
-    zoneTree_.addZone(buf,  pData);
+
+    zoneTree_.addZone(buf, pData);
 }
 
 void TraceBuilder::flushZoneTree(void)

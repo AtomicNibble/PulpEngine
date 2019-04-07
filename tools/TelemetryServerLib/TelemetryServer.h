@@ -135,7 +135,22 @@ struct TraceBuilder : public TraceDB
     static constexpr size_t MAX_LOCKS = 256;
 
     using StringIdxMap = core::FixedHashTable<core::string, int32_t>;
-    using IndexArr = core::Array<uint16_t>;
+
+    struct IndexStr
+    {
+        IndexStr(uint16_t idx, core::string str) :
+            idx(idx),
+            str(str)
+        {}
+        IndexStr() :
+            idx(std::numeric_limits<uint16_t>::max())
+        {}
+
+        uint16_t idx;
+        core::string str;
+    };
+
+    using IndexStrPairArr = core::Array<IndexStr>;
 
 public:
     TraceBuilder() :
@@ -155,7 +170,7 @@ public:
         stringMap(g_TelemSrvLibArena, 1024 * 64),
         indexMap(g_TelemSrvLibArena, 1024 * 8)
     {
-        std::fill(indexMap.begin(), indexMap.end(), std::numeric_limits<uint16_t>::max());
+        // std::fill(indexMap.begin(), indexMap.end(), std::numeric_limits<uint16_t>::max());
     }
 
     bool createDB(core::Path<char>& path);
@@ -210,7 +225,7 @@ private:
     core::FixedArray<uint64_t, MAX_LOCKS> lockSet;
 
     StringIdxMap stringMap;
-    IndexArr indexMap;
+    IndexStrPairArr indexMap;
 
     ZoneTree zoneTree_;
 };
