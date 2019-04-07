@@ -649,7 +649,7 @@ CREATE TABLE IF NOT EXISTS "zones" (
     "endTick"	        INTEGER NOT NULL,
     "packedSourceInfo"	INTEGER NOT NULL,
     "strIdx"	        INTEGER NOT NULL,
-    PRIMARY KEY("id"),
+    PRIMARY KEY("id")
 );
 
 CREATE TABLE IF NOT EXISTS "locks" (
