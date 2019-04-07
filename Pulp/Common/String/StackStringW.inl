@@ -282,14 +282,19 @@ void StackString<N, wchar_t>::set(const wchar_t* str)
 }
 
 template<size_t N>
-void StackString<N, wchar_t>::set(const wchar_t* const beginInclusive, const wchar_t* const endExclusive)
+inline void StackString<N, wchar_t>::set(const wchar_t* const beginInclusive, const wchar_t* const endExclusive)
 {
-    size_t len = core::Min<size_t>(N - 1, (endExclusive - beginInclusive));
+    const size_t len = core::Min<size_t>(N - 1, (endExclusive - beginInclusive));
+    set(beginInclusive, len);
+}
 
-    X_ASSERT(len < N, "String of length %d does not fit into StackString of size %d.", len, N)();
+template<size_t N>
+void StackString<N, wchar_t>::set(const wchar_t* const beginInclusive, size_t length)
+{
+    X_ASSERT(length < N, "String of length %d does not fit into StackString of size %d.", length, N)();
 
-    memcpy(str_, beginInclusive, len * sizeof(wchar_t));
-    len_ = len;
+    memcpy(str_, beginInclusive, length * sizeof(wchar_t));
+    len_ = length;
     str_[len_] = 0;
 }
 

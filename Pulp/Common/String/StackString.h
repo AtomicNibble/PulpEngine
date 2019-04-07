@@ -62,6 +62,7 @@ public:
 
     void set(const TChar* str);
     void set(const TChar* const beginInclusive, const TChar* const endExclusive);
+    void set(const TChar* const beginInclusive, size_t length);
     void set(const StringRange<TChar>& range);
 
     void setFmt(const TChar* format, ...);
@@ -187,6 +188,7 @@ public:
 
     void set(const wchar_t* str);
     void set(const wchar_t* const beginInclusive, const wchar_t* const endExclusive);
+    void set(const wchar_t* const beginInclusive, size_t length);
     void set(const StringRange<wchar_t>& range);
 
     void setFmt(const wchar_t* format, ...);
