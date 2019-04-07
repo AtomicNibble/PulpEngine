@@ -65,6 +65,8 @@ void XTimer::reset(void)
 
 void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
 {
+    ttZone(gEnv->ctx, "(Core/Time) Update");
+
     int64_t now = SysTimer::Get();
     currentTime_ = now - baseTime_;
 
@@ -83,7 +85,10 @@ void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
                 X_LOG0("Timer", "Sleeping for %gms to limit frame rate.", sleepMs);
             }
 
-            core::Thread::sleep(static_cast<uint32_t>(sleepMs));
+            {
+                ttZone(gEnv->ctx, "(Core/Time) Sleep");
+                core::Thread::sleep(static_cast<uint32_t>(sleepMs));
+            }
 
             // how long did we actually sleep for.
             now = SysTimer::Get();
