@@ -9,11 +9,15 @@ const char* const SimpleMemoryTagging::TYPE_NAME = "MemoryTag";
 
 void SimpleMemoryTagging::TagAllocation(void* memory, size_t size)
 {
+    ttZone(gEnv->ctx, "(Memory/Tag) Alloc");
+
     memset(memory, TAG_ALLOCATED, size);
 }
 
 void SimpleMemoryTagging::TagDeallocation(void* memory, size_t size)
 {
+    ttZone(gEnv->ctx, "(Memory/Tag) Free");
+
     memset(memory, TAG_FREED, size);
 }
 

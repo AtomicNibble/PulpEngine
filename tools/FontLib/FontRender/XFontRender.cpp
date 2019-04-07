@@ -70,6 +70,8 @@ bool XFontRender::SetRawFontBuffer(core::span<const uint8_t> fontSrc, FontEncodi
 
 bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, wchar_t charCode, bool sdf)
 {
+    ttZone(gEnv->ctx, "(Font) Render glphy");
+
     X_ASSERT(glyphBitmapWidth_ > 0 && glyphBitmapHeight_ > 0, "Invalid bitmapsize set")(); 
 
     int32_t err = FT_Load_Char(pFace_, static_cast<FT_ULong>(charCode), FT_LOAD_DEFAULT);

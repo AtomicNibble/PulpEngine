@@ -138,6 +138,8 @@ void RootSignature::initStaticSampler(uint32_t shaderRegister, const D3D12_SAMPL
 
 bool RootSignature::finalize(RootSignatureDeviceCache& cache, D3D12_ROOT_SIGNATURE_FLAGS flags)
 {
+    ttZone(gEnv->ctx, "(Render/RootSig) Finalize");
+
     if (pSignature_) {
 #if PSO_HOT_RELOAD
         // I don't realse since cache owns it.

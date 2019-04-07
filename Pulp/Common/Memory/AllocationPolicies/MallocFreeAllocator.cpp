@@ -35,7 +35,12 @@ void* MallocFreeAllocator::allocate(size_t Origsize, size_t alignment, size_t of
 
     size_t size = Origsize + alignment + (SIZE_OF_HEADER);
 
+    tt_uint64 matchId;
+    ttEnterEx(gEnv->ctx, matchId, 1000, "(Memory) Alloc");
+
     void* pMem = malloc(size);
+
+    ttLeaveEx(gEnv->ctx, matchId);
 
     if (pMem) {
         union

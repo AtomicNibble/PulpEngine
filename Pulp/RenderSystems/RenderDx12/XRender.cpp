@@ -2111,6 +2111,8 @@ void XRender::initILDescriptions(void)
 
 bool XRender::resize(Vec2i res)
 {
+    ttZone(gEnv->ctx, "(Render) Resize");
+
     X_LOG1("Dx12", "Resizing display res to: (%" PRIi32 ",%" PRIi32 ")", res.x, res.y);
     X_ASSERT_NOT_NULL(pSwapChain_);
     X_ASSERT_NOT_NULL(pDescriptorAllocator_);

@@ -139,6 +139,7 @@ namespace CI
         imgFile.setFormat(hdr.format);
         imgFile.resize();
 
+        ttZone(gEnv->ctx, "(Texture) File Read");
         size_t bytesRead = file->read(imgFile.getFace(0), hdr.DataSize);
 
         if (bytesRead != hdr.DataSize) {

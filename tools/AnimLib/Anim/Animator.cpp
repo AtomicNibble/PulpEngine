@@ -567,6 +567,8 @@ bool Animator::getBoneTransform(model::BoneHandle handle, core::TimeVal currentT
         return false;
     }
 
+    ttZone(gEnv->ctx, "(Anim) getBoneTrans");
+
     X_ASSERT(handle < pModel_->getNumBones(), "Out of range")(handle, pModel_->getNumBones()); 
 
     // create a frame if needed,

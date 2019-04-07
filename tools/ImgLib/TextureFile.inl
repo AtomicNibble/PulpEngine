@@ -22,6 +22,8 @@ X_INLINE XTextureFile::~XTextureFile()
 
 X_INLINE void XTextureFile::resize(void)
 {
+    ttZone(gEnv->ctx, "(Texture) TextureFile Buf resize");
+
     X_ASSERT(format_ != Texturefmt::UNKNOWN, "format must be set")(format_); 
 
     // work out the size needed.
