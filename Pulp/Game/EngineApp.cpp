@@ -32,22 +32,12 @@ void AssetHandler::OnAssertVariable(const core::SourceInfo& sourceInfo)
 
 EngineApp::EngineApp() :
     pICore_(nullptr),
-    hSystemHandle_(core::Module::NULL_HANDLE),
-    allocator_()
-//	arena_(&allocator_, "CoreArena")
+    hSystemHandle_(core::Module::NULL_HANDLE)
 {
-    void* pMem = allocator_.allocate(sizeof(CoreArena),
-        X_ALIGN_OF(CoreArena), 0);
-
-    pArena_ = new (pMem) CoreArena(&allocator_, "CoreArena");
 }
 
 EngineApp::~EngineApp()
 {
-    // core allocator needs to close before this for leak reporting.
-    core::Mem::Destruct(pArena_);
-    allocator_.free(pArena_);
-
     if (hSystemHandle_) {
         core::Module::UnLoad(hSystemHandle_);
     }

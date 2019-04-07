@@ -5,26 +5,6 @@
 
 X_USING_NAMESPACE;
 
-#include "Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.h"
-#include "Memory\MemoryTrackingPolicies\FullMemoryTracking.h"
-#include "Memory\ThreadPolicies\MultiThreadPolicy.h"
-
-typedef core::MemoryArena<
-    core::MallocFreeAllocator,
-    core::MultiThreadPolicy<core::Spinlock>,
-
-#if X_ENABLE_MEMORY_DEBUG_POLICIES
-    core::SimpleBoundsChecking,
-    core::SimpleMemoryTracking,
-    core::SimpleMemoryTagging
-#else
-    core::NoBoundsChecking,
-    core::NoMemoryTracking,
-    core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-    >
-    CoreArena;
-
 class AssetHandler : public IAssertHandler
 {
 public:
@@ -56,7 +36,4 @@ private:
     AssetHandler assertCallback_;
     core::Module::Handle hSystemHandle_;
     ICore* pICore_;
-
-    core::MallocFreeAllocator allocator_;
-    CoreArena* pArena_;
 };
