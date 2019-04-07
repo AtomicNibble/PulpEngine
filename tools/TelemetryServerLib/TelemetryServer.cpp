@@ -802,10 +802,8 @@ uint16_t TraceBuilder::getStringIndex(uint16_t strIdx) const
     return idx;
 }
 
-uint16_t TraceBuilder::getStringIndex(StringBuf& buf_, const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt)
+uint16_t TraceBuilder::getStringIndex(StringBuf& buf, const DataPacketBaseArgData* pPacket, int32_t packetSize, uint16_t strIdxFmt)
 {
-    X_UNUSED(buf_);
-
     int32_t strIdx = -1;
 
     if (pPacket->argDataSize)
@@ -819,10 +817,9 @@ uint16_t TraceBuilder::getStringIndex(StringBuf& buf_, const DataPacketBaseArgDa
         auto fmtIt = stringMap.at(fmtStrIdx);
         auto& fmtStr = fmtIt->first;
 
-        char buf[MAX_STRING_LEN];
-        int32_t length = sprintf_ArgData(buf, sizeof(buf), fmtStr.c_str(), *pArgData);
+        sprintf_ArgData(buf, fmtStr.c_str(), *pArgData);
 
-        core::string_view view(buf, length);
+        core::string_view view(buf.data(), buf.length());
 
         // now we need to check if this string is unique.
         auto it = stringMap.find(view);

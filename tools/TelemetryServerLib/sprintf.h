@@ -11,7 +11,8 @@ struct ArgData
     tt_uint8 data[BUF_SIZE];
 };
 
+using SprintfStrBuf = core::StackString<MAX_STRING_LEN, char>;
 
-int sprintf_ArgData(char* buffer, int32_t bufLength, const char* format, const ArgData& data);
+void sprintf_ArgData(SprintfStrBuf& buf, const char* pFormat, const ArgData& data);
 
 X_NAMESPACE_END

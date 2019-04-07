@@ -23,26 +23,6 @@ namespace
         Precision
     );
 
-
-    // output function type
-    using OutFunc = core::traits::Function<void(char character, void* buffer, int32_t idx, int32_t maxlen)>;
-
-    // internal buffer output
-    inline void _out_buffer(char character, void* buffer, int32_t idx, int32_t maxlen)
-    {
-        if (idx < maxlen) {
-            ((char*)buffer)[idx] = character;
-        }
-    }
-
-    inline void _out_null(char character, void* buffer, int32_t idx, int32_t maxlen)
-    {
-        X_UNUSED(character);
-        X_UNUSED(buffer);
-        X_UNUSED(idx);
-        X_UNUSED(maxlen);
-    }
-
     // internal secure strlen
     // \return The length of the string (excluding the terminating 0) limited by 'maxsize'
     inline int32_t _strnlen_s(const char* pStr, int32_t maxsize)
@@ -71,15 +51,66 @@ namespace
         return i;
     }
 
+
+    struct ArgDataHelper
+    {
+        ArgDataHelper(const ArgData& argData) :
+            curIdx_(0),
+            argData_(argData)
+        {
+        }
+
+        template<typename T>
+        inline T get(void) {
+            const uintptr_t* pArgs = reinterpret_cast<const uintptr_t*>(argData_.data);
+
+            X_ASSERT(curIdx_ < argData_.numArgs, "No more args")(curIdx_, argData_.numArgs);
+
+            if constexpr (sizeof(T) == 4) {
+                return (T)(pArgs[curIdx_++] & 0xFFFFFFFF);
+            }
+            else {
+                return (T)pArgs[curIdx_++];
+            }
+        }
+
+        template<>
+        inline double get(void) {
+            const uintptr_t* pArgs = reinterpret_cast<const uintptr_t*>(argData_.data);
+            X_ASSERT(curIdx_ < argData_.numArgs, "No more args")(curIdx_, argData_.numArgs);
+
+            pArgs += curIdx_++;
+            const double* pValue = reinterpret_cast<const double*>(pArgs);
+
+            return *pValue;
+        }
+
+
+        inline std::pair<const char*, int32_t> getString(void) {
+
+            const intptr_t offset = get<intptr_t>();
+
+            uint8_t length = *(argData_.data + offset);
+            const char* pStr = reinterpret_cast<const char*>(argData_.data + offset + 1);
+
+            return { pStr, length };
+        }
+
+    private:
+        int32_t curIdx_;
+        const ArgData& argData_;
+    };
+
+
 } // namespace
 
 
 
 // internal itoa pFormat
-int32_t _ntoa_format(OutFunc::Pointer out, char* buffer, int32_t idx, int32_t maxlen, char* buf, int32_t len, bool negative,
+void _ntoa_format(SprintfStrBuf& buf, char* tmpBuf, int32_t len, bool negative,
     int32_t base, int32_t prec, int32_t width, uint32_t flags)
 {
-    const int32_t start_idx = idx;
+    const size_t start_idx = buf.length();
 
     // pad leading zeros
     if (!(flags & ParseFlag::Left)) {
@@ -87,10 +118,10 @@ int32_t _ntoa_format(OutFunc::Pointer out, char* buffer, int32_t idx, int32_t ma
             width--;
         }
         while ((len < prec) && (len < PRINTF_NTOA_BUFFER_SIZE)) {
-            buf[len++] = '0';
+            tmpBuf[len++] = '0';
         }
         while ((flags & ParseFlag::Zeropad) && (len < width) && (len < PRINTF_NTOA_BUFFER_SIZE)) {
-            buf[len++] = '0';
+            tmpBuf[len++] = '0';
         }
     }
 
@@ -103,58 +134,55 @@ int32_t _ntoa_format(OutFunc::Pointer out, char* buffer, int32_t idx, int32_t ma
             }
         }
         if ((base == 16) && !(flags & ParseFlag::Uppercase) && (len < PRINTF_NTOA_BUFFER_SIZE)) {
-            buf[len++] = 'x';
+            tmpBuf[len++] = 'x';
         }
         else if ((base == 16) && (flags & ParseFlag::Uppercase) && (len < PRINTF_NTOA_BUFFER_SIZE)) {
-            buf[len++] = 'X';
+            tmpBuf[len++] = 'X';
         }
         else if ((base == 2) && (len < PRINTF_NTOA_BUFFER_SIZE)) {
-            buf[len++] = 'b';
+            tmpBuf[len++] = 'b';
         }
         if (len < PRINTF_NTOA_BUFFER_SIZE) {
-            buf[len++] = '0';
+            tmpBuf[len++] = '0';
         }
     }
 
     if (len < PRINTF_NTOA_BUFFER_SIZE) {
         if (negative) {
-            buf[len++] = '-';
+            tmpBuf[len++] = '-';
         }
         else if (flags & ParseFlag::Plus) {
-            buf[len++] = '+'; // ignore the space if the '+' exists
+            tmpBuf[len++] = '+'; // ignore the space if the '+' exists
         }
         else if (flags & ParseFlag::Space) {
-            buf[len++] = ' ';
+            tmpBuf[len++] = ' ';
         }
     }
 
     // pad spaces up to given width
     if (!(flags & ParseFlag::Left) && !(flags & ParseFlag::Zeropad)) {
-        for (int32_t i = len; i < width; i++) {
-            out(' ', buffer, idx++, maxlen);
-        }
+        auto num = width - len;
+        buf.append(' ', num);
     }
 
     // reverse string
     for (int32_t i = 0; i < len; i++) {
-        out(buf[len - i - 1], buffer, idx++, maxlen);
+        buf.append(tmpBuf[len - i - 1]);
     }
 
     // append pad spaces up to given width
     if (flags & ParseFlag::Left) {
-        while (idx - start_idx < width) {
-            out(' ', buffer, idx++, maxlen);
+        while (buf.length() - start_idx < width) {
+            buf.append(' ');
         }
     }
-
-    return idx;
 }
 
 // internal itoa for 'long' type
-int32_t _ntoa_long(OutFunc::Pointer out, char* buffer, int32_t idx, int32_t maxlen,
+void _ntoa_long(SprintfStrBuf& buf,
     unsigned long value, bool negative, int32_t base, int32_t prec, int32_t width, uint32_t flags)
 {
-    char buf[PRINTF_NTOA_BUFFER_SIZE];
+    char tmpBuf[PRINTF_NTOA_BUFFER_SIZE];
     int32_t len = 0;
 
     // no hash for 0 values
@@ -166,19 +194,19 @@ int32_t _ntoa_long(OutFunc::Pointer out, char* buffer, int32_t idx, int32_t maxl
     if (!(flags & ParseFlag::Precision) || value) {
         do {
             const char digit = (char)(value % base);
-            buf[len++] = digit < 10 ? '0' + digit : (flags & ParseFlag::Uppercase ? 'A' : 'a') + digit - 10;
+            tmpBuf[len++] = digit < 10 ? '0' + digit : (flags & ParseFlag::Uppercase ? 'A' : 'a') + digit - 10;
             value /= base;
         } while (value && (len < PRINTF_NTOA_BUFFER_SIZE));
     }
 
-    return _ntoa_format(out, buffer, idx, maxlen, buf, len, negative, base, prec, width, flags);
+    _ntoa_format(buf, tmpBuf, len, negative, base, prec, width, flags);
 }
 
 // internal itoa for 'long long' type
-int32_t _ntoa_long_long(OutFunc::Pointer out, char* buffer, int32_t idx, int32_t maxlen,
+void _ntoa_long_long(SprintfStrBuf& buf,
     unsigned long long value, bool negative, int32_t base, int32_t prec, int32_t width, uint32_t flags)
 {
-    char buf[PRINTF_NTOA_BUFFER_SIZE];
+    char tmpBuf[PRINTF_NTOA_BUFFER_SIZE];
     int32_t len = 0;
 
     // no hash for 0 values
@@ -190,19 +218,19 @@ int32_t _ntoa_long_long(OutFunc::Pointer out, char* buffer, int32_t idx, int32_t
     if (!(flags & ParseFlag::Precision) || value) {
         do {
             const char digit = (char)(value % base);
-            buf[len++] = digit < 10 ? '0' + digit : (flags & ParseFlag::Uppercase ? 'A' : 'a') + digit - 10;
+            tmpBuf[len++] = digit < 10 ? '0' + digit : (flags & ParseFlag::Uppercase ? 'A' : 'a') + digit - 10;
             value /= base;
         } while (value && (len < PRINTF_NTOA_BUFFER_SIZE));
     }
 
-    return _ntoa_format(out, buffer, idx, maxlen, buf, len, negative, base, prec, width, flags);
+    _ntoa_format(buf, tmpBuf, len, negative, base, prec, width, flags);
 }
 
-int32_t _ftoa(OutFunc::Pointer out, char* buffer, int32_t idx, int32_t maxlen, double value, int32_t prec, int32_t width, uint32_t flags)
+void _ftoa(SprintfStrBuf& buf, double value, int32_t prec, int32_t width, uint32_t flags)
 {
-    const int32_t start_idx = idx;
+    const size_t start_idx = buf.length();
 
-    char buf[PRINTF_FTOA_BUFFER_SIZE];
+    char tmpBuf[PRINTF_FTOA_BUFFER_SIZE];
     int32_t len = 0;
     double diff = 0.0;
 
@@ -210,14 +238,12 @@ int32_t _ftoa(OutFunc::Pointer out, char* buffer, int32_t idx, int32_t maxlen, d
     constexpr double thres_max = (double)0x7FFFFFFF;
 
     // powers of 10
-    static const double pow10[] = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
+    static constexpr double pow10[] = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
 
     // test for NaN
     if (value != value) {
-        out('n', buffer, idx++, maxlen);
-        out('a', buffer, idx++, maxlen);
-        out('n', buffer, idx++, maxlen);
-        return idx;
+        buf.append("nan");
+        return;
     }
 
     // test for negative
@@ -233,7 +259,7 @@ int32_t _ftoa(OutFunc::Pointer out, char* buffer, int32_t idx, int32_t maxlen, d
     }
     // limit precision to 9, cause a prec >= 10 can lead to overflow errors
     while ((len < PRINTF_FTOA_BUFFER_SIZE) && (prec > 9)) {
-        buf[len++] = '0';
+        tmpBuf[len++] = '0';
         prec--;
     }
 
@@ -261,7 +287,7 @@ int32_t _ftoa(OutFunc::Pointer out, char* buffer, int32_t idx, int32_t maxlen, d
     // Normal printf behavior is to print EVERY whole number digit which can be 100s of characters overflowing your buffers == bad
 #if 1
     if (value > thres_max) {
-        return start_idx;
+        return;
     }
 #endif
 
@@ -278,24 +304,24 @@ int32_t _ftoa(OutFunc::Pointer out, char* buffer, int32_t idx, int32_t maxlen, d
         // now do fractional part, as an unsigned number
         while (len < PRINTF_FTOA_BUFFER_SIZE) {
             --count;
-            buf[len++] = (char)(48 + (frac % 10));
+            tmpBuf[len++] = (char)(48 + (frac % 10));
             if (!(frac /= 10)) {
                 break;
             }
         }
         // add extra 0s
         while ((len < PRINTF_FTOA_BUFFER_SIZE) && (count-- > 0)) {
-            buf[len++] = '0';
+            tmpBuf[len++] = '0';
         }
         if (len < PRINTF_FTOA_BUFFER_SIZE) {
             // add decimal
-            buf[len++] = '.';
+            tmpBuf[len++] = '.';
         }
     }
 
     // do whole part, number is reversed
     while (len < PRINTF_FTOA_BUFFER_SIZE) {
-        buf[len++] = (char)(48 + (whole % 10));
+        tmpBuf[len++] = (char)(48 + (whole % 10));
         if (!(whole /= 10)) {
             break;
         }
@@ -307,110 +333,51 @@ int32_t _ftoa(OutFunc::Pointer out, char* buffer, int32_t idx, int32_t maxlen, d
             width--;
         }
         while ((len < width) && (len < PRINTF_FTOA_BUFFER_SIZE)) {
-            buf[len++] = '0';
+            tmpBuf[len++] = '0';
         }
     }
 
     if (len < PRINTF_FTOA_BUFFER_SIZE) {
         if (negative) {
-            buf[len++] = '-';
+            tmpBuf[len++] = '-';
         }
         else if (flags & ParseFlag::Plus) {
-            buf[len++] = '+'; // ignore the space if the '+' exists
+            tmpBuf[len++] = '+'; // ignore the space if the '+' exists
         }
         else if (flags & ParseFlag::Space) {
-            buf[len++] = ' ';
+            tmpBuf[len++] = ' ';
         }
     }
 
     // pad spaces up to given width
     if (!(flags & ParseFlag::Left) && !(flags & ParseFlag::Zeropad)) {
-        for (int32_t i = len; i < width; i++) {
-            out(' ', buffer, idx++, maxlen);
-        }
+        auto padLen = width - len;
+        buf.append(' ', padLen);
     }
 
     // reverse string
     for (int32_t i = 0; i < len; i++) {
-        out(buf[len - i - 1], buffer, idx++, maxlen);
+        buf.append(tmpBuf[len - i - 1]);
     }
 
     // append pad spaces up to given width
     if (flags & ParseFlag::Left) {
-        while (idx - start_idx < width) {
-            out(' ', buffer, idx++, maxlen);
+        while (buf.length() - start_idx < width) {
+            buf.append(' ');
         }
     }
-
-    return idx;
 }
 
 
-struct ArgDataHelper
-{
-    ArgDataHelper(const ArgData& argData) :
-        curIdx_(0),
-        argData_(argData)
-    {
-    }
-
-    template<typename T>
-    inline T get(void) {
-        const uintptr_t* pArgs = reinterpret_cast<const uintptr_t*>(argData_.data);
-
-        X_ASSERT(curIdx_ < argData_.numArgs, "No more args")(curIdx_, argData_.numArgs);
-
-        if constexpr (sizeof(T) == 4) {
-            return (T)(pArgs[curIdx_++] & 0xFFFFFFFF);
-        }
-        else {
-            return (T)pArgs[curIdx_++];
-        }
-    }
-
-    template<>
-    inline double get(void) {
-        const uintptr_t* pArgs = reinterpret_cast<const uintptr_t*>(argData_.data);
-        X_ASSERT(curIdx_ < argData_.numArgs, "No more args")(curIdx_, argData_.numArgs);
-
-        pArgs += curIdx_++;
-        const double* pValue = reinterpret_cast<const double*>(pArgs);
-
-        return *pValue;
-    }
-
-
-    inline std::pair<const char*, int32_t> getString(void) {
-
-        const intptr_t offset = get<intptr_t>();
-
-        uint8_t length = *(argData_.data + offset);
-        const char* pStr = reinterpret_cast<const char*>(argData_.data + offset + 1);
-
-        return { pStr, length };
-    }
-
-private:
-    int32_t curIdx_;
-    const ArgData& argData_;
-};
-
-
-int32_t _vsnprintf(OutFunc::Pointer out, char* buffer, const int32_t maxlen, const char* pFormat, ArgDataHelper& va)
+void _vsnprintf(SprintfStrBuf& buf, const char* pFormat, ArgDataHelper& va)
 {
     uint32_t flags;
     int32_t width, precision;
-    int32_t idx = 0;
-
-    if (!buffer) {
-        // use null output function
-        out = _out_null;
-    }
 
     // %[flags][width][.precision][length]
     while (*pFormat) {
         if (*pFormat != '%') {
-            out(*pFormat, buffer, idx++, maxlen);
+            buf.append(*pFormat);
             pFormat++;
             continue;
         }
@@ -565,28 +532,28 @@ int32_t _vsnprintf(OutFunc::Pointer out, char* buffer, const int32_t maxlen, con
                     // signed
                     if (flags & ParseFlag::LongLong) {
                         const long long value = va.get<long long>();
-                        idx = _ntoa_long_long(out, buffer, idx, maxlen, (unsigned long long)(value > 0 ? value : 0 - value), value < 0, base, precision, width, flags);
+                        _ntoa_long_long(buf, (unsigned long long)(value > 0 ? value : 0 - value), value < 0, base, precision, width, flags);
                     }
                     else if (flags & ParseFlag::Long) {
                         const long value = va.get<long>();
-                        idx = _ntoa_long(out, buffer, idx, maxlen, (unsigned long)(value > 0 ? value : 0 - value), value < 0, base, precision, width, flags);
+                        _ntoa_long(buf, (unsigned long)(value > 0 ? value : 0 - value), value < 0, base, precision, width, flags);
                     }
                     else {
                         const int value = (flags & ParseFlag::Char) ? (char)va.get<int>() : (flags & ParseFlag::Short) ? (short int)va.get<int>() : va.get<int>();
-                        idx = _ntoa_long(out, buffer, idx, maxlen, (uint32_t)(value > 0 ? value : 0 - value), value < 0, base, precision, width, flags);
+                        _ntoa_long(buf, (uint32_t)(value > 0 ? value : 0 - value), value < 0, base, precision, width, flags);
                     }
                 }
                 else {
                     // unsigned
                     if (flags & ParseFlag::LongLong) {
-                        idx = _ntoa_long_long(out, buffer, idx, maxlen, va.get<unsigned long long>(), false, base, precision, width, flags);
+                        _ntoa_long_long(buf, va.get<unsigned long long>(), false, base, precision, width, flags);
                     }
                     else if (flags & ParseFlag::Long) {
-                        idx = _ntoa_long(out, buffer, idx, maxlen, va.get<unsigned long>(), false, base, precision, width, flags);
+                        _ntoa_long(buf, va.get<unsigned long>(), false, base, precision, width, flags);
                     }
                     else {
                         const uint32_t value = (flags & ParseFlag::Char) ? (unsigned char)va.get<unsigned int>() : (flags & ParseFlag::Short) ? (unsigned short int)va.get<unsigned int>() : va.get<unsigned int>();
-                        idx = _ntoa_long(out, buffer, idx, maxlen, value, false, base, precision, width, flags);
+                        _ntoa_long(buf, value, false, base, precision, width, flags);
                     }
                 }
                 pFormat++;
@@ -595,7 +562,7 @@ int32_t _vsnprintf(OutFunc::Pointer out, char* buffer, const int32_t maxlen, con
 
             case 'f':
             case 'F':
-                idx = _ftoa(out, buffer, idx, maxlen, va.get<double>(), precision, width, flags);
+                _ftoa(buf, va.get<double>(), precision, width, flags);
                 pFormat++;
                 break;
 
@@ -604,15 +571,16 @@ int32_t _vsnprintf(OutFunc::Pointer out, char* buffer, const int32_t maxlen, con
                 // pre padding
                 if (!(flags & ParseFlag::Left)) {
                     while (l++ < width) {
-                        out(' ', buffer, idx++, maxlen);
+                        buf.append(' ');
                     }
                 }
                 // char output
-                out((char)va.get<int>(), buffer, idx++, maxlen);
+                buf.append((char)va.get<int>());
+
                 // post padding
                 if (flags & ParseFlag::Left) {
                     while (l++ < width) {
-                        out(' ', buffer, idx++, maxlen);
+                        buf.append(' ');
                     }
                 }
                 pFormat++;
@@ -635,17 +603,17 @@ int32_t _vsnprintf(OutFunc::Pointer out, char* buffer, const int32_t maxlen, con
 
                 if (!(flags & ParseFlag::Left)) {
                     while (l++ < width) {
-                        out(' ', buffer, idx++, maxlen);
+                        buf.append(' ');
                     }
                 }
                 // string output
                 while (precision--) {
-                    out(*(pStr++), buffer, idx++, maxlen);
+                    buf.append(*(pStr++));
                 }
                 // post padding
                 if (flags & ParseFlag::Left) {
                     while (l++ < width) {
-                        out(' ', buffer, idx++, maxlen);
+                        buf.append(' ');
                     }
                 }
                 pFormat++;
@@ -657,40 +625,34 @@ int32_t _vsnprintf(OutFunc::Pointer out, char* buffer, const int32_t maxlen, con
                 flags |= ParseFlag::Zeropad | ParseFlag::Uppercase;
                 const bool is_ll = sizeof(uintptr_t) == sizeof(long long);
                 if (is_ll) {
-                    idx = _ntoa_long_long(out, buffer, idx, maxlen, (uintptr_t)va.get<void*>(), false, 16, precision, width, flags);
+                    _ntoa_long_long(buf, (uintptr_t)va.get<void*>(), false, 16, precision, width, flags);
                 }
                 else {
-                    idx = _ntoa_long(out, buffer, idx, maxlen, (unsigned long)((uintptr_t)va.get<void*>()), false, 16, precision, width, flags);
+                    _ntoa_long(buf, (unsigned long)((uintptr_t)va.get<void*>()), false, 16, precision, width, flags);
                 }
                 pFormat++;
                 break;
             }
 
             case '%':
-                out('%', buffer, idx++, maxlen);
+                buf.append('%');
                 pFormat++;
                 break;
 
             default:
-                out(*pFormat, buffer, idx++, maxlen);
+                buf.append(*pFormat);
                 pFormat++;
                 break;
         }
     }
 
-    // termination
-    out((char)0, buffer, idx < maxlen ? idx : maxlen - 1, maxlen);
-
-    // return written chars without terminating \0
-    return idx;
 }
 
-int sprintf_ArgData(char* buffer, int32_t bufLength, const char* pFormat, const ArgData& data)
+
+void sprintf_ArgData(SprintfStrBuf& buf, const char* pFormat, const ArgData& data)
 {
     ArgDataHelper vaShim(data);
-    const int ret = _vsnprintf(_out_buffer, buffer, bufLength, pFormat, vaShim);
-    return ret;
+    _vsnprintf(buf, pFormat, vaShim);
 }
-
 
 X_NAMESPACE_END
