@@ -245,6 +245,8 @@ void TextureManager::releasePixelBuffer(render::IPixelBuffer* pPixelBuf)
 
 bool TextureManager::initDeviceTexture(Texture* pTex, const texture::XTextureFile& imgFile) const
 {
+    ttZone(gEnv->ctx, "(Render/Texture) initDeviceTexture");
+
     if (!initDeviceTexture(pTex)) {
         return false;
     }
@@ -366,6 +368,8 @@ X_INLINE bool TextureManager::updateTextureData(Texture* pTex, uint32_t numSubre
 
 bool TextureManager::updateTextureData(render::GpuResource& dest, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* pSubData) const
 {
+    ttZone(gEnv->ctx, "(Render/Texture) Update Texture data");
+
     const uint64_t uploadBufSize = getRequiredIntermediateSize(dest.getResource(), 0, numSubresources);
 
     D3D12_HEAP_PROPERTIES heapProps;
