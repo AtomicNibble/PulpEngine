@@ -222,6 +222,11 @@ namespace
                     i += strm.handleDataPacketMessage(reinterpret_cast<const DataPacketMessage*>(&pDst[i]));
                     break;
                 }
+                case DataStreamType::Plot:
+                {
+                    i += strm.handleDataPacketPlot(reinterpret_cast<const DataPacketPlot*>(&pDst[i]));
+                    break;
+                }
 
                 default:
                     X_NO_SWITCH_DEFAULT_ASSERT;
@@ -599,6 +604,7 @@ bool TraceBuilder::createDB(core::Path<char>& path)
     okay &= (sql::Result::OK == cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertMessage.prepare("INSERT INTO messages (timeTicks, type, strIdx) VALUES(?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertZoneNode.prepare("INSERT INTO zoneNodes (setId, parentId, totalTick, strIdx) VALUES(?,?,?,?)"));
+    okay &= (sql::Result::OK == cmdInsertPlot.prepare("INSERT INTO plots (type, timeTicks, value, strIdx) VALUES(?,?,?,?)"));
 
     return okay;
 }
@@ -744,6 +750,16 @@ CREATE TABLE "messages" (
 	"strIdx"	        INTEGER NOT NULL,
 	PRIMARY KEY("Id")
 );
+
+CREATE TABLE "plots" (
+	"Id"	            INTEGER,
+	"type"	            INTEGER NOT NULL,
+	"timeTicks"	        INTEGER NOT NULL,
+	"value"	            BLOB NOT NULL,
+	"strIdx"	        INTEGER NOT NULL,
+	PRIMARY KEY("Id")
+);
+
 
             )")) {
         X_ERROR("TelemSrv", "Failed to create tables");
@@ -1159,6 +1175,35 @@ int32_t TraceBuilder::handleDataPacketMessage(const DataPacketMessage* pData)
     cmd.bind(1, static_cast<int64_t>(pData->time));
     cmd.bind(2, static_cast<int32_t>(pData->logType));
     cmd.bind(3, strIdx);
+
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
+    }
+
+    cmd.reset();
+    return getPacketSizeIncArgData(pData);
+}
+
+int32_t TraceBuilder::handleDataPacketPlot(const DataPacketPlot* pData)
+{
+    StringBuf strBuf;
+    int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxFmt);
+
+    constexpr std::array<int32_t,6> typeSize = {
+        sizeof(int32_t),
+        sizeof(uint32_t),
+        sizeof(int64_t),
+        sizeof(uint64_t),
+        sizeof(float),
+        sizeof(double),
+    };
+
+    auto& cmd = cmdInsertPlot;
+    cmd.bind(1, static_cast<int32_t>(pData->value.plotType));
+    cmd.bind(2, static_cast<int64_t>(pData->time));
+    cmd.bind(3, &pData->value.uint64, typeSize[pData->value.valueType]);
+    cmd.bind(4, strIdx);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {

@@ -1000,7 +1000,8 @@ namespace
         LockCount,
         MemAlloc,
         MemFree,
-        Message
+        Message,
+        Plot
     };
 
     TELEM_PACK_PUSH(8)
@@ -1118,6 +1119,14 @@ namespace
         ArgData argData;
     };
 
+    struct QueueDataPlot : public QueueDataBase
+    {
+        tt_uint64 time;
+        TtPlotValue value;
+        const char* pFmtStr;
+        ArgData argData;
+    };
+
     TELEM_PACK_POP
 
 
@@ -1130,8 +1139,9 @@ namespace
     constexpr size_t size6 = sizeof(QueueDataMemAlloc);
     constexpr size_t size7 = sizeof(QueueDataMemFree);
     constexpr size_t size8 = sizeof(QueueDataMessage);
+    constexpr size_t size9 = sizeof(QueueDataPlot);
 
-    constexpr size_t size9 = sizeof(ArgData);
+    constexpr size_t size10 = sizeof(ArgData);
     
 
     static_assert(64 == GetSizeWithoutArgData<QueueDataThreadSetName>());
@@ -1145,6 +1155,7 @@ namespace
     static_assert(64 == GetSizeWithoutArgData<QueueDataMemAlloc>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataMemFree>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataMessage>());
+    static_assert(64 == GetSizeWithoutArgData<QueueDataPlot>());
 
     void flipBufferInternal(TraceContext* pCtx, bool force)
     {
@@ -1601,6 +1612,25 @@ namespace
         return dataSize;
     }
 
+    tt_int32 queueProcessPlot(PacketCompressor* pComp, const QueueDataPlot* pBuf)
+    {
+        DataPacketPlot packet;
+        packet.type = DataStreamType::Plot;
+        packet.time = pBuf->time;
+        packet.strIdxFmt = GetStringId(pComp, pBuf->pFmtStr);
+        packet.value = pBuf->value;
+        packet.argDataSize = pBuf->argDataSize;
+
+        const auto dataSize = GetDataSize<std::remove_pointer_t<decltype(pBuf)>>(pBuf->argDataSize);
+        flushCompressionBufferIfrequired(pComp, dataSize);
+
+        addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
+        if (pBuf->argDataSize) {
+            addToCompressionBufferNoFlush(pComp, &pBuf->argData, pBuf->argDataSize);
+        }
+
+        return dataSize;
+    }
 
     DWORD __stdcall WorkerThread(LPVOID pParam)
     {
@@ -1718,6 +1748,9 @@ namespace
                         break;
                     case QueueDataType::Message:
                         pBuf += queueProcessMessage(&comp, reinterpret_cast<const QueueDataMessage*>(pBuf));
+                        break;
+                    case QueueDataType::Plot:
+                        pBuf += queueProcessPlot(&comp, reinterpret_cast<const QueueDataPlot*>(pBuf));
                         break;
 
                     default:
@@ -2605,56 +2638,212 @@ void TelemFree(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr
 
 void TelemPlotF32(TraceContexHandle ctx, TtPlotType::Enum type, float value, const char* pFmtString, tt_int32 numArgs, ...)
 {
-    TELEM_UNUSED(ctx);
-    TELEM_UNUSED(type);
-    TELEM_UNUSED(value);
-    TELEM_UNUSED(pFmtString);
-    TELEM_UNUSED(numArgs);
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    QueueDataPlot data;
+    data.type = QueueDataType::Plot;
+    data.time = getRelativeTicks(pCtx);
+    data.value.plotType = type;
+    data.value.valueType = TtPlotValueType::f32;
+    data.value.f32 = value;
+    data.pFmtStr = pFmtString;
+
+    if (!numArgs)
+    {
+        constexpr auto size = GetSizeWithoutArgData<decltype(data)>();
+        data.argDataSize = 0;
+        addToTickBuffer(pCtx, &data, size);
+    }
+    else
+    {
+        va_list l;
+        va_start(l, numArgs);
+
+        auto argDataSize = BuildArgData(data.argData, pFmtString, numArgs, l);
+        data.argDataSize = static_cast<tt_int8>(argDataSize & 0xFF);
+
+        va_end(l);
+
+        addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(argDataSize));
+    }
 }
 
 void TelemPlotF64(TraceContexHandle ctx, TtPlotType::Enum type, double value, const char* pFmtString, tt_int32 numArgs, ...)
 {
-    TELEM_UNUSED(ctx);
-    TELEM_UNUSED(type);
-    TELEM_UNUSED(value);
-    TELEM_UNUSED(pFmtString);
-    TELEM_UNUSED(numArgs);
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    QueueDataPlot data;
+    data.type = QueueDataType::Plot;
+    data.time = getRelativeTicks(pCtx);
+    data.value.plotType = type;
+    data.value.valueType = TtPlotValueType::f64;
+    data.value.f64 = value;
+    data.pFmtStr = pFmtString;
+
+    if (!numArgs)
+    {
+        constexpr auto size = GetSizeWithoutArgData<decltype(data)>();
+        data.argDataSize = 0;
+        addToTickBuffer(pCtx, &data, size);
+    }
+    else
+    {
+        va_list l;
+        va_start(l, numArgs);
+
+        auto argDataSize = BuildArgData(data.argData, pFmtString, numArgs, l);
+        data.argDataSize = static_cast<tt_int8>(argDataSize & 0xFF);
+
+        va_end(l);
+
+        addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(argDataSize));
+    }
 }
 
 void TelemPlotI32(TraceContexHandle ctx, TtPlotType::Enum type, tt_int32 value, const char* pFmtString, tt_int32 numArgs, ...)
 {
-    TELEM_UNUSED(ctx);
-    TELEM_UNUSED(type);
-    TELEM_UNUSED(value);
-    TELEM_UNUSED(pFmtString);
-    TELEM_UNUSED(numArgs);
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    QueueDataPlot data;
+    data.type = QueueDataType::Plot;
+    data.time = getRelativeTicks(pCtx);
+    data.value.plotType = type;
+    data.value.valueType = TtPlotValueType::Int32;
+    data.value.int32 = value;
+    data.pFmtStr = pFmtString;
+
+    if (!numArgs)
+    {
+        constexpr auto size = GetSizeWithoutArgData<decltype(data)>();
+        data.argDataSize = 0;
+        addToTickBuffer(pCtx, &data, size);
+    }
+    else
+    {
+        va_list l;
+        va_start(l, numArgs);
+
+        auto argDataSize = BuildArgData(data.argData, pFmtString, numArgs, l);
+        data.argDataSize = static_cast<tt_int8>(argDataSize & 0xFF);
+
+        va_end(l);
+
+        addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(argDataSize));
+    }
 }
 
 void TelemPlotI64(TraceContexHandle ctx, TtPlotType::Enum type, tt_int64 value, const char* pFmtString, tt_int32 numArgs, ...)
 {
-    TELEM_UNUSED(ctx);
-    TELEM_UNUSED(type);
-    TELEM_UNUSED(value);
-    TELEM_UNUSED(pFmtString);
-    TELEM_UNUSED(numArgs);
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    QueueDataPlot data;
+    data.type = QueueDataType::Plot;
+    data.time = getRelativeTicks(pCtx);
+    data.value.plotType = type;
+    data.value.valueType = TtPlotValueType::Int64;
+    data.value.int64 = value;
+    data.pFmtStr = pFmtString;
+
+    if (!numArgs)
+    {
+        constexpr auto size = GetSizeWithoutArgData<decltype(data)>();
+        data.argDataSize = 0;
+        addToTickBuffer(pCtx, &data, size);
+    }
+    else
+    {
+        va_list l;
+        va_start(l, numArgs);
+
+        auto argDataSize = BuildArgData(data.argData, pFmtString, numArgs, l);
+        data.argDataSize = static_cast<tt_int8>(argDataSize & 0xFF);
+
+        va_end(l);
+
+        addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(argDataSize));
+    }
 }
 
 void TelemPlotU32(TraceContexHandle ctx, TtPlotType::Enum type, tt_uint32 value, const char* pFmtString, tt_int32 numArgs, ...)
 {
-    TELEM_UNUSED(ctx);
-    TELEM_UNUSED(type);
-    TELEM_UNUSED(value);
-    TELEM_UNUSED(pFmtString);
-    TELEM_UNUSED(numArgs);
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    QueueDataPlot data;
+    data.type = QueueDataType::Plot;
+    data.time = getRelativeTicks(pCtx);
+    data.value.plotType = type;
+    data.value.valueType = TtPlotValueType::UInt32;
+    data.value.uint32 = value;
+    data.pFmtStr = pFmtString;
+
+    if (!numArgs)
+    {
+        constexpr auto size = GetSizeWithoutArgData<decltype(data)>();
+        data.argDataSize = 0;
+        addToTickBuffer(pCtx, &data, size);
+    }
+    else
+    {
+        va_list l;
+        va_start(l, numArgs);
+
+        auto argDataSize = BuildArgData(data.argData, pFmtString, numArgs, l);
+        data.argDataSize = static_cast<tt_int8>(argDataSize & 0xFF);
+
+        va_end(l);
+
+        addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(argDataSize));
+    }
 }
 
 void TelemPlotU64(TraceContexHandle ctx, TtPlotType::Enum type, tt_uint64 value, const char* pFmtString, tt_int32 numArgs, ...)
 {
-    TELEM_UNUSED(ctx);
-    TELEM_UNUSED(type);
-    TELEM_UNUSED(value);
-    TELEM_UNUSED(pFmtString);
-    TELEM_UNUSED(numArgs);
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    QueueDataPlot data;
+    data.type = QueueDataType::Plot;
+    data.time = getRelativeTicks(pCtx);
+    data.value.plotType = type;
+    data.value.valueType = TtPlotValueType::UInt64;
+    data.value.uint64 = value;
+    data.pFmtStr = pFmtString;
+
+    if (!numArgs)
+    {
+        constexpr auto size = GetSizeWithoutArgData<decltype(data)>();
+        data.argDataSize = 0;
+        addToTickBuffer(pCtx, &data, size);
+    }
+    else
+    {
+        va_list l;
+        va_start(l, numArgs);
+
+        auto argDataSize = BuildArgData(data.argData, pFmtString, numArgs, l);
+        data.argDataSize = static_cast<tt_int8>(argDataSize & 0xFF);
+
+        va_end(l);
+
+        addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(argDataSize));
+    }
 }
 
 // ----------- Message Stuff -----------

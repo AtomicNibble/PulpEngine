@@ -167,6 +167,7 @@ public:
         cmdInsertMemory(con),
         cmdInsertMessage(con),
         cmdInsertZoneNode(con),
+        cmdInsertPlot(con),
         stringMap(g_TelemSrvLibArena, 1024 * 64),
         indexMap(g_TelemSrvLibArena, 1024 * 8)
     {
@@ -192,6 +193,7 @@ public:
     int32_t handleDataPacketMemAlloc(const DataPacketMemAlloc* pData);
     int32_t handleDataPacketMemFree(const DataPacketMemFree* pData);
     int32_t handleDataPacketMessage(const DataPacketMessage* pData);
+    int32_t handleDataPacketPlot(const DataPacketPlot* pData);
     int32_t handleDataPacketCallStack(const DataPacketCallStack* pData);
 
 private:
@@ -221,6 +223,7 @@ private:
     sql::SqlLiteCmd cmdInsertMemory;
     sql::SqlLiteCmd cmdInsertMessage;
     sql::SqlLiteCmd cmdInsertZoneNode;
+    sql::SqlLiteCmd cmdInsertPlot;
 
     core::FixedArray<uint64_t, MAX_LOCKS> lockSet;
 

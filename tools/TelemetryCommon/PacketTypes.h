@@ -166,6 +166,7 @@ struct DataStreamType
         MemAlloc,
         MemFree,
         Message,
+        Plot,
 
         Num
     };
@@ -363,6 +364,44 @@ struct DataPacketMessage : public DataPacketBaseArgData
     tt_uint8 logType;
 };
 
+struct TtPlotValueType
+{
+    enum Enum : tt_uint8
+    {
+        Int32,
+        UInt32,
+        Int64,
+        UInt64,
+        f32,
+        f64
+    };
+};
+
+struct TtPlotValue
+{
+    TtPlotType::Enum plotType;
+    TtPlotValueType::Enum valueType;
+
+    union {
+        tt_int32 int32;
+        tt_uint32 uint32;
+        tt_int64 int64;
+        tt_uint64 uint64;
+        float f32;
+        double f64;
+    };
+};
+
+struct DataPacketPlot : public DataPacketBaseArgData
+{
+    // 8
+    tt_uint64 time;
+
+    // 2
+    tt_uint16 strIdxFmt;
+    TtPlotValue value;
+};
+
 static_assert(sizeof(DataPacketBase) == 1, "Incorrect size");
 static_assert(sizeof(DataPacketStringTableAdd) == 5, "Incorrect size");
 static_assert(sizeof(DataPacketZone) == 32, "Incorrect size");
@@ -374,6 +413,7 @@ static_assert(sizeof(DataPacketLockCount) == 29, "Incorrect size");
 static_assert(sizeof(DataPacketMemAlloc) == 34, "Incorrect size");
 static_assert(sizeof(DataPacketMemFree) == 27, "Incorrect size");
 static_assert(sizeof(DataPacketMessage) == 13, "Incorrect size");
+static_assert(sizeof(DataPacketPlot) == 22, "Incorrect size");
 
 
 TELEM_PACK_POP
