@@ -305,6 +305,7 @@ private:
     bool handleReqTraceStrings(ClientConnection& client, uint8_t* pData);
     bool handleReqTraceThreadNames(ClientConnection& client, uint8_t* pData);
     bool handleReqTraceLockNames(ClientConnection& client, uint8_t* pData);
+    bool handleReqTraceZoneTree(ClientConnection& client, uint8_t* pData);
 
 private:
     core::MemoryArenaBase* arena_;

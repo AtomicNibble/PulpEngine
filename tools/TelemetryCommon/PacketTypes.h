@@ -31,6 +31,7 @@ struct PacketType
         ReqTraceStrings,
         ReqTraceThreadNames,
         ReqTraceLockNames,
+        ReqTraceZoneTree,
 
         Num
     };

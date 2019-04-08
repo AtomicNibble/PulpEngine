@@ -1465,6 +1465,9 @@ bool Server::processPacket(ClientConnection& client, uint8_t* pData)
             return handleReqTraceThreadNames(client, pData);
         case PacketType::ReqTraceLockNames:
             return handleReqTraceLockNames(client, pData);
+        case PacketType::ReqTraceZoneTree:
+            return handleReqTraceZoneTree(client, pData);
+            
         default:
             X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
             return false;
@@ -2471,6 +2474,64 @@ bool Server::handleReqTraceLockNames(ClientConnection& client, uint8_t* pData)
     return true;
 }
 
+
+bool Server::handleReqTraceZoneTree(ClientConnection& client, uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const ReqTraceZoneTree*>(pData);
+    if (pHdr->type != PacketType::ReqTraceZoneTree) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    int32_t handle = pHdr->handle;
+    if (handle < 0 || handle >= static_cast<int32_t>(client.traces.size())) {
+        return false;
+    }
+
+    auto& ts = client.traces[pHdr->handle];
+
+    auto* pTreeHdr = addToCompressionBufferT<ReqTraceZoneTreeResp>(client);
+    core::zero_this(pTreeHdr);
+    pTreeHdr->type = DataStreamTypeViewer::TraceZoneTree;
+    pTreeHdr->handle = pHdr->handle;
+
+    int32_t num = 0;
+
+    sql::SqlLiteQuery qry(ts.con, "SELECT parentId, totalTick, strIdx FROM zoneNodes WHERE setId = ?");
+    qry.bind(1, pHdr->frameIdx);
+
+    auto it = qry.begin();
+    for (; it != qry.end(); ++it) {
+        auto row = *it;
+
+        TraceZoneTreeData ztd;
+        ztd.parentId = row.get<int32_t>(0);
+        ztd.totalTicks = row.get<int64_t>(1);
+        ztd.strIdx = safe_static_cast<uint32_t>(row.get<int32_t>(2));
+
+        if (getCompressionBufferSpace(client) < sizeof(ztd)) {
+            pTreeHdr->num = num;
+            num = 0;
+
+            flushCompressionBuffer(client);
+
+            pTreeHdr = addToCompressionBufferT<ReqTraceZoneTreeResp>(client);
+            core::zero_this(pTreeHdr);
+            pTreeHdr->type = DataStreamTypeViewer::TraceZoneTree;
+            pTreeHdr->handle = pHdr->handle;
+        }
+
+        addToCompressionBuffer(client, &ztd, sizeof(ztd));
+
+        num++;
+    }
+
+    if (num) {
+        pTreeHdr->num = num;
+        flushCompressionBuffer(client);
+    }
+
+    return true;
+}
 
 
 X_NAMESPACE_END
