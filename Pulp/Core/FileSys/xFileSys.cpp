@@ -1784,6 +1784,8 @@ OsFileAsync* xFileSys::openPakFile(const PathT& relPath)
 
 bool xFileSys::openPak(const PathT& relPath)
 {
+    ttZone(gEnv->ctx, "(Core/FileSys) OpenPack");
+
     X_LOG1("FileSys", "Mounting pak: \"%s\"", relPath.c_str());
 
     if (numPak_ == MAX_PAK) {

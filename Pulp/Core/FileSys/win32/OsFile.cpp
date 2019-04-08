@@ -47,6 +47,8 @@ OsFile::OsFile(const core::Path<wchar_t>& path, IFileSys::FileFlags mode) :
     mode_(mode),
     file_(INVALID_HANDLE_VALUE)
 {
+    ttZone(gEnv->ctx, "(Core/FileSys/File) OSOpen");
+
     // lets open you up.
     file_ = createFileHelper(path.c_str(), mode);
 
@@ -86,6 +88,8 @@ OsFile::~OsFile(void)
 
 size_t OsFile::read(void* pBuffer, size_t length)
 {
+    ttZone(gEnv->ctx, "(Core/FileSys/File) OSRead");
+
     if (!mode_.IsSet(FileFlag::READ)) {
         IFileSys::FileFlags::Description Dsc;
         X_ERROR("File", "can't read from file. Flags: %s", mode_.ToString(Dsc));
@@ -128,6 +132,8 @@ size_t OsFile::read(void* pBuffer, size_t length)
 
 size_t OsFile::write(const void* pBuffer, size_t length)
 {
+    ttZone(gEnv->ctx, "(Core/FileSys/File) OSWrite");
+
     if (!mode_.IsSet(FileFlag::WRITE)) {
         IFileSys::FileFlags::Description Dsc;
         X_ERROR("File", "can't write to file. Flags: %s", mode_.ToString(Dsc));
@@ -170,6 +176,8 @@ size_t OsFile::write(const void* pBuffer, size_t length)
 
 void OsFile::seek(int64_t position, IFileSys::SeekMode::Enum origin, bool requireRandomAccess)
 {
+    ttZone(gEnv->ctx, "(Core/FileSys/File) OSSeek");
+
     // seeking is allowed by win32 when RANDOM_ACCESS is not passed.
     // but i want to prevent a user trying to seek if they did not use RANDOM_ACCESS.
     if (requireRandomAccess && !mode_.IsSet(FileFlag::RANDOM_ACCESS)) {

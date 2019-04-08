@@ -70,6 +70,8 @@ OsFileAsync::OsFileAsync(const core::Path<wchar_t>& path, IFileSys::FileFlags mo
     mode_(mode),
     hFile_(INVALID_HANDLE_VALUE)
 {
+    ttZone(gEnv->ctx, "(Core/FileSys/AsyncFile) OSOpen");
+
     DWORD access = mode::GetAccess(mode);
     DWORD share = mode::GetShareMode(mode);
     DWORD dispo = mode::GetCreationDispo(mode);
@@ -107,6 +109,8 @@ OsFileAsync::~OsFileAsync(void)
 
 XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position)
 {
+    ttZone(gEnv->ctx, "(Core/FileSys/AsyncFile) OSRead");
+
     XOsFileAsyncOperation op(overlappedArena_, hFile_, position);
 
     LPOVERLAPPED pOverlapped = op.getOverlapped();
@@ -143,6 +147,8 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint6
 
 XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length, uint64_t position)
 {
+    ttZone(gEnv->ctx, "(Core/FileSys/AsyncFile) OSWrite");
+
     XOsFileAsyncOperation op(overlappedArena_, hFile_, position);
 
     if (length > std::numeric_limits<uint32_t>::max()) {
@@ -175,6 +181,8 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length
 XOsFileAsyncOperationCompiltion OsFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position,
     XOsFileAsyncOperation::ComplitionRotinue callBack)
 {
+    ttZone(gEnv->ctx, "(Core/FileSys/AsyncFile) OSRead");
+
     XOsFileAsyncOperationCompiltion op(overlappedArena_, hFile_, position, callBack);
     auto* pOverlapped = op.getOverlapped();
 
@@ -206,6 +214,8 @@ XOsFileAsyncOperationCompiltion OsFileAsync::readAsync(void* pBuffer, size_t len
 
 XOsFileAsyncOperationCompiltion OsFileAsync::writeAsync(void* pBuffer, size_t length, uint64_t position, XOsFileAsyncOperation::ComplitionRotinue callBack)
 {
+    ttZone(gEnv->ctx, "(Core/FileSys/AsyncFile) OSWrite");
+
     XOsFileAsyncOperationCompiltion op(overlappedArena_, hFile_, position, callBack);
 
     if (length > std::numeric_limits<uint32_t>::max()) {
