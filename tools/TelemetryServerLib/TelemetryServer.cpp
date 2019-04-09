@@ -603,7 +603,7 @@ bool TraceBuilder::createDB(core::Path<char>& path)
     okay &= (sql::Result::OK == cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)"));
     okay &= (sql::Result::OK == cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertMessage.prepare("INSERT INTO messages (timeTicks, type, strIdx) VALUES(?,?,?)"));
-    okay &= (sql::Result::OK == cmdInsertZoneNode.prepare("INSERT INTO zoneNodes (setId, parentId, totalTick, strIdx) VALUES(?,?,?,?)"));
+    okay &= (sql::Result::OK == cmdInsertZoneNode.prepare("INSERT INTO zoneNodes (setId, parentId, totalTick, count, strIdx) VALUES(?,?,?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertPlot.prepare("INSERT INTO plots (type, timeTicks, value, strIdx) VALUES(?,?,?,?)"));
 
     return okay;
@@ -628,6 +628,9 @@ bool TraceBuilder::createIndexes(void)
         );
         CREATE INDEX IF NOT EXISTS "messages_time" ON "messages" (
             "timeTicks"	ASC
+        );
+        CREATE INDEX IF NOT EXISTS "zoneNode_setid" ON "zoneNodes" (
+            "setId"	ASC
         );
     )");
 
@@ -691,6 +694,7 @@ CREATE TABLE IF NOT EXISTS "zoneNodes" (
     "setId"	            INTEGER NOT NULL,
     "parentId"	        INTEGER NOT NULL,
     "totalTick"	        INTEGER NOT NULL,
+    "count"	            INTEGER NOT NULL,
     "strIdx"	        INTEGER NOT NULL,
     PRIMARY KEY("id")
 );
@@ -961,7 +965,8 @@ void TraceBuilder::writeZoneTree(const ZoneTree& zoneTree, int32_t setID)
         cmd.bind(1, setID);
         cmd.bind(2, node.parentIdx);
         cmd.bind(3, static_cast<int64_t>(node.info.totalTicks));
-        cmd.bind(4, strIdx);
+        cmd.bind(4, static_cast<int64_t>(node.info.count));
+        cmd.bind(5, strIdx);
     
         auto res = cmd.execute();
         if (res != sql::Result::OK) {

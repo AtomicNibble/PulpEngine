@@ -20,9 +20,11 @@ struct ZoneTree
     {
         ZoneInfo() {
             totalTicks = 0_ui64;
+            count = 0;
         }
 
         uint64_t totalTicks;
+        int32_t count;
     };
 
     struct Node
