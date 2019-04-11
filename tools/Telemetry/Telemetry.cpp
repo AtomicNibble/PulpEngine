@@ -8,9 +8,14 @@
 
 #include <intrin.h>
 
+TELEM_DISABLE_WARNING(4091)
+#include <DbgHelp.h>
+TELEM_ENABLE_WARNING(4091)
+
 #include <../../3rdparty/source/lz4-1.8.3/lz4_lib.h>
 
 TELEM_LINK_LIB("engine_TelemetryCommonLib.lib");
+TELEM_LINK_LIB("dbghelp.lib");
 
 TELEM_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
 
@@ -21,6 +26,8 @@ namespace
 {
     static const char* TELEM_ZONE_SOURCE_FILE = "Telem.cpp";
 
+    typedef unsigned long(__stdcall *RtlWalkFrameChainFunc)(void**, unsigned long, unsigned long);
+    RtlWalkFrameChainFunc pRtlWalkFrameChain = nullptr;
 
     TELEM_PACK_PUSH(8)
     struct THREADNAME_INFO
@@ -1815,6 +1822,15 @@ bool TelemInit(void)
     if (!gSysTimer.StartUp()) {
         return false;
     }
+
+    // resolve callstack shizz.
+    pRtlWalkFrameChain = (RtlWalkFrameChainFunc)GetProcAddress(GetModuleHandleW(L"ntdll.dll"), "RtlWalkFrameChain");
+    if (!pRtlWalkFrameChain) {
+        return false;
+    }
+
+    SymSetOptions(SYMOPT_LOAD_LINES);
+    SymInitialize(GetCurrentProcess(), nullptr, true);
 
     // want to work out ticks per micro.
     {
