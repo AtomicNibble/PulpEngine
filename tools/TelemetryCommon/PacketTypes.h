@@ -236,7 +236,11 @@ struct DataPacketThreadSetName : public DataPacketBaseArgData
 struct DataPacketCallStack : public DataPacketBase
 {
     // 4
-    TtthreadId threadID;
+    // TtthreadId threadID; // maybe?
+    tt_uint32 id;
+    tt_uint32 numFrames;
+
+    tt_uint64 frames[1];
 };
 
 struct DataPacketLockSetName : public DataPacketBaseArgData
