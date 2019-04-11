@@ -1860,6 +1860,11 @@ void TelemShutDown(void)
         // rip
         return;
     }
+
+    if (!SymCleanup(GetCurrentProcess())) {
+        // rip
+        return;
+    }
 }
 
 TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size bufLen)
