@@ -145,6 +145,7 @@ extern "C"
     // Callstack
     __TELEM_API_BOOL(TelemGetCallStack, TraceContexHandle ctx, TtCallStack& stackOut);
     __TELEM_API_VOID(TelemSendCallStack, TraceContexHandle ctx, const TtCallStack* pStack);
+    __TELEM_API_VOID(TelemSendCallStackSkip, TraceContexHandle ctx, const TtCallStack* pStack, tt_int32 numToSkip);
 
     // Zones
     __TELEM_API_VOID(TelemEnter, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pFmtString, tt_int32 numArgs, ...);
@@ -438,6 +439,7 @@ namespace telem
 
 #define ttGetCallStack(ctx, stackOut) __TELEM_FUNC_NAME(TelemGetCallStack)(ctx, stackOut)
 #define ttSendCallStack(ctx, pStack) __TELEM_FUNC_NAME(TelemSendCallStack)(ctx, pStack)
+#define ttSendCallStackSkip(ctx, pStack, numToSkip) __TELEM_FUNC_NAME(TelemSendCallStackSkip)(ctx, pStack, numToSkip)
 
 // Zones
 #define ttEnter(ctx, pFmtString, ...) __TELEM_FUNC_NAME(TelemEnter)(ctx, TT_SOURCE_INFO, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
@@ -505,6 +507,7 @@ namespace telem
 
 #define ttGetCallStack(...)
 #define ttSendCallStack(...)
+#define ttSendCallStackSkip(...)
 
 // Zones
 #define ttEnter(...);
