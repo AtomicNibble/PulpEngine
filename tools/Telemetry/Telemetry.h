@@ -67,8 +67,13 @@ enum TtError
 
 struct TtCallStack
 {
-    static const unsigned int MAX_FRAMES = 7;
+    static const tt_uint32 MAX_FRAMES = 31;
 
+    TtCallStack() {
+        num = 0;
+    }
+
+    tt_int32 num;
     void* frames[MAX_FRAMES];
 };
 

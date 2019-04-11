@@ -1147,15 +1147,16 @@ namespace
     constexpr size_t size7 = sizeof(QueueDataMemFree);
     constexpr size_t size8 = sizeof(QueueDataMessage);
     constexpr size_t size9 = sizeof(QueueDataPlot);
+    constexpr size_t size10 = sizeof(QueueDataCallStack);
 
-    constexpr size_t size10 = sizeof(ArgData);
+    constexpr size_t size11 = sizeof(ArgData);
     
 
     static_assert(64 == GetSizeWithoutArgData<QueueDataThreadSetName>());
     static_assert(64 == sizeof(QueueDataTickInfo));
     static_assert(64 == GetSizeWithoutArgData<QueueDataZone>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockSetName>());
-    static_assert(64 == sizeof(QueueDataCallStack));
+    static_assert(320 == sizeof(QueueDataCallStack));
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockTry>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockState>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockCount>());
@@ -1289,12 +1290,22 @@ namespace
 
     TELEM_INLINE void queueCallStack(TraceContext* pCtx, const TtCallStack& stack)
     {
-        QueueDataCallStack data;
+        QueueDataCallStack data; // this is full size so we don't read past end of stack..
         data.type = QueueDataType::CallStack;
         data.argDataSize = 0;
-        data.callstack = stack;
+        data.callstack.num = stack.num;
+        memcpy(data.callstack.frames, stack.frames, stack.num * sizeof(stack.frames[0]));
 
-        addToTickBuffer(pCtx, &data, sizeof(data));
+        tt_int32 size = sizeof(QueueDataBase) + (sizeof(stack.frames[0]) * (stack.num - 1));
+        size = RoundUpToMultiple(size, static_cast<tt_int32>(64));
+
+#if X_DEBUG
+        if (size > sizeof(data)) {
+            ::DebugBreak();
+        }
+#endif // X_DEBUG
+
+        addToTickBuffer(pCtx, &data, size);
     }
 
     TELEM_INLINE void queueZone(TraceContext* pCtx, TraceThread* pThread, TraceZoneBuilder& scopeData)
@@ -1451,7 +1462,12 @@ namespace
         // but callstack cache should be done in background thread.
         // meaning
 
-        return GetSizeNotArgData<std::remove_pointer_t<decltype(pBuf)>>();
+
+        // re calculate size.
+        tt_int32 size = sizeof(QueueDataBase) + (sizeof(pBuf->callstack.frames[0]) * (pBuf->callstack.num - 1));
+        size = RoundUpToMultiple(size, static_cast<tt_int32>(64));
+
+        return size;
     }
 
     tt_int32 queueProcessLockSetName(PacketCompressor* pComp, const QueueDataLockSetName* pBuf)
@@ -2271,9 +2287,11 @@ bool TelemGetCallStack(TraceContexHandle ctx, TtCallStack& stackOut)
         return true;
     }
 
+#if X_DEBUG
     zero_object(stackOut.frames);
+#endif // X_DEBUG
 
-    RtlCaptureStackBackTrace(0, TtCallStack::MAX_FRAMES, stackOut.frames, 0);
+    stackOut.num = pRtlWalkFrameChain(stackOut.frames, TtCallStack::MAX_FRAMES, 0);
     return true;
 }
 
