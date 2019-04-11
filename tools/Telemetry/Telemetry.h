@@ -228,6 +228,9 @@ namespace telem
             __TELEM_RESOLVE(TelemPause);
             __TELEM_RESOLVE(TelemIsPaused);
             __TELEM_RESOLVE(TelemSetThreadName);
+            __TELEM_RESOLVE(TelemGetCallStack);
+            __TELEM_RESOLVE(TelemSendCallStack);
+            __TELEM_RESOLVE(TelemSendCallStackSkip);
             __TELEM_RESOLVE(TelemEnter);
             __TELEM_RESOLVE(TelemEnterEx);
             __TELEM_RESOLVE(TelemLeave);
@@ -266,6 +269,9 @@ namespace telem
             __TELEM_SET_BLANK(TelemPause);
             __TELEM_SET_BLANK(TelemIsPaused);
             __TELEM_SET_BLANK(TelemSetThreadName);
+            __TELEM_SET_BLANK(TelemGetCallStack);
+            __TELEM_SET_BLANK(TelemSendCallStack);
+            __TELEM_SET_BLANK(TelemSendCallStackSkip);
             __TELEM_SET_BLANK(TelemEnter);
             __TELEM_SET_BLANK(TelemEnterEx);
             __TELEM_SET_BLANK(TelemLeave);
@@ -310,6 +316,9 @@ namespace telem
         __TELEM_FUNC_PTR(TelemPause);
         __TELEM_FUNC_PTR(TelemIsPaused);
         __TELEM_FUNC_PTR(TelemSetThreadName);
+        __TELEM_FUNC_PTR(TelemGetCallStack);
+        __TELEM_FUNC_PTR(TelemSendCallStack);
+        __TELEM_FUNC_PTR(TelemSendCallStackSkip);
         __TELEM_FUNC_PTR(TelemEnter);
         __TELEM_FUNC_PTR(TelemEnterEx);
         __TELEM_FUNC_PTR(TelemLeave);
