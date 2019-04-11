@@ -132,7 +132,8 @@ namespace
                 }
             }
 
-            ScopedLockTelemetry lock(cs1);
+            ScopedLockTelemetry lock0(cs1);
+            ScopedLockTelemetry lock1(cs1); // recursive lock check.
             ttZone(ctx, "Sleeping under lock");
             core::Thread::sleep(1);
         }
