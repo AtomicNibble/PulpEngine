@@ -110,7 +110,7 @@ namespace
 void _ntoa_format(SprintfStrBuf& buf, char* tmpBuf, int32_t len, bool negative,
     int32_t base, int32_t prec, int32_t width, uint32_t flags)
 {
-    const size_t start_idx = buf.length();
+    const int32_t start_idx = static_cast<int32_t>(buf.length());
 
     // pad leading zeros
     if (!(flags & ParseFlag::Left)) {
@@ -173,7 +173,7 @@ void _ntoa_format(SprintfStrBuf& buf, char* tmpBuf, int32_t len, bool negative,
 
     // append pad spaces up to given width
     if (flags & ParseFlag::Left) {
-        while (buf.length() - start_idx < width) {
+        while (static_cast<int32_t>(buf.length()) - start_idx < width) {
             buf.append(' ');
         }
     }
@@ -229,7 +229,7 @@ void _ntoa_long_long(SprintfStrBuf& buf,
 
 void _ftoa(SprintfStrBuf& buf, double value, int32_t prec, int32_t width, uint32_t flags)
 {
-    const size_t start_idx = buf.length();
+    const int32_t start_idx = static_cast<int32_t>(buf.length());
 
     char tmpBuf[PRINTF_FTOA_BUFFER_SIZE];
     int32_t len = 0;
@@ -364,7 +364,7 @@ void _ftoa(SprintfStrBuf& buf, double value, int32_t prec, int32_t width, uint32
 
     // append pad spaces up to given width
     if (flags & ParseFlag::Left) {
-        while (buf.length() - start_idx < width) {
+        while (static_cast<int32_t>(buf.length()) - start_idx < width) {
             buf.append(' ');
         }
     }
