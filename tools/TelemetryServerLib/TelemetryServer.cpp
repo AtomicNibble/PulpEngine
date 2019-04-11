@@ -1225,7 +1225,10 @@ int32_t TraceBuilder::handleDataPacketCallStack(const DataPacketCallStack* pData
 
     // TODO: ...
 
-    return sizeof(*pData);
+
+    const tt_int32 dataSize = sizeof(*pData) + (sizeof(tt_uint64) * pData->numFrames);
+
+    return dataSize;
 }
 
 // --------------------------------

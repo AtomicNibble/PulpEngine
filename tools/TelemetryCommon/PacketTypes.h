@@ -240,7 +240,7 @@ struct DataPacketCallStack : public DataPacketBase
     tt_uint32 id;
     tt_uint32 numFrames;
 
-    tt_uint64 frames[1];
+    // tt_uint64 frames[1];
 };
 
 struct DataPacketLockSetName : public DataPacketBaseArgData

@@ -1452,8 +1452,8 @@ namespace
         packet.numFrames = pBuf->callstack.num;
 
 
-        const tt_int32 baseSize = sizeof(packet) - sizeof(packet.frames);
-        const tt_int32 framesSize = (sizeof(packet.frames[0]) * pBuf->callstack.num);
+        const tt_int32 baseSize = sizeof(packet);
+        const tt_int32 framesSize = (sizeof(pBuf->callstack.frames[0]) * pBuf->callstack.num);
         const tt_int32 dataSize = baseSize + framesSize;
         flushCompressionBufferIfrequired(pComp, dataSize);
 
