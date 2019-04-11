@@ -1156,7 +1156,7 @@ namespace
     static_assert(64 == sizeof(QueueDataTickInfo));
     static_assert(64 == GetSizeWithoutArgData<QueueDataZone>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockSetName>());
-    static_assert(320 == sizeof(QueueDataCallStack));
+    static_assert((sizeof(QueueDataCallStack) % 64) == 0);
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockTry>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockState>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockCount>());
