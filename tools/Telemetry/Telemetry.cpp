@@ -1448,22 +1448,19 @@ namespace
     {
         DataPacketCallStack packet;
         packet.type = DataStreamType::CallStack;
-
-        TELEM_UNUSED(pComp);
-        TELEM_UNUSED(pBuf);
-        // so think going todo a callstack cache.
-        // then send a id for it?
-        // one thing is how to i match these callstacks up like what will i do with them.
-        // guess it will just be the current threads zone.
-        // so the zone would need call stack info?
-        // think that makes the most sense.
-        // but how to link them?
-        // maybe just gets push/poped.
-        // but callstack cache should be done in background thread.
-        // meaning
+        packet.id = pBuf->callstack.id;
+        packet.numFrames = pBuf->callstack.num;
 
 
-        // re calculate size.
+        const tt_int32 baseSize = sizeof(packet) - sizeof(packet.frames);
+        const tt_int32 framesSize = (sizeof(packet.frames[0]) * pBuf->callstack.num);
+        const tt_int32 dataSize = baseSize + framesSize;
+        flushCompressionBufferIfrequired(pComp, dataSize);
+
+        addToCompressionBufferNoFlush(pComp, &packet, baseSize);
+        addToCompressionBufferNoFlush(pComp, pBuf->callstack.frames, framesSize);
+    
+        // incoming buffer size.
         tt_int32 size = sizeof(QueueDataBase) + (sizeof(pBuf->callstack.frames[0]) * (pBuf->callstack.num - 1));
         size = RoundUpToMultiple(size, static_cast<tt_int32>(64));
 
