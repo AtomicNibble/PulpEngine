@@ -2280,11 +2280,11 @@ void TelemSetThreadName(TraceContexHandle ctx, tt_uint32 threadID, const char* p
     }
 }
 
-bool TelemGetCallStack(TraceContexHandle ctx, TtCallStack& stackOut)
+tt_int32 TelemGetCallStack(TraceContexHandle ctx, TtCallStack& stackOut)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
-        return true;
+        return -1;
     }
 
 #if X_DEBUG
@@ -2292,25 +2292,28 @@ bool TelemGetCallStack(TraceContexHandle ctx, TtCallStack& stackOut)
 #endif // X_DEBUG
 
     stackOut.num = pRtlWalkFrameChain(stackOut.frames, TtCallStack::MAX_FRAMES, 0);
-    return true;
+
+    stackOut.id = -1; // TODO
+
+    return stackOut.id;
 }
 
-void TelemSendCallStack(TraceContexHandle ctx, const TtCallStack* pStack)
+tt_int32 TelemSendCallStack(TraceContexHandle ctx, const TtCallStack* pStack)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
-        return;
+        return -1;
     }
 
     if (pStack) {
         queueCallStack(pCtx, *pStack);
-        return;
+        return pStack->id;
     }
 
     TtCallStack stack;
     TelemGetCallStack(ctx, stack);
     queueCallStack(pCtx, stack);
-    return;
+    return stack.id;
 }
 
 // ----------- Zones -----------

@@ -70,9 +70,11 @@ struct TtCallStack
     static const tt_uint32 MAX_FRAMES = 31;
 
     TtCallStack() {
+        id = -1;
         num = 0;
     }
 
+    tt_int32 id;
     tt_int32 num;
     void* frames[MAX_FRAMES];
 };
@@ -117,6 +119,9 @@ extern "C"
 #define __TELEM_API_BOOL(name, ...) TELEMETRYLIB_EXPORT bool name(__VA_ARGS__); \
         __TELEM_API_BLANK(inline bool __blank##name(__VA_ARGS__) { return true; })
 
+#define __TELEM_API_INT(name, ...) TELEMETRYLIB_EXPORT tt_int32 name(__VA_ARGS__); \
+        __TELEM_API_BLANK(inline tt_int32 __blank##name(__VA_ARGS__) { return -1; })
+
 #define __TELEM_API_ERR(name, ...) TELEMETRYLIB_EXPORT TtError name(__VA_ARGS__); \
         __TELEM_API_BLANK(inline TtError __blank##name(__VA_ARGS__) { return TtError::Ok; })
 
@@ -148,8 +153,8 @@ extern "C"
     __TELEM_API_VOID(TelemSetThreadName, TraceContexHandle ctx, tt_uint32 threadID, const char* pFmtString, tt_int32 numArgs, ...);
 
     // Callstack
-    __TELEM_API_BOOL(TelemGetCallStack, TraceContexHandle ctx, TtCallStack& stackOut);
-    __TELEM_API_VOID(TelemSendCallStack, TraceContexHandle ctx, const TtCallStack* pStack);
+    __TELEM_API_INT(TelemGetCallStack, TraceContexHandle ctx, TtCallStack& stackOut);
+    __TELEM_API_INT(TelemSendCallStack, TraceContexHandle ctx, const TtCallStack* pStack);
     __TELEM_API_VOID(TelemSendCallStackSkip, TraceContexHandle ctx, const TtCallStack* pStack, tt_int32 numToSkip);
 
     // Zones
