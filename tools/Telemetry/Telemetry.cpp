@@ -514,6 +514,17 @@ namespace
         const tt_int32 packetBufCapacity;
     };
 
+    TELEM_NO_INLINE void onFatalWorkerError(TraceContext* pCtx)
+    {
+        if (pCtx->socket != INV_SOCKET) {
+            platform::closesocket(pCtx->socket);
+            pCtx->socket = INV_SOCKET;
+        }
+
+        // Also disable telem otherwise we can deadlock.
+        pCtx->isEnabled = false;
+    }
+
     void sendDataToServer(TraceContext* pCtx, const void* pData, tt_int32 len)
     {
         if(pCtx->socket == INV_SOCKET) {
@@ -538,13 +549,7 @@ namespace
             lastErrorWSA::Description Dsc;
             const auto err = lastErrorWSA::Get();
 
-            // Mark the socket invalid.
-            platform::closesocket(pCtx->socket);
-            pCtx->socket = INV_SOCKET;
-
-            // Also disable telem otherwise we can deadlock.
-            pCtx->isEnabled = false;
-
+            onFatalWorkerError(pCtx);
             writeLog(pCtx, TtLogType::Error, "Socket: send failed with Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
             return;
         }
@@ -695,7 +700,9 @@ namespace
         auto end = getTicks();
 
         if (cmpBytes <= 0) {
-            // TODO: error.
+            onFatalWorkerError(pComp->pCtx);
+            writeLog(pComp->pCtx, TtLogType::Error, "Compression Error(0x%x)", cmpBytes);
+            return;
         }
 
         const tt_int32 totalLen = cmpBytes + sizeof(DataStreamHdr);
