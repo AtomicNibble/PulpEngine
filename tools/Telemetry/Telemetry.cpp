@@ -819,7 +819,7 @@ namespace
 
     void writeStringCompressionBuffer(PacketCompressor* pComp, StringTableIndex idx, const char* pStr)
     {
-        tt_size strLen = strlen(pStr);
+        tt_int32 strLen = static_cast<tt_int32>(strlen(pStr));
         if (strLen > MAX_STRING_LEN) {
             strLen = MAX_STRING_LEN;
         }
@@ -827,15 +827,15 @@ namespace
         // TODO: skip the copy and write this directly to packet buffer?
         tt_int32 packetLen = sizeof(DataPacketStringTableAdd) + static_cast<tt_int32>(strLen);
 
-        tt_uint8 strDataBuf[sizeof(DataPacketStringTableAdd) + MAX_STRING_LEN];
-        auto* pHeader = reinterpret_cast<DataPacketStringTableAdd*>(strDataBuf);
-        pHeader->type = DataStreamType::StringTableAdd;
-        pHeader->id = idx.index;
-        pHeader->length = static_cast<tt_uint16>(strLen);
+        DataPacketStringTableAdd hdr;
+        hdr.type = DataStreamType::StringTableAdd;
+        hdr.id = idx.index;
+        hdr.length = static_cast<tt_uint16>(strLen);
 
-        memcpy(strDataBuf + sizeof(DataPacketStringTableAdd), pStr, strLen);
+        flushCompressionBufferIfrequired(pComp, packetLen);
 
-        addToCompressionBuffer(pComp, &strDataBuf, packetLen);
+        addToCompressionBufferNoFlush(pComp, &hdr, sizeof(hdr));
+        addToCompressionBufferNoFlush(pComp, pStr, strLen);
     }
 
     tt_uint16 GetStringId(PacketCompressor* pComp, const char* pStr)
