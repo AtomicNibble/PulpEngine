@@ -46,7 +46,10 @@ struct TtLockState
     enum Enum : tt_uint8
     {
         Locked,
-        Released
+        Released,
+        // TODO: not sure if will need these.
+        LockedShared,
+        ReleasedShared
     };
 
     static inline const char* ToString(Enum ls)
@@ -57,6 +60,10 @@ struct TtLockState
                 return "Locked";
             case Released:
                 return "Released";
+            case LockedShared:
+                return "LockedShared";
+            case ReleasedShared:
+                return "ReleasedShared";
             default:
                 return "<ukn>";
         }
