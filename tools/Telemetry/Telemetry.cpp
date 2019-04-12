@@ -817,7 +817,7 @@ namespace
 #endif // !PACKET_COMPRESSION
     }
 
-    void writeStringCompressionBuffer(PacketCompressor* pComp, StringTableIndex idx, const char* pStr)
+    TELEM_NO_INLINE void writeStringCompressionBuffer(PacketCompressor* pComp, StringTableIndex idx, const char* pStr)
     {
         tt_int32 strLen = static_cast<tt_int32>(strlen(pStr));
         if (strLen > MAX_STRING_LEN) {
