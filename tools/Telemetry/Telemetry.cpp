@@ -2325,7 +2325,7 @@ void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const cha
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = getThreadData(pCtx);
 
-    if (!pCtx->isEnabled | !pThreadData) {
+    if (!pCtx->isEnabled | (pThreadData == nullptr)) {
         return;
     }
 
@@ -2360,7 +2360,7 @@ void TelemLeave(TraceContexHandle ctx)
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = gThreadData;
 
-    if (!pCtx->isEnabled | !pThreadData) {
+    if (!pCtx->isEnabled | (pThreadData == nullptr)) {
         return;
     }
 
@@ -2378,7 +2378,7 @@ void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = getThreadData(pCtx);
 
-    if (!pCtx->isEnabled | !pThreadData) {
+    if (!pCtx->isEnabled | (pThreadData == nullptr)) {
         return;
     }
 
@@ -2414,7 +2414,7 @@ void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId)
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = gThreadData;
 
-    if (!pCtx->isEnabled | !pThreadData) {
+    if (!pCtx->isEnabled | (pThreadData == nullptr)) {
         return;
     }
 
@@ -2553,7 +2553,7 @@ void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult::Enum
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = gThreadData;
 
-    if (!pCtx->isEnabled | !pThreadData) {
+    if (!pCtx->isEnabled | (pThreadData == nullptr)) {
         return;
     }
 
@@ -2575,7 +2575,7 @@ void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPt
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = gThreadData;
 
-    if (!pCtx->isEnabled | !pThreadData) {
+    if (!pCtx->isEnabled | (pThreadData == nullptr)) {
         return;
     }
 
