@@ -1741,6 +1741,12 @@ namespace
                 ::DebugBreak();
             }
 
+            // If the socket is dead don't bother processing, but we need to keep flipping to prevent stall.
+            // TODO: stall and try reconnect?
+            if (pCtx->socket == INV_SOCKET) {
+                continue;
+            }
+
             tt_int32 num = 0;
 
             // process the packets.
