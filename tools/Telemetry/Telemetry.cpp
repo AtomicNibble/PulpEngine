@@ -2150,12 +2150,12 @@ bool TelemClose(TraceContexHandle ctx)
 
     TelemFlush(ctx);
 
-#if 0 // TODO: needed?
+    // flush
     int res = platform::shutdown(pCtx->socket, SD_BOTH);
     if (res == SOCKET_ERROR) {
-        writeLog(pCtx, LogType::Error, "shutdown failed with error: %d", platform::WSAGetLastError());
+        lastErrorWSA::Description Dsc;
+        writeLog(pCtx, TtLogType::Error, "socket shutdown failed with error: %s", lastErrorWSA::ToString(Dsc));
     }
-#endif
 
     if (pCtx->socket != INV_SOCKET) {
         platform::closesocket(pCtx->socket);
