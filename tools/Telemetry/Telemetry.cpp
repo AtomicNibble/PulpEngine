@@ -516,6 +516,10 @@ namespace
 
     void sendDataToServer(TraceContext* pCtx, const void* pData, tt_int32 len)
     {
+        if(pCtx->socket == INV_SOCKET) {
+            return;
+        }
+
 #if X_DEBUG
         if (len > MAX_PACKET_SIZE) {
             ::DebugBreak();
@@ -533,6 +537,14 @@ namespace
         if (res == SOCKET_ERROR) {
             lastErrorWSA::Description Dsc;
             const auto err = lastErrorWSA::Get();
+
+            // Mark the socket invalid.
+            platform::closesocket(pCtx->socket);
+            pCtx->socket = INV_SOCKET;
+
+            // Also disable telem otherwise we can deadlock.
+            pCtx->isEnabled = false;
+
             writeLog(pCtx, TtLogType::Error, "Socket: send failed with Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
             return;
         }
