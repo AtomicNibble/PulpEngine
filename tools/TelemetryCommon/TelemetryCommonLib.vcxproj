@@ -449,6 +449,7 @@
   <ItemGroup>
     <ClInclude Include="Compiler.h" />
     <ClInclude Include="Configuration.h" />
+    <ClInclude Include="LastErrorWSA.h" />
     <ClInclude Include="PacketTypes.h" />
     <ClInclude Include="StringCompress.h" />
     <ClInclude Include="StringTable.h" />
@@ -459,6 +460,7 @@
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="LastErrorWSA.cpp" />
     <ClCompile Include="StringCompress.cpp" />
     <ClCompile Include="SysTimer.cpp" />
     <ClCompile Include="stdafx.cpp">
