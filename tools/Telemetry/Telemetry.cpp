@@ -449,7 +449,8 @@ namespace
                 return false;
             }
             else if (res < 0) {
-                writeLog(pCtx, TtLogType::Error, "recv failed with error: %d", platform::WSAGetLastError());
+                lastErrorWSA::Description Dsc;
+                writeLog(pCtx, TtLogType::Error, "recv failed with error: %s", lastErrorWSA::ToString(Dsc));
                 return false;
             }
 
@@ -529,7 +530,8 @@ namespace
         // TODO: none blocking?
         int res = platform::send(pCtx->socket, reinterpret_cast<const char*>(pData), len, 0);
         if (res == SOCKET_ERROR) {
-            writeLog(pCtx, TtLogType::Error, "Socket: send failed with error: %d", platform::WSAGetLastError());
+            lastErrorWSA::Description Dsc;
+            writeLog(pCtx, TtLogType::Error, "Socket: send failed with error: %s", lastErrorWSA::ToString(Dsc));
             return;
         }
 
@@ -2045,7 +2047,8 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     // Resolve the server address and port
     auto res = platform::getaddrinfo(pServerAddress, portStr, &hints, &servinfo);
     if (res != 0) {
-        writeLog(pCtx, TtLogType::Error, "Failed to getaddrinfo. Error: %d", platform::WSAGetLastError());
+        lastErrorWSA::Description Dsc;
+        writeLog(pCtx, TtLogType::Error, "Failed to getaddrinfo. Error: %s", lastErrorWSA::ToString(Dsc));
         return TtError::Error;
     }
 
@@ -2079,7 +2082,8 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     tt_int32 sock_opt = 1024 * 16;
     res = platform::setsockopt(connectSocket, SOL_SOCKET, SO_SNDBUF, (char*)&sock_opt, sizeof(sock_opt));
     if (res != 0) {
-        writeLog(pCtx, TtLogType::Error, "Failed to set sndbuf on socket. Error: %d", platform::WSAGetLastError());
+        lastErrorWSA::Description Dsc;
+        writeLog(pCtx, TtLogType::Error, "Failed to set sndbuf on socket. Error: %s", lastErrorWSA::ToString(Dsc));
         return TtError::Error;
     }
    
