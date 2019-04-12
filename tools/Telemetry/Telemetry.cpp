@@ -450,7 +450,8 @@ namespace
             }
             else if (res < 0) {
                 lastErrorWSA::Description Dsc;
-                writeLog(pCtx, TtLogType::Error, "recv failed with error: %s", lastErrorWSA::ToString(Dsc));
+                const auto err = lastErrorWSA::Get();
+                writeLog(pCtx, TtLogType::Error, "recv failed with Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
                 return false;
             }
 
@@ -531,7 +532,8 @@ namespace
         int res = platform::send(pCtx->socket, reinterpret_cast<const char*>(pData), len, 0);
         if (res == SOCKET_ERROR) {
             lastErrorWSA::Description Dsc;
-            writeLog(pCtx, TtLogType::Error, "Socket: send failed with error: %s", lastErrorWSA::ToString(Dsc));
+            const auto err = lastErrorWSA::Get();
+            writeLog(pCtx, TtLogType::Error, "Socket: send failed with Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
             return;
         }
 
@@ -2048,7 +2050,8 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     auto res = platform::getaddrinfo(pServerAddress, portStr, &hints, &servinfo);
     if (res != 0) {
         lastErrorWSA::Description Dsc;
-        writeLog(pCtx, TtLogType::Error, "Failed to getaddrinfo. Error: %s", lastErrorWSA::ToString(Dsc));
+        const auto err = lastErrorWSA::Get();
+        writeLog(pCtx, TtLogType::Error, "Failed to getaddrinfo. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
         return TtError::Error;
     }
 
@@ -2083,7 +2086,8 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     res = platform::setsockopt(connectSocket, SOL_SOCKET, SO_SNDBUF, (char*)&sock_opt, sizeof(sock_opt));
     if (res != 0) {
         lastErrorWSA::Description Dsc;
-        writeLog(pCtx, TtLogType::Error, "Failed to set sndbuf on socket. Error: %s", lastErrorWSA::ToString(Dsc));
+        const auto err = lastErrorWSA::Get();
+        writeLog(pCtx, TtLogType::Error, "Failed to set sndbuf on socket. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
         return TtError::Error;
     }
    
@@ -2158,7 +2162,8 @@ bool TelemClose(TraceContexHandle ctx)
     int res = platform::shutdown(pCtx->socket, SD_BOTH);
     if (res == SOCKET_ERROR) {
         lastErrorWSA::Description Dsc;
-        writeLog(pCtx, TtLogType::Error, "socket shutdown failed with error: %s", lastErrorWSA::ToString(Dsc));
+        const auto err = lastErrorWSA::Get();
+        writeLog(pCtx, TtLogType::Error, "socket shutdown failed with Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
     }
 
     if (pCtx->socket != INV_SOCKET) {
