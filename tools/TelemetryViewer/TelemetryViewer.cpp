@@ -2857,6 +2857,27 @@ bool handleTraceLockNames(Client& client, const DataPacketBaseViewer* pBase)
     return true;
 }
 
+bool handleTraceZoneTree(Client& client, const DataPacketBaseViewer* pBase)
+{
+    auto* pHdr = static_cast<const ReqTraceZoneTreeResp*>(pBase);
+    if (pHdr->type != DataStreamTypeViewer::TraceZoneTree) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    // shake it.
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+
+    TraceView* pView = client.viewForHandle(pHdr->handle);
+    if (!pView) {
+        return false;
+    }
+
+    auto& view = *pView;
+    X_UNUSED(view);
+
+    return true;
+}
+
 
 bool handleDataSream(Client& client, uint8_t* pData)
 {
@@ -2921,6 +2942,8 @@ bool handleDataSream(Client& client, uint8_t* pData)
                 return handleTraceThreadNames(client, pPacket);
             case DataStreamTypeViewer::TraceLockNames:
                 return handleTraceLockNames(client, pPacket);
+            case DataStreamTypeViewer::TraceZoneTree:
+                return handleTraceZoneTree(client, pPacket);
 
             default:
                 X_NO_SWITCH_DEFAULT_ASSERT;
@@ -3058,6 +3081,13 @@ bool handleOpenTraceResp(Client& client, uint8_t* pData)
     rtln.dataSize = sizeof(rtln);
     rtln.handle = pHdr->handle;
     client.sendDataToServer(&rtln, sizeof(rtln));
+
+    ReqTraceZoneTree rtzt;
+    rtzt.type = PacketType::ReqTraceLockNames;
+    rtzt.dataSize = sizeof(rtzt);
+    rtzt.handle = pHdr->handle;
+    rtzt.frameIdx = -1;
+    client.sendDataToServer(&rtzt, sizeof(rtzt));
 
     ReqTraceLocks trl;
     trl.type = PacketType::ReqTraceLocks;
