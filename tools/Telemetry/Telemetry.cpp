@@ -8,6 +8,8 @@
 
 #include <intrin.h>
 
+#include <psapi.h> // EnumProcessModules
+
 TELEM_DISABLE_WARNING(4091)
 #include <DbgHelp.h>
 TELEM_ENABLE_WARNING(4091)
@@ -28,6 +30,236 @@ namespace
 
     typedef unsigned long(__stdcall *RtlWalkFrameChainFunc)(void**, unsigned long, unsigned long);
     RtlWalkFrameChainFunc pRtlWalkFrameChain = nullptr;
+
+    namespace PE
+    {
+
+        struct PdbInfo
+        {
+            DWORD     Signature;
+            BYTE      Guid[16];
+            DWORD     Age;
+            char      PdbFileName[1];
+        };
+
+        const WORD DOS_HEADER_MAGIC = IMAGE_DOS_SIGNATURE;
+        const WORD OPTIONAL_HEADER_MAGIC = IMAGE_NT_OPTIONAL_HDR32_MAGIC;
+        const WORD OPTIONAL_HEADER_MAGIC64 = IMAGE_NT_OPTIONAL_HDR64_MAGIC;
+        const DWORD NT_SIGNATURE = IMAGE_NT_SIGNATURE;
+
+        const WORD IMAGE_FILE_I386 = IMAGE_FILE_MACHINE_I386;
+        const WORD IMAGE_FILE_IA64 = IMAGE_FILE_MACHINE_IA64;
+        const WORD IMAGE_FILE_AMD64 = IMAGE_FILE_MACHINE_AMD64;
+
+        const size_t NUM_DATA_DIRECTORYS = IMAGE_NUMBEROF_DIRECTORY_ENTRIES;
+
+        struct MyNtHeader;
+        struct MyOptionalHeader;
+
+#if X_64
+
+        struct MyDosHeader : public IMAGE_DOS_HEADER
+        {
+            bool isValid(void) const {
+                return this->e_magic == DOS_HEADER_MAGIC;
+            }
+
+            MyNtHeader* GetNtHeader(void) const {
+                return reinterpret_cast<MyNtHeader*>(e_lfanew + reinterpret_cast<size_t>(this));
+            }
+        };
+
+        struct MyNtHeader : public IMAGE_NT_HEADERS64
+        {
+            bool isValid(void) const {
+                return this->Signature == NT_SIGNATURE;
+            }
+            MyOptionalHeader* GetOptionalHeader(void) {
+                return reinterpret_cast<MyOptionalHeader*>(&OptionalHeader);
+            }
+        };
+
+        struct MyOptionalHeader : public IMAGE_OPTIONAL_HEADER64
+        {
+            bool isValid(void) const {
+                return this->Magic == OPTIONAL_HEADER_MAGIC64;
+            }
+        };
+
+#else
+
+        struct MyDosHeader : public IMAGE_DOS_HEADER
+        {
+            bool isValid(void) const {
+                return this->e_magic == DOS_HEADER_MAGIC;
+            }
+            MyNtHeader* GetNtHeader(void) const {
+                return reinterpret_cast<MyNtHeader*>(e_lfanew + reinterpret_cast<LONG>(this));
+            }
+        };
+
+        struct MyNtHeader : public IMAGE_NT_HEADERS32
+        {
+            bool isValid(void) const {
+                return this->Signature == NT_SIGNATURE;
+            }
+            MyOptionalHeader* GetOptionalHeader(void) {
+                return reinterpret_cast<MyOptionalHeader*>(&OptionalHeader);
+            }
+        };
+
+        struct MyOptionalHeader : public IMAGE_OPTIONAL_HEADER32
+        {
+            bool isValid(void) const {
+                return this->Magic == OPTIONAL_HEADER_MAGIC;
+            }
+
+            bool is64Bit(void) const {
+                return this->Magic == OPTIONAL_HEADER_MAGIC64;
+            }
+
+        };
+#endif // X_64
+
+        struct PDBSig
+        {
+#if X_DEBUG
+            PDBSig() {
+                zero_this(this);
+            }
+#endif
+
+            int32_t     imageSize;
+
+            BYTE        Guid[16];
+            DWORD       Age;
+            char        PdbFileName[256]; // Do i care for paths?
+        };
+
+
+        struct PDBInfo
+        {
+            static constexpr tt_int32 MAX_MODULES_PDB = 256;
+
+            using HModArr = HMODULE[MAX_MODULES_PDB];
+            using PDBSigArr = PDBSig[MAX_MODULES_PDB];
+
+        public:
+            PDBInfo() :
+                num(0)
+            {
+                memset(mods, 0, sizeof(mods));
+            }
+
+            tt_int32 num;
+            HModArr mods;
+            PDBSigArr sigs;
+        };
+
+        bool getPDBSig(HMODULE hMod, PDBSig& sig)
+        {
+            uintptr_t base = reinterpret_cast<uintptr_t>(hMod);
+
+            const auto* pHeader = reinterpret_cast<MyDosHeader*>(base);
+            if (!pHeader->isValid()) {
+                return false;
+            }
+
+            auto* pNt = pHeader->GetNtHeader();
+            if (!pNt->isValid()) {
+                return false;
+            }
+
+            auto* pOtional = pNt->GetOptionalHeader();
+            if (!pOtional->isValid()) {
+                return false;
+            }
+
+            IMAGE_DATA_DIRECTORY* pDir = &pOtional->DataDirectory[IMAGE_DIRECTORY_ENTRY_DEBUG];
+
+            // Convert that data to the right type.
+            IMAGE_DEBUG_DIRECTORY* pDbgDir = reinterpret_cast<IMAGE_DEBUG_DIRECTORY*>(base + pDir->VirtualAddress);
+
+            // Check to see that the data has the right type
+            if (pDbgDir->Type != IMAGE_DEBUG_TYPE_CODEVIEW) {
+                return false;
+            }
+
+            PdbInfo* pPdbInfo = reinterpret_cast<PdbInfo*>(base + pDbgDir->AddressOfRawData);
+            if (memcmp(&pPdbInfo->Signature, "RSDS", 4) != 0) {
+                return false;
+            }
+
+            sig.imageSize = pOtional->SizeOfImage;
+            sig.Age = pPdbInfo->Age;
+            memcpy(sig.Guid, pPdbInfo->Guid, sizeof(pPdbInfo->Guid));
+            strcpy(sig.PdbFileName, pPdbInfo->PdbFileName);
+            return true;
+        }
+
+        // so i want to get the PE sigs for every loaded module?
+        // i guess so.
+        // guess should just do it at startup?
+
+        bool haveInfoForPDB(const PDBInfo& info, HMODULE hMod)
+        {
+            for (tt_int32 i = 0; i < info.num; i++)
+            {
+                if (info.mods[i] == hMod) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        bool updatePDBInfo(PDBInfo& info)
+        {
+            auto hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, ::GetCurrentProcessId());
+            if (!hProcess) {
+                return true;
+            }
+
+            // Get a list of all the modules in this process.
+            // we use bigger buffer than MAX_MODULES_PDB since not all modules have PDB info.
+            HMODULE hMods[1024];
+            DWORD cbNeeded;
+
+            bool ok = EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded);
+            if (ok)
+            {
+                const tt_size num = (cbNeeded / sizeof(HMODULE));
+
+                for (tt_size i = 0; i < num; i++)
+                {
+                    auto hMod = hMods[i];
+
+                    // do we have info for this mod?
+                    if (!haveInfoForPDB(info, hMod)) {
+                        continue;
+                    }
+
+                    if (info.num == PDBInfo::MAX_MODULES_PDB) {
+                        break;
+                    }
+
+                    PDBSig sig;
+                    if (getPDBSig(hMod, sig)) {
+                        info.mods[info.num] = hMod;
+                        info.sigs[info.num] = sig;
+                        ++info.num;
+                    }
+                }
+            }
+
+            CloseHandle(hProcess);
+            return ok;
+        }
+
+        PDBInfo pdbInfo;
+
+    } // namespace PE
+
 
     TELEM_PACK_PUSH(8)
     struct THREADNAME_INFO
@@ -214,7 +446,9 @@ namespace
         tt_uint64 baseNano;
 
         bool isEnabled;
-        bool _pad[7];
+        bool _pad[3];
+
+        tt_int32 numPDBSync;
 
     //    tt_uint8 _lanePad0[6];
         X86_PAD(8)
@@ -1031,7 +1265,8 @@ namespace
         MemAlloc,
         MemFree,
         Message,
-        Plot
+        Plot,
+        PDBInfo
     };
 
     TELEM_PACK_PUSH(8)
@@ -1157,6 +1392,12 @@ namespace
         ArgData argData;
     };
 
+    TELEM_ALIGNED_SYMBOL(struct QueueDataPDB, 64) : public QueueDataBase
+    {
+        HMODULE hMod;
+        PE::PDBSig sig;
+    };
+
     TELEM_PACK_POP
 
 
@@ -1187,6 +1428,7 @@ namespace
     static_assert(64 == GetSizeWithoutArgData<QueueDataMemFree>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataMessage>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataPlot>());
+    static_assert(256 + 64 == sizeof(QueueDataPDB));
 
     void flipBufferInternal(TraceContext* pCtx, bool force)
     {
@@ -1296,7 +1538,30 @@ namespace
         tickBufferFull(pCtx);
         addToTickBuffer(pCtx, pPtr, size);
     }
-     
+
+    void syncPDBInfo(TraceContext* pCtx, const PE::PDBInfo& info)
+    {
+        if (pCtx->numPDBSync == info.num) {
+            return;
+        }
+
+        // TODO: lock?
+        auto base = pCtx->numPDBSync;
+        auto num = info.num - pCtx->numPDBSync;
+        for (tt_int32 i = 0; i < num; i++) {
+
+            QueueDataPDB data;
+            data.type = QueueDataType::PDBInfo;
+            data.argDataSize = 0;
+            data.hMod = info.mods[base + i];
+            data.sig = info.sigs[base + i];
+
+            addToTickBuffer(pCtx, &data, sizeof(data));
+        }
+
+        pCtx->numPDBSync = info.num;
+    }
+
     TELEM_INLINE void queueTickInfo(TraceContext* pCtx, tt_uint64 startTick, tt_uint64 endTick, tt_uint64 startNano, tt_uint64 endNano)
     {
         QueueDataTickInfo data;
@@ -1473,7 +1738,6 @@ namespace
         packet.type = DataStreamType::CallStack;
         packet.id = pBuf->callstack.id;
         packet.numFrames = pBuf->callstack.num;
-
 
         const tt_int32 baseSize = sizeof(packet);
         const tt_int32 framesSize = (sizeof(pBuf->callstack.frames[0]) * pBuf->callstack.num);
@@ -1675,6 +1939,15 @@ namespace
         return dataSize;
     }
 
+    tt_int32 queueProcessPDBInfo(PacketCompressor* pComp, const QueueDataPDB* pBuf)
+    {
+        TELEM_UNUSED(pComp);
+        TELEM_UNUSED(pBuf);
+
+        return sizeof(*pBuf);
+    }
+
+
     DWORD __stdcall WorkerThread(LPVOID pParam)
     {
         setThreadName(getThreadID(), "Telemetry");
@@ -1801,6 +2074,9 @@ namespace
                     case QueueDataType::Plot:
                         pBuf += queueProcessPlot(&comp, reinterpret_cast<const QueueDataPlot*>(pBuf));
                         break;
+                    case QueueDataType::PDBInfo:
+                        pBuf += queueProcessPDBInfo(&comp, reinterpret_cast<const QueueDataPDB*>(pBuf));
+                        break;
 
                     default:
 #if X_DEBUG
@@ -1873,6 +2149,8 @@ bool TelemInit(void)
 
     SymSetOptions(SYMOPT_LOAD_LINES);
     SymInitialize(GetCurrentProcess(), nullptr, true);
+
+    PE::updatePDBInfo(PE::pdbInfo);
 
     // want to work out ticks per micro.
     {
@@ -2005,6 +2283,8 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     
     pCtx->logFunc = defaultLogFunction;
     pCtx->pUserData = nullptr;
+
+    pCtx->numPDBSync = 0;
 
     out = contextToHandle(pCtx);
     return TtError::Ok;
@@ -2251,9 +2531,17 @@ void TelemUpdateSymbolData(TraceContexHandle ctx)
 {
     TELEM_UNUSED(ctx);
 
-    // So do i actually need todo this?
-    // can't i just listen for loader events.
-    // will see...
+    // so i want to just find any new modules and try get PDB sig info for them.
+    // TODO: put this on the context?
+    // surley it should just be global.
+    // like if you have multiple context in a single address space, it's still the same adress space.
+    // oh i guess what really matters is if that context is in sync.
+    // aka do we need to send anything to the server for this context.
+    PE::updatePDBInfo(PE::pdbInfo);
+
+    auto* pCtx = handleToContext(ctx);
+
+    syncPDBInfo(pCtx, PE::pdbInfo);
 }
 
 void TelemPause(TraceContexHandle ctx, bool pause)
