@@ -235,7 +235,7 @@ namespace
                     auto hMod = hMods[i];
 
                     // do we have info for this mod?
-                    if (!haveInfoForPDB(info, hMod)) {
+                    if (haveInfoForPDB(info, hMod)) {
                         continue;
                     }
 
