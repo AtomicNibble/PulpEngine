@@ -227,7 +227,11 @@ namespace
                     i += strm.handleDataPacketPlot(reinterpret_cast<const DataPacketPlot*>(&pDst[i]));
                     break;
                 }
-
+                case DataStreamType::PDB:
+                {
+                    i += strm.handleDataPacketPDB(reinterpret_cast<const DataPacketPDB*>(&pDst[i]));
+                    break;
+                }
                 default:
                     X_NO_SWITCH_DEFAULT_ASSERT;
             }
@@ -605,6 +609,7 @@ bool TraceBuilder::createDB(core::Path<char>& path)
     okay &= (sql::Result::OK == cmdInsertMessage.prepare("INSERT INTO messages (timeTicks, type, strIdx) VALUES(?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertZoneNode.prepare("INSERT INTO zoneNodes (setId, parentId, totalTick, count, strIdx) VALUES(?,?,?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertPlot.prepare("INSERT INTO plots (type, timeTicks, value, strIdx) VALUES(?,?,?,?)"));
+    okay &= (sql::Result::OK == cmdInsertPDB.prepare("INSERT INTO sym (modAddr, imageSize, guid, strIdx) VALUES(?,?,?,?)"));
 
     return okay;
 }
@@ -762,6 +767,15 @@ CREATE TABLE "plots" (
 	"value"	            BLOB NOT NULL,
 	"strIdx"	        INTEGER NOT NULL,
 	PRIMARY KEY("Id")
+);
+
+CREATE TABLE "sym" (
+    "Id"                INTEGER,
+    "modAddr"           INTEGER NOT NULL,
+    "imageSize"         INTEGER NOT NULL,
+    "guid"              BLOB NOT NULL,
+    "strIdx"            INTEGER NOT NULL,
+    PRIMARY KEY("Id")
 );
 
 
@@ -1230,6 +1244,27 @@ int32_t TraceBuilder::handleDataPacketCallStack(const DataPacketCallStack* pData
 
     return dataSize;
 }
+
+int32_t TraceBuilder::handleDataPacketPDB(const DataPacketPDB* pData)
+{
+    StringBuf strBuf;
+    int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxName);
+
+    auto& cmd = cmdInsertPDB;
+    cmd.bind(1, static_cast<int64_t>(pData->modAddr));
+    cmd.bind(2, static_cast<int32_t>(pData->imageSize));
+    cmd.bind(3, pData->guid, sizeof(pData->guid));
+    cmd.bind(4, strIdx);
+
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
+    }
+
+    cmd.reset();
+    return sizeof(*pData);
+}
+
 
 // --------------------------------
 

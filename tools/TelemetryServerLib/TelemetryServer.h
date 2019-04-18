@@ -170,6 +170,7 @@ public:
         cmdInsertMessage(con),
         cmdInsertZoneNode(con),
         cmdInsertPlot(con),
+        cmdInsertPDB(con),
         stringMap(g_TelemSrvLibArena, 1024 * 64),
         indexMap(g_TelemSrvLibArena, 1024 * 8)
     {
@@ -197,6 +198,7 @@ public:
     int32_t handleDataPacketMessage(const DataPacketMessage* pData);
     int32_t handleDataPacketPlot(const DataPacketPlot* pData);
     int32_t handleDataPacketCallStack(const DataPacketCallStack* pData);
+    int32_t handleDataPacketPDB(const DataPacketPDB* pData);
 
 private:
     bool createTables(void);
@@ -226,6 +228,7 @@ private:
     sql::SqlLiteCmd cmdInsertMessage;
     sql::SqlLiteCmd cmdInsertZoneNode;
     sql::SqlLiteCmd cmdInsertPlot;
+    sql::SqlLiteCmd cmdInsertPDB;
 
     core::FixedArray<uint64_t, MAX_LOCKS> lockSet;
 
