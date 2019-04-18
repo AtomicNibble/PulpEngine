@@ -2303,6 +2303,9 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
 
     pCtx->numPDBSync = 0;
 
+    // initial sync of PDB info.
+    syncPDBInfo(pCtx, PE::pdbInfo);
+
     out = contextToHandle(pCtx);
     return TtError::Ok;
 }
