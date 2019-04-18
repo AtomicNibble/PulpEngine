@@ -1778,7 +1778,7 @@ namespace
         size = RoundUpToMultiple(size, static_cast<tt_int32>(64));
 
         // seen this callstack before?
-        if (CallstackCacheContains(pComp->callstackCache, pBuf->callstack.id)) {
+        if (CallstackCacheContainsAdd(pComp->callstackCache, pBuf->callstack.id)) {
             return size;
         }
 

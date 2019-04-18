@@ -36,7 +36,7 @@ inline tt_uint32 getIndex(CallstackCache& csc, tt_uint32 id)
     return hash & csc.sizeMask;
 }
 
-inline bool CallstackCacheContains(CallstackCache& csc, tt_uint32 id)
+inline bool CallstackCacheContainsAdd(CallstackCache& csc, tt_uint32 id)
 {
     auto index = getIndex(csc, id);
 
