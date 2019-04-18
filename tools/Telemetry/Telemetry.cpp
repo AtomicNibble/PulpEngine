@@ -131,9 +131,9 @@ namespace
 
             int32_t     imageSize;
 
-            BYTE        Guid[16];
-            DWORD       Age;
-            char        PdbFileName[256]; // Do i care for paths?
+            BYTE        guid[16];
+            DWORD       age;
+            char        pdbFileName[256]; // Do i care for paths?
         };
 
 
@@ -191,9 +191,9 @@ namespace
             }
 
             sig.imageSize = pOtional->SizeOfImage;
-            sig.Age = pPdbInfo->Age;
-            memcpy(sig.Guid, pPdbInfo->Guid, sizeof(pPdbInfo->Guid));
-            strcpy(sig.PdbFileName, pPdbInfo->PdbFileName);
+            sig.age = pPdbInfo->Age;
+            memcpy(sig.guid, pPdbInfo->Guid, sizeof(pPdbInfo->Guid));
+            strcpy(sig.pdbFileName, pPdbInfo->PdbFileName);
             return true;
         }
 
