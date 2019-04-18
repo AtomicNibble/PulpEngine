@@ -2,10 +2,11 @@
 Runtime:
 
   CallStacks:
-    ☐ PDB / Symbol for callstacks
+    ✔ Send PDB sigs to server @done (19-04-18 19:18)
     ☐ Callstack cache
     ☐ Linking callstacks with zones.
-    ☐ Send callstacks to server
+      ☐ Support passing callstacks to printf strings using %t
+    ✔ Send callstacks to server @done (19-04-13 12:55)
 
   Performance:
     ☐ Have each thread store a format string cache.
@@ -17,7 +18,9 @@ Runtime:
      ☐ Explore having a mini string format cache on each thread to improve tight loop performance.
 
   Zones:
-    ☐ Build total time and counts for each zone.
+    ✔ Build total time and counts for each zone. @done (19-04-07 18:43)
+      ☐ Move hot siblings to front of child list.
+    ☐ Support zone counts for each frame.
 
   Strings:
      ✔ Support printf @done (19-03-21 23:34)
@@ -28,11 +31,22 @@ Runtime:
     ✔ Capture and send program command line @done (19-02-15 17:05)
 
   Plots:
-    ☐ Implement plots
+    ✔ Implement plots @done (19-04-13 12:56)
 
   Polish:
     ☐ Get rid of the CRT (low priority)
+    ☐ Handle disconnects better
+      ☐ Try reconnect?
+        Sounds painful unless you can resume.
 
+
+Veiwer:
+
+    ☐ Notice server disconnects and show option to connect again.
+    ☐ Support showing zoneData
+    ☐ Support showing child time
+    ☐ Fix issue with overlapping lock holds due to context switches.
+    ☐ Show plots
 
 ServerLib:
 
@@ -51,6 +65,11 @@ ServerLib:
  ✔ Prosess format specifiers on ingest, anding new ones to db. @done (19-03-23 10:59)
    ✔ Might have to map plain strings to new indexes since the set will be much bigger. @done (19-03-23 10:59)
 
+ ☐ Implment symbol resolving.
+   ☐ Add support for symbol paths so the server knows where to look.
+   ☐ Add logic for resolving the symbols.
+     Not totally sure i can do this using dbghelp storing the data the way to do.
+     Worst comes to worse i can just write my own code for it.
 
 Server:
 
