@@ -1394,8 +1394,12 @@ namespace
 
     TELEM_ALIGNED_SYMBOL(struct QueueDataPDB, 64) : public QueueDataBase
     {
-        HMODULE hMod;
-        PE::PDBSig sig;
+        tt_uint64 modAddr;
+        tt_uint32 imageSize;
+        tt_uint32 age;
+
+        tt_uint8 guid[16];
+        const char* pFilename;
     };
 
     TELEM_PACK_POP
@@ -1428,7 +1432,7 @@ namespace
     static_assert(64 == GetSizeWithoutArgData<QueueDataMemFree>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataMessage>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataPlot>());
-    static_assert(256 + 64 == sizeof(QueueDataPDB));
+    static_assert(64 == sizeof(QueueDataPDB));
 
     void flipBufferInternal(TraceContext* pCtx, bool force)
     {
@@ -1553,8 +1557,14 @@ namespace
             QueueDataPDB data;
             data.type = QueueDataType::PDBInfo;
             data.argDataSize = 0;
-            data.hMod = info.mods[base + i];
-            data.sig = info.sigs[base + i];
+            data.modAddr = reinterpret_cast<tt_uint64>(info.mods[base + i]);
+
+            const auto& sig = info.sigs[base + i];
+
+            data.imageSize = sig.imageSize;
+            data.age = sig.age;
+            memcpy(data.guid, sig.guid, sizeof(sig.guid));
+            data.pFilename = sig.pdbFileName; // this is static so taking pointer will work for the hash table etc.
 
             addToTickBuffer(pCtx, &data, sizeof(data));
         }
@@ -1944,13 +1954,10 @@ namespace
         DataPacketPDB packet;
         packet.type = DataStreamType::PDB;
         packet.argDataSize = 0;
-        packet.modAddr = reinterpret_cast<tt_uint64>(pBuf->hMod);
-        packet.imageSize = pBuf->sig.imageSize;
-        memcpy(packet.guid, pBuf->sig.guid, sizeof(pBuf->sig.guid));
-
-        // This is not correct, the address changes.
-        // so this needs to be dynamic.
-        packet.strIdxName = 0; // GetStringId(pComp, pBuf->sig.pdbFileName);
+        packet.modAddr = pBuf->modAddr;
+        packet.imageSize = pBuf->imageSize;
+        memcpy(packet.guid, pBuf->guid, sizeof(pBuf->guid));
+        packet.strIdxName = GetStringId(pComp, pBuf->pFilename);
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
 
