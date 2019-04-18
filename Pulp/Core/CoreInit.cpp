@@ -793,6 +793,8 @@ bool XCore::Init(CoreInitParams& startupParams)
         //	pWindow_->ClipCursorToWindow();
     }
 
+    ttUpdateSymbolData(gEnv->ctx);
+
     X_LOG1("Core", "Core startup: ^6%gms", time.GetMilliSeconds());
 
     return true;
