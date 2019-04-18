@@ -31,6 +31,33 @@ namespace
     typedef unsigned long(__stdcall *RtlWalkFrameChainFunc)(void**, unsigned long, unsigned long);
     RtlWalkFrameChainFunc pRtlWalkFrameChain = nullptr;
 
+    namespace Hash
+    {
+        typedef uint32_t Fnv1aVal;
+
+        static const uint32_t FNV_32_PRIME = 16777619u;
+        static const uint32_t FNV1_32_INIT = 2166136261u;
+
+
+        TELEM_INLINE Fnv1aVal Fnv1aHash(const void* key, size_t length, Fnv1aVal seed)
+        {
+            Fnv1aVal hash = seed;
+            auto* s = reinterpret_cast<const uint8_t*>(key);
+
+            for (uint32_t i = 0; i < length; ++i) {
+                hash ^= (uint32_t)*s++;
+                hash *= FNV_32_PRIME;
+            }
+
+            return hash;
+        }
+
+        TELEM_INLINE Fnv1aVal Fnv1aHash(const void* key, size_t length)
+        {
+            return Fnv1aHash(key, length, FNV1_32_INIT);
+        }
+
+    } // namespace Hash
     namespace PE
     {
 
@@ -2619,6 +2646,18 @@ void TelemSetThreadName(TraceContexHandle ctx, tt_uint32 threadID, const char* p
     }
 }
 
+
+void caclHash(TtCallStack& stack)
+{
+    // don't think i'm going to cap the hash actually since if we cap it.
+    // displaying the stack above that is pointless as it could be totally wrong.
+    // so we might as well just collect less data.
+
+    auto hash = Hash::Fnv1aHash(stack.frames, sizeof(stack.frames[0]) * stack.num);
+
+    stack.id = hash;
+}
+
 tt_int32 TelemGetCallStack(TraceContexHandle ctx, TtCallStack& stackOut)
 {
     auto* pCtx = handleToContext(ctx);
@@ -2632,7 +2671,7 @@ tt_int32 TelemGetCallStack(TraceContexHandle ctx, TtCallStack& stackOut)
 
     stackOut.num = pRtlWalkFrameChain(stackOut.frames, TtCallStack::MAX_FRAMES, 0);
 
-    stackOut.id = -1; // TODO
+    caclHash(stackOut);
 
     return stackOut.id;
 }
