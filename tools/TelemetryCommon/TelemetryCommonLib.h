@@ -24,6 +24,7 @@
 #include "PacketTypes.h"
 
 #include "StringTable.h"
+#include "CallstackCache.h"
 #include "StringCompress.h"
 #include "SysTimer.h"
 #include "LastErrorWSA.h"

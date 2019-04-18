@@ -89,13 +89,15 @@ constexpr tt_size COMPRESSION_MAX_INPUT_SIZE = 1024 * 8;
 constexpr tt_size COMPRESSION_RING_BUFFER_SIZE = 1024 * 64;
 
 constexpr tt_size STRING_TABLE_BUF_SIZE = sizeof(void*) * MAX_STATIC_STRINGS;
+constexpr tt_size CALLSTACK_CACHE_BUF_SIZE = sizeof(tt_uint32) * 2048;
 
 constexpr tt_size BACKGROUND_THREAD_STACK_SIZE_BASE = 1024 * 32; // base size for anything that's not a compression buffer.
 constexpr tt_size BACKGROUND_THREAD_STACK_SIZE = Internal::RoundUpToMultiple<tt_size>(
     COMPRESSION_RING_BUFFER_SIZE + 
     MAX_PACKET_SIZE + 
     BACKGROUND_THREAD_STACK_SIZE_BASE + 
-    STRING_TABLE_BUF_SIZE, 
+    STRING_TABLE_BUF_SIZE +
+    CALLSTACK_CACHE_BUF_SIZE,
     1024 * 4
 );
 
@@ -236,9 +238,7 @@ struct DataPacketThreadSetName : public DataPacketBaseArgData
 
 struct DataPacketCallStack : public DataPacketBase
 {
-    // 4
-    // TtthreadId threadID; // maybe?
-    tt_uint32 id;
+    tt_uint32 id;   // this is currently hash.
     tt_uint32 numFrames;
 
     // tt_uint64 frames[1];

@@ -447,6 +447,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CallstackCache.h" />
     <ClInclude Include="Compiler.h" />
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="LastErrorWSA.h" />

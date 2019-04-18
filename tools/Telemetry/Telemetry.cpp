@@ -58,6 +58,7 @@ namespace
         }
 
     } // namespace Hash
+
     namespace PE
     {
 
@@ -919,6 +920,7 @@ namespace
         SocketBuffer* pBuffer;
 
         StringTable strTable;
+        CallstackCache callstackCache;
 
         tt_int32 writeBegin;
         tt_int32 writeEnd;
@@ -1771,6 +1773,15 @@ namespace
 
     tt_int32 queueProcessCallStack(PacketCompressor* pComp, const QueueDataCallStack* pBuf)
     {
+        // incoming buffer size.
+        tt_int32 size = sizeof(QueueDataBase) + (sizeof(pBuf->callstack.frames[0]) * (pBuf->callstack.num - 1));
+        size = RoundUpToMultiple(size, static_cast<tt_int32>(64));
+
+        // seen this callstack before?
+        if (CallstackCacheContains(pComp->callstackCache, pBuf->callstack.id)) {
+            return size;
+        }
+
         DataPacketCallStack packet;
         packet.type = DataStreamType::CallStack;
         packet.id = pBuf->callstack.id;
@@ -1783,10 +1794,6 @@ namespace
 
         addToCompressionBufferNoFlush(pComp, &packet, baseSize);
         addToCompressionBufferNoFlush(pComp, pBuf->callstack.frames, framesSize);
-    
-        // incoming buffer size.
-        tt_int32 size = sizeof(QueueDataBase) + (sizeof(pBuf->callstack.frames[0]) * (pBuf->callstack.num - 1));
-        size = RoundUpToMultiple(size, static_cast<tt_int32>(64));
 
         return size;
     }
@@ -2001,6 +2008,7 @@ namespace
         ttSetThreadName(contextToHandle(pCtx), getThreadID(), "Telem - Worker");
 
         tt_uint8 stringTableBuf[STRING_TABLE_BUF_SIZE];
+        tt_uint8 callstackCacheBuf[CALLSTACK_CACHE_BUF_SIZE];
         tt_uint8 packetBuff[MAX_PACKET_SIZE];
 
         SocketBuffer buffer = {
@@ -2013,6 +2021,7 @@ namespace
         comp.pCtx = pCtx;
         comp.pBuffer = &buffer;
         comp.strTable = CreateStringTable(stringTableBuf, sizeof(stringTableBuf));
+        comp.callstackCache = CreateCallstackCache(callstackCacheBuf, sizeof(callstackCacheBuf));
 
 #if !PACKET_COMPRESSION
         {

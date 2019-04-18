@@ -44,6 +44,9 @@
     <ClInclude Include="LastErrorWSA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CallstackCache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
