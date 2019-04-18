@@ -167,6 +167,7 @@ struct DataStreamType
         MemFree,
         Message,
         Plot,
+        PDB,
 
         Num
     };
@@ -406,6 +407,17 @@ struct DataPacketPlot : public DataPacketBaseArgData
     TtPlotValue value;
 };
 
+struct DataPacketPDB : public DataPacketBaseArgData
+{
+    tt_uint64 modAddr;
+    tt_uint32 imageSize;
+
+    tt_uint8 guid[16];
+
+    tt_uint16 strIdxName;
+};
+
+
 static_assert(sizeof(DataPacketBase) == 1, "Incorrect size");
 static_assert(sizeof(DataPacketStringTableAdd) == 5, "Incorrect size");
 static_assert(sizeof(DataPacketZone) == 32, "Incorrect size");
@@ -418,6 +430,7 @@ static_assert(sizeof(DataPacketMemAlloc) == 34, "Incorrect size");
 static_assert(sizeof(DataPacketMemFree) == 27, "Incorrect size");
 static_assert(sizeof(DataPacketMessage) == 13, "Incorrect size");
 static_assert(sizeof(DataPacketPlot) == 22, "Incorrect size");
+static_assert(sizeof(DataPacketPDB) == 32, "Incorrect size");
 
 
 TELEM_PACK_POP

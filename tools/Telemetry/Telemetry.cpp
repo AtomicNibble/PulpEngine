@@ -1941,8 +1941,18 @@ namespace
 
     tt_int32 queueProcessPDBInfo(PacketCompressor* pComp, const QueueDataPDB* pBuf)
     {
-        TELEM_UNUSED(pComp);
-        TELEM_UNUSED(pBuf);
+        DataPacketPDB packet;
+        packet.type = DataStreamType::PDB;
+        packet.argDataSize = 0;
+        packet.modAddr = reinterpret_cast<tt_uint64>(pBuf->hMod);
+        packet.imageSize = pBuf->sig.imageSize;
+        memcpy(packet.guid, pBuf->sig.guid, sizeof(pBuf->sig.guid));
+
+        // This is not correct, the address changes.
+        // so this needs to be dynamic.
+        packet.strIdxName = 0; // GetStringId(pComp, pBuf->sig.pdbFileName);
+
+        addToCompressionBuffer(pComp, &packet, sizeof(packet));
 
         return sizeof(*pBuf);
     }
