@@ -70,6 +70,14 @@ BENCHMARK_DEFINE_F(TelemFixture, callstack_get)(benchmark::State& state) {
     }
 }
 
+BENCHMARK_DEFINE_F(TelemFixture, lock_try)(benchmark::State& state) {
+    int bogusHandle;
+    for (auto _ : state) {
+        ttTryLock(gEnv->ctx, &bogusHandle, "AcquireSlot");
+        ttEndTryLock(gEnv->ctx, &bogusHandle, TtLockResult::Acquired);
+        ttSetLockState(gEnv->ctx, &bogusHandle, TtLockState::Locked);
+    }
+}
 
 BENCHMARK_REGISTER_F(TelemFixture, zone_paused);
 BENCHMARK_REGISTER_F(TelemFixture, zone_simple);
@@ -77,4 +85,5 @@ BENCHMARK_REGISTER_F(TelemFixture, zone_simple)->Threads(4);
 BENCHMARK_REGISTER_F(TelemFixture, zone_printf_str);
 BENCHMARK_REGISTER_F(TelemFixture, zone_printf_int);
 BENCHMARK_REGISTER_F(TelemFixture, callstack_get);
+BENCHMARK_REGISTER_F(TelemFixture, lock_try);
 
