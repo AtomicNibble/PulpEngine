@@ -321,8 +321,12 @@ namespace
 
     TELEM_INLINE tt_uint32 getThreadID(void)
     {
-        // TODO: remove function call.
+#if 1
+        auto val = __readgsqword(0x30) + 0x48;
+        return *reinterpret_cast<const tt_uint32*>(val);
+#else
         return ::GetCurrentThreadId();
+#endif
     }
 
     TELEM_INLINE tt_uint64 getTicks(void)
