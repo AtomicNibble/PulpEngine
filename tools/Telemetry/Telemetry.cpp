@@ -572,6 +572,7 @@ namespace
     TraceLockBuilder* addLock(TraceThread* pThread, const void* pLockPtr)
     {
         auto& locks = pThread->locks;
+
         for (tt_int32 i = 0; i < MAX_LOCKS_HELD_PER_THREAD; i++)
         {
             if (!locks.pLockPtr[i])
@@ -1553,6 +1554,14 @@ namespace
         flipBuffer(pCtx, true, false);
     }
 
+    void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_int32 size);
+
+    TELEM_NO_INLINE void addToTickBufferFull(TraceContext* pCtx, const void* pPtr, tt_int32 size)
+    {
+        flipBuffer(pCtx, true, false);
+        addToTickBuffer(pCtx, pPtr, size);
+    }
+
     void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_int32 size)
     {
         auto& buf = pCtx->tickBuffers[pCtx->activeTickBufIdx];
@@ -1570,8 +1579,7 @@ namespace
         }
 #endif // X_DEBUG
 
-        tickBufferFull(pCtx);
-        addToTickBuffer(pCtx, pPtr, size);
+        addToTickBufferFull(pCtx, pPtr, size);
     }
 
     void syncPDBInfo(TraceContext* pCtx, const PE::PDBInfo& info)
