@@ -42,6 +42,8 @@ struct TtLogType
     };
 };
 
+typedef TtLogType TtMsgType;
+
 using LogFunction = void(*)(void* pUserData, TtLogType::Enum type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm);
 using TraceContexHandle = tt_uintptr;
 
