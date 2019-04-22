@@ -90,13 +90,20 @@ BENCHMARK_DEFINE_F(TelemFixture, plot)(benchmark::State& state) {
         ttPlotI32(ctx, TtPlotType::Integer, 1249, "my plot");
     }
 }
+
+
 BENCHMARK_REGISTER_F(TelemFixture, zone_paused);
 BENCHMARK_REGISTER_F(TelemFixture, zone_simple);
 BENCHMARK_REGISTER_F(TelemFixture, zone_simple)->Threads(4);
 BENCHMARK_REGISTER_F(TelemFixture, zone_printf_str);
+BENCHMARK_REGISTER_F(TelemFixture, zone_printf_str)->Threads(4);
 BENCHMARK_REGISTER_F(TelemFixture, zone_printf_int);
+BENCHMARK_REGISTER_F(TelemFixture, zone_printf_int)->Threads(4);
 BENCHMARK_REGISTER_F(TelemFixture, callstack_get);
 BENCHMARK_REGISTER_F(TelemFixture, lock_try);
+BENCHMARK_REGISTER_F(TelemFixture, lock_try)->Threads(4);
 BENCHMARK_REGISTER_F(TelemFixture, lock_setstate);
+BENCHMARK_REGISTER_F(TelemFixture, lock_setstate)->Threads(4);
 BENCHMARK_REGISTER_F(TelemFixture, plot);
+BENCHMARK_REGISTER_F(TelemFixture, plot)->Threads(4);
 
