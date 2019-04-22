@@ -1147,6 +1147,12 @@ namespace
     }
 
     template<typename T>
+    inline constexpr tt_int32 GetDataSizeNoAlign(tt_int32 argDataSize)
+    {
+        return GetSizeWithoutArgData<T>() + argDataSize;
+    }
+
+    template<typename T>
     inline constexpr tt_int32 GetDataSize(tt_int32 argDataSize)
     {
         return RoundUpToMultiple(GetSizeWithoutArgData<T>() + argDataSize, 64);
@@ -1680,10 +1686,15 @@ namespace
 
         if (scopeData.argDataSize) {
             memcpy(&data.argData, &scopeData.argData, scopeData.argDataSize);
+            const tt_int32 copySize = GetDataSizeNoAlign<decltype(data)>(scopeData.argDataSize);
+            addToTickBuffer(pCtx, &data, copySize, RoundUpToMultiple(copySize, 64));
         }
-
-        constexpr tt_int32 copySize = GetSizeWithoutArgDataNoAlign<decltype(data)>();
-        addToTickBuffer(pCtx, &data, copySize, GetDataSize<decltype(data)>(scopeData.argDataSize));
+        else {
+            // we can skip the runtime size calculation here.
+            constexpr tt_int32 copySize = GetSizeWithoutArgDataNoAlign<decltype(data)>();
+            constexpr tt_int32 size = GetSizeWithoutArgData<decltype(data)>();
+            addToTickBuffer(pCtx, &data, copySize, size);
+        }
     }
 
     TELEM_INLINE void queueLockTry(TraceContext* pCtx, TraceThread* pThread, const void* pPtr, TraceLockBuilder* pLock)
@@ -2765,7 +2776,7 @@ tt_int32 TelemSendCallStack(TraceContexHandle ctx, const TtCallStack* pStack)
 
 // ----------- Zones -----------
 
-// TODO: have a overload that don't take args so can skip the conditional? o baby I love it when you remove my branches!
+// TODO: have a overload that don't take args so can skip the conditional?
 void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
