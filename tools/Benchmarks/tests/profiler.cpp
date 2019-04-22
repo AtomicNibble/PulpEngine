@@ -73,8 +73,8 @@ BENCHMARK_DEFINE_F(TelemFixture, callstack_get)(benchmark::State& state) {
 BENCHMARK_DEFINE_F(TelemFixture, lock_try)(benchmark::State& state) {
     int bogusHandle;
     for (auto _ : state) {
-        ttTryLock(gEnv->ctx, &bogusHandle, "AcquireSlot");
-        ttEndTryLock(gEnv->ctx, &bogusHandle, TtLockResult::Acquired);
+        ttTryLock(ctx, &bogusHandle, "AcquireSlot");
+        ttEndTryLock(ctx, &bogusHandle, TtLockResult::Acquired);
         ttSetLockState(gEnv->ctx, &bogusHandle, TtLockState::Locked);
     }
 }
