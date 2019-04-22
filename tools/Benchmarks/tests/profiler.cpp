@@ -6,7 +6,7 @@ class TelemFixture : public benchmark::Fixture
 public:
     void SetUp(const::benchmark::State& state)
     {
-        const size_t telemBufSize = 1024 * 1024 * 2;
+        const size_t telemBufSize = 1024 * 1024 * 16;
         static uint8_t telemBuf[telemBufSize];
 
         if (state.thread_index == 0) {
