@@ -202,12 +202,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             const int32_t numThreads = 4;
 
             core::Thread thread[numThreads];
-            const char* threadNames[numThreads] = {
-                "Worker 0",
-                "Worker 1",
-                "Worker 2",
-                "Worker 3",
-            };
 
             ttLog(ctx, "Hello stu!");
             ttWarning(ctx, "Can't find stu");
@@ -222,12 +216,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             ttPlotU32(ctx, TtPlotType::Integer, 1, "noodles?");
             ttPlotU64(ctx, TtPlotType::Integer, 1, "bananan?");
 
+            core::StackString256 name;
             for (int32_t i = 0; i < numThreads; i++) {
-                thread[i].create(threadNames[i]);
+                name.setFmt("Worder %" PRIi32, i);
+
+                thread[i].create(name.c_str());
                 thread[i].start(threadFunc);
 
                 // TODO: Support dynamic strings.
-                ttSetThreadName(ctx, thread[i].getID(), threadNames[i]);
+                ttSetThreadName(ctx, thread[i].getID(), "%s", name.c_str());
             }
 
             // main loop
