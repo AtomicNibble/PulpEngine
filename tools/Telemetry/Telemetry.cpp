@@ -1214,6 +1214,7 @@ namespace
                 case 'h':
                 case 'j':
                 case 'z':
+                case 't':
                     pFmtString++;
                     break;
                 default:
