@@ -597,10 +597,10 @@ namespace
                 locks.pLockPtr[i] = nullptr; // clear the slot.
 
                 pLock = &locks.locks[i];
-                // TODO: is breaking faster here?
-                // I'm guessing not as long as this loop is unrolled.
-                // break;
 
+                // breaking here is faster, even tho it's unrolling the loop without break.
+                // forcing inline of unrolled code don't help much.
+                break;
             }
         }
 
