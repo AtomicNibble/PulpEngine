@@ -1573,7 +1573,7 @@ namespace
         flipBuffer(pCtx, true, false);
     }
 
-    void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_int32 copySize, tt_int32 size);
+    TELEM_INLINE void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_int32 copySize, tt_int32 size);
 
     TELEM_NO_INLINE void addToTickBufferFull(TraceContext* pCtx, const void* pPtr, tt_int32 copySize, tt_int32 size)
     {
@@ -1581,7 +1581,7 @@ namespace
         addToTickBuffer(pCtx, pPtr, copySize, size);
     }
 
-    void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_int32 copySize, tt_int32 size)
+    TELEM_INLINE void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_int32 copySize, tt_int32 size)
     {
         auto& buf = pCtx->tickBuffers[pCtx->activeTickBufIdx];
         long offset = _InterlockedExchangeAdd(reinterpret_cast<volatile long*>(&buf.bufOffset), static_cast<long>(size));
@@ -1677,6 +1677,8 @@ namespace
 
     TELEM_INLINE void queueZone(TraceContext* pCtx, TraceThread* pThread, TraceZoneBuilder& scopeData)
     {
+        const bool hasArgData = scopeData.argDataSize;
+
         QueueDataZone data;
         data.type = QueueDataType::Zone;
         data.argDataSize = static_cast<tt_uint8>(scopeData.argDataSize & 0xFF);
@@ -1687,15 +1689,15 @@ namespace
         tt_int32 copySize;
         tt_int32 size;
 
-        if (scopeData.argDataSize) {
-            memcpy(&data.argData, &scopeData.argData, scopeData.argDataSize);
-            copySize = GetDataSizeNoAlign<decltype(data)>(scopeData.argDataSize);
-            size = RoundUpToMultiple(copySize, 64);
-        }
-        else {
+        if (!hasArgData) {
             // we can skip the runtime size calculation here.
             copySize = GetSizeWithoutArgDataNoAlign<decltype(data)>();
             size = GetSizeWithoutArgData<decltype(data)>();
+        }
+        else {
+            memcpy(&data.argData, &scopeData.argData, scopeData.argDataSize);
+            copySize = GetDataSizeNoAlign<decltype(data)>(scopeData.argDataSize);
+            size = RoundUpToMultiple(copySize, 64);
         }
 
         addToTickBuffer(pCtx, &data, copySize, size);
