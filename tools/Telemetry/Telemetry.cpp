@@ -474,7 +474,8 @@ namespace
         tt_uint64 baseNano;
 
         bool isEnabled;
-        bool _pad[3];
+        tt_uint8 flags;
+        bool _pad[2];
 
         tt_int32 numPDBSync;
 
@@ -2081,6 +2082,10 @@ namespace
                 continue;
             }
 
+            if ((pCtx->flags & TTFlag::DropData) != 0) {
+                continue;
+            }
+
             tt_int32 num = 0;
 
             // process the packets.
@@ -2296,6 +2301,7 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     pCtx->lastTick = getTicks();
     pCtx->lastTickNano = gSysTimer.GetNano();
     pCtx->isEnabled = true;
+    pCtx->flags = 0;
     pCtx->socket = INV_SOCKET;
     pCtx->pThreadData = reinterpret_cast<TraceThread*>(pThreadDataBuf);
     pCtx->numThreadData = 0;
@@ -2617,6 +2623,22 @@ bool TelemIsPaused(TraceContexHandle ctx)
     }
 
     return handleToContext(ctx)->isEnabled;
+}
+
+void TelemSetFlag(TraceContexHandle ctx, TTFlag::Enum flag, bool set)
+{
+    if (!isValidContext(ctx)) {
+        return;
+    }
+
+    auto* pCtx = handleToContext(ctx);
+
+    if (set) {
+        pCtx->flags |= flag;
+    }
+    else {
+        pCtx->flags &= ~flag;
+    }
 }
 
 void TelemSetThreadName(TraceContexHandle ctx, tt_uint32 threadID, const char* pFmtString, tt_int32 numArgs, ...)

@@ -44,6 +44,14 @@ struct TtLogType
 
 typedef TtLogType TtMsgType;
 
+struct TTFlag
+{
+    enum Enum : tt_uint8
+    {
+        DropData = 1, // Used for profiling overhead, data is not sent to server.
+    };
+};
+
 using LogFunction = void(*)(void* pUserData, TtLogType::Enum type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm);
 using TraceContexHandle = tt_uintptr;
 
@@ -151,6 +159,8 @@ extern "C"
     __TELEM_API_VOID(TelemPause, TraceContexHandle ctx, bool pause);
     __TELEM_API_BOOL(TelemIsPaused, TraceContexHandle ctx);
 
+    __TELEM_API_VOID(TelemSetFlag, TraceContexHandle ctx, TTFlag::Enum flag, bool set);
+
     // Thread
     __TELEM_API_VOID(TelemSetThreadName, TraceContexHandle ctx, tt_uint32 threadID, const char* pFmtString, tt_int32 numArgs, ...);
 
@@ -185,7 +195,7 @@ extern "C"
     __TELEM_API_VOID(TelemPlotU32, TraceContexHandle ctx, TtPlotType::Enum type, tt_uint32 value, const char* pFmtString, tt_int32 numArgs, ...);
     __TELEM_API_VOID(TelemPlotU64, TraceContexHandle ctx, TtPlotType::Enum type, tt_uint64 value, const char* pFmtString, tt_int32 numArgs, ...);
 
-    __TELEM_API_VOID(TelemMessage, TraceContexHandle ctx, TtLogType::Enum type, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemMessage, TraceContexHandle ctx, TtMsgType::Enum type, const char* pFmtString, tt_int32 numArgs, ...);
 
 #pragma warning( pop )
 
@@ -239,6 +249,7 @@ namespace telem
             __TELEM_RESOLVE(TelemUpdateSymbolData);
             __TELEM_RESOLVE(TelemPause);
             __TELEM_RESOLVE(TelemIsPaused);
+            __TELEM_RESOLVE(TelemSetFlag);
             __TELEM_RESOLVE(TelemSetThreadName);
             __TELEM_RESOLVE(TelemGetCallStack);
             __TELEM_RESOLVE(TelemSendCallStack);
@@ -280,6 +291,7 @@ namespace telem
             __TELEM_SET_BLANK(TelemUpdateSymbolData);
             __TELEM_SET_BLANK(TelemPause);
             __TELEM_SET_BLANK(TelemIsPaused);
+            __TELEM_SET_BLANK(TelemSetFlag);
             __TELEM_SET_BLANK(TelemSetThreadName);
             __TELEM_SET_BLANK(TelemGetCallStack);
             __TELEM_SET_BLANK(TelemSendCallStack);
@@ -327,6 +339,7 @@ namespace telem
         __TELEM_FUNC_PTR(TelemUpdateSymbolData);
         __TELEM_FUNC_PTR(TelemPause);
         __TELEM_FUNC_PTR(TelemIsPaused);
+        __TELEM_FUNC_PTR(TelemSetFlag);
         __TELEM_FUNC_PTR(TelemSetThreadName);
         __TELEM_FUNC_PTR(TelemGetCallStack);
         __TELEM_FUNC_PTR(TelemSendCallStack);
@@ -455,6 +468,8 @@ namespace telem
 #define ttPause(ctx, pause) __TELEM_FUNC_NAME(TelemPause)(ctx, pause)
 #define ttIsPaused(ctx) __TELEM_FUNC_NAME(TelemIsPaused)(ctx)
 
+#define ttSetFlag(ctx, flag, set) __TELEM_FUNC_NAME(TelemSetFlag)(ctx, flag, set)
+
 // Thread
 #define ttSetThreadName(ctx, threadID, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetThreadName)(ctx, threadID, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 
@@ -522,6 +537,8 @@ namespace telem
 
 #define ttPause(...)
 #define ttIsPaused(...)
+
+#define ttSetFlag(...)
 
 // Thread
 #define ttSetThreadName(...);
