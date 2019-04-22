@@ -1663,8 +1663,8 @@ namespace
         data.callstack.num = stack.num;
         memcpy(data.callstack.frames, stack.frames, stack.num * sizeof(stack.frames[0]));
 
-        tt_int32 size = sizeof(QueueDataBase) + (sizeof(stack.frames[0]) * (stack.num - 1));
-        size = RoundUpToMultiple(size, static_cast<tt_int32>(64));
+        tt_int32 copySize = sizeof(QueueDataBase) + (sizeof(stack.frames[0]) * (stack.num - 1));
+        tt_int32 size = RoundUpToMultiple(copySize, static_cast<tt_int32>(64));
 
 #if X_DEBUG
         if (size > sizeof(data)) {
@@ -1672,7 +1672,7 @@ namespace
         }
 #endif // X_DEBUG
 
-        addToTickBuffer(pCtx, &data, size);
+        addToTickBuffer(pCtx, &data, copySize, size);
     }
 
     TELEM_INLINE void queueZone(TraceContext* pCtx, TraceThread* pThread, TraceZoneBuilder& scopeData)
