@@ -636,6 +636,11 @@ void _vsnprintf(SprintfStrBuf& buf, const char* pFormat, ArgDataHelper& va)
                 break;
             }
 
+            case 't':
+                buf.append("<callstack>"); // TODO:
+                pFormat++;
+                break;
+
             case '%':
                 buf.append('%');
                 pFormat++;
