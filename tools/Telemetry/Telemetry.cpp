@@ -1684,17 +1684,21 @@ namespace
         data.threadID = pThread->id;
         data.zone = scopeData.zone;
 
+        tt_int32 copySize;
+        tt_int32 size;
+
         if (scopeData.argDataSize) {
             memcpy(&data.argData, &scopeData.argData, scopeData.argDataSize);
-            const tt_int32 copySize = GetDataSizeNoAlign<decltype(data)>(scopeData.argDataSize);
-            addToTickBuffer(pCtx, &data, copySize, RoundUpToMultiple(copySize, 64));
+            copySize = GetDataSizeNoAlign<decltype(data)>(scopeData.argDataSize);
+            size = RoundUpToMultiple(copySize, 64);
         }
         else {
             // we can skip the runtime size calculation here.
-            constexpr tt_int32 copySize = GetSizeWithoutArgDataNoAlign<decltype(data)>();
-            constexpr tt_int32 size = GetSizeWithoutArgData<decltype(data)>();
-            addToTickBuffer(pCtx, &data, copySize, size);
+            copySize = GetSizeWithoutArgDataNoAlign<decltype(data)>();
+            size = GetSizeWithoutArgData<decltype(data)>();
         }
+
+        addToTickBuffer(pCtx, &data, copySize, size);
     }
 
     TELEM_INLINE void queueLockTry(TraceContext* pCtx, TraceThread* pThread, const void* pPtr, TraceLockBuilder* pLock)
