@@ -70,6 +70,14 @@ BENCHMARK_DEFINE_F(TelemFixture, callstack_get)(benchmark::State& state) {
     }
 }
 
+BENCHMARK_DEFINE_F(TelemFixture, callstack_send)(benchmark::State& state) {
+    TtCallStack stack;
+    ttGetCallStack(ctx, stack);
+    for (auto _ : state) {
+        ttSendCallStack(ctx, &stack);
+    }
+}
+
 BENCHMARK_DEFINE_F(TelemFixture, lock_try)(benchmark::State& state) {
     int bogusHandle;
     for (auto _ : state) {
@@ -91,6 +99,17 @@ BENCHMARK_DEFINE_F(TelemFixture, plot)(benchmark::State& state) {
     }
 }
 
+BENCHMARK_DEFINE_F(TelemFixture, msg)(benchmark::State& state) {
+    for (auto _ : state) {
+        ttMessage(ctx, TtMsgType::Msg, "this is a msg for you!");
+    }
+}
+
+BENCHMARK_DEFINE_F(TelemFixture, msg_printf)(benchmark::State& state) {
+    for (auto _ : state) {
+        ttMessage(ctx, TtMsgType::Msg, "this is a string %" PRIi32 ", %" PRIi64 " in the middle", 25251_i32, 123456_i64);
+    }
+}
 
 BENCHMARK_REGISTER_F(TelemFixture, zone_paused);
 BENCHMARK_REGISTER_F(TelemFixture, zone_simple);
@@ -100,10 +119,16 @@ BENCHMARK_REGISTER_F(TelemFixture, zone_printf_str)->Threads(4);
 BENCHMARK_REGISTER_F(TelemFixture, zone_printf_int);
 BENCHMARK_REGISTER_F(TelemFixture, zone_printf_int)->Threads(4);
 BENCHMARK_REGISTER_F(TelemFixture, callstack_get);
+BENCHMARK_REGISTER_F(TelemFixture, callstack_send);
 BENCHMARK_REGISTER_F(TelemFixture, lock_try);
 BENCHMARK_REGISTER_F(TelemFixture, lock_try)->Threads(4);
 BENCHMARK_REGISTER_F(TelemFixture, lock_setstate);
 BENCHMARK_REGISTER_F(TelemFixture, lock_setstate)->Threads(4);
 BENCHMARK_REGISTER_F(TelemFixture, plot);
 BENCHMARK_REGISTER_F(TelemFixture, plot)->Threads(4);
+BENCHMARK_REGISTER_F(TelemFixture, msg);
+BENCHMARK_REGISTER_F(TelemFixture, msg)->Threads(4);
+BENCHMARK_REGISTER_F(TelemFixture, msg_printf);
+BENCHMARK_REGISTER_F(TelemFixture, msg_printf)->Threads(4);
+
 
