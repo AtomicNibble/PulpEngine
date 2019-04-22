@@ -610,6 +610,7 @@ bool TraceBuilder::createDB(core::Path<char>& path)
     okay &= (sql::Result::OK == cmdInsertZoneNode.prepare("INSERT INTO zoneNodes (setId, parentId, totalTick, count, strIdx) VALUES(?,?,?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertPlot.prepare("INSERT INTO plots (type, timeTicks, value, strIdx) VALUES(?,?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertPDB.prepare("INSERT INTO sym (modAddr, imageSize, guid, strIdx) VALUES(?,?,?,?)"));
+    okay &= (sql::Result::OK == cmdInsertCallstack.prepare("INSERT INTO callstack (id, depth, data) VALUES(?,?,?)"));
 
     return okay;
 }
@@ -636,6 +637,9 @@ bool TraceBuilder::createIndexes(void)
         );
         CREATE INDEX IF NOT EXISTS "zoneNode_setid" ON "zoneNodes" (
             "setId"	ASC
+        );
+        CREATE INDEX IF NOT EXISTS "callstack_id" ON "callstack" (
+            "id"	ASC
         );
     )");
 
@@ -778,6 +782,12 @@ CREATE TABLE "sym" (
     PRIMARY KEY("Id")
 );
 
+CREATE TABLE "callstack" (
+    "Id"                INTEGER,
+    "depth"             INTEGER NOT NULL,
+    "data"             BLOB NOT NULL,
+    PRIMARY KEY("Id")
+);
 
             )")) {
         X_ERROR("TelemSrv", "Failed to create tables");
@@ -1237,11 +1247,20 @@ int32_t TraceBuilder::handleDataPacketCallStack(const DataPacketCallStack* pData
 {
     X_UNUSED(pData);
 
-    // TODO: ...
+    const tt_int32 frameDataSize = sizeof(tt_uint64) * pData->numFrames;
+    const tt_int32 dataSize = sizeof(*pData) + frameDataSize;
+    const tt_uint64* pFrames = reinterpret_cast<const tt_uint64*>(pData + 1);
 
+    auto& cmd = cmdInsertCallstack;
+    cmd.bind(1, static_cast<int32_t>(pData->id));
+    cmd.bind(2, static_cast<int32_t>(pData->numFrames));
+    cmd.bind(3, pFrames, frameDataSize);
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
+    }
 
-    const tt_int32 dataSize = sizeof(*pData) + (sizeof(tt_uint64) * pData->numFrames);
-
+    cmd.reset();
     return dataSize;
 }
 

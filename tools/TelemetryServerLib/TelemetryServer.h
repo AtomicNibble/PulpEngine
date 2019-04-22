@@ -171,6 +171,7 @@ public:
         cmdInsertZoneNode(con),
         cmdInsertPlot(con),
         cmdInsertPDB(con),
+        cmdInsertCallstack(con),
         stringMap(g_TelemSrvLibArena, 1024 * 64),
         indexMap(g_TelemSrvLibArena, 1024 * 8)
     {
@@ -229,6 +230,7 @@ private:
     sql::SqlLiteCmd cmdInsertZoneNode;
     sql::SqlLiteCmd cmdInsertPlot;
     sql::SqlLiteCmd cmdInsertPDB;
+    sql::SqlLiteCmd cmdInsertCallstack;
 
     core::FixedArray<uint64_t, MAX_LOCKS> lockSet;
 
