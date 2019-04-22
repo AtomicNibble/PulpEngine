@@ -1124,8 +1124,15 @@ namespace
     template<typename T>
     inline constexpr tt_int32 GetSizeNotArgData(void)
     {
-        static_assert(sizeof(T) == 64);
-        return sizeof(T);
+        // static_assert(sizeof(T) == 64);
+        return RoundUpToMultiple(sizeof(T), 64);
+    }
+
+    template<typename T>
+    inline constexpr tt_int32 GetSizeWithoutArgDataNoAlign(void)
+    {
+        constexpr tt_int32 argDataSize = sizeof(T::argData);
+        return sizeof(T) - argDataSize;
     }
 
     template<typename T>
@@ -1309,7 +1316,7 @@ namespace
         tt_uint8 argDataSize;
     };
     
-    TELEM_ALIGNED_SYMBOL(struct QueueDataTickInfo, 64) : public QueueDataBase
+    struct QueueDataTickInfo : public QueueDataBase
     {
         TtthreadId threadID;
         tt_uint64 start;
@@ -1424,7 +1431,7 @@ namespace
         ArgData argData;
     };
 
-    TELEM_ALIGNED_SYMBOL(struct QueueDataPDB, 64) : public QueueDataBase
+    struct QueueDataPDB : public QueueDataBase
     {
         tt_uint64 modAddr;
         tt_uint32 imageSize;
@@ -1448,12 +1455,14 @@ namespace
     constexpr size_t size8 = sizeof(QueueDataMessage);
     constexpr size_t size9 = sizeof(QueueDataPlot);
     constexpr size_t size10 = sizeof(QueueDataCallStack);
+    constexpr size_t size11 = sizeof(QueueDataTickInfo);
+    constexpr size_t size12 = sizeof(QueueDataPDB);
 
-    constexpr size_t size11 = sizeof(ArgData);
+    constexpr size_t size15 = sizeof(ArgData);
     
 
     static_assert(64 == GetSizeWithoutArgData<QueueDataThreadSetName>());
-    static_assert(64 == sizeof(QueueDataTickInfo));
+    static_assert(40 == sizeof(QueueDataTickInfo));
     static_assert(64 == GetSizeWithoutArgData<QueueDataZone>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockSetName>());
     static_assert((sizeof(QueueDataCallStack) % 64) == 0);
@@ -1464,7 +1473,7 @@ namespace
     static_assert(64 == GetSizeWithoutArgData<QueueDataMemFree>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataMessage>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataPlot>());
-    static_assert(64 == sizeof(QueueDataPDB));
+    static_assert(48 == sizeof(QueueDataPDB));
 
     void flipBufferInternal(TraceContext* pCtx, bool force)
     {
@@ -1554,32 +1563,41 @@ namespace
         flipBuffer(pCtx, true, false);
     }
 
-    void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_int32 size);
+    void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_int32 copySize, tt_int32 size);
 
-    TELEM_NO_INLINE void addToTickBufferFull(TraceContext* pCtx, const void* pPtr, tt_int32 size)
+    TELEM_NO_INLINE void addToTickBufferFull(TraceContext* pCtx, const void* pPtr, tt_int32 copySize, tt_int32 size)
     {
         flipBuffer(pCtx, true, false);
-        addToTickBuffer(pCtx, pPtr, size);
+        addToTickBuffer(pCtx, pPtr, copySize, size);
     }
 
-    void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_int32 size)
+    void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_int32 copySize, tt_int32 size)
     {
         auto& buf = pCtx->tickBuffers[pCtx->activeTickBufIdx];
         long offset = _InterlockedExchangeAdd(reinterpret_cast<volatile long*>(&buf.bufOffset), static_cast<long>(size));
         
         if (offset + size <= pCtx->tickBufCapacity) {
-            memcpy(buf.pTickBuf + offset, pPtr, size);
+            memcpy(buf.pTickBuf + offset, pPtr, copySize);
             return;
         }
 
         // no space,
 #if X_DEBUG && 0
+        if (copySize > size) {
+            ::DebugBreak();
+        }
+
         if (offset + size > pCtx->tickBufCapacity) {
             ::DebugBreak();
         }
 #endif // X_DEBUG
 
-        addToTickBufferFull(pCtx, pPtr, size);
+        addToTickBufferFull(pCtx, pPtr, copySize, size);
+    }
+
+    TELEM_INLINE void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_int32 size)
+    {
+        addToTickBuffer(pCtx, pPtr, size, size);
     }
 
     void syncPDBInfo(TraceContext* pCtx, const PE::PDBInfo& info)
@@ -1605,7 +1623,8 @@ namespace
             memcpy(data.guid, sig.guid, sizeof(sig.guid));
             data.pFilename = sig.pdbFileName; // this is static so taking pointer will work for the hash table etc.
 
-            addToTickBuffer(pCtx, &data, sizeof(data));
+            constexpr tt_int32 alignedSize = RoundUpToMultiple(sizeof(data), 64);
+            addToTickBuffer(pCtx, &data, sizeof(data), alignedSize);
         }
 
         pCtx->numPDBSync = info.num;
@@ -1622,7 +1641,8 @@ namespace
         data.startNano = startNano - pCtx->baseNano;
         data.endNano = endNano - pCtx->baseNano;
 
-        addToTickBuffer(pCtx, &data, sizeof(data));
+        constexpr tt_int32 alignedSize = RoundUpToMultiple(sizeof(data), 64);
+        addToTickBuffer(pCtx, &data, sizeof(data), alignedSize);
     }
 
     TELEM_INLINE void queueCallStack(TraceContext* pCtx, const TtCallStack& stack)
@@ -1658,7 +1678,8 @@ namespace
             memcpy(&data.argData, &scopeData.argData, scopeData.argDataSize);
         }
 
-        addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(scopeData.argDataSize));
+        constexpr tt_int32 copySize = GetSizeWithoutArgDataNoAlign<decltype(data)>();
+        addToTickBuffer(pCtx, &data, copySize, GetDataSize<decltype(data)>(scopeData.argDataSize));
     }
 
     TELEM_INLINE void queueLockTry(TraceContext* pCtx, TraceThread* pThread, const void* pPtr, TraceLockBuilder* pLock)
@@ -1670,11 +1691,13 @@ namespace
         data.lock = pLock->lock;
         data.pLockPtr = pPtr;
 
-        if (pLock->argDataSize) {
+        if (!pLock->argDataSize) {
             memcpy(&data.argData, &pLock->argData, pLock->argDataSize);
+            addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(pLock->argDataSize));
         }
-
-        addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(pLock->argDataSize));
+        else {
+            addToTickBuffer(pCtx, &data, GetSizeWithoutArgDataNoAlign<decltype(data)>(), GetSizeWithoutArgData<decltype(data)>());
+        }
     }
 
     TELEM_INLINE void queueLockState(TraceContext* pCtx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState::Enum state)
@@ -1689,7 +1712,8 @@ namespace
         data.sourceInfo = sourceInfo;
         data.pFmtStr = "<none>";
 
-        addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
+        constexpr tt_int32 copySize = GetSizeWithoutArgDataNoAlign<decltype(data)>();
+        addToTickBuffer(pCtx, &data, copySize, GetSizeWithoutArgData<decltype(data)>());
     }
 
     TELEM_INLINE void queueLockCount(TraceContext* pCtx, const TtSourceInfo& sourceInfo, const void* pPtr, tt_int32 count)
@@ -2005,7 +2029,8 @@ namespace
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
 
-        return sizeof(*pBuf);
+        constexpr tt_int32 alignedSize = RoundUpToMultiple(sizeof(*pBuf), 64);
+        return alignedSize;
     }
 
 
@@ -3183,9 +3208,10 @@ void TelemPlotI32(TraceContexHandle ctx, TtPlotType::Enum type, tt_int32 value, 
 
     if (!numArgs)
     {
+        constexpr auto copySize = GetSizeWithoutArgDataNoAlign<decltype(data)>();
         constexpr auto size = GetSizeWithoutArgData<decltype(data)>();
         data.argDataSize = 0;
-        addToTickBuffer(pCtx, &data, size);
+        addToTickBuffer(pCtx, &data, copySize, size);
     }
     else
     {
