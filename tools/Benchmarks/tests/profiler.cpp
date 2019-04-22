@@ -4,23 +4,27 @@
 class TelemFixture : public benchmark::Fixture
 {
 public:
-    void SetUp(const ::benchmark::State&)
+    void SetUp(const::benchmark::State& state)
     {
         const size_t telemBufSize = 1024 * 1024 * 2;
         static uint8_t telemBuf[telemBufSize];
 
-        X_ASSERT(ttLoadLibary(), "Failed to resolve telem")();
-        X_ASSERT(ttInit(), "Failed to init telem")();
+        if (state.thread_index == 0) {
+            X_ASSERT(ttLoadLibary(), "Failed to resolve telem")();
+            X_ASSERT(ttInit(), "Failed to init telem")();
 
-        ttInitializeContext(ctx, telemBuf, sizeof(telemBuf));
-        ttTick(ctx);
+            ttInitializeContext(ctx, telemBuf, sizeof(telemBuf));
+            ttTick(ctx);
+        }
     }
 
-    void TearDown(const ::benchmark::State&)
+    void TearDown(const ::benchmark::State& state)
     {
-        ttClose(ctx);
-        ttShutdownContext(ctx);
-        ttShutDown();
+        if (state.thread_index == 0) {
+            ttClose(ctx);
+            ttShutdownContext(ctx);
+            ttShutDown();
+        }
     }
 
 protected:
@@ -69,6 +73,7 @@ BENCHMARK_F(TelemFixture, callstack_get)(benchmark::State& state) {
 
 BENCHMARK_REGISTER_F(TelemFixture, zone_paused);
 BENCHMARK_REGISTER_F(TelemFixture, zone_simple);
+BENCHMARK_REGISTER_F(TelemFixture, zone_simple)->Threads(4);
 BENCHMARK_REGISTER_F(TelemFixture, zone_printf_str);
 BENCHMARK_REGISTER_F(TelemFixture, zone_printf_int);
 BENCHMARK_REGISTER_F(TelemFixture, callstack_get);
