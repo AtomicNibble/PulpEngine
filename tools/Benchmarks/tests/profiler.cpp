@@ -3,7 +3,7 @@
 void BM_telem_zone(benchmark::State& state)
 {
     // i need to make this from something.
-    const size_t telemBufSize = 1024 * 1024 * 32;
+    const size_t telemBufSize = 1024 * 1024 * 2;
     static uint8_t telemBuf[telemBufSize];
 
     // Setup telem.
@@ -13,17 +13,6 @@ void BM_telem_zone(benchmark::State& state)
     telem::ContexHandle ctx;
     ttInitializeContext(ctx, telemBuf, sizeof(telemBuf));
 
-    auto res = ttOpen(
-        ctx,
-        "Benchmarks",
-        X_BUILD_STRING " Version: " X_ENGINE_VERSION_STR " Rev: " X_ENGINE_BUILD_REF_STR,
-        "127.0.0.1",
-        8001,
-        telem::ConnectionType::Tcp,
-        1000
-    );
-
-    X_ASSERT(res == telem::Error::Ok, "Failed to init")(res);
 
     ttSetThreadName(ctx, 0, "Main");
 
