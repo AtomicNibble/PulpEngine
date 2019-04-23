@@ -41,6 +41,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
     params.bEnableJobSystem = false;
     params.bFileSysWorkingDir = true;
     params.bPauseShutdown = false;
+    params.bEnableJobSystem = true;
     params.consoleDesc.pTitle = X_ENGINE_NAME " - TelemetryServer";
 
 #ifdef X_LIB
