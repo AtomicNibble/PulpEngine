@@ -154,6 +154,8 @@ struct TraceBuilder : public TraceDB
     using IndexStrPairArr = core::Array<IndexStr>;
 
 public:
+    TraceBuilder(const TraceBuilder& oth) = delete;
+    TraceBuilder& operator=(const TraceBuilder& oth) = delete;
     TraceBuilder() :
         pTrace(nullptr),
         cmdInsertZone(con),
