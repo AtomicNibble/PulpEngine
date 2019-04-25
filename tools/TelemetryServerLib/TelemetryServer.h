@@ -247,6 +247,7 @@ enum class ClientType
     Viewer
 };
 
+#if 0
 struct ClientConnection
 {
     using TraceStreamArr = core::Array<TraceStream>;
@@ -283,13 +284,122 @@ struct ClientConnection
     core::Compression::LZ4StreamDecode lz4DecodeStream;
     core::Compression::LZ4Stream lz4Stream;
 };
+#endif
+
+
+X_DECLARE_ENUM(IOOperation)(
+    Invalid,
+    Send,
+    Recv
+);
+
+struct PerClientIoData
+{
+    PerClientIoData()
+    {
+        core::zero_object(overlapped);
+
+        op = IOOperation::Invalid;
+        bytesTrans = 0;
+        buf.buf = recvbuf;
+        buf.len = sizeof(recvbuf);
+    }
+
+    OVERLAPPED overlapped;
+    IOOperation::Enum op;
+
+    uint32_t bytesTrans;
+
+    platform::WSABUF buf;
+    char recvbuf[MAX_PACKET_SIZE];
+};
+
+static_assert(X_OFFSETOF(PerClientIoData, overlapped) == 0, "Overlapped must be at start");
+
+class Server;
+
+struct ClientConnection
+{
+    using HostStr = core::StackString<NI_MAXHOST, char>;
+    using ServStr = core::StackString<NI_MAXSERV, char>;
+
+    using TraceStreamArr = core::Array<TraceStream>;
+
+public:
+    ClientConnection(Server& srv, core::MemoryArenaBase* arena) :
+        srv_(srv),
+        traces_(arena)
+    {
+        core::zero_object(clientVer_);
+        socket_ = INV_SOCKET;
+        type_ = ClientType::Unknown;
+
+        cmpBufBegin_ = 0;
+        cmpBufEnd_ = 0;
+
+#if X_DEBUG
+        core::zero_object(cmpRingBuf_);
+#endif // X_DEBUG
+    }
+
+    void processNetPacketJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+
+    bool handleConnectionRequest(uint8_t* pData);
+    bool handleConnectionRequestViewer(uint8_t* pData);
+
+    bool handleDataSream(uint8_t* pData);
+
+    bool handleQueryTraceInfo(uint8_t* pData);
+    bool handleOpenTrace(uint8_t* pData);
+
+    bool handleReqTraceZoneSegment(uint8_t* pData);
+    bool handleReqTraceLocks(uint8_t* pData);
+    bool handleReqTraceStrings(uint8_t* pData);
+    bool handleReqTraceThreadNames(uint8_t* pData);
+    bool handleReqTraceLockNames(uint8_t* pData);
+    bool handleReqTraceZoneTree(uint8_t* pData);
+
+    // Tmp public
+    void sendDataToClient(const void* pData, size_t len);
+private:
+    void sendConnectionRejected(const char* pReason);
+
+    void flushCompressionBuffer(void);
+    int32_t getCompressionBufferSize(void);
+    int32_t getCompressionBufferSpace(void) const;
+    void addToCompressionBuffer(const void* pData, int32_t len);
+
+    template<typename T>
+    T* addToCompressionBufferT(void);
+
+public:
+    Server& srv_;
+
+    platform::SOCKET            socket_;
+    platform::SOCKADDR_STORAGE  clientAddr_;
+    HostStr                     host_;
+    ServStr                     serv_;
+    VersionInfo                 clientVer_;
+    ClientType                  type_;
+
+    PerClientIoData io_;
+
+    TraceStreamArr traces_;
+    TraceBuilder traceBuilder_;
+
+    // this is used for both incoming and outgoing streams.
+    // depending on if it'sincoming trace data or a viewer connection.
+    int32_t cmpBufBegin_;
+    int32_t cmpBufEnd_;
+    int8_t cmpRingBuf_[COMPRESSION_RING_BUFFER_SIZE];
+
+    core::Compression::LZ4StreamDecode lz4DecodeStream_;
+    core::Compression::LZ4Stream lz4Stream_;
+};
 
 
 class Server : public ITelemServer
 {
-public:
-
-
 public:
     Server(core::MemoryArenaBase* arena);
     ~Server() X_OVERRIDE;
@@ -299,26 +409,14 @@ public:
 
     bool listen(void) X_FINAL;
 
-private:
-    bool processPacket(ClientConnection& client, uint8_t* pData);
-    void handleClient(ClientConnection& client);
-
+public:
+    void addTraceForApp(const TelemFixedStr& appName, Trace& trace);
     bool sendAppList(ClientConnection& client);
-
-    bool handleConnectionRequest(ClientConnection& client, uint8_t* pData);
-    bool handleConnectionRequestViewer(ClientConnection& client, uint8_t* pData);
-    
-    bool handleQueryTraceInfo(ClientConnection& client, uint8_t* pData);
-    bool handleOpenTrace(ClientConnection& client, uint8_t* pData);
-    bool handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData);
-    bool handleReqTraceLocks(ClientConnection& client, uint8_t* pData);
-    bool handleReqTraceStrings(ClientConnection& client, uint8_t* pData);
-    bool handleReqTraceThreadNames(ClientConnection& client, uint8_t* pData);
-    bool handleReqTraceLockNames(ClientConnection& client, uint8_t* pData);
-    bool handleReqTraceZoneTree(ClientConnection& client, uint8_t* pData);
 
 private:
     core::MemoryArenaBase* arena_;
+    core::CriticalSection cs_;
+
     TraceAppArr apps_;
 };
 

@@ -38,7 +38,7 @@ namespace
         }
     }
 
- 
+#if 0
     bool readPacket(ClientConnection& client, char* pBuffer, int& bufLengthInOut)
     {
         // this should return complete packets or error.
@@ -88,159 +88,7 @@ namespace
             }
         }
     }
-
-    void sendDataToClient(ClientConnection& client, const void* pData, size_t len)
-    {
-        // send some data...
-        int res = platform::send(client.socket, reinterpret_cast<const char*>(pData), static_cast<int>(len), 0);
-        if (res == SOCKET_ERROR) {
-            X_LOG0("TelemSrv", "send failed with error: %d", platform::WSAGetLastError());
-            return;
-        }
-    }
-
-    void sendConnectionRejected(ClientConnection& client, const char* pReason)
-    {
-        X_LOG0("TelemSrv", "ConnectionRejected:");
-
-        size_t msgLen = strlen(pReason);
-        size_t datalen = sizeof(ConnectionRequestRejectedHdr) + msgLen;
-
-        if (msgLen > MAX_STRING_LEN) {
-            msgLen = MAX_STRING_LEN;
-        }
-
-        char buf[sizeof(ConnectionRequestRejectedHdr) + MAX_STRING_LEN];
-
-        auto* pCr = reinterpret_cast<ConnectionRequestRejectedHdr*>(buf);
-        pCr->dataSize = static_cast<tt_uint16>(datalen);
-        pCr->type = PacketType::ConnectionRequestRejected;
-
-        memcpy(pCr + 1, pReason, msgLen);
-        sendDataToClient(client, buf, datalen);
-    }
-
-    bool handleDataSream(ClientConnection& client, uint8_t* pData)
-    {
-        auto* pHdr = reinterpret_cast<const DataStreamHdr*>(pData);
-        if (pHdr->type != PacketType::DataStream) {
-            X_ASSERT_UNREACHABLE();
-        }
-
-        // the data is compressed.
-        // decompress it..
-        int32_t cmpLen = pHdr->dataSize - sizeof(DataStreamHdr);
-        int32_t origLen = pHdr->origSize - sizeof(DataStreamHdr);
-        X_UNUSED(cmpLen);
-
-        if (cmpLen == origLen) {
-            // uncompressed packets.
-            X_ASSERT_NOT_IMPLEMENTED();
-        }
-
-        auto* pDst = &client.cmpRingBuf[client.cmpBufBegin];
-
-        int32_t cmpLenOut = static_cast<int32_t>(client.lz4DecodeStream.decompressContinue(pHdr + 1, pDst, origLen));
-        if (cmpLenOut != cmpLen) {
-            // TODO: ..
-            return false;
-        }
-
-        client.cmpBufBegin += origLen;
-        if (client.cmpBufBegin >= (COMPRESSION_RING_BUFFER_SIZE - COMPRESSION_MAX_INPUT_SIZE)) {
-            client.cmpBufBegin = 0;
-        }
-
-        auto& strm = client.traceBuilder;
-        sql::SqlLiteTransaction trans(strm.con);
-
-        // process this data?
-        for (int32 i = 0; i < origLen; )
-        {
-            // packet me baby!
-            auto* pPacket = reinterpret_cast<const DataPacketBase*>(&pDst[i]);
-
-            switch (pPacket->type)
-            {
-                case DataStreamType::StringTableAdd:
-                {
-                    i += strm.handleDataPacketStringTableAdd(reinterpret_cast<const DataPacketStringTableAdd*>(&pDst[i]));
-                    break;
-                }
-                case DataStreamType::Zone:
-                {
-                    i += strm.handleDataPacketZone(reinterpret_cast<const DataPacketZone*>(&pDst[i]));
-                    break;
-                }
-                case DataStreamType::TickInfo:
-                {
-                    i += strm.handleDataPacketTickInfo(reinterpret_cast<const DataPacketTickInfo*>(&pDst[i]));
-                    break;
-                }
-                case DataStreamType::ThreadSetName:
-                {
-                    i += strm.handleDataPacketThreadSetName(reinterpret_cast<const DataPacketThreadSetName*>(&pDst[i]));
-                    break;
-                }
-                case DataStreamType::CallStack:
-                {
-                    i += strm.handleDataPacketCallStack(reinterpret_cast<const DataPacketCallStack*>(&pDst[i]));
-                    break;
-                }
-                case DataStreamType::LockSetName:
-                {
-                    i += strm.handleDataPacketLockSetName(reinterpret_cast<const DataPacketLockSetName*>(&pDst[i]));
-                    break;
-                }
-                case DataStreamType::LockTry:
-                {
-                    i += strm.handleDataPacketLockTry(reinterpret_cast<const DataPacketLockTry*>(&pDst[i]));
-                    break;
-                }
-                case DataStreamType::LockState:
-                {
-                    i += strm.handleDataPacketLockState(reinterpret_cast<const DataPacketLockState*>(&pDst[i]));
-                    break;
-                }
-                case DataStreamType::LockCount:
-                {
-                    i += strm.handleDataPacketLockCount(reinterpret_cast<const DataPacketLockCount*>(&pDst[i]));
-                    break;
-                }
-                case DataStreamType::MemAlloc:
-                {
-                    i += strm.handleDataPacketMemAlloc(reinterpret_cast<const DataPacketMemAlloc*>(&pDst[i]));
-                    break;
-                }
-                case DataStreamType::MemFree:
-                {
-                    i += strm.handleDataPacketMemFree(reinterpret_cast<const DataPacketMemFree*>(&pDst[i]));
-                    break;
-                }
-                case DataStreamType::Message:
-                {
-                    i += strm.handleDataPacketMessage(reinterpret_cast<const DataPacketMessage*>(&pDst[i]));
-                    break;
-                }
-                case DataStreamType::Plot:
-                {
-                    i += strm.handleDataPacketPlot(reinterpret_cast<const DataPacketPlot*>(&pDst[i]));
-                    break;
-                }
-                case DataStreamType::PDB:
-                {
-                    i += strm.handleDataPacketPDB(reinterpret_cast<const DataPacketPDB*>(&pDst[i]));
-                    break;
-                }
-                default:
-                    X_NO_SWITCH_DEFAULT_ASSERT;
-            }
-        }
-
-        trans.commit();
-
-        return true;
-    }
+#endif
 
 
     template<typename T>
@@ -250,8 +98,1113 @@ namespace
     }
 
 
+    struct IOCPJobData
+    {
+        HANDLE hIOCP;
+    };
+
+    struct ProcessPacketJobData
+    {
+        uint8_t* pBuf;
+        int32_t length;
+    };
+
+
 } // namespace
 
+
+void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData)
+{
+    X_UNUSED(jobSys, threadIdx, pJob, pJobData);
+    auto* pPacketJobData = reinterpret_cast<ProcessPacketJobData*>(pJobData);
+    auto* pData = pPacketJobData->pBuf;
+
+    auto* pPacketHdr = reinterpret_cast<const PacketBase*>(pData);
+
+    bool res = false;
+
+    switch (pPacketHdr->type)
+    {
+        case PacketType::ConnectionRequest:
+            res = handleConnectionRequest(pData);
+        case PacketType::ConnectionRequestViewer:
+            res = handleConnectionRequestViewer(pData);
+        case PacketType::DataStream:
+            res = handleDataSream(pData);
+
+            // From viewer clients.
+        case PacketType::QueryTraceInfo:
+            res = handleQueryTraceInfo(pData);
+        case PacketType::OpenTrace:
+            res = handleOpenTrace(pData);
+
+        case PacketType::ReqTraceZoneSegment:
+            res = handleReqTraceZoneSegment(pData);
+        case PacketType::ReqTraceLocks:
+            res = handleReqTraceLocks(pData);
+        case PacketType::ReqTraceStrings:
+            res = handleReqTraceStrings(pData);
+        case PacketType::ReqTraceThreadNames:
+            res = handleReqTraceThreadNames(pData);
+        case PacketType::ReqTraceLockNames:
+            res = handleReqTraceLockNames(pData);
+        case PacketType::ReqTraceZoneTree:
+            res = handleReqTraceZoneTree(pData);
+
+        default:
+            X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
+    }
+
+    if (!res) {
+        X_ERROR("TelemSrv", "Error processing packet");
+    }
+}
+
+
+bool ClientConnection::handleConnectionRequest(uint8_t* pData)
+{
+    auto* pConReq = reinterpret_cast<const ConnectionRequestHdr*>(pData);
+    if (pConReq->type != PacketType::ConnectionRequest) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    VersionInfo serverVer;
+    serverVer.major = TELEM_VERSION_MAJOR;
+    serverVer.minor = TELEM_VERSION_MINOR;
+    serverVer.patch = TELEM_VERSION_PATCH;
+    serverVer.build = TELEM_VERSION_BUILD;
+
+    if (pConReq->clientVer != serverVer) {
+        sendConnectionRejected("Client server version incompatible");
+        return false;
+    }
+    if (pConReq->appNameLen < 1) {
+        sendConnectionRejected("Invalid app name");
+        return false;
+    }
+
+    clientVer_ = pConReq->clientVer;
+
+    auto* pStrData = reinterpret_cast<const char*>(pConReq + 1);
+    auto* pAppNameStr = pStrData;
+    auto* pBuildInfoStr = pAppNameStr + pConReq->appNameLen;
+    auto* pCmdLineStr = pBuildInfoStr + pConReq->buildInfoLen;
+
+    // Get the app name and see if we have it already.
+    TelemFixedStr appName;
+    appName.set(pAppNameStr, pAppNameStr + pConReq->appNameLen);
+
+    // Create a new trace 
+    Trace trace;
+    trace.guid = core::Guid::newGuid();
+    trace.buildInfo.assign(pBuildInfoStr, pConReq->buildInfoLen);
+    trace.cmdLine.assign(pCmdLineStr, pConReq->cmdLineLen);
+    trace.ticksPerMicro = pConReq->ticksPerMicro;
+    trace.ticksPerMs = pConReq->ticksPerMs;
+
+    core::Path<> workingDir;
+    if (!gEnv->pFileSys->getWorkingDirectory(workingDir)) {
+        return false;
+    }
+
+    core::DateTimeStamp date = core::DateTimeStamp::getSystemDateTime();
+    core::DateTimeStamp::Description dateStr;
+
+    core::Path<> dbPath(workingDir);
+    // want a folder for each app.
+    dbPath.ensureSlash();
+    dbPath.append("traces");
+    dbPath.ensureSlash();
+    dbPath.append(appName.begin(), appName.end());
+    dbPath.ensureSlash();
+
+    if (!gEnv->pFileSys->directoryExists(dbPath, core::VirtualDirectory::BASE)) {
+        if (!gEnv->pFileSys->createDirectoryTree(dbPath, core::VirtualDirectory::BASE)) {
+            return false;
+        }
+    }
+
+    // add filename,
+    core::Guid::GuidStr guidStr;
+
+    dbPath.append("telem_");
+    dbPath.append(date.toString(dateStr));
+    dbPath.append("_");
+    dbPath.append(trace.guid.toString(guidStr));
+    dbPath.setExtension("db");
+
+
+    trace.dbPath = dbPath;
+    trace.hostName.assign(host_.begin(), host_.end());
+
+    // open a trace stream for the conneciton.
+    auto& strm = traceBuilder_;
+    if (!strm.createDB(dbPath)) {
+        return false;
+    }
+
+    bool setMeta = true;
+
+    VersionInfo::Description verStr;
+    setMeta &= strm.setMeta("guid", trace.guid.toString(guidStr));
+    setMeta &= strm.setMeta("appName", core::string_view(appName));
+    setMeta &= strm.setMeta("hostName", core::string_view(host_));
+    setMeta &= strm.setMeta("buildInfo", trace.buildInfo);
+    setMeta &= strm.setMeta("cmdLine", trace.cmdLine);
+    setMeta &= strm.setMeta("dateStamp", dateStr);
+    setMeta &= strm.setMeta("clientVer", clientVer_.toString(verStr));
+    setMeta &= strm.setMeta("serverVer", serverVer.toString(verStr));
+    setMeta &= strm.setMeta<int64_t>("tickPerMicro", static_cast<int64_t>(trace.ticksPerMicro));
+    setMeta &= strm.setMeta<int64_t>("tickPerMs", static_cast<int64_t>(trace.ticksPerMs));
+
+    if (!setMeta) {
+        return false;
+    }
+
+    srv_.addTraceForApp(appName, trace);
+
+    // Meow...
+    X_LOG0("TelemSrv", "ConnectionAccepted:");
+    X_LOG0("TelemSrv", "> AppName: %s", appName.c_str());
+    X_LOG0("TelemSrv", "> BuildInfo: %s", trace.buildInfo.c_str());
+    X_LOG0("TelemSrv", "> CmdLine: %s", trace.cmdLine.c_str());
+    X_LOG0("TelemSrv", "> DB: %s", dbPath.c_str());
+
+    // send a packet back!
+    ConnectionRequestAcceptedHdr cra;
+    core::zero_object(cra);
+    cra.dataSize = sizeof(cra);
+    cra.type = PacketType::ConnectionRequestAccepted;
+    cra.serverVer = serverVer;
+
+    sendDataToClient(&cra, sizeof(cra));
+
+    X_ASSERT(type_ == ClientType::Unknown, "Client type already set")(type_);
+    type_ = ClientType::TraceStream;
+    return true;
+}
+
+
+
+bool ClientConnection::handleConnectionRequestViewer(uint8_t* pData)
+{
+    auto* pConReq = reinterpret_cast<const ConnectionRequestViewerHdr*>(pData);
+    if (pConReq->type != PacketType::ConnectionRequestViewer) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    VersionInfo serverVer;
+    serverVer.major = TELEM_VERSION_MAJOR;
+    serverVer.minor = TELEM_VERSION_MINOR;
+    serverVer.patch = TELEM_VERSION_PATCH;
+    serverVer.build = TELEM_VERSION_BUILD;
+
+    if (pConReq->viewerVer != serverVer) {
+        sendConnectionRejected("Viewer version incompatible with server");
+        return false;
+    }
+
+    clientVer_ = pConReq->viewerVer;
+
+    // Meow...
+    X_LOG0("TelemSrv", "ConnectionAccepted(Viewer):");
+
+    // send a packet back!
+    ConnectionRequestAcceptedHdr cra;
+    core::zero_object(cra);
+    cra.dataSize = sizeof(cra);
+    cra.type = PacketType::ConnectionRequestAccepted;
+    cra.serverVer = serverVer;
+
+    sendDataToClient(&cra, sizeof(cra));
+    
+    // send them some data.
+#if 0
+    if (!sendAppList(*this)) {
+        X_LOG0("TelemSrv", "Error sending app list to client");
+    }
+#endif
+
+    X_ASSERT(type_ == ClientType::Unknown, "Client type already set")(type_);
+    type_ = ClientType::Viewer;
+    return true;
+}
+
+
+bool ClientConnection::handleDataSream(uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const DataStreamHdr*>(pData);
+    if (pHdr->type != PacketType::DataStream) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    // the data is compressed.
+    // decompress it..
+    int32_t cmpLen = pHdr->dataSize - sizeof(DataStreamHdr);
+    int32_t origLen = pHdr->origSize - sizeof(DataStreamHdr);
+    X_UNUSED(cmpLen);
+
+    if (cmpLen == origLen) {
+        // uncompressed packets.
+        X_ASSERT_NOT_IMPLEMENTED();
+    }
+
+    auto* pDst = &cmpRingBuf_[cmpBufBegin_];
+
+    int32_t cmpLenOut = static_cast<int32_t>(lz4DecodeStream_.decompressContinue(pHdr + 1, pDst, origLen));
+    if (cmpLenOut != cmpLen) {
+        // TODO: ..
+        return false;
+    }
+
+    cmpBufBegin_ += origLen;
+    if (cmpBufBegin_ >= (COMPRESSION_RING_BUFFER_SIZE - COMPRESSION_MAX_INPUT_SIZE)) {
+        cmpBufBegin_ = 0;
+    }
+
+    auto& strm = traceBuilder_;
+    sql::SqlLiteTransaction trans(strm.con);
+
+    // process this data?
+    for (int32 i = 0; i < origLen; )
+    {
+        // packet me baby!
+        auto* pPacket = reinterpret_cast<const DataPacketBase*>(&pDst[i]);
+
+        switch (pPacket->type)
+        {
+            case DataStreamType::StringTableAdd:
+            {
+                i += strm.handleDataPacketStringTableAdd(reinterpret_cast<const DataPacketStringTableAdd*>(&pDst[i]));
+                break;
+            }
+            case DataStreamType::Zone:
+            {
+                i += strm.handleDataPacketZone(reinterpret_cast<const DataPacketZone*>(&pDst[i]));
+                break;
+            }
+            case DataStreamType::TickInfo:
+            {
+                i += strm.handleDataPacketTickInfo(reinterpret_cast<const DataPacketTickInfo*>(&pDst[i]));
+                break;
+            }
+            case DataStreamType::ThreadSetName:
+            {
+                i += strm.handleDataPacketThreadSetName(reinterpret_cast<const DataPacketThreadSetName*>(&pDst[i]));
+                break;
+            }
+            case DataStreamType::CallStack:
+            {
+                i += strm.handleDataPacketCallStack(reinterpret_cast<const DataPacketCallStack*>(&pDst[i]));
+                break;
+            }
+            case DataStreamType::LockSetName:
+            {
+                i += strm.handleDataPacketLockSetName(reinterpret_cast<const DataPacketLockSetName*>(&pDst[i]));
+                break;
+            }
+            case DataStreamType::LockTry:
+            {
+                i += strm.handleDataPacketLockTry(reinterpret_cast<const DataPacketLockTry*>(&pDst[i]));
+                break;
+            }
+            case DataStreamType::LockState:
+            {
+                i += strm.handleDataPacketLockState(reinterpret_cast<const DataPacketLockState*>(&pDst[i]));
+                break;
+            }
+            case DataStreamType::LockCount:
+            {
+                i += strm.handleDataPacketLockCount(reinterpret_cast<const DataPacketLockCount*>(&pDst[i]));
+                break;
+            }
+            case DataStreamType::MemAlloc:
+            {
+                i += strm.handleDataPacketMemAlloc(reinterpret_cast<const DataPacketMemAlloc*>(&pDst[i]));
+                break;
+            }
+            case DataStreamType::MemFree:
+            {
+                i += strm.handleDataPacketMemFree(reinterpret_cast<const DataPacketMemFree*>(&pDst[i]));
+                break;
+            }
+            case DataStreamType::Message:
+            {
+                i += strm.handleDataPacketMessage(reinterpret_cast<const DataPacketMessage*>(&pDst[i]));
+                break;
+            }
+            case DataStreamType::Plot:
+            {
+                i += strm.handleDataPacketPlot(reinterpret_cast<const DataPacketPlot*>(&pDst[i]));
+                break;
+            }
+            case DataStreamType::PDB:
+            {
+                i += strm.handleDataPacketPDB(reinterpret_cast<const DataPacketPDB*>(&pDst[i]));
+                break;
+            }
+            default:
+                X_NO_SWITCH_DEFAULT_ASSERT;
+        }
+    }
+
+    trans.commit();
+    return true;
+}
+
+
+bool ClientConnection::handleQueryTraceInfo(uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const QueryTraceInfo*>(pData);
+    if (pHdr->type != PacketType::QueryTraceInfo) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+
+    // you silly goat.
+    return true;
+}
+
+bool ClientConnection::handleOpenTrace(uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const OpenTrace*>(pData);
+    if (pHdr->type != PacketType::OpenTrace) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+   
+    return true;
+}
+
+
+
+
+X_DISABLE_WARNING(4701) // potentially uninitialized local variable 'tick' used
+
+
+bool ClientConnection::handleReqTraceZoneSegment(uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const ReqTraceZoneSegment*>(pData);
+    if (pHdr->type != PacketType::ReqTraceZoneSegment) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    // MEOW
+    // load me the ticks!
+    int32_t handle = pHdr->handle;
+    if (handle < 0 || handle >= static_cast<int32_t>(traces_.size())) {
+        return false;
+    }
+
+    auto& ts = traces_[pHdr->handle];
+    DataPacketTickInfo startTick;
+    DataPacketTickInfo endTick;
+
+    {
+        auto* pTickHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespTicks>();
+        pTickHdr->type = DataStreamTypeViewer::TraceZoneSegmentTicks;
+        pTickHdr->num = 0;
+        pTickHdr->handle = pHdr->handle;
+
+        auto begin = ts.pTrace->nanoToTicks(pHdr->startNano);
+        auto end = ts.pTrace->nanoToTicks(pHdr->endNano);
+
+        sql::SqlLiteQuery qry(ts.con, "SELECT threadId, startTick, endTick, startNano, endNano FROM ticks WHERE startTick >= ? AND startTick < ?");
+        qry.bind(1, begin);
+        qry.bind(2, end);
+
+        auto it = qry.begin();
+        if (it == qry.end()) {
+            // none
+        }
+
+        DataPacketTickInfo tick;
+        int32_t numTicks = 0;
+
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            tick.type = DataStreamType::TickInfo;
+            tick.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
+            tick.start = static_cast<uint64_t>(row.get<int64_t>(1));
+            tick.end = static_cast<uint64_t>(row.get<int64_t>(2));
+            tick.startNano = static_cast<uint64_t>(row.get<int64_t>(3));
+            tick.endNano = static_cast<uint64_t>(row.get<int64_t>(4));
+
+            if (getCompressionBufferSpace() < sizeof(tick))
+            {
+                // flush etc and add new block header.
+                pTickHdr->num = numTicks;
+                flushCompressionBuffer();
+
+                pTickHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespTicks>();
+                pTickHdr->type = DataStreamTypeViewer::TraceZoneSegmentTicks;
+                pTickHdr->num = 0;
+                pTickHdr->handle = pHdr->handle;
+
+                numTicks = 0;
+            }
+
+            addToCompressionBuffer(&tick, sizeof(tick));
+
+            if (numTicks == 0) {
+                startTick = tick;
+            }
+
+            ++numTicks;
+        }
+
+        if (numTicks == 0)
+        {
+            X_ASSERT_NOT_IMPLEMENTED();
+        }
+
+        // if startTick == endTick it don't matter
+        endTick = tick;
+
+        // flush the tick headers.
+        pTickHdr->num = numTicks;
+        flushCompressionBuffer();
+    }
+
+
+    auto start = startTick.start;
+    auto end = endTick.end;
+
+    {
+
+        // so on the client i need to handle overlapping zones.
+        // if we just take every zone that starts in the tick and draw it should be okay even if it overlaps.
+        // we should still be able to pick it.
+        auto* pZonesHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespZones>();
+        pZonesHdr->type = DataStreamTypeViewer::TraceZoneSegmentZones;
+        pZonesHdr->num = 0;
+        pZonesHdr->handle = pHdr->handle;
+
+        int32_t numZones = 0;
+
+        sql::SqlLiteQuery qry(ts.con, "SELECT threadId, startTick, endTick, packedSourceInfo, strIdx FROM zones WHERE startTick >= ? AND startTick < ?");
+        qry.bind(1, static_cast<int64_t>(start));
+        qry.bind(2, static_cast<int64_t>(end));
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            DataPacketZone zone;
+            zone.type = DataStreamType::Zone;
+            zone.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
+            zone.start = static_cast<uint64_t>(row.get<int64_t>(1));
+            zone.end = static_cast<uint64_t>(row.get<int64_t>(2));
+
+            TraceBuilder::PackedSourceInfo info;
+            info.packed = static_cast<uint64_t>(row.get<int64_t>(3));
+
+            zone.lineNo = info.raw.lineNo;
+            zone.strIdxFunction = info.raw.idxFunction;
+            zone.strIdxFile = info.raw.idxFile;
+            zone.stackDepth = static_cast<uint8_t>(info.raw.depth & 0xFF);
+
+            // TODO: support sending 32bit id to viewer.
+            zone.strIdxFmt = static_cast<uint16_t>(row.get<int32_t>(4) & 0xFFFF);
+
+            if (getCompressionBufferSpace() < sizeof(zone))
+            {
+                // flush etc and add new block header.
+                pZonesHdr->num = numZones;
+                flushCompressionBuffer();
+
+                pZonesHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespZones>();
+                pZonesHdr->type = DataStreamTypeViewer::TraceZoneSegmentZones;
+                pZonesHdr->num = 0;
+                pZonesHdr->handle = pHdr->handle;
+
+                numZones = 0;
+            }
+
+            addToCompressionBuffer(&zone, sizeof(zone));
+
+            ++numZones;
+        }
+
+        if (numZones) {
+            pZonesHdr->num = numZones;
+            flushCompressionBuffer();
+        }
+    }
+
+    {
+        sql::SqlLiteQuery qry(ts.con, "SELECT lockId, threadId, startTick, endTick, result, packedSourceInfo, strIdx FROM lockTry WHERE startTick >= ? AND startTick < ?");
+        qry.bind(1, static_cast<int64_t>(start));
+        qry.bind(2, static_cast<int64_t>(end));
+
+        auto* pLockTryHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespLockTry>();
+        pLockTryHdr->type = DataStreamTypeViewer::TraceZoneSegmentLockTry;
+        pLockTryHdr->num = 0;
+        pLockTryHdr->handle = pHdr->handle;
+
+        int32_t numLockTry = 0;
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            DataPacketLockTry lockTry;
+            lockTry.type = DataStreamType::LockTry;
+            lockTry.lockHandle = static_cast<uint64_t>(row.get<int64_t>(0));
+            lockTry.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
+            lockTry.start = static_cast<uint64_t>(row.get<int64_t>(2));
+            lockTry.end = static_cast<uint64_t>(row.get<int64_t>(3));
+            lockTry.result = static_cast<TtLockResult::Enum>(row.get<int32_t>(4));
+
+            TraceBuilder::PackedSourceInfo info;
+            info.packed = static_cast<uint64_t>(row.get<int64_t>(5));
+
+            lockTry.lineNo = info.raw.lineNo;
+            lockTry.strIdxFunction = info.raw.idxFunction;
+            lockTry.strIdxFile = info.raw.idxFile;
+            lockTry.depth = static_cast<uint8_t>(info.raw.depth & 0xFF);
+
+            // TODO: support sending 32bit id to viewer.
+            lockTry.strIdxFmt = static_cast<uint16_t>(row.get<int32_t>(6) & 0xFFFF);
+
+            if (getCompressionBufferSpace() < sizeof(lockTry))
+            {
+                // flush etc and add new block header.
+                pLockTryHdr->num = numLockTry;
+                flushCompressionBuffer();
+
+                pLockTryHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespLockTry>();
+                pLockTryHdr->type = DataStreamTypeViewer::TraceZoneSegmentLockTry;
+                pLockTryHdr->num = 0;
+                pLockTryHdr->handle = pHdr->handle;
+
+                numLockTry = 0;
+            }
+
+            addToCompressionBuffer(&lockTry, sizeof(lockTry));
+
+            ++numLockTry;
+        }
+
+        if (numLockTry) {
+            pLockTryHdr->num = numLockTry;
+            flushCompressionBuffer();
+        }
+    }
+
+    {
+        // lockStates?
+        sql::SqlLiteQuery qry(ts.con, "SELECT lockId, threadId, timeTicks, state, packedSourceInfo FROM lockStates WHERE timeTicks >= ? AND timeTicks < ?");
+        qry.bind(1, static_cast<int64_t>(start));
+        qry.bind(2, static_cast<int64_t>(end));
+
+        auto* pLockStateHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespLockStates>();
+        pLockStateHdr->type = DataStreamTypeViewer::TraceZoneSegmentLockStates;
+        pLockStateHdr->num = 0;
+        pLockStateHdr->handle = pHdr->handle;
+
+        int32_t numLockState = 0;
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            DataPacketLockState lockState;
+            lockState.type = DataStreamType::LockState;
+            lockState.lockHandle = static_cast<uint64_t>(row.get<int64_t>(0));
+            lockState.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
+            lockState.time = static_cast<uint64_t>(row.get<int64_t>(2));
+            lockState.state = static_cast<TtLockState::Enum>(row.get<int32_t>(3));
+
+            TraceBuilder::PackedSourceInfo info;
+            info.packed = static_cast<uint64_t>(row.get<int64_t>(4));
+
+            lockState.lineNo = info.raw.lineNo;
+            lockState.strIdxFunction = info.raw.idxFunction;
+            lockState.strIdxFile = info.raw.idxFile;
+
+            if (getCompressionBufferSpace() < sizeof(lockState))
+            {
+                // flush etc and add new block header.
+                pLockStateHdr->num = numLockState;
+                flushCompressionBuffer();
+
+                pLockStateHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespLockStates>();
+                pLockStateHdr->type = DataStreamTypeViewer::TraceZoneSegmentLockStates;
+                pLockStateHdr->num = 0;
+                pLockStateHdr->handle = pHdr->handle;
+
+                numLockState = 0;
+            }
+
+            addToCompressionBuffer(&lockState, sizeof(lockState));
+
+            ++numLockState;
+        }
+
+        if (numLockState) {
+            pLockStateHdr->num = numLockState;
+            flushCompressionBuffer();
+        }
+    }
+
+    X_ASSERT(getCompressionBufferSize() == 0, "Compression buffer is not empty")();
+    return true;
+}
+
+X_ENABLE_WARNING(4701)
+
+
+bool ClientConnection::handleReqTraceLocks(uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const ReqTraceLocks*>(pData);
+    if (pHdr->type != PacketType::ReqTraceLocks) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    int32_t handle = pHdr->handle;
+    if (handle < 0 || handle >= static_cast<int32_t>(traces_.size())) {
+        return false;
+    }
+
+    auto& ts = traces_[pHdr->handle];
+
+    auto* pLocksHdr = addToCompressionBufferT<ReqTraceLocksResp>();
+    pLocksHdr->type = DataStreamTypeViewer::TraceLocks;
+    pLocksHdr->handle = pHdr->handle;
+
+    int32_t num = 0;
+
+    sql::SqlLiteQuery qry(ts.con, "SELECT id FROM locks");
+
+    auto it = qry.begin();
+    for (; it != qry.end(); ++it) {
+        auto row = *it;
+
+        TraceLockData tld;
+        tld.id = static_cast<uint64_t>(row.get<int64_t>(0));
+
+        if (getCompressionBufferSpace() < sizeof(tld)) {
+            pLocksHdr->num = num;
+            num = 0;
+
+            flushCompressionBuffer();
+
+            pLocksHdr = addToCompressionBufferT<ReqTraceLocksResp>();
+            pLocksHdr->type = DataStreamTypeViewer::TraceLocks;
+            pLocksHdr->handle = pHdr->handle;
+        }
+
+        addToCompressionBuffer(&tld, sizeof(tld));
+
+        num++;
+    }
+
+    if (num) {
+        pLocksHdr->num = num;
+        flushCompressionBuffer();
+    }
+    return true;
+}
+
+bool ClientConnection::handleReqTraceStrings(uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const ReqTraceStrings*>(pData);
+    if (pHdr->type != PacketType::ReqTraceStrings) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    int32_t handle = pHdr->handle;
+    if (handle < 0 || handle >= static_cast<int32_t>(traces_.size())) {
+        return false;
+    }
+
+    auto& ts = traces_[pHdr->handle];
+
+    ReqTraceStringsRespInfo info;
+    info.type = DataStreamTypeViewer::TraceStringsInfo;
+    info.handle = pHdr->handle;
+
+    {
+        // lets just count it will be cheap.    
+        // TODO: pretty easy to calculate this in ingest if it becomes slow.
+        sql::SqlLiteQuery qry(ts.con, "SELECT COUNT(_rowid_), SUM(LENGTH(value)), MIN(Id), MAX(Id) FROM strings");
+        auto it = qry.begin();
+        if (it == qry.end()) {
+            X_ERROR("TelemSrv", "Failed to load string count");
+            return false;
+        }
+
+        info.num = (*it).get<int32_t>(0);
+        info.strDataSize = (*it).get<int32_t>(1);
+        info.minId = (*it).get<int32_t>(2);
+        info.maxId = (*it).get<int32_t>(3);
+    }
+
+    addToCompressionBuffer(&info, sizeof(info));
+
+    // TODO: hack until client can handle multiple per packet
+    flushCompressionBuffer();
+
+    auto* pStringsHdr = addToCompressionBufferT<ReqTraceStringsResp>();
+    core::zero_this(pStringsHdr);
+    pStringsHdr->type = DataStreamTypeViewer::TraceStrings;
+    pStringsHdr->handle = pHdr->handle;
+
+    int32_t num = 0;
+
+    if (info.num > 0)
+    {
+        sql::SqlLiteQuery qry(ts.con, "SELECT id, value FROM strings");
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            int32_t id = row.get<int32_t>(0);
+            int32_t strLen = row.columnBytes(1);
+            const char* pStr = row.get<const char*>(1);
+
+            TraceStringHdr strHdr;
+            strHdr.id = static_cast<uint16_t>(id);
+            strHdr.length = static_cast<uint16_t>(strLen);
+
+            if (getCompressionBufferSpace() < static_cast<int32_t>(sizeof(strHdr)) + strLen)
+            {
+                pStringsHdr->num = num;
+                num = 0;
+
+                flushCompressionBuffer();
+
+                pStringsHdr = addToCompressionBufferT<ReqTraceStringsResp>();
+                core::zero_this(pStringsHdr);
+                pStringsHdr->type = DataStreamTypeViewer::TraceStrings;
+                pStringsHdr->handle = pHdr->handle;
+            }
+
+            addToCompressionBuffer(&strHdr, sizeof(strHdr));
+            addToCompressionBuffer(pStr, strLen);
+
+            num++;
+        }
+
+        if (num) {
+            pStringsHdr->num = num;
+            flushCompressionBuffer();
+        }
+    }
+
+    X_ASSERT(getCompressionBufferSize() == 0, "Compression buffer is not empty")();
+    return true;
+}
+
+bool ClientConnection::handleReqTraceThreadNames(uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const ReqTraceThreadNames*>(pData);
+    if (pHdr->type != PacketType::ReqTraceThreadNames) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    int32_t handle = pHdr->handle;
+    if (handle < 0 || handle >= static_cast<int32_t>(traces_.size())) {
+        return false;
+    }
+
+    auto& ts = traces_[pHdr->handle];
+
+    auto* pNamesHdr = addToCompressionBufferT<ReqTraceThreadNamesResp>();
+    core::zero_this(pNamesHdr);
+    pNamesHdr->type = DataStreamTypeViewer::TraceThreadNames;
+    pNamesHdr->handle = pHdr->handle;
+
+    int32_t num = 0;
+
+    sql::SqlLiteQuery qry(ts.con, "SELECT threadId, timeTicks, strIdx FROM threadNames");
+
+    auto it = qry.begin();
+    for (; it != qry.end(); ++it) {
+        auto row = *it;
+
+        TraceThreadNameData tnd;
+        tnd.threadId = row.get<int32_t>(0);
+        tnd.timeTicks = row.get<int64_t>(1);
+        tnd.strIdx = safe_static_cast<uint16_t>(row.get<int32_t>(2));
+
+        if (getCompressionBufferSpace() < sizeof(tnd)) {
+            pNamesHdr->num = num;
+            num = 0;
+
+            flushCompressionBuffer();
+
+            pNamesHdr = addToCompressionBufferT<ReqTraceThreadNamesResp>();
+            core::zero_this(pNamesHdr);
+            pNamesHdr->type = DataStreamTypeViewer::TraceThreadNames;
+            pNamesHdr->handle = pHdr->handle;
+        }
+
+        addToCompressionBuffer(&tnd, sizeof(tnd));
+
+        num++;
+    }
+
+    if (num) {
+        pNamesHdr->num = num;
+        flushCompressionBuffer();
+    }
+
+    return true;
+}
+
+bool ClientConnection::handleReqTraceLockNames(uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const ReqTraceLockNames*>(pData);
+    if (pHdr->type != PacketType::ReqTraceLockNames) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    int32_t handle = pHdr->handle;
+    if (handle < 0 || handle >= static_cast<int32_t>(traces_.size())) {
+        return false;
+    }
+
+    auto& ts = traces_[pHdr->handle];
+
+    auto* pNamesHdr = addToCompressionBufferT<ReqTraceLockNamesResp>();
+    core::zero_this(pNamesHdr);
+    pNamesHdr->type = DataStreamTypeViewer::TraceLockNames;
+    pNamesHdr->handle = pHdr->handle;
+
+    int32_t num = 0;
+
+    sql::SqlLiteQuery qry(ts.con, "SELECT lockId, timeTicks, strIdx FROM lockNames");
+
+    auto it = qry.begin();
+    for (; it != qry.end(); ++it) {
+        auto row = *it;
+
+        TraceLockNameData lnd;
+        lnd.lockId = static_cast<uint64_t>(row.get<int64_t>(0));
+        lnd.timeTicks = row.get<int64_t>(1);
+        lnd.strIdx = safe_static_cast<uint16_t>(row.get<int32_t>(2));
+
+        if (getCompressionBufferSpace() < sizeof(lnd)) {
+            pNamesHdr->num = num;
+            num = 0;
+
+            flushCompressionBuffer();
+
+            pNamesHdr = addToCompressionBufferT<ReqTraceLockNamesResp>();
+            core::zero_this(pNamesHdr);
+            pNamesHdr->type = DataStreamTypeViewer::TraceLockNames;
+            pNamesHdr->handle = pHdr->handle;
+        }
+
+        addToCompressionBuffer( &lnd, sizeof(lnd));
+
+        num++;
+    }
+
+    if (num) {
+        pNamesHdr->num = num;
+        flushCompressionBuffer();
+    }
+
+    return true;
+}
+
+
+bool ClientConnection::handleReqTraceZoneTree(uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const ReqTraceZoneTree*>(pData);
+    if (pHdr->type != PacketType::ReqTraceZoneTree) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    int32_t handle = pHdr->handle;
+    if (handle < 0 || handle >= static_cast<int32_t>(traces_.size())) {
+        return false;
+    }
+
+    auto& ts = traces_[pHdr->handle];
+
+    auto* pTreeHdr = addToCompressionBufferT<ReqTraceZoneTreeResp>();
+    core::zero_this(pTreeHdr);
+    pTreeHdr->type = DataStreamTypeViewer::TraceZoneTree;
+    pTreeHdr->handle = pHdr->handle;
+
+    int32_t num = 0;
+
+    sql::SqlLiteQuery qry(ts.con, "SELECT parentId, totalTick, strIdx FROM zoneNodes WHERE setId = ?");
+    qry.bind(1, pHdr->frameIdx);
+
+    auto it = qry.begin();
+    for (; it != qry.end(); ++it) {
+        auto row = *it;
+
+        TraceZoneTreeData ztd;
+        ztd.parentId = row.get<int32_t>(0);
+        ztd.totalTicks = row.get<int64_t>(1);
+        ztd.strIdx = safe_static_cast<uint32_t>(row.get<int32_t>(2));
+
+        if (getCompressionBufferSpace() < sizeof(ztd)) {
+            pTreeHdr->num = num;
+            num = 0;
+
+            flushCompressionBuffer();
+
+            pTreeHdr = addToCompressionBufferT<ReqTraceZoneTreeResp>();
+            core::zero_this(pTreeHdr);
+            pTreeHdr->type = DataStreamTypeViewer::TraceZoneTree;
+            pTreeHdr->handle = pHdr->handle;
+        }
+
+        addToCompressionBuffer(&ztd, sizeof(ztd));
+
+        num++;
+    }
+
+    if (num) {
+        pTreeHdr->num = num;
+        flushCompressionBuffer();
+    }
+
+    return true;
+}
+
+void ClientConnection::sendDataToClient(const void* pData, size_t len)
+{
+    // send some data...
+    int res = platform::send(socket_, reinterpret_cast<const char*>(pData), static_cast<int>(len), 0);
+    if (res == SOCKET_ERROR) {
+        X_LOG0("TelemSrv", "send failed with error: %d", platform::WSAGetLastError());
+    }
+}
+
+void ClientConnection::sendConnectionRejected(const char* pReason)
+{
+    X_LOG0("TelemSrv", "ConnectionRejected:");
+
+    size_t msgLen = strlen(pReason);
+    size_t datalen = sizeof(ConnectionRequestRejectedHdr) + msgLen;
+
+    if (msgLen > MAX_STRING_LEN) {
+        msgLen = MAX_STRING_LEN;
+    }
+
+    char buf[sizeof(ConnectionRequestRejectedHdr) + MAX_STRING_LEN];
+
+    auto* pCr = reinterpret_cast<ConnectionRequestRejectedHdr*>(buf);
+    pCr->dataSize = static_cast<tt_uint16>(datalen);
+    pCr->type = PacketType::ConnectionRequestRejected;
+
+    memcpy(pCr + 1, pReason, msgLen);
+    sendDataToClient(buf, datalen);
+}
+
+
+void ClientConnection::flushCompressionBuffer(void)
+{
+    // compress it.
+    const auto* pInBegin = &cmpRingBuf_[cmpBufBegin_];
+    const size_t inBytes = cmpBufEnd_ - cmpBufBegin_;
+
+#if X_DEBUG
+    if (inBytes > COMPRESSION_MAX_INPUT_SIZE) {
+        ::DebugBreak();
+    }
+#endif // X_DEBUG
+
+    if (inBytes == 0) {
+        return;
+    }
+
+    constexpr size_t cmpBufSize = core::Compression::LZ4Stream::requiredDeflateDestBuf(COMPRESSION_MAX_INPUT_SIZE);
+    char cmpBuf[cmpBufSize + sizeof(DataStreamHdr)];
+
+    const size_t cmpBytes = lz4Stream_.compressContinue(
+        pInBegin, inBytes,
+        cmpBuf + sizeof(DataStreamHdr), cmpBufSize,
+        core::Compression::CompressLevel::NORMAL
+    );
+
+    if (cmpBytes <= 0) {
+        // TODO: error.
+    }
+
+    const size_t totalLen = cmpBytes + sizeof(DataStreamHdr);
+
+    DataStreamHdr* pHdr = reinterpret_cast<DataStreamHdr*>(cmpBuf);
+
+    // patch the length 
+    pHdr->type = PacketType::DataStream;
+    pHdr->dataSize = static_cast<tt_uint16>(totalLen);
+    pHdr->origSize = static_cast<tt_uint16>(inBytes + sizeof(DataStreamHdr));
+
+    sendDataToClient(cmpBuf, totalLen);
+
+    cmpBufBegin_ = cmpBufEnd_;
+    if ((sizeof(cmpRingBuf_) - cmpBufBegin_) < COMPRESSION_MAX_INPUT_SIZE) {
+        cmpBufBegin_ = 0;
+        cmpBufEnd_ = 0;
+    }
+}
+
+X_INLINE int32_t ClientConnection::getCompressionBufferSize(void)
+{
+    return cmpBufEnd_ - cmpBufBegin_;
+}
+
+X_INLINE int32_t ClientConnection::getCompressionBufferSpace(void) const
+{
+    const int32_t space = COMPRESSION_MAX_INPUT_SIZE - (cmpBufEnd_ - cmpBufBegin_);
+
+    return space;
+}
+
+void ClientConnection::addToCompressionBuffer(const void* pData, int32_t len)
+{
+#if X_DEBUG
+    if (len > COMPRESSION_MAX_INPUT_SIZE) {
+        ::DebugBreak();
+    }
+#endif // X_DEBUG
+
+    // can we fit this data?
+    const int32_t space = getCompressionBufferSpace();
+    if (space < len) {
+        flushCompressionBuffer();
+    }
+
+    memcpy(&cmpRingBuf_[cmpBufEnd_], pData, len);
+    cmpBufEnd_ += len;
+}
+
+template<typename T>
+T* ClientConnection::addToCompressionBufferT(void)
+{
+#if X_DEBUG
+    if constexpr (sizeof(T) > COMPRESSION_MAX_INPUT_SIZE) {
+        ::DebugBreak();
+    }
+#endif // X_DEBUG
+
+    // can we fit this data?
+    const int32_t space = getCompressionBufferSpace();
+    if (space < sizeof(T)) {
+        flushCompressionBuffer();
+    }
+
+    static_assert(std::is_trivially_copyable_v<T>, "T is not trivially copyable");
+
+    T* pPtr = reinterpret_cast<T*>(&cmpRingBuf_[cmpBufEnd_]);
+    cmpBufEnd_ += sizeof(T);
+    return pPtr;
+}
+
+
+
+// ----------------------------------------------
 
 ZoneTree::ZoneTree() :
     root_(core::string_view("root")),
@@ -963,6 +1916,12 @@ inline void TraceBuilder::accumulateZoneData(const StringBuf& buf, int32_t strId
 {
     X_UNUSED(strIdx);
 
+    // so we need like a FIFO queue
+    // and we dump zones for that frame into it.
+    // problem is need to handle overlap?
+    // fuck.
+    // need to think some more...
+
     zoneTree_.addZone(buf, pData);
 }
 
@@ -1300,6 +2259,47 @@ Server::Server(core::MemoryArenaBase* arena) :
     if (!winSockInit()) {
      
     }
+
+#if 0
+    DataPacketZone zone;
+    zone.start = 0;
+    zone.end = 1000;
+
+    StringBuf str;
+
+    ZoneTree tree;
+
+    str.set("(goat/boat/moat)");
+    tree.addZone(str, &zone);
+
+    str.set("(goat/moat)");
+    tree.addZone(str, &zone);
+
+    str.set("(goat)");
+    tree.addZone(str, &zone);
+
+    str.set("(goat/pickle)");
+    tree.addZone(str, &zone);
+
+    str.set("(goat/meow?)");
+    tree.addZone(str, &zone);
+
+    str.set("(goat/defook)");
+    tree.addZone(str, &zone);
+
+    tree.addZone(str, &zone);
+    tree.addZone(str, &zone);
+    tree.addZone(str, &zone);
+    tree.addZone(str, &zone);
+
+    tree.print();
+
+    ZoneTree::NodeFlatArr arr(g_TelemSrvLibArena);
+    tree.getNodes(arr);
+#endif
+
+    // so need to save these to db
+
 }
 
 Server::~Server()
@@ -1436,10 +2436,157 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
     return true;
 }
 
+
+
+void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData)
+{
+    X_UNUSED(jobSys, threadIdx, pJob, pJobData);
+
+    auto* pJobSys = gEnv->pJobSys;
+
+    auto* pData = reinterpret_cast<const IOCPJobData*>(pJobData);
+
+    ClientConnection* pClientCon = nullptr;
+    PerClientIoData* pIOContext = nullptr;
+    DWORD bytesTransferred = 0;
+    DWORD flags = 0;
+
+    lastErrorWSA::Description errDsc;
+
+    while (1)
+    {
+        auto ok = GetQueuedCompletionStatus(
+            pData->hIOCP,
+            &bytesTransferred,
+            (PDWORD_PTR)&pClientCon,
+            (LPOVERLAPPED*)&pIOContext,
+            INFINITE
+        );
+
+        if (!ok) {
+            // rip
+            continue;
+        }
+
+        if (bytesTransferred == 0) {
+            // rip
+            continue;
+        }
+
+        if (!pClientCon) {
+            // rip
+            return;
+        }
+
+        auto& ioCtx = *pIOContext;
+        ioCtx.bytesTrans += bytesTransferred;
+
+        X_LOG0("TelemSrv", "Recv %" PRIu32 " buffer has %" PRIu32, bytesTransferred, ioCtx.bytesTrans);
+
+
+        // so this could either be me sending data to viewer or getting data from trace or viewer.
+        // so first i need to know if we are reading or writing.
+        // for revicing we basically need to wait till we have a full packet.
+        if (ioCtx.op == IOOperation::Recv)
+        {
+            // i need to know if we have a full packet yet.
+            if (ioCtx.bytesTrans >= sizeof(PacketBase))
+            {
+                auto* pHdr = reinterpret_cast<const PacketBase*>(ioCtx.buf.buf);
+                if (pHdr->dataSize == 0) {
+                    X_ERROR("TelemSrv", "Client sent packet with length zero...");
+                    continue;
+                }
+
+                if (pHdr->dataSize > sizeof(ioCtx.recvbuf)) {
+                    X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<int32_t>(pHdr->dataSize));
+                    continue;
+                }
+
+                // we have the packet?
+                if (pHdr->dataSize >= ioCtx.bytesTrans) {
+                    const auto trailingBytes = ioCtx.bytesTrans - pHdr->dataSize;
+
+                    // dispatch a job to process this bitch.
+                    // we don't want to just keep allocating jobs for all the packets
+                    // as we will jsut end up with far too many jobs.
+                    // ideally we need to limit it, so i don't actually want to dispatch another WSARecv
+                    // untill i have finished decompressing the last?
+                    // but ideally we want the next one ready to go.
+                    // but can't really do that, have to see what the bubble is like.
+                    // then we insert the data, need to rate limit that also.
+
+
+                    // so i need like a way to limit depth of pipelines.
+                    // allmost like a queue.
+                    // if we allow 3 uncompressed packets we dispatch network reads while that is still the case.
+                    // that way the db insert should not starve and multiple packets can decompress
+                    // actually no they can't since it's a stream must be done in order.
+                    // so as long as decompressed packets is below 3 and one is not active decompress.
+                    // dispatch a read?
+                    
+                    ProcessPacketJobData ppjd;
+                    ppjd.pBuf = X_NEW_ARRAY(uint8_t, pHdr->dataSize, g_TelemSrvLibArena, "PacketBuf");
+                    ppjd.length = pHdr->dataSize;
+
+                    std::memcpy(ioCtx.recvbuf, ioCtx.recvbuf, pHdr->dataSize);
+
+
+                    // dispatch the job.
+                    pJobSys->CreateMemberJobAndRun<ClientConnection>(
+                        pClientCon,
+                        &ClientConnection::processNetPacketJob,
+                        ppjd
+                        JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL)
+                    );
+
+                    // shit trailing bytes to start.
+                    if (trailingBytes)
+                    {
+                        const auto offset = pHdr->dataSize;
+                        std::memcpy(ioCtx.recvbuf, &ioCtx.recvbuf[offset], trailingBytes);
+                    }
+
+                    // if trailingBytes is zero logic is still correct.
+                    ioCtx.buf.buf = ioCtx.recvbuf + trailingBytes;
+                    ioCtx.buf.len = sizeof(ioCtx.recvbuf) - trailingBytes;
+                }
+
+            }
+            else
+            {
+                // need to read some more, shrink the buffer.
+                ioCtx.buf.buf = ioCtx.recvbuf + ioCtx.bytesTrans;
+                ioCtx.buf.len = sizeof(ioCtx.recvbuf) - ioCtx.bytesTrans;
+            }
+            
+            auto res = platform::WSARecv(pClientCon->socket_, &ioCtx.buf, 1, &bytesTransferred, &flags, &ioCtx.overlapped, nullptr);
+            if (res == SOCKET_ERROR) {
+                auto err = lastErrorWSA::Get();
+                if (err != ERROR_IO_PENDING) {
+                    X_ERROR("TelemSrv", "failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
+                }
+            }
+
+        }
+        else if (pIOContext->op == IOOperation::Send)
+        {
+
+        }
+    }
+}
+
 bool Server::listen(void)
 {
     // completetion port.
-    // auto hIOCP = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
+    auto hIOCP = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
+    if (hIOCP == nullptr) {
+        core::lastError::Description Dsc;
+        X_ERROR("TelemSrv", "failed to create iocp. Error: %s", core::lastError::ToString(Dsc));
+        return false;
+    }
+
+    lastErrorWSA::Description errDsc;
 
     struct platform::addrinfo hints;
     struct platform::addrinfo *result = nullptr;
@@ -1460,7 +2607,7 @@ bool Server::listen(void)
     platform::SOCKET clientSocket = INV_SOCKET;
 
     // Create a SOCKET for connecting to server
-    listenSocket = platform::socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    listenSocket = platform::WSASocketW(result->ai_family, result->ai_socktype, result->ai_protocol, nullptr, 0, WSA_FLAG_OVERLAPPED);
     if (listenSocket == INV_SOCKET) {
         platform::freeaddrinfo(result);
         return false;
@@ -1469,13 +2616,13 @@ bool Server::listen(void)
     int32_t sock_opt = 1024 * 1024;
     res = platform::setsockopt(listenSocket, SOL_SOCKET, SO_RCVBUF, (char*)&sock_opt, sizeof(sock_opt));
     if (res != 0) {
-        X_ERROR("TelemSrv", "Failed to set rcvbuf on socket. Error: %d", platform::WSAGetLastError());
+        X_ERROR("TelemSrv", "Failed to set rcvbuf on socket. Error: %s", lastErrorWSA::ToString(errDsc));
     }
 
     // Setup the TCP listening socket
-    res = bind(listenSocket, result->ai_addr, (int)result->ai_addrlen);
+    res = platform::bind(listenSocket, result->ai_addr, (int)result->ai_addrlen);
     if (res == SOCKET_ERROR) {
-        X_ERROR("TelemSrv", "bind failed with error: %d", platform::WSAGetLastError());
+        X_ERROR("TelemSrv", "bind failed. Error: %s", lastErrorWSA::ToString(errDsc));
         platform::freeaddrinfo(result);
         platform::closesocket(listenSocket);
         return false;
@@ -1485,9 +2632,20 @@ bool Server::listen(void)
 
     res = platform::listen(listenSocket, SOMAXCONN);
     if (res == SOCKET_ERROR) {
+        X_ERROR("TelemSrv", "listen failed. Error: %s", lastErrorWSA::ToString(errDsc));
         platform::closesocket(listenSocket);
         return false;
     }
+
+    // start a job to read from the queue.
+    auto* pJobSys = gEnv->pJobSys;
+
+    IOCPJobData data;
+    data.hIOCP = hIOCP;
+
+    auto* pJob = pJobSys->CreateJob(readfromIOCPJob, data JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
+    pJobSys->Run(pJob);
+
 
     while (true)
     {
@@ -1496,9 +2654,10 @@ bool Server::listen(void)
         struct platform::sockaddr addr;
         int32_t addrLen = sizeof(addr);
 
-        // Accept a client socket
-        clientSocket = platform::accept(listenSocket, &addr, &addrLen);
-        if (clientSocket == INV_SOCKET) {
+        clientSocket = platform::WSAAccept(listenSocket, &addr, &addrLen, nullptr, 0);
+        if (clientSocket == SOCKET_ERROR) {
+            X_ERROR("TelemSrv", "accept failed. Error: %s", lastErrorWSA::ToString(errDsc));
+            platform::freeaddrinfo(result);
             platform::closesocket(listenSocket);
             return false;
         }
@@ -1507,133 +2666,56 @@ bool Server::listen(void)
         char servInfo[NI_MAXSERV] = {};
 
         res = platform::getnameinfo(
-            &addr, 
+            &addr,
             addrLen,
             hostname,
-            NI_MAXHOST, 
-            servInfo, 
-            NI_MAXSERV, 
+            NI_MAXHOST,
+            servInfo,
+            NI_MAXSERV,
             NI_NUMERICSERV
         );
 
         if (res != 0) {
-            X_ERROR("TelemSrv", "Error resolving client name: %d", platform::WSAGetLastError());
+            X_ERROR("TelemSrv", "Error resolving client name. Error: %s", lastErrorWSA::ToString(errDsc));
         }
 
         X_LOG0("TelemSrv", "Client connected: %s:%s", hostname, servInfo);
 
-        ClientConnection client(arena_);
-        client.socket = clientSocket;
-        client.hostName = hostname;
- 
-        handleClient(client);
+        ClientConnection* pClientCon = new ClientConnection(*this, g_TelemSrvLibArena); // TEMP
+        pClientCon->socket_ = clientSocket;
+        memcpy(&pClientCon->clientAddr_, &addr, addrLen);
+        pClientCon->host_.set(hostname);
+        pClientCon->serv_.set(servInfo);
 
-        // TEMP: add index if needed
-        if (client.type == ClientType::TraceStream) {
-            client.traceBuilder.flushZoneTree();
-            client.traceBuilder.createIndexes();
+
+        hIOCP = CreateIoCompletionPort((HANDLE)clientSocket, hIOCP, (DWORD_PTR)pClientCon, 0);
+        if (hIOCP == nullptr) {
+            core::lastError::Description Dsc;
+            X_ERROR("TelemSrv", "failed to create client iocp. Error: %s", core::lastError::ToString(Dsc));
+            platform::freeaddrinfo(result);
+            platform::closesocket(listenSocket);
+            return false;
         }
 
-        platform::closesocket(clientSocket);
-    }
+        DWORD flags = 0;
+        DWORD recvBytes = 0;
+        res = platform::WSARecv(clientSocket, &pClientCon->io_.buf, 1, &recvBytes, &flags, &pClientCon->io_.overlapped, nullptr);
+        if (res == SOCKET_ERROR) {
+            auto err = lastErrorWSA::Get();
+            if (err != ERROR_IO_PENDING) {
+                X_ERROR("TelemSrv", "failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
+                return false;
+            }
+        }
 
-    // clean up socket.
-    platform::closesocket(listenSocket);
+    }
 
     return true;
 }
 
-bool Server::processPacket(ClientConnection& client, uint8_t* pData)
+void Server::addTraceForApp(const TelemFixedStr& appName, Trace& trace)
 {
-    auto* pPacketHdr = reinterpret_cast<const PacketBase*>(pData);
-
-    switch (pPacketHdr->type)
-    {
-        case PacketType::ConnectionRequest:
-            return handleConnectionRequest(client, pData);
-        case PacketType::ConnectionRequestViewer:
-            return handleConnectionRequestViewer(client, pData);
-        case PacketType::DataStream:
-            return handleDataSream(client, pData);
-
-        // From viewer clients.
-        case PacketType::QueryTraceInfo:
-            return handleQueryTraceInfo(client, pData);
-        case PacketType::OpenTrace:
-            return handleOpenTrace(client, pData);
-
-        case PacketType::ReqTraceZoneSegment:
-            return handleReqTraceZoneSegment(client, pData);
-        case PacketType::ReqTraceLocks:
-            return handleReqTraceLocks(client, pData);
-        case PacketType::ReqTraceStrings:
-            return handleReqTraceStrings(client, pData);
-        case PacketType::ReqTraceThreadNames:
-            return handleReqTraceThreadNames(client, pData);
-        case PacketType::ReqTraceLockNames:
-            return handleReqTraceLockNames(client, pData);
-        case PacketType::ReqTraceZoneTree:
-            return handleReqTraceZoneTree(client, pData);
-            
-        default:
-            X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
-            return false;
-    }
-}
-
-void Server::handleClient(ClientConnection& client)
-{
-    char recvbuf[MAX_PACKET_SIZE];
-
-    while (1)
-    {
-        int recvbuflen = sizeof(recvbuf);
-        if (!readPacket(client, recvbuf, recvbuflen)) {
-            X_LOG0("TelemSrv", "Error reading packet");
-            return;
-        }
-
-        //   X_LOG0("TelemSrv", "Bytes received: %" PRIi32, recvbuflen);
-
-        if (!processPacket(client, reinterpret_cast<uint8_t*>(recvbuf))) {
-            X_LOG0("TelemSrv", "Failed to process packet");
-            return;
-        }
-    }
-}
-
-bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
-{
-    auto* pConReq = reinterpret_cast<const ConnectionRequestHdr*>(pData);
-    if (pConReq->type != PacketType::ConnectionRequest) {
-        X_ASSERT_UNREACHABLE();
-    }
-
-    VersionInfo serverVer;
-    serverVer.major = TELEM_VERSION_MAJOR;
-    serverVer.minor = TELEM_VERSION_MINOR;
-    serverVer.patch = TELEM_VERSION_PATCH;
-    serverVer.build = TELEM_VERSION_BUILD;
-
-    if (pConReq->clientVer != serverVer) {
-        sendConnectionRejected(client, "Client server version incompatible");
-        return false;
-    }
-    if (pConReq->appNameLen < 1) {
-        sendConnectionRejected(client, "Invalid app name");
-        return false;
-    }
-
-    client.clientVer = pConReq->clientVer;
-
-    auto* pStrData = reinterpret_cast<const char*>(pConReq + 1);
-    auto* pAppNameStr = pStrData;
-    auto* pBuildInfoStr = pAppNameStr + pConReq->appNameLen;
-    auto* pCmdLineStr = pBuildInfoStr + pConReq->buildInfoLen;
-
-    // Get the app name and see if we have it already.
-    TelemFixedStr appName;
-    appName.set(pAppNameStr, pAppNameStr + pConReq->appNameLen);
+    core::CriticalSection::ScopedLock lock(cs_);
 
     auto it = std::find_if(apps_.begin(), apps_.end(), [&appName](const TraceApp& app) {
         return app.appName == appName;
@@ -1642,7 +2724,7 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
     TraceApp* pApp = nullptr;
     if (it == apps_.end())
     {
-        apps_.emplace_back(appName, arena_);
+        apps_.emplace_back(appName, g_TelemSrvLibArena);
         pApp = &apps_.back();
     }
     else
@@ -1650,141 +2732,10 @@ bool Server::handleConnectionRequest(ClientConnection& client, uint8_t* pData)
         pApp = it;
     }
 
-    X_ASSERT_NOT_NULL(pApp);
-    X_ASSERT(pApp->appName.isNotEmpty(), "")();
-
-    // Create a new trace 
-    Trace trace;
-    trace.guid = core::Guid::newGuid();
-    trace.buildInfo.assign(pBuildInfoStr, pConReq->buildInfoLen);
-    trace.cmdLine.assign(pCmdLineStr, pConReq->cmdLineLen);
-    trace.ticksPerMicro = pConReq->ticksPerMicro;
-    trace.ticksPerMs = pConReq->ticksPerMs;
-
-    core::Path<> workingDir;
-    if (!gEnv->pFileSys->getWorkingDirectory(workingDir)) {
-        return false;
-    }
-
-    core::DateTimeStamp date = core::DateTimeStamp::getSystemDateTime();
-    core::DateTimeStamp::Description dateStr;
-
-    core::Path<> dbPath(workingDir);
-    // want a folder for each app.
-    dbPath.ensureSlash();
-    dbPath.append("traces");
-    dbPath.ensureSlash();
-    dbPath.append(pApp->appName.begin(), pApp->appName.end());
-    dbPath.ensureSlash();
-
-    if (!gEnv->pFileSys->directoryExists(dbPath, core::VirtualDirectory::BASE)) {
-        if (!gEnv->pFileSys->createDirectoryTree(dbPath, core::VirtualDirectory::BASE)) {
-            return false;
-        }
-    }
-
-    // add filename,
-    core::Guid::GuidStr guidStr;
-
-    dbPath.append("telem_");
-    dbPath.append(date.toString(dateStr));
-    dbPath.append("_");
-    dbPath.append(trace.guid.toString(guidStr));
-    dbPath.setExtension("db");
-
-
-    trace.dbPath = dbPath;
-    trace.hostName = client.hostName;
-
-    // open a trace stream for the conneciton.
-    auto& strm = client.traceBuilder;
-    if (!strm.createDB(dbPath)) {
-        return false;
-    }
-
-    bool setMeta = true;
-
-    VersionInfo::Description verStr;
-    setMeta &= strm.setMeta("guid", trace.guid.toString(guidStr));
-    setMeta &= strm.setMeta("appName", core::string_view(pApp->appName));
-    setMeta &= strm.setMeta("hostName", core::string_view(client.hostName));
-    setMeta &= strm.setMeta("buildInfo", trace.buildInfo);
-    setMeta &= strm.setMeta("cmdLine", trace.cmdLine);
-    setMeta &= strm.setMeta("dateStamp", dateStr);
-    setMeta &= strm.setMeta("clientVer", client.clientVer.toString(verStr));
-    setMeta &= strm.setMeta("serverVer", serverVer.toString(verStr));
-    setMeta &= strm.setMeta<int64_t>("tickPerMicro", static_cast<int64_t>(trace.ticksPerMicro));
-    setMeta &= strm.setMeta<int64_t>("tickPerMs", static_cast<int64_t>(trace.ticksPerMs));
-
-    if (!setMeta) {
-        return false;
-    }
-
-    pApp->traces.push_back(trace);
-
-    // Meow...
-    X_LOG0("TelemSrv", "ConnectionAccepted:");
-    X_LOG0("TelemSrv", "> AppName: %s", pApp->appName.c_str());
-    X_LOG0("TelemSrv", "> BuildInfo: %s", trace.buildInfo.c_str());
-    X_LOG0("TelemSrv", "> CmdLine: %s", trace.cmdLine.c_str());
-    X_LOG0("TelemSrv", "> DB: %s", dbPath.c_str());
-
-    // send a packet back!
-    ConnectionRequestAcceptedHdr cra;
-    core::zero_object(cra);
-    cra.dataSize = sizeof(cra);
-    cra.type = PacketType::ConnectionRequestAccepted;
-    cra.serverVer = serverVer;
-
-    sendDataToClient(client, &cra, sizeof(cra));
-
-    X_ASSERT(client.type == ClientType::Unknown, "Client type already set")(client.type);
-    client.type = ClientType::TraceStream;
-    return true;
+    pApp->traces.append(trace);
 }
 
-bool Server::handleConnectionRequestViewer(ClientConnection& client, uint8_t* pData)
-{
-    auto* pConReq = reinterpret_cast<const ConnectionRequestViewerHdr*>(pData);
-    if (pConReq->type != PacketType::ConnectionRequestViewer) {
-        X_ASSERT_UNREACHABLE();
-    }
-
-    VersionInfo serverVer;
-    serverVer.major = TELEM_VERSION_MAJOR;
-    serverVer.minor = TELEM_VERSION_MINOR;
-    serverVer.patch = TELEM_VERSION_PATCH;
-    serverVer.build = TELEM_VERSION_BUILD;
-
-    if (pConReq->viewerVer != serverVer) {
-        sendConnectionRejected(client, "Viewer version incompatible with server");
-        return false;
-    }
-
-    client.clientVer = pConReq->viewerVer;
-
-    // Meow...
-    X_LOG0("TelemSrv", "ConnectionAccepted(Viewer):");
-
-    // send a packet back!
-    ConnectionRequestAcceptedHdr cra;
-    core::zero_object(cra);
-    cra.dataSize = sizeof(cra);
-    cra.type = PacketType::ConnectionRequestAccepted;
-    cra.serverVer = serverVer;
-
-    sendDataToClient(client, &cra, sizeof(cra));
-
-    // send them some data.
-    if (!sendAppList(client)) {
-        X_LOG0("TelemSrv", "Error sending app list to client");
-    }
-
-    X_ASSERT(client.type == ClientType::Unknown, "Client type already set")(client.type);
-    client.type = ClientType::Viewer;
-    return true;
-}
-
+// i need to send list of apps to client
 bool Server::sendAppList(ClientConnection& client)
 {
     int32_t numApps = static_cast<int32_t>(apps_.size());
@@ -1801,7 +2752,7 @@ bool Server::sendAppList(ClientConnection& client)
     resHdr.type = PacketType::AppList;
     resHdr.num = numApps;
 
-    sendDataToClient(client, &resHdr, sizeof(resHdr));
+    client.sendDataToClient(&resHdr, sizeof(resHdr));
 
     for (const auto& app : apps_)
     {
@@ -1809,7 +2760,7 @@ bool Server::sendAppList(ClientConnection& client)
         ald.numTraces = static_cast<int32_t>(app.traces.size());
         strcpy_s(ald.appName, app.appName.c_str());
 
-        sendDataToClient(client, &ald, sizeof(ald));
+        client.sendDataToClient(&ald, sizeof(ald));
 
         // send the traces
         for (const auto& trace : app.traces)
@@ -1821,820 +2772,8 @@ bool Server::sendAppList(ClientConnection& client)
             strcpy_s(tld.hostName, trace.hostName.c_str());
             strcpy_s(tld.buildInfo, trace.buildInfo.c_str());
 
-            sendDataToClient(client, &tld, sizeof(tld));
+            client.sendDataToClient(&tld, sizeof(tld));
         }
-    }
-
-    return true;
-}
-
-bool Server::handleQueryTraceInfo(ClientConnection& client, uint8_t* pData)
-{
-    auto* pHdr = reinterpret_cast<const QueryTraceInfo*>(pData);
-    if (pHdr->type != PacketType::QueryTraceInfo) {
-        X_ASSERT_UNREACHABLE();
-    }
-
-    core::Guid::GuidStr guidStr;
-    X_LOG0("TelemSrv", "Recived trace info request for: \"%s\"", pHdr->guid.toString(guidStr));
-
-    for (auto& app : apps_)
-    {
-        for (auto& trace : app.traces)
-        {
-            if (trace.guid == pHdr->guid)
-            {
-                sql::SqlLiteDb db;
-
-                if (!db.connect(trace.dbPath.c_str(), sql::OpenFlags())) {
-                    X_ERROR("TelemSrv", "Failed to openDB: \"%s\"", trace.dbPath.c_str());
-                    continue;
-                }
-
-                TraceStats stats;
-                if (TraceDB::getStats(db, stats))
-                {
-                    QueryTraceInfoResp resp;
-                    resp.type = PacketType::QueryTraceInfoResp;
-                    resp.dataSize = sizeof(resp);
-                    resp.guid = pHdr->guid;
-                    resp.stats = stats;
-
-                    sendDataToClient(client, &resp, sizeof(resp));
-                }
-
-                return true;
-            }
-        }
-    }
-
-    // you silly goat.
-    return true;
-}
-
-bool Server::handleOpenTrace(ClientConnection& client, uint8_t* pData)
-{
-    auto* pHdr = reinterpret_cast<const OpenTrace*>(pData);
-    if (pHdr->type != PacketType::OpenTrace) {
-        X_ASSERT_UNREACHABLE();
-    }
-    
-    core::Guid::GuidStr guidStr;
-    X_LOG0("TelemSrv", "Recived trace open request for: \"%s\"", pHdr->guid.toString(guidStr));
-
-    OpenTraceResp otr;
-    otr.dataSize = sizeof(otr);
-    otr.type = PacketType::OpenTraceResp;
-    otr.guid = pHdr->guid;
-    otr.ticksPerMicro = 0;
-    otr.handle = -1_ui8;
-
-    // TODO: check we don't have it open already.
-    // TODO: thread safety etc..
-    for (size_t i = 0; i < client.traces.size();i++)
-    {
-        auto& trace = client.traces[i];
-        if (trace.pTrace->guid == pHdr->guid)
-        {
-            X_WARNING("TelemSrv", "Client opened a trace they already have open");
-
-            if (!TraceDB::getStats(trace.con, otr.stats))
-            {
-                X_ERROR("TelemSrv", "Failed to get stats for openDb request");
-                return true;
-            }
-
-            otr.handle = safe_static_cast<int8_t>(i);
-            otr.ticksPerMicro = trace.pTrace->ticksPerMicro;
-            sendDataToClient(client, &otr, sizeof(otr));
-            return true;
-        }
-    }
-
-    if (client.traces.size() < MAX_TRACES_OPEN_PER_CLIENT)
-    {
-        for (auto& app : apps_)
-        {
-            for (auto& trace : app.traces)
-            {
-                if (trace.guid == pHdr->guid) 
-                {
-                    // we found it !
-                    TraceStream ts;
-                    ts.pTrace = &trace;
-                    if (ts.openDB(trace.dbPath)) 
-                    {
-                        if (!TraceDB::getStats(ts.con, otr.stats))
-                        {
-                            X_ERROR("TelemSrv", "Failed to get stats for openDb request");
-                            return true;
-                        }
-
-                        auto id = client.traces.size();
-                        client.traces.emplace_back(std::move(ts));
-
-                        otr.handle = safe_static_cast<int8_t>(id);
-                        otr.ticksPerMicro = trace.ticksPerMicro;
-                        sendDataToClient(client, &otr, sizeof(otr));
-                        return true;
-                    }
-                }
-            }
-        }
-    }
-
-    sendDataToClient(client, &otr, sizeof(otr));
-    return true;
-}
-
-
-void flushCompressionBuffer(ClientConnection& client)
-{
-    // compress it.
-    const auto* pInBegin = &client.cmpRingBuf[client.cmpBufBegin];
-    const size_t inBytes = client.cmpBufEnd - client.cmpBufBegin;
-
-#if X_DEBUG
-    if (inBytes > COMPRESSION_MAX_INPUT_SIZE) {
-        ::DebugBreak();
-    }
-#endif // X_DEBUG
-
-    if (inBytes == 0) {
-        return;
-    }
-
-    constexpr size_t cmpBufSize = core::Compression::LZ4Stream::requiredDeflateDestBuf(COMPRESSION_MAX_INPUT_SIZE);
-    char cmpBuf[cmpBufSize + sizeof(DataStreamHdr)];
-
-    const size_t cmpBytes = client.lz4Stream.compressContinue(
-        pInBegin, inBytes,
-        cmpBuf + sizeof(DataStreamHdr), cmpBufSize,
-        core::Compression::CompressLevel::NORMAL
-    );
-
-    if (cmpBytes <= 0) {
-        // TODO: error.
-    }
-
-    const size_t totalLen = cmpBytes + sizeof(DataStreamHdr);
-
-    DataStreamHdr* pHdr = reinterpret_cast<DataStreamHdr*>(cmpBuf);
-
-    // patch the length 
-    pHdr->type = PacketType::DataStream;
-    pHdr->dataSize = static_cast<tt_uint16>(totalLen);
-    pHdr->origSize = static_cast<tt_uint16>(inBytes + sizeof(DataStreamHdr));
-
-    sendDataToClient(client, cmpBuf, totalLen);
-
-    client.cmpBufBegin = client.cmpBufEnd;
-    if ((sizeof(client.cmpRingBuf) - client.cmpBufBegin) < COMPRESSION_MAX_INPUT_SIZE) {
-        client.cmpBufBegin = 0;
-        client.cmpBufEnd = 0;
-    }
-}
-
-X_INLINE int32_t getCompressionBufferSize(ClientConnection& client)
-{
-    return client.cmpBufEnd - client.cmpBufBegin;
-}
-
-X_INLINE int32_t getCompressionBufferSpace(ClientConnection& client)
-{
-    const int32_t space = COMPRESSION_MAX_INPUT_SIZE - (client.cmpBufEnd - client.cmpBufBegin);
-
-    return space;
-}
-
-void addToCompressionBuffer(ClientConnection& client, const void* pData, int32_t len)
-{
-#if X_DEBUG
-    if (len > COMPRESSION_MAX_INPUT_SIZE) {
-        ::DebugBreak();
-    }
-#endif // X_DEBUG
-
-    // can we fit this data?
-    const int32_t space = getCompressionBufferSpace(client);
-    if (space < len) {
-        flushCompressionBuffer(client);
-    }
-
-    memcpy(&client.cmpRingBuf[client.cmpBufEnd], pData, len);
-    client.cmpBufEnd += len;
-}
-
-template<typename T>
-T* addToCompressionBufferT(ClientConnection& client)
-{
-#if X_DEBUG
-    if constexpr (sizeof(T) > COMPRESSION_MAX_INPUT_SIZE) {
-        ::DebugBreak();
-    }
-#endif // X_DEBUG
-
-    // can we fit this data?
-    const int32_t space = getCompressionBufferSpace(client);
-    if (space < sizeof(T)) {
-        flushCompressionBuffer(client);
-    }
-
-    static_assert(std::is_trivially_copyable_v<T>, "T is not trivially copyable");
-
-    T* pPtr = reinterpret_cast<T*>(&client.cmpRingBuf[client.cmpBufEnd]);
-    client.cmpBufEnd += sizeof(T);
-    return pPtr;
-}
-
-
-X_DISABLE_WARNING(4701) // potentially uninitialized local variable 'tick' used
-
-
-bool Server::handleReqTraceZoneSegment(ClientConnection& client, uint8_t* pData)
-{
-    auto* pHdr = reinterpret_cast<const ReqTraceZoneSegment*>(pData);
-    if (pHdr->type != PacketType::ReqTraceZoneSegment) {
-        X_ASSERT_UNREACHABLE();
-    }
-
-    // MEOW
-    // load me the ticks!
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(client.traces.size())) {
-        return false;
-    }
-
-    auto& ts = client.traces[pHdr->handle];
-    DataPacketTickInfo startTick;
-    DataPacketTickInfo endTick;
-
-    {
-        auto* pTickHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespTicks>(client);
-        pTickHdr->type = DataStreamTypeViewer::TraceZoneSegmentTicks;
-        pTickHdr->num = 0;
-        pTickHdr->handle = pHdr->handle;
-
-        auto begin = ts.pTrace->nanoToTicks(pHdr->startNano);
-        auto end = ts.pTrace->nanoToTicks(pHdr->endNano);
-
-        sql::SqlLiteQuery qry(ts.con, "SELECT threadId, startTick, endTick, startNano, endNano FROM ticks WHERE startTick >= ? AND startTick < ?");
-        qry.bind(1, begin);
-        qry.bind(2, end);
-
-        auto it = qry.begin();
-        if (it == qry.end()) {
-            // none
-        }
-
-        DataPacketTickInfo tick;
-        int32_t numTicks = 0;
-        
-        for (; it != qry.end(); ++it) {
-            auto row = *it;
-
-            tick.type = DataStreamType::TickInfo;
-            tick.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
-            tick.start = static_cast<uint64_t>(row.get<int64_t>(1));
-            tick.end = static_cast<uint64_t>(row.get<int64_t>(2));
-            tick.startNano = static_cast<uint64_t>(row.get<int64_t>(3));
-            tick.endNano = static_cast<uint64_t>(row.get<int64_t>(4));
-
-            if (getCompressionBufferSpace(client) < sizeof(tick))
-            {
-                // flush etc and add new block header.
-                pTickHdr->num = numTicks;
-                flushCompressionBuffer(client);
-
-                pTickHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespTicks>(client);
-                pTickHdr->type = DataStreamTypeViewer::TraceZoneSegmentTicks;
-                pTickHdr->num = 0;
-                pTickHdr->handle = pHdr->handle;
-
-                numTicks = 0;
-            }
-
-            addToCompressionBuffer(client, &tick, sizeof(tick));
-
-            if (numTicks == 0) {
-                startTick = tick;
-            }
-
-            ++numTicks;
-        }
-
-        if (numTicks == 0)
-        {
-            X_ASSERT_NOT_IMPLEMENTED();
-        }
-
-        // if startTick == endTick it don't matter
-        endTick = tick;
-
-        // flush the tick headers.
-        pTickHdr->num = numTicks;
-        flushCompressionBuffer(client);
-    }
-
-
-    auto start = startTick.start;
-    auto end = endTick.end;
-
-    {
-
-        // so on the client i need to handle overlapping zones.
-        // if we just take every zone that starts in the tick and draw it should be okay even if it overlaps.
-        // we should still be able to pick it.
-        auto* pZonesHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespZones>(client);
-        pZonesHdr->type = DataStreamTypeViewer::TraceZoneSegmentZones;
-        pZonesHdr->num = 0;
-        pZonesHdr->handle = pHdr->handle;
-
-        int32_t numZones = 0;
-
-        sql::SqlLiteQuery qry(ts.con, "SELECT threadId, startTick, endTick, packedSourceInfo, strIdx FROM zones WHERE startTick >= ? AND startTick < ?");
-        qry.bind(1, static_cast<int64_t>(start));
-        qry.bind(2, static_cast<int64_t>(end));
-
-        auto it = qry.begin();
-        for (; it != qry.end(); ++it) {
-            auto row = *it;
-
-            DataPacketZone zone;
-            zone.type = DataStreamType::Zone;
-            zone.threadID = static_cast<uint32_t>(row.get<int32_t>(0));
-            zone.start = static_cast<uint64_t>(row.get<int64_t>(1));
-            zone.end = static_cast<uint64_t>(row.get<int64_t>(2));
-
-            TraceBuilder::PackedSourceInfo info;
-            info.packed = static_cast<uint64_t>(row.get<int64_t>(3));
-
-            zone.lineNo = info.raw.lineNo;
-            zone.strIdxFunction = info.raw.idxFunction;
-            zone.strIdxFile = info.raw.idxFile;
-            zone.stackDepth = static_cast<uint8_t>(info.raw.depth & 0xFF);
-
-            // TODO: support sending 32bit id to viewer.
-            zone.strIdxFmt = static_cast<uint16_t>(row.get<int32_t>(4) & 0xFFFF);
-
-            if (getCompressionBufferSpace(client) < sizeof(zone))
-            {
-                // flush etc and add new block header.
-                pZonesHdr->num = numZones;
-                flushCompressionBuffer(client);
-
-                pZonesHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespZones>(client);
-                pZonesHdr->type = DataStreamTypeViewer::TraceZoneSegmentZones;
-                pZonesHdr->num = 0;
-                pZonesHdr->handle = pHdr->handle;
-
-                numZones = 0;
-            }
-
-            addToCompressionBuffer(client, &zone, sizeof(zone));
-
-            ++numZones;
-        }
-
-        if (numZones) {
-            pZonesHdr->num = numZones;
-            flushCompressionBuffer(client);
-        }
-    }
-
-    {
-        sql::SqlLiteQuery qry(ts.con, "SELECT lockId, threadId, startTick, endTick, result, packedSourceInfo, strIdx FROM lockTry WHERE startTick >= ? AND startTick < ?");
-        qry.bind(1, static_cast<int64_t>(start));
-        qry.bind(2, static_cast<int64_t>(end));
-
-        auto* pLockTryHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespLockTry>(client);
-        pLockTryHdr->type = DataStreamTypeViewer::TraceZoneSegmentLockTry;
-        pLockTryHdr->num = 0;
-        pLockTryHdr->handle = pHdr->handle;
-
-        int32_t numLockTry = 0;
-
-        auto it = qry.begin();
-        for (; it != qry.end(); ++it) {
-            auto row = *it;
-
-            DataPacketLockTry lockTry;
-            lockTry.type = DataStreamType::LockTry;
-            lockTry.lockHandle = static_cast<uint64_t>(row.get<int64_t>(0));
-            lockTry.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
-            lockTry.start = static_cast<uint64_t>(row.get<int64_t>(2));
-            lockTry.end = static_cast<uint64_t>(row.get<int64_t>(3));
-            lockTry.result = static_cast<TtLockResult::Enum>(row.get<int32_t>(4));
-
-            TraceBuilder::PackedSourceInfo info;
-            info.packed = static_cast<uint64_t>(row.get<int64_t>(5));
-
-            lockTry.lineNo = info.raw.lineNo;
-            lockTry.strIdxFunction = info.raw.idxFunction;
-            lockTry.strIdxFile = info.raw.idxFile;
-            lockTry.depth = static_cast<uint8_t>(info.raw.depth & 0xFF);
-
-            // TODO: support sending 32bit id to viewer.
-            lockTry.strIdxFmt = static_cast<uint16_t>(row.get<int32_t>(6) & 0xFFFF);
-
-            if (getCompressionBufferSpace(client) < sizeof(lockTry))
-            {
-                // flush etc and add new block header.
-                pLockTryHdr->num = numLockTry;
-                flushCompressionBuffer(client);
-
-                pLockTryHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespLockTry>(client);
-                pLockTryHdr->type = DataStreamTypeViewer::TraceZoneSegmentLockTry;
-                pLockTryHdr->num = 0;
-                pLockTryHdr->handle = pHdr->handle;
-
-                numLockTry = 0;
-            }
-
-            addToCompressionBuffer(client, &lockTry, sizeof(lockTry));
-
-            ++numLockTry;
-        }
-
-        if (numLockTry) {
-            pLockTryHdr->num = numLockTry;
-            flushCompressionBuffer(client);
-        }
-    }
-
-    {
-        // lockStates?
-        sql::SqlLiteQuery qry(ts.con, "SELECT lockId, threadId, timeTicks, state, packedSourceInfo FROM lockStates WHERE timeTicks >= ? AND timeTicks < ?");
-        qry.bind(1, static_cast<int64_t>(start));
-        qry.bind(2, static_cast<int64_t>(end));
-
-        auto* pLockStateHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespLockStates>(client);
-        pLockStateHdr->type = DataStreamTypeViewer::TraceZoneSegmentLockStates;
-        pLockStateHdr->num = 0;
-        pLockStateHdr->handle = pHdr->handle;
-
-        int32_t numLockState = 0;
-
-        auto it = qry.begin();
-        for (; it != qry.end(); ++it) {
-            auto row = *it;
-
-            DataPacketLockState lockState;
-            lockState.type = DataStreamType::LockState;
-            lockState.lockHandle = static_cast<uint64_t>(row.get<int64_t>(0));
-            lockState.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
-            lockState.time = static_cast<uint64_t>(row.get<int64_t>(2));
-            lockState.state = static_cast<TtLockState::Enum>(row.get<int32_t>(3));
-
-            TraceBuilder::PackedSourceInfo info;
-            info.packed = static_cast<uint64_t>(row.get<int64_t>(4));
-
-            lockState.lineNo = info.raw.lineNo;
-            lockState.strIdxFunction = info.raw.idxFunction;
-            lockState.strIdxFile = info.raw.idxFile;
-
-            if (getCompressionBufferSpace(client) < sizeof(lockState))
-            {
-                // flush etc and add new block header.
-                pLockStateHdr->num = numLockState;
-                flushCompressionBuffer(client);
-
-                pLockStateHdr = addToCompressionBufferT<ReqTraceZoneSegmentRespLockStates>(client);
-                pLockStateHdr->type = DataStreamTypeViewer::TraceZoneSegmentLockStates;
-                pLockStateHdr->num = 0;
-                pLockStateHdr->handle = pHdr->handle;
-
-                numLockState = 0;
-            }
-
-            addToCompressionBuffer(client, &lockState, sizeof(lockState));
-
-            ++numLockState;
-        }
-
-        if (numLockState) {
-            pLockStateHdr->num = numLockState;
-            flushCompressionBuffer(client);
-        }
-    }
-
-    X_ASSERT(getCompressionBufferSize(client) == 0, "Compression buffer is not empty")();
-    return true;
-}
-
-X_ENABLE_WARNING(4701)
-
-bool Server::handleReqTraceLocks(ClientConnection& client, uint8_t* pData)
-{
-    auto* pHdr = reinterpret_cast<const ReqTraceLocks*>(pData);
-    if (pHdr->type != PacketType::ReqTraceLocks) {
-        X_ASSERT_UNREACHABLE();
-    }
-
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(client.traces.size())) {
-        return false;
-    }
-
-    auto& ts = client.traces[pHdr->handle];
-
-    auto* pLocksHdr = addToCompressionBufferT<ReqTraceLocksResp>(client);
-    pLocksHdr->type = DataStreamTypeViewer::TraceLocks;
-    pLocksHdr->handle = pHdr->handle;
-
-    int32_t num = 0;
-
-    sql::SqlLiteQuery qry(ts.con, "SELECT id FROM locks");
-
-    auto it = qry.begin();
-    for (; it != qry.end(); ++it) {
-        auto row = *it;
-
-        TraceLockData tld;
-        tld.id = static_cast<uint64_t>(row.get<int64_t>(0));
-
-        if (getCompressionBufferSpace(client) < sizeof(tld)) {
-            pLocksHdr->num = num;
-            num = 0;
-
-            flushCompressionBuffer(client);
-
-            pLocksHdr = addToCompressionBufferT<ReqTraceLocksResp>(client);
-            pLocksHdr->type = DataStreamTypeViewer::TraceLocks;
-            pLocksHdr->handle = pHdr->handle;
-        }
-
-        addToCompressionBuffer(client, &tld, sizeof(tld));
-
-        num++;
-    }
-
-    if (num) {
-        pLocksHdr->num = num;
-        flushCompressionBuffer(client);
-    }
-    return true;
-}
-
-bool Server::handleReqTraceStrings(ClientConnection& client, uint8_t* pData)
-{
-    auto* pHdr = reinterpret_cast<const ReqTraceStrings*>(pData);
-    if (pHdr->type != PacketType::ReqTraceStrings) {
-        X_ASSERT_UNREACHABLE();
-    }
-
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(client.traces.size())) {
-        return false;
-    }
-
-    auto& ts = client.traces[pHdr->handle];
-
-    ReqTraceStringsRespInfo info;
-    info.type = DataStreamTypeViewer::TraceStringsInfo;
-    info.handle = pHdr->handle;
-
-    {
-        // lets just count it will be cheap.    
-        // TODO: pretty easy to calculate this in ingest if it becomes slow.
-        sql::SqlLiteQuery qry(ts.con, "SELECT COUNT(_rowid_), SUM(LENGTH(value)), MIN(Id), MAX(Id) FROM strings");
-        auto it = qry.begin();
-        if (it == qry.end()) {
-            X_ERROR("TelemSrv", "Failed to load string count");
-            return false;
-        }
-
-        info.num = (*it).get<int32_t>(0);
-        info.strDataSize = (*it).get<int32_t>(1);
-        info.minId = (*it).get<int32_t>(2);
-        info.maxId = (*it).get<int32_t>(3);
-    }
-
-    addToCompressionBuffer(client, &info, sizeof(info));
-
-    // TODO: hack until client can handle multiple per packet
-    flushCompressionBuffer(client);
-
-    auto* pStringsHdr = addToCompressionBufferT<ReqTraceStringsResp>(client);
-    core::zero_this(pStringsHdr);
-    pStringsHdr->type = DataStreamTypeViewer::TraceStrings;
-    pStringsHdr->handle = pHdr->handle;
-
-    int32_t num = 0;
-
-    if (info.num > 0)
-    {
-        sql::SqlLiteQuery qry(ts.con, "SELECT id, value FROM strings");
-
-        auto it = qry.begin();
-        for (; it != qry.end(); ++it) {
-            auto row = *it;
-
-            int32_t id = row.get<int32_t>(0);
-            int32_t strLen = row.columnBytes(1);
-            const char* pStr = row.get<const char*>(1);
-
-            TraceStringHdr strHdr;
-            strHdr.id = static_cast<uint16_t>(id);
-            strHdr.length = static_cast<uint16_t>(strLen);
-
-            if (getCompressionBufferSpace(client) < static_cast<int32_t>(sizeof(strHdr)) + strLen)
-            {
-                pStringsHdr->num = num;
-                num = 0;
-
-                flushCompressionBuffer(client);
-
-                pStringsHdr = addToCompressionBufferT<ReqTraceStringsResp>(client);
-                core::zero_this(pStringsHdr);
-                pStringsHdr->type = DataStreamTypeViewer::TraceStrings;
-                pStringsHdr->handle = pHdr->handle;
-            }
-
-            addToCompressionBuffer(client, &strHdr, sizeof(strHdr));
-            addToCompressionBuffer(client, pStr, strLen);
-
-            num++;
-        }
-
-        if (num) {
-            pStringsHdr->num = num;
-            flushCompressionBuffer(client);
-        }
-    }
-
-    X_ASSERT(getCompressionBufferSize(client) == 0, "Compression buffer is not empty")();
-    return true;
-}
-
-bool Server::handleReqTraceThreadNames(ClientConnection& client, uint8_t* pData)
-{
-    auto* pHdr = reinterpret_cast<const ReqTraceThreadNames*>(pData);
-    if (pHdr->type != PacketType::ReqTraceThreadNames) {
-        X_ASSERT_UNREACHABLE();
-    }
-
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(client.traces.size())) {
-        return false;
-    }
-
-    auto& ts = client.traces[pHdr->handle];
-
-    auto* pNamesHdr = addToCompressionBufferT<ReqTraceThreadNamesResp>(client);
-    core::zero_this(pNamesHdr);
-    pNamesHdr->type = DataStreamTypeViewer::TraceThreadNames;
-    pNamesHdr->handle = pHdr->handle;
-
-    int32_t num = 0;
-
-    sql::SqlLiteQuery qry(ts.con, "SELECT threadId, timeTicks, strIdx FROM threadNames");
-
-    auto it = qry.begin();
-    for (; it != qry.end(); ++it) {
-        auto row = *it;
-
-        TraceThreadNameData tnd;
-        tnd.threadId = row.get<int32_t>(0);
-        tnd.timeTicks = row.get<int64_t>(1);
-        tnd.strIdx = safe_static_cast<uint16_t>(row.get<int32_t>(2));
-              
-        if (getCompressionBufferSpace(client) < sizeof(tnd)) {
-            pNamesHdr->num = num;
-            num = 0;
-
-            flushCompressionBuffer(client);
-
-            pNamesHdr = addToCompressionBufferT<ReqTraceThreadNamesResp>(client);
-            core::zero_this(pNamesHdr);
-            pNamesHdr->type = DataStreamTypeViewer::TraceThreadNames;
-            pNamesHdr->handle = pHdr->handle;
-        }
-
-        addToCompressionBuffer(client, &tnd, sizeof(tnd));
-
-        num++;
-    }
-
-    if (num) {
-        pNamesHdr->num = num;
-        flushCompressionBuffer(client);
-    }
-    
-    return true;
-}
-
-bool Server::handleReqTraceLockNames(ClientConnection& client, uint8_t* pData)
-{
-    auto* pHdr = reinterpret_cast<const ReqTraceLockNames*>(pData);
-    if (pHdr->type != PacketType::ReqTraceLockNames) {
-        X_ASSERT_UNREACHABLE();
-    }
-
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(client.traces.size())) {
-        return false;
-    }
-
-    auto& ts = client.traces[pHdr->handle];
-
-    auto* pNamesHdr = addToCompressionBufferT<ReqTraceLockNamesResp>(client);
-    core::zero_this(pNamesHdr);
-    pNamesHdr->type = DataStreamTypeViewer::TraceLockNames;
-    pNamesHdr->handle = pHdr->handle;
-
-    int32_t num = 0;
-
-    sql::SqlLiteQuery qry(ts.con, "SELECT lockId, timeTicks, strIdx FROM lockNames");
-
-    auto it = qry.begin();
-    for (; it != qry.end(); ++it) {
-        auto row = *it;
-
-        TraceLockNameData lnd;
-        lnd.lockId = static_cast<uint64_t>(row.get<int64_t>(0));
-        lnd.timeTicks = row.get<int64_t>(1);
-        lnd.strIdx = safe_static_cast<uint16_t>(row.get<int32_t>(2));
-
-        if (getCompressionBufferSpace(client) < sizeof(lnd)) {
-            pNamesHdr->num = num;
-            num = 0;
-
-            flushCompressionBuffer(client);
-
-            pNamesHdr = addToCompressionBufferT<ReqTraceLockNamesResp>(client);
-            core::zero_this(pNamesHdr);
-            pNamesHdr->type = DataStreamTypeViewer::TraceLockNames;
-            pNamesHdr->handle = pHdr->handle;
-        }
-
-        addToCompressionBuffer(client, &lnd, sizeof(lnd));
-
-        num++;
-    }
-
-    if (num) {
-        pNamesHdr->num = num;
-        flushCompressionBuffer(client);
-    }
-
-    return true;
-}
-
-
-bool Server::handleReqTraceZoneTree(ClientConnection& client, uint8_t* pData)
-{
-    auto* pHdr = reinterpret_cast<const ReqTraceZoneTree*>(pData);
-    if (pHdr->type != PacketType::ReqTraceZoneTree) {
-        X_ASSERT_UNREACHABLE();
-    }
-
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(client.traces.size())) {
-        return false;
-    }
-
-    auto& ts = client.traces[pHdr->handle];
-
-    auto* pTreeHdr = addToCompressionBufferT<ReqTraceZoneTreeResp>(client);
-    core::zero_this(pTreeHdr);
-    pTreeHdr->type = DataStreamTypeViewer::TraceZoneTree;
-    pTreeHdr->handle = pHdr->handle;
-
-    int32_t num = 0;
-
-    sql::SqlLiteQuery qry(ts.con, "SELECT parentId, totalTick, strIdx FROM zoneNodes WHERE setId = ?");
-    qry.bind(1, pHdr->frameIdx);
-
-    auto it = qry.begin();
-    for (; it != qry.end(); ++it) {
-        auto row = *it;
-
-        TraceZoneTreeData ztd;
-        ztd.parentId = row.get<int32_t>(0);
-        ztd.totalTicks = row.get<int64_t>(1);
-        ztd.strIdx = safe_static_cast<uint32_t>(row.get<int32_t>(2));
-
-        if (getCompressionBufferSpace(client) < sizeof(ztd)) {
-            pTreeHdr->num = num;
-            num = 0;
-
-            flushCompressionBuffer(client);
-
-            pTreeHdr = addToCompressionBufferT<ReqTraceZoneTreeResp>(client);
-            core::zero_this(pTreeHdr);
-            pTreeHdr->type = DataStreamTypeViewer::TraceZoneTree;
-            pTreeHdr->handle = pHdr->handle;
-        }
-
-        addToCompressionBuffer(client, &ztd, sizeof(ztd));
-
-        num++;
-    }
-
-    if (num) {
-        pTreeHdr->num = num;
-        flushCompressionBuffer(client);
     }
 
     return true;
