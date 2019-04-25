@@ -2596,8 +2596,7 @@ void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Jo
                     ppjd.pBuf = X_NEW_ARRAY(uint8_t, pHdr->dataSize, g_TelemSrvLibArena, "PacketBuf");
                     ppjd.length = pHdr->dataSize;
 
-                    std::memcpy(ioCtx.recvbuf, ioCtx.recvbuf, pHdr->dataSize);
-
+                    std::memcpy(ppjd.pBuf, ioCtx.recvbuf, pHdr->dataSize);
 
                     // dispatch the job.
                     pJobSys->CreateMemberJobAndRun<ClientConnection>(
