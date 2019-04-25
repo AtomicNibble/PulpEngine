@@ -2763,10 +2763,13 @@ bool Server::listen(void)
             return false;
         }
 
+        auto& io = pClientCon->io_;
+        io.op = IOOperation::Recv;
+
         // wait for some data.
         DWORD flags = 0;
         DWORD recvBytes = 0;
-        res = platform::WSARecv(clientSocket, &pClientCon->io_.buf, 1, &recvBytes, &flags, &pClientCon->io_.overlapped, nullptr);
+        res = platform::WSARecv(clientSocket, &io.buf, 1, &recvBytes, &flags, &io.overlapped, nullptr);
         if (res == SOCKET_ERROR) {
             auto err = lastErrorWSA::Get();
             if (err != ERROR_IO_PENDING) {
