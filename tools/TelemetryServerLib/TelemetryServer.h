@@ -247,46 +247,6 @@ enum class ClientType
     Viewer
 };
 
-#if 0
-struct ClientConnection
-{
-    using TraceStreamArr = core::Array<TraceStream>;
-
-    ClientConnection(core::MemoryArenaBase* arena) :
-        traces(arena)
-    {
-        core::zero_object(clientVer);
-        socket = INV_SOCKET;
-        type = ClientType::Unknown;
-
-        cmpBufBegin = 0;
-        cmpBufEnd = 0;
-
-#if X_DEBUG
-        core::zero_object(cmpRingBuf);
-#endif // X_DEBUG
-    }
-
-    platform::SOCKET socket;
-    VersionInfo clientVer;
-    core::string hostName;
-    ClientType type;
-
-    TraceStreamArr traces;
-    TraceBuilder traceBuilder;
-
-    // this is used for both incoming and outgoing streams.
-    // depending on if it'sincoming trace data or a viewer connection.
-    int32_t cmpBufBegin;
-    int32_t cmpBufEnd;
-    int8_t cmpRingBuf[COMPRESSION_RING_BUFFER_SIZE];
-
-    core::Compression::LZ4StreamDecode lz4DecodeStream;
-    core::Compression::LZ4Stream lz4Stream;
-};
-#endif
-
-
 X_DECLARE_ENUM(IOOperation)(
     Invalid,
     Send,
