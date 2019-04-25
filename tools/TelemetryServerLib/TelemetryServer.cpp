@@ -2598,12 +2598,14 @@ void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Jo
                     std::memcpy(ppjd.pBuf, ioCtx.recvbuf, pHdr->dataSize);
 
                     // dispatch the job.
-                    pJobSys->CreateMemberJobAndRun<ClientConnection>(
+                    pJob = pJobSys->CreateMemberJobAndRun<ClientConnection>(
                         pClientCon,
                         &ClientConnection::processNetPacketJob,
                         ppjd
                         JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL)
                     );
+
+                    pJobSys->Wait(pJob);
 
                     // shit trailing bytes to start.
                     if (trailingBytes)
