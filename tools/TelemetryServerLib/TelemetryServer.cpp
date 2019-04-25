@@ -2617,8 +2617,15 @@ void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Jo
                     // if trailingBytes is zero logic is still correct.
                     ioCtx.buf.buf = ioCtx.recvbuf + trailingBytes;
                     ioCtx.buf.len = sizeof(ioCtx.recvbuf) - trailingBytes;
-                }
 
+                    ioCtx.bytesTrans = trailingBytes;
+                }
+                else
+                {
+                    // need to read some more, shrink the buffer.
+                    ioCtx.buf.buf = ioCtx.recvbuf + ioCtx.bytesTrans;
+                    ioCtx.buf.len = sizeof(ioCtx.recvbuf) - ioCtx.bytesTrans;
+                }
             }
             else
             {
