@@ -98,15 +98,14 @@ struct TraceStream : public TraceDB
 {
     TraceStream(TraceStream&& oth) :
         TraceDB(std::move(oth)),
-        pTrace(std::move(oth.pTrace))
+        trace(std::move(oth.trace))
     {
     }
-    TraceStream() :
-        pTrace(nullptr)
+    TraceStream() 
     {
     }
 
-    const Trace* pTrace;
+    Trace trace;
 };
 
 struct TraceBuilder : public TraceDB
@@ -325,7 +324,7 @@ private:
     void sendConnectionRejected(const char* pReason);
 
     void flushCompressionBuffer(void);
-    int32_t getCompressionBufferSize(void);
+    int32_t getCompressionBufferSize(void) const;
     int32_t getCompressionBufferSpace(void) const;
     void addToCompressionBuffer(const void* pData, int32_t len);
 
@@ -357,7 +356,7 @@ public:
     core::Compression::LZ4Stream lz4Stream_;
 };
 
-
+struct QueryTraceInfo;
 class Server : public ITelemServer
 {
 public:
@@ -372,6 +371,9 @@ public:
 public:
     void addTraceForApp(const TelemFixedStr& appName, Trace& trace);
     bool sendAppList(ClientConnection& client);
+
+    void handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo* pHdr);
+    bool getTraceForGuid(const core::Guid& guid, Trace& traceOut);
 
 private:
     core::MemoryArenaBase* arena_;

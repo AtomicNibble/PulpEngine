@@ -319,11 +319,9 @@ bool ClientConnection::handleConnectionRequestViewer(uint8_t* pData)
     sendDataToClient(&cra, sizeof(cra));
     
     // send them some data.
-#if 0
-    if (!sendAppList(*this)) {
+    if (!srv_.sendAppList(*this)) {
         X_LOG0("TelemSrv", "Error sending app list to client");
     }
-#endif
 
     X_ASSERT(type_ == ClientType::Unknown, "Client type already set")(type_);
     type_ = ClientType::Viewer;
@@ -460,8 +458,7 @@ bool ClientConnection::handleQueryTraceInfo(uint8_t* pData)
         X_ASSERT_UNREACHABLE();
     }
 
-
-    // you silly goat.
+    srv_.handleQueryTraceInfo(*this, pHdr);
     return true;
 }
 
@@ -472,10 +469,71 @@ bool ClientConnection::handleOpenTrace(uint8_t* pData)
         X_ASSERT_UNREACHABLE();
     }
 
-   
+    core::Guid::GuidStr guidStr;
+    X_LOG0("TelemSrv", "Recived trace open request for: \"%s\"", pHdr->guid.toString(guidStr));
+
+    OpenTraceResp otr;
+    otr.dataSize = sizeof(otr);
+    otr.type = PacketType::OpenTraceResp;
+    otr.guid = pHdr->guid;
+    otr.ticksPerMicro = 0;
+    otr.handle = -1_ui8;
+
+    // TODO: check we don't have it open already.
+    // TODO: thread safety etc..
+    for (size_t i = 0; i < traces_.size(); i++)
+    {
+        auto& trace = traces_[i];
+        if (trace.trace.guid == pHdr->guid)
+        {
+            X_WARNING("TelemSrv", "Client opened a trace they already have open");
+
+            if (!TraceDB::getStats(trace.con, otr.stats))
+            {
+                X_ERROR("TelemSrv", "Failed to get stats for openDb request");
+                return true;
+            }
+
+            otr.handle = safe_static_cast<int8_t>(i);
+            otr.ticksPerMicro = trace.trace.ticksPerMicro;
+            sendDataToClient(&otr, sizeof(otr));
+            return true;
+        }
+    }
+
+    // TODO: can't open any more, tell the client?
+    if (traces_.size() >= MAX_TRACES_OPEN_PER_CLIENT) {
+        return true;
+    }
+
+    Trace trace;
+    if (!srv_.getTraceForGuid(pHdr->guid, trace)) {
+        sendDataToClient(&otr, sizeof(otr));
+        return true;
+    }
+
+    TraceStream ts;
+    // ts.pTrace = &trace;
+    if (!ts.openDB(trace.dbPath)) {
+        sendDataToClient(&otr, sizeof(otr));
+        return true;
+    }
+
+    if (!TraceDB::getStats(ts.con, otr.stats))
+    {
+        X_ERROR("TelemSrv", "Failed to get stats for openDb request");
+        return true;
+    }
+
+    auto id = traces_.size();
+    traces_.emplace_back(std::move(ts));
+
+    otr.handle = safe_static_cast<int8_t>(id);
+    otr.ticksPerMicro = trace.ticksPerMicro;
+    sendDataToClient(&otr, sizeof(otr));
+
     return true;
 }
-
 
 
 
@@ -506,8 +564,8 @@ bool ClientConnection::handleReqTraceZoneSegment(uint8_t* pData)
         pTickHdr->num = 0;
         pTickHdr->handle = pHdr->handle;
 
-        auto begin = ts.pTrace->nanoToTicks(pHdr->startNano);
-        auto end = ts.pTrace->nanoToTicks(pHdr->endNano);
+        auto begin = ts.trace.nanoToTicks(pHdr->startNano);
+        auto end = ts.trace.nanoToTicks(pHdr->endNano);
 
         sql::SqlLiteQuery qry(ts.con, "SELECT threadId, startTick, endTick, startNano, endNano FROM ticks WHERE startTick >= ? AND startTick < ?");
         qry.bind(1, begin);
@@ -1150,7 +1208,7 @@ void ClientConnection::flushCompressionBuffer(void)
     }
 }
 
-X_INLINE int32_t ClientConnection::getCompressionBufferSize(void)
+X_INLINE int32_t ClientConnection::getCompressionBufferSize(void) const
 {
     return cmpBufEnd_ - cmpBufBegin_;
 }
@@ -2697,6 +2755,7 @@ bool Server::listen(void)
             return false;
         }
 
+        // wait for some data.
         DWORD flags = 0;
         DWORD recvBytes = 0;
         res = platform::WSARecv(clientSocket, &pClientCon->io_.buf, 1, &recvBytes, &flags, &pClientCon->io_.overlapped, nullptr);
@@ -2778,6 +2837,62 @@ bool Server::sendAppList(ClientConnection& client)
 
     return true;
 }
+
+void Server::handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo* pHdr)
+{
+    core::Guid::GuidStr guidStr;
+    X_LOG0("TelemSrv", "Recived trace info request for: \"%s\"", pHdr->guid.toString(guidStr));
+
+    for (auto& app : apps_)
+    {
+        for (auto& trace : app.traces)
+        {
+            if (trace.guid == pHdr->guid)
+            {
+                sql::SqlLiteDb db;
+
+                if (!db.connect(trace.dbPath.c_str(), sql::OpenFlags())) {
+                    X_ERROR("TelemSrv", "Failed to openDB: \"%s\"", trace.dbPath.c_str());
+                    continue;
+                }
+
+                TraceStats stats;
+                if (TraceDB::getStats(db, stats))
+                {
+                    QueryTraceInfoResp resp;
+                    resp.type = PacketType::QueryTraceInfoResp;
+                    resp.dataSize = sizeof(resp);
+                    resp.guid = pHdr->guid;
+                    resp.stats = stats;
+
+                    client.sendDataToClient(&resp, sizeof(resp));
+                }
+
+                return;
+            }
+        }
+    }
+}
+
+bool Server::getTraceForGuid(const core::Guid& guid, Trace& traceOut)
+{
+    core::CriticalSection::ScopedLock lock(cs_);
+
+    for (auto& app : apps_)
+    {
+        for (auto& trace : app.traces)
+        {
+            if (trace.guid == guid)
+            {
+                traceOut = trace;
+                return true;
+            }
+        }
+    }
+  
+    return false;
+}
+
 
 
 X_NAMESPACE_END
