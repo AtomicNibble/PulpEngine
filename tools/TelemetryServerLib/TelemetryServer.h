@@ -156,8 +156,8 @@ struct TraceBuilder : public TraceDB
 public:
     TraceBuilder(const TraceBuilder& oth) = delete;
     TraceBuilder& operator=(const TraceBuilder& oth) = delete;
+
     TraceBuilder() :
-        pTrace(nullptr),
         cmdInsertZone(con),
         cmdInsertString(con),
         cmdInsertTickInfo(con),
@@ -212,9 +212,6 @@ private:
 
     void accumulateZoneData(const StringBuf& buf, int32_t strIdx, const DataPacketZone* pData);
     void writeZoneTree(const ZoneTree& zoneTree, int32_t setID);
-
-public:
-    const Trace* pTrace;
 
 private:
     sql::SqlLiteCmd cmdInsertZone;
