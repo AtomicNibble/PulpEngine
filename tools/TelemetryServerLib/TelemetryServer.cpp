@@ -2571,7 +2571,7 @@ void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Jo
                 }
 
                 // we have the packet?
-                if (pHdr->dataSize >= ioCtx.bytesTrans) {
+                if (ioCtx.bytesTrans >= pHdr->dataSize) {
                     const auto trailingBytes = ioCtx.bytesTrans - pHdr->dataSize;
 
                     // dispatch a job to process this bitch.
