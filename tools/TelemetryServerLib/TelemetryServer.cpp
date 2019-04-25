@@ -127,29 +127,38 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
     {
         case PacketType::ConnectionRequest:
             res = handleConnectionRequest(pData);
+            break;
         case PacketType::ConnectionRequestViewer:
             res = handleConnectionRequestViewer(pData);
+            break;
         case PacketType::DataStream:
             res = handleDataSream(pData);
-
+            break;
             // From viewer clients.
         case PacketType::QueryTraceInfo:
             res = handleQueryTraceInfo(pData);
+            break;
         case PacketType::OpenTrace:
             res = handleOpenTrace(pData);
-
+            break;
         case PacketType::ReqTraceZoneSegment:
             res = handleReqTraceZoneSegment(pData);
+            break;
         case PacketType::ReqTraceLocks:
             res = handleReqTraceLocks(pData);
+            break;
         case PacketType::ReqTraceStrings:
             res = handleReqTraceStrings(pData);
+            break;
         case PacketType::ReqTraceThreadNames:
             res = handleReqTraceThreadNames(pData);
+            break;
         case PacketType::ReqTraceLockNames:
             res = handleReqTraceLockNames(pData);
+            break;
         case PacketType::ReqTraceZoneTree:
             res = handleReqTraceZoneTree(pData);
+            break;
 
         default:
             X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
