@@ -2633,7 +2633,9 @@ void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Jo
                 ioCtx.buf.buf = ioCtx.recvbuf + ioCtx.bytesTrans;
                 ioCtx.buf.len = sizeof(ioCtx.recvbuf) - ioCtx.bytesTrans;
             }
-            
+
+            X_LOG1("TelemSrv", "requesting recv with buffer size %" PRIu32, ioCtx.buf.len);
+
             auto res = platform::WSARecv(pClientCon->socket_, &ioCtx.buf, 1, &bytesTransferred, &flags, &ioCtx.overlapped, nullptr);
             if (res == SOCKET_ERROR) {
                 auto err = lastErrorWSA::Get();
