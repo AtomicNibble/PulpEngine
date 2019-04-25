@@ -522,7 +522,7 @@ bool ClientConnection::handleOpenTrace(uint8_t* pData)
     }
 
     TraceStream ts;
-    // ts.pTrace = &trace;
+    ts.trace = trace;
     if (!ts.openDB(trace.dbPath)) {
         sendDataToClient(&otr, sizeof(otr));
         return true;
