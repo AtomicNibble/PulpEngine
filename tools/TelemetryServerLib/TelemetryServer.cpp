@@ -540,7 +540,6 @@ bool ClientConnection::handleOpenTrace(uint8_t* pData)
     otr.handle = safe_static_cast<int8_t>(id);
     otr.ticksPerMicro = trace.ticksPerMicro;
     sendDataToClient(&otr, sizeof(otr));
-
     return true;
 }
 
