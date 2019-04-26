@@ -2826,7 +2826,7 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
                         &ClientConnection::processNetPacketJob,
                         nullptr
                         JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL)
-                        );
+                    );
 
                     continue;
                 }
