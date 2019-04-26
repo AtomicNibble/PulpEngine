@@ -103,11 +103,6 @@ namespace
         HANDLE hIOCP;
     };
 
-    struct ProcessPacketJobData
-    {
-        uint8_t* pBuf;
-        int32_t length;
-    };
 
 
 } // namespace
@@ -116,57 +111,112 @@ namespace
 void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData)
 {
     X_UNUSED(jobSys, threadIdx, pJob, pJobData);
-    auto* pPacketJobData = reinterpret_cast<ProcessPacketJobData*>(pJobData);
-    auto* pData = pPacketJobData->pBuf;
 
-    auto* pPacketHdr = reinterpret_cast<const PacketBase*>(pData);
+    // we get called when we have atleast one packet in buffer maybe more.
+    auto* pData = reinterpret_cast<uint8_t*>(io_.recvbuf);
+    auto bytesLeft = io_.bytesTrans;
 
-    bool res = false;
-
-    switch (pPacketHdr->type)
+    while (1)
     {
-        case PacketType::ConnectionRequest:
-            res = handleConnectionRequest(pData);
-            break;
-        case PacketType::ConnectionRequestViewer:
-            res = handleConnectionRequestViewer(pData);
-            break;
-        case PacketType::DataStream:
-            res = handleDataSream(pData);
-            break;
-            // From viewer clients.
-        case PacketType::QueryTraceInfo:
-            res = handleQueryTraceInfo(pData);
-            break;
-        case PacketType::OpenTrace:
-            res = handleOpenTrace(pData);
-            break;
-        case PacketType::ReqTraceZoneSegment:
-            res = handleReqTraceZoneSegment(pData);
-            break;
-        case PacketType::ReqTraceLocks:
-            res = handleReqTraceLocks(pData);
-            break;
-        case PacketType::ReqTraceStrings:
-            res = handleReqTraceStrings(pData);
-            break;
-        case PacketType::ReqTraceThreadNames:
-            res = handleReqTraceThreadNames(pData);
-            break;
-        case PacketType::ReqTraceLockNames:
-            res = handleReqTraceLockNames(pData);
-            break;
-        case PacketType::ReqTraceZoneTree:
-            res = handleReqTraceZoneTree(pData);
-            break;
+        auto* pPacketHdr = reinterpret_cast<const PacketBase*>(pData);
 
-        default:
-            X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
+        bool res = false;
+
+        switch (pPacketHdr->type)
+        {
+            case PacketType::ConnectionRequest:
+                res = handleConnectionRequest(pData);
+                break;
+            case PacketType::ConnectionRequestViewer:
+                res = handleConnectionRequestViewer(pData);
+                break;
+            case PacketType::DataStream:
+                res = handleDataSream(pData);
+                break;
+                // From viewer clients.
+            case PacketType::QueryTraceInfo:
+                res = handleQueryTraceInfo(pData);
+                break;
+            case PacketType::OpenTrace:
+                res = handleOpenTrace(pData);
+                break;
+            case PacketType::ReqTraceZoneSegment:
+                res = handleReqTraceZoneSegment(pData);
+                break;
+            case PacketType::ReqTraceLocks:
+                res = handleReqTraceLocks(pData);
+                break;
+            case PacketType::ReqTraceStrings:
+                res = handleReqTraceStrings(pData);
+                break;
+            case PacketType::ReqTraceThreadNames:
+                res = handleReqTraceThreadNames(pData);
+                break;
+            case PacketType::ReqTraceLockNames:
+                res = handleReqTraceLockNames(pData);
+                break;
+            case PacketType::ReqTraceZoneTree:
+                res = handleReqTraceZoneTree(pData);
+                break;
+
+            default:
+                X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
+        }
+
+        if (!res) {
+            X_ERROR("TelemSrv", "Error processing packet");
+            break;
+        }
+
+        // process next packet.
+        bytesLeft -= pPacketHdr->dataSize;
+        pData += pPacketHdr->dataSize;
+
+        // got another packet?
+        if (bytesLeft > sizeof(PacketBase))
+        {
+            pPacketHdr = reinterpret_cast<const PacketBase*>(pData);
+
+            if (bytesLeft >= pPacketHdr->dataSize)
+            {
+                // process the next packet
+                continue;
+            }
+        }
+
+        break;
     }
 
-    if (!res) {
-        X_ERROR("TelemSrv", "Error processing packet");
+    // we need to read more data.
+    // first shift the data down.
+    auto trailingBytes = bytesLeft;
+    auto offset = std::distance(reinterpret_cast<uint8_t*>(io_.recvbuf), pData);
+    std::memcpy(io_.recvbuf, &io_.recvbuf[offset], trailingBytes);
+
+    uint32_t freeSpace = sizeof(io_.recvbuf) - trailingBytes;
+
+    io_.buf.buf = io_.recvbuf + trailingBytes;
+    io_.buf.len = freeSpace;
+    io_.bytesTrans = trailingBytes;
+
+    // post a recv.
+    X_LOG1("TelemSrv", "requesting recv with buffer size %" PRIu32, io_.buf.len);
+    X_ASSERT(io_.buf.len > 0 && io_.buf.len <= sizeof(io_.recvbuf), "Length is invalid")(io_.buf);
+
+    DWORD bytesTransferred = 0;
+    DWORD flags = 0;
+
+    auto res = platform::WSARecv(socket_, &io_.buf, 1, &bytesTransferred, &flags, &io_.overlapped, nullptr);
+    if (res == SOCKET_ERROR) {
+        auto err = lastErrorWSA::Get();
+        if (err != ERROR_IO_PENDING) {
+            lastErrorWSA::Description errDsc;
+            X_ERROR("TelemSrv", "failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
+        }
     }
+
+    // if we got data back the IOCP gets called anyway.
+
 }
 
 
@@ -337,6 +387,96 @@ bool ClientConnection::handleConnectionRequestViewer(uint8_t* pData)
     return true;
 }
 
+void ClientConnection::processDataSream(uint8_t* pData, int32_t len)
+{
+    auto& strm = traceBuilder_;
+    sql::SqlLiteTransaction trans(strm.con);
+
+    // process this data?
+    for (int32 i = 0; i < len; )
+    {
+        // packet me baby!
+        auto* pPacket = reinterpret_cast<const DataPacketBase*>(&pData[i]);
+
+        switch (pPacket->type)
+        {
+            case DataStreamType::StringTableAdd:
+            {
+                i += strm.handleDataPacketStringTableAdd(reinterpret_cast<const DataPacketStringTableAdd*>(&pData[i]));
+                break;
+            }
+            case DataStreamType::Zone:
+            {
+                i += strm.handleDataPacketZone(reinterpret_cast<const DataPacketZone*>(&pData[i]));
+                break;
+            }
+            case DataStreamType::TickInfo:
+            {
+                i += strm.handleDataPacketTickInfo(reinterpret_cast<const DataPacketTickInfo*>(&pData[i]));
+                break;
+            }
+            case DataStreamType::ThreadSetName:
+            {
+                i += strm.handleDataPacketThreadSetName(reinterpret_cast<const DataPacketThreadSetName*>(&pData[i]));
+                break;
+            }
+            case DataStreamType::CallStack:
+            {
+                i += strm.handleDataPacketCallStack(reinterpret_cast<const DataPacketCallStack*>(&pData[i]));
+                break;
+            }
+            case DataStreamType::LockSetName:
+            {
+                i += strm.handleDataPacketLockSetName(reinterpret_cast<const DataPacketLockSetName*>(&pData[i]));
+                break;
+            }
+            case DataStreamType::LockTry:
+            {
+                i += strm.handleDataPacketLockTry(reinterpret_cast<const DataPacketLockTry*>(&pData[i]));
+                break;
+            }
+            case DataStreamType::LockState:
+            {
+                i += strm.handleDataPacketLockState(reinterpret_cast<const DataPacketLockState*>(&pData[i]));
+                break;
+            }
+            case DataStreamType::LockCount:
+            {
+                i += strm.handleDataPacketLockCount(reinterpret_cast<const DataPacketLockCount*>(&pData[i]));
+                break;
+            }
+            case DataStreamType::MemAlloc:
+            {
+                i += strm.handleDataPacketMemAlloc(reinterpret_cast<const DataPacketMemAlloc*>(&pData[i]));
+                break;
+            }
+            case DataStreamType::MemFree:
+            {
+                i += strm.handleDataPacketMemFree(reinterpret_cast<const DataPacketMemFree*>(&pData[i]));
+                break;
+            }
+            case DataStreamType::Message:
+            {
+                i += strm.handleDataPacketMessage(reinterpret_cast<const DataPacketMessage*>(&pData[i]));
+                break;
+            }
+            case DataStreamType::Plot:
+            {
+                i += strm.handleDataPacketPlot(reinterpret_cast<const DataPacketPlot*>(&pData[i]));
+                break;
+            }
+            case DataStreamType::PDB:
+            {
+                i += strm.handleDataPacketPDB(reinterpret_cast<const DataPacketPDB*>(&pData[i]));
+                break;
+            }
+            default:
+                X_NO_SWITCH_DEFAULT_ASSERT;
+        }
+    }
+
+    trans.commit();
+}
 
 bool ClientConnection::handleDataSream(uint8_t* pData)
 {
@@ -360,7 +500,7 @@ bool ClientConnection::handleDataSream(uint8_t* pData)
 
     int32_t cmpLenOut = static_cast<int32_t>(lz4DecodeStream_.decompressContinue(pHdr + 1, pDst, origLen));
     if (cmpLenOut != cmpLen) {
-        // TODO: ..
+        X_ERROR("TelemSrv", "LZ4 decompress failed");
         return false;
     }
 
@@ -369,93 +509,12 @@ bool ClientConnection::handleDataSream(uint8_t* pData)
         cmpBufBegin_ = 0;
     }
 
-    auto& strm = traceBuilder_;
-    sql::SqlLiteTransaction trans(strm.con);
+    // create a job to process the data.
+    // if there is one already running wait.
+    // i need processing to be in order currently.
 
-    // process this data?
-    for (int32 i = 0; i < origLen; )
-    {
-        // packet me baby!
-        auto* pPacket = reinterpret_cast<const DataPacketBase*>(&pDst[i]);
 
-        switch (pPacket->type)
-        {
-            case DataStreamType::StringTableAdd:
-            {
-                i += strm.handleDataPacketStringTableAdd(reinterpret_cast<const DataPacketStringTableAdd*>(&pDst[i]));
-                break;
-            }
-            case DataStreamType::Zone:
-            {
-                i += strm.handleDataPacketZone(reinterpret_cast<const DataPacketZone*>(&pDst[i]));
-                break;
-            }
-            case DataStreamType::TickInfo:
-            {
-                i += strm.handleDataPacketTickInfo(reinterpret_cast<const DataPacketTickInfo*>(&pDst[i]));
-                break;
-            }
-            case DataStreamType::ThreadSetName:
-            {
-                i += strm.handleDataPacketThreadSetName(reinterpret_cast<const DataPacketThreadSetName*>(&pDst[i]));
-                break;
-            }
-            case DataStreamType::CallStack:
-            {
-                i += strm.handleDataPacketCallStack(reinterpret_cast<const DataPacketCallStack*>(&pDst[i]));
-                break;
-            }
-            case DataStreamType::LockSetName:
-            {
-                i += strm.handleDataPacketLockSetName(reinterpret_cast<const DataPacketLockSetName*>(&pDst[i]));
-                break;
-            }
-            case DataStreamType::LockTry:
-            {
-                i += strm.handleDataPacketLockTry(reinterpret_cast<const DataPacketLockTry*>(&pDst[i]));
-                break;
-            }
-            case DataStreamType::LockState:
-            {
-                i += strm.handleDataPacketLockState(reinterpret_cast<const DataPacketLockState*>(&pDst[i]));
-                break;
-            }
-            case DataStreamType::LockCount:
-            {
-                i += strm.handleDataPacketLockCount(reinterpret_cast<const DataPacketLockCount*>(&pDst[i]));
-                break;
-            }
-            case DataStreamType::MemAlloc:
-            {
-                i += strm.handleDataPacketMemAlloc(reinterpret_cast<const DataPacketMemAlloc*>(&pDst[i]));
-                break;
-            }
-            case DataStreamType::MemFree:
-            {
-                i += strm.handleDataPacketMemFree(reinterpret_cast<const DataPacketMemFree*>(&pDst[i]));
-                break;
-            }
-            case DataStreamType::Message:
-            {
-                i += strm.handleDataPacketMessage(reinterpret_cast<const DataPacketMessage*>(&pDst[i]));
-                break;
-            }
-            case DataStreamType::Plot:
-            {
-                i += strm.handleDataPacketPlot(reinterpret_cast<const DataPacketPlot*>(&pDst[i]));
-                break;
-            }
-            case DataStreamType::PDB:
-            {
-                i += strm.handleDataPacketPDB(reinterpret_cast<const DataPacketPDB*>(&pDst[i]));
-                break;
-            }
-            default:
-                X_NO_SWITCH_DEFAULT_ASSERT;
-        }
-    }
-
-    trans.commit();
+    processDataSream(pDst, origLen);
     return true;
 }
 
@@ -2530,17 +2589,17 @@ void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Jo
         );
 
         if (!ok) {
-            // rip
+            X_ERROR("TelemSrv", "GetQueuedCompletionStatus failed");
             continue;
         }
 
         if (bytesTransferred == 0) {
-            // rip
+            X_ERROR("TelemSrv", "GetQueuedCompletionStatus returned zero bytes");
             continue;
         }
 
         if (!pClientCon) {
-            // rip
+            X_ERROR("TelemSrv", "GetQueuedCompletionStatus returned a invalid client con");
             return;
         }
 
@@ -2549,23 +2608,21 @@ void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Jo
 
         X_LOG0("TelemSrv", "Recv %" PRIu32 " buffer has %" PRIu32, bytesTransferred, ioCtx.bytesTrans);
 
-
-        // so this could either be me sending data to viewer or getting data from trace or viewer.
-        // so first i need to know if we are reading or writing.
-        // for revicing we basically need to wait till we have a full packet.
         if (ioCtx.op == IOOperation::Recv)
         {
-            // i need to know if we have a full packet yet.
             if (ioCtx.bytesTrans >= sizeof(PacketBase))
             {
-                auto* pHdr = reinterpret_cast<const PacketBase*>(ioCtx.buf.buf);
+                // we always check for header from start of buffer.
+                auto* pHdr = reinterpret_cast<const PacketBase*>(ioCtx.recvbuf);
                 if (pHdr->dataSize == 0) {
                     X_ERROR("TelemSrv", "Client sent packet with length zero...");
+                    // TODO: disconnect them.
                     continue;
                 }
 
                 if (pHdr->dataSize > sizeof(ioCtx.recvbuf)) {
                     X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<int32_t>(pHdr->dataSize));
+                    // TODO: disconnect them.
                     continue;
                 }
 
@@ -2573,43 +2630,22 @@ void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Jo
                 if (ioCtx.bytesTrans >= pHdr->dataSize) {
                     const auto trailingBytes = ioCtx.bytesTrans - pHdr->dataSize;
 
-                    // dispatch a job to process this bitch.
-                    // we don't want to just keep allocating jobs for all the packets
-                    // as we will jsut end up with far too many jobs.
-                    // ideally we need to limit it, so i don't actually want to dispatch another WSARecv
-                    // untill i have finished decompressing the last?
-                    // but ideally we want the next one ready to go.
-                    // but can't really do that, have to see what the bubble is like.
-                    // then we insert the data, need to rate limit that also.
-
-
-                    // so i need like a way to limit depth of pipelines.
-                    // allmost like a queue.
-                    // if we allow 3 uncompressed packets we dispatch network reads while that is still the case.
-                    // that way the db insert should not starve and multiple packets can decompress
-                    // actually no they can't since it's a stream must be done in order.
-                    // so as long as decompressed packets is below 3 and one is not active decompress.
-                    // dispatch a read?
+                    X_LOG1("TelemSrv", "Got packet size: %" PRIu16 " trailingbytes: %" PRIu32, pHdr->dataSize, trailingBytes);
                     
-                    ProcessPacketJobData ppjd;
-                    ppjd.pBuf = X_NEW_ARRAY(uint8_t, pHdr->dataSize, g_TelemSrvLibArena, "PacketBuf");
-                    ppjd.length = pHdr->dataSize;
-
-                    std::memcpy(ppjd.pBuf, ioCtx.recvbuf, pHdr->dataSize);
-
-                    // dispatch the job.
                     pJob = pJobSys->CreateMemberJobAndRun<ClientConnection>(
                         pClientCon,
                         &ClientConnection::processNetPacketJob,
-                        ppjd
+                        nullptr
                         JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL)
                     );
 
+                    continue;
+
+#if 0
                     pJobSys->Wait(pJob);
 
-                    // shit trailing bytes to start.
-                    if (trailingBytes)
-                    {
+                    // shift trailing bytes to start.
+                    if (trailingBytes) {
                         const auto offset = pHdr->dataSize;
                         std::memcpy(ioCtx.recvbuf, &ioCtx.recvbuf[offset], trailingBytes);
                     }
@@ -2617,24 +2653,23 @@ void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Jo
                     // if trailingBytes is zero logic is still correct.
                     ioCtx.buf.buf = ioCtx.recvbuf + trailingBytes;
                     ioCtx.buf.len = sizeof(ioCtx.recvbuf) - trailingBytes;
-
                     ioCtx.bytesTrans = trailingBytes;
+#endif
                 }
                 else
                 {
-                    // need to read some more, shrink the buffer.
                     ioCtx.buf.buf = ioCtx.recvbuf + ioCtx.bytesTrans;
                     ioCtx.buf.len = sizeof(ioCtx.recvbuf) - ioCtx.bytesTrans;
                 }
             }
             else
             {
-                // need to read some more, shrink the buffer.
                 ioCtx.buf.buf = ioCtx.recvbuf + ioCtx.bytesTrans;
                 ioCtx.buf.len = sizeof(ioCtx.recvbuf) - ioCtx.bytesTrans;
             }
 
             X_LOG1("TelemSrv", "requesting recv with buffer size %" PRIu32, ioCtx.buf.len);
+            X_ASSERT(ioCtx.buf.len > 0 && ioCtx.buf.len <= sizeof(ioCtx.recvbuf), "Length is invalid")(ioCtx.buf);
 
             auto res = platform::WSARecv(pClientCon->socket_, &ioCtx.buf, 1, &bytesTransferred, &flags, &ioCtx.overlapped, nullptr);
             if (res == SOCKET_ERROR) {
@@ -2647,6 +2682,8 @@ void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Jo
         }
         else if (pIOContext->op == IOOperation::Send)
         {
+            // we sent some data, it might not of been all of it.
+
 
         }
         else

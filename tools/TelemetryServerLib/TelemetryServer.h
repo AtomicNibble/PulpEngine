@@ -306,6 +306,7 @@ public:
     bool handleConnectionRequestViewer(uint8_t* pData);
 
     bool handleDataSream(uint8_t* pData);
+    void processDataSream(uint8_t* pData, int32_t len);
 
     bool handleQueryTraceInfo(uint8_t* pData);
     bool handleOpenTrace(uint8_t* pData);
@@ -349,7 +350,7 @@ public:
     // depending on if it'sincoming trace data or a viewer connection.
     int32_t cmpBufBegin_;
     int32_t cmpBufEnd_;
-    int8_t cmpRingBuf_[COMPRESSION_RING_BUFFER_SIZE];
+    uint8_t cmpRingBuf_[COMPRESSION_RING_BUFFER_SIZE];
 
     core::Compression::LZ4StreamDecode lz4DecodeStream_;
     core::Compression::LZ4Stream lz4Stream_;
