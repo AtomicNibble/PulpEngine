@@ -200,7 +200,7 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
     io_.bytesTrans = trailingBytes;
 
     // post a recv.
-    X_LOG1("TelemSrv", "requesting recv with buffer size %" PRIu32, io_.buf.len);
+    X_LOG1("TelemSrv", "Requesting recv with buffer size %" PRIu32, io_.buf.len);
     X_ASSERT(io_.buf.len > 0 && io_.buf.len <= sizeof(io_.recvbuf), "Length is invalid")(io_.buf);
 
     DWORD bytesTransferred = 0;
@@ -2638,7 +2638,7 @@ void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Jo
         auto& ioCtx = *pIOContext;
         ioCtx.bytesTrans += bytesTransferred;
 
-        X_LOG0("TelemSrv", "Recv %" PRIu32 " buffer has %" PRIu32, bytesTransferred, ioCtx.bytesTrans);
+        X_LOG1("TelemSrv", "Recv %" PRIu32 " buffer has %" PRIu32, bytesTransferred, ioCtx.bytesTrans);
 
         if (ioCtx.op == IOOperation::Recv)
         {
@@ -2700,7 +2700,7 @@ void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Jo
                 ioCtx.buf.len = sizeof(ioCtx.recvbuf) - ioCtx.bytesTrans;
             }
 
-            X_LOG1("TelemSrv", "requesting recv with buffer size %" PRIu32, ioCtx.buf.len);
+            X_LOG1("TelemSrv", "Requesting recv with buffer size %" PRIu32, ioCtx.buf.len);
             X_ASSERT(ioCtx.buf.len > 0 && ioCtx.buf.len <= sizeof(ioCtx.recvbuf), "Length is invalid")(ioCtx.buf);
 
             auto res = platform::WSARecv(pClientCon->socket_, &ioCtx.buf, 1, &bytesTransferred, &flags, &ioCtx.overlapped, nullptr);
