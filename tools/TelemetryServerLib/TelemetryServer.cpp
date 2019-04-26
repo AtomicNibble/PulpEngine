@@ -526,8 +526,6 @@ bool ClientConnection::handleDataStream(uint8_t* pData)
     // create a job to process the data.
     // if there is one already running wait.
     // i need processing to be in order currently.
-#if 1
-
     if (pPendingJob_) {
         gEnv->pJobSys->Wait(pPendingJob_);
         pPendingJob_ = nullptr;
@@ -543,10 +541,6 @@ bool ClientConnection::handleDataStream(uint8_t* pData)
         jd
         JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL)
     );
-
-#else
-    processDataStream(pDst, origLen);
-#endif
     return true;
 }
 
