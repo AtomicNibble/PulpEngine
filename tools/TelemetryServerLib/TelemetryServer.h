@@ -298,15 +298,18 @@ public:
 #if X_DEBUG
         core::zero_object(cmpRingBuf_);
 #endif // X_DEBUG
+
+        pPendingJob_ = nullptr;
     }
 
-    void processNetPacketJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+    void processNetPacketJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData);
+    void processDataStreamJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData);
 
     bool handleConnectionRequest(uint8_t* pData);
     bool handleConnectionRequestViewer(uint8_t* pData);
 
-    bool handleDataSream(uint8_t* pData);
-    void processDataSream(uint8_t* pData, int32_t len);
+    bool handleDataStream(uint8_t* pData);
+    void processDataStream(uint8_t* pData, int32_t len);
 
     bool handleQueryTraceInfo(uint8_t* pData);
     bool handleOpenTrace(uint8_t* pData);
@@ -354,6 +357,8 @@ public:
 
     core::Compression::LZ4StreamDecode lz4DecodeStream_;
     core::Compression::LZ4Stream lz4Stream_;
+
+    core::V2::Job* pPendingJob_;
 };
 
 struct QueryTraceInfo;

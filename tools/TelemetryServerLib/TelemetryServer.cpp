@@ -131,7 +131,7 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
                 res = handleConnectionRequestViewer(pData);
                 break;
             case PacketType::DataStream:
-                res = handleDataSream(pData);
+                res = handleDataStream(pData);
                 break;
                 // From viewer clients.
             case PacketType::QueryTraceInfo:
@@ -387,7 +387,7 @@ bool ClientConnection::handleConnectionRequestViewer(uint8_t* pData)
     return true;
 }
 
-void ClientConnection::processDataSream(uint8_t* pData, int32_t len)
+void ClientConnection::processDataStream(uint8_t* pData, int32_t len)
 {
     auto& strm = traceBuilder_;
     sql::SqlLiteTransaction trans(strm.con);
@@ -478,7 +478,21 @@ void ClientConnection::processDataSream(uint8_t* pData, int32_t len)
     trans.commit();
 }
 
-bool ClientConnection::handleDataSream(uint8_t* pData)
+struct ProcessDataStreamJobData
+{
+    uint8_t* pData;
+    int32_t len;
+};
+
+void ClientConnection::processDataStreamJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData)
+{
+    X_UNUSED(jobSys, threadIdx, pJob, pJobData);
+    auto* pData = reinterpret_cast<ProcessDataStreamJobData*>(pJobData);
+
+    processDataStream(pData->pData, pData->len);
+}
+
+bool ClientConnection::handleDataStream(uint8_t* pData)
 {
     auto* pHdr = reinterpret_cast<const DataStreamHdr*>(pData);
     if (pHdr->type != PacketType::DataStream) {
@@ -512,9 +526,27 @@ bool ClientConnection::handleDataSream(uint8_t* pData)
     // create a job to process the data.
     // if there is one already running wait.
     // i need processing to be in order currently.
+#if 1
 
+    if (pPendingJob_) {
+        gEnv->pJobSys->Wait(pPendingJob_);
+        pPendingJob_ = nullptr;
+    }
 
-    processDataSream(pDst, origLen);
+    ProcessDataStreamJobData jd;
+    jd.pData = pDst;
+    jd.len = origLen;
+
+    pPendingJob_ = gEnv->pJobSys->CreateMemberJobAndRun<ClientConnection>(
+        this,
+        &ClientConnection::processDataStreamJob,
+        jd
+        JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL)
+    );
+
+#else
+    processDataStream(pDst, origLen);
+#endif
     return true;
 }
 
