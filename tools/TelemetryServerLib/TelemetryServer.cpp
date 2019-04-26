@@ -2742,8 +2742,6 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
     DWORD bytesTransferred = 0;
     DWORD flags = 0;
 
-    lastErrorWSA::Description errDsc;
-
     while (1)
     {
         auto ok = GetQueuedCompletionStatus(
@@ -2755,7 +2753,8 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
         );
 
         if (!ok) {
-            X_ERROR("TelemSrv", "GetQueuedCompletionStatus failed");
+            core::lastError::Description Dsc;
+            X_ERROR("TelemSrv", "GetQueuedCompletionStatus failed. Error: %s", core::lastError::ToString(Dsc));
             continue;
         }
 
@@ -2819,7 +2818,8 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
             if (res == SOCKET_ERROR) {
                 auto err = lastErrorWSA::Get();
                 if (err != ERROR_IO_PENDING) {
-                    X_ERROR("TelemSrv", "failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
+                    lastErrorWSA::Description errDsc;
+                    X_ERROR("TelemSrv", "Failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
                 }
             }
 
