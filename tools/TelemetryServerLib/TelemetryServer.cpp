@@ -2587,116 +2587,6 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
     return true;
 }
 
-
-
-void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData)
-{
-    X_UNUSED(jobSys, threadIdx, pJob, pJobData);
-
-    auto* pJobSys = gEnv->pJobSys;
-
-    auto* pData = reinterpret_cast<const IOCPJobData*>(pJobData);
-
-    ClientConnection* pClientCon = nullptr;
-    PerClientIoData* pIOContext = nullptr;
-    DWORD bytesTransferred = 0;
-    DWORD flags = 0;
-
-    lastErrorWSA::Description errDsc;
-
-    while (1)
-    {
-        auto ok = GetQueuedCompletionStatus(
-            pData->hIOCP,
-            &bytesTransferred,
-            (PDWORD_PTR)&pClientCon,
-            (LPOVERLAPPED*)&pIOContext,
-            INFINITE
-        );
-
-        if (!ok) {
-            X_ERROR("TelemSrv", "GetQueuedCompletionStatus failed");
-            continue;
-        }
-
-        if (bytesTransferred == 0) {
-            X_ERROR("TelemSrv", "GetQueuedCompletionStatus returned zero bytes");
-            continue;
-        }
-
-        if (!pClientCon) {
-            X_ERROR("TelemSrv", "GetQueuedCompletionStatus returned a invalid client con");
-            return;
-        }
-
-        auto& ioCtx = *pIOContext;
-        ioCtx.bytesTrans += bytesTransferred;
-
-        X_LOG1("TelemSrv", "Recv %" PRIu32 " buffer has %" PRIu32, bytesTransferred, ioCtx.bytesTrans);
-
-        if (ioCtx.op == IOOperation::Recv)
-        {
-            if (ioCtx.bytesTrans >= sizeof(PacketBase))
-            {
-                // we always check for header from start of buffer.
-                auto* pHdr = reinterpret_cast<const PacketBase*>(ioCtx.recvbuf);
-                if (pHdr->dataSize == 0) {
-                    X_ERROR("TelemSrv", "Client sent packet with length zero...");
-                    // TODO: disconnect them.
-                    continue;
-                }
-
-                if (pHdr->dataSize > sizeof(ioCtx.recvbuf)) {
-                    X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<int32_t>(pHdr->dataSize));
-                    // TODO: disconnect them.
-                    continue;
-                }
-
-                // we don't bother starting a job untill we have atleast one packet.
-                if (ioCtx.bytesTrans >= pHdr->dataSize) {
-                    const auto trailingBytes = ioCtx.bytesTrans - pHdr->dataSize;
-
-                    X_LOG1("TelemSrv", "Got packet size: %" PRIu16 " trailingbytes: %" PRIu32, pHdr->dataSize, trailingBytes);
-                    
-                    pJob = pJobSys->CreateMemberJobAndRun<ClientConnection>(
-                        pClientCon,
-                        &ClientConnection::processNetPacketJob,
-                        nullptr
-                        JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL)
-                    );
-
-                    continue;
-                }
-            }
-            
-            ioCtx.buf.buf = ioCtx.recvbuf + ioCtx.bytesTrans;
-            ioCtx.buf.len = sizeof(ioCtx.recvbuf) - ioCtx.bytesTrans;
-
-            X_LOG1("TelemSrv", "Requesting recv with buffer size %" PRIu32, ioCtx.buf.len);
-            X_ASSERT(ioCtx.buf.len > 0 && ioCtx.buf.len <= sizeof(ioCtx.recvbuf), "Length is invalid")(ioCtx.buf);
-
-            auto res = platform::WSARecv(pClientCon->socket_, &ioCtx.buf, 1, &bytesTransferred, &flags, &ioCtx.overlapped, nullptr);
-            if (res == SOCKET_ERROR) {
-                auto err = lastErrorWSA::Get();
-                if (err != ERROR_IO_PENDING) {
-                    X_ERROR("TelemSrv", "failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
-                }
-            }
-
-        }
-        else if (pIOContext->op == IOOperation::Send)
-        {
-            // we sent some data, it might not of been all of it.
-
-
-        }
-        else
-        {
-            X_ASSERT_UNREACHABLE();
-        }
-    }
-}
-
 bool Server::listen(void)
 {
     // completetion port.
@@ -2836,6 +2726,115 @@ bool Server::listen(void)
     }
 
     return true;
+}
+
+
+void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData)
+{
+    X_UNUSED(jobSys, threadIdx, pJob, pJobData);
+
+    auto* pJobSys = gEnv->pJobSys;
+
+    auto* pData = reinterpret_cast<const IOCPJobData*>(pJobData);
+
+    ClientConnection* pClientCon = nullptr;
+    PerClientIoData* pIOContext = nullptr;
+    DWORD bytesTransferred = 0;
+    DWORD flags = 0;
+
+    lastErrorWSA::Description errDsc;
+
+    while (1)
+    {
+        auto ok = GetQueuedCompletionStatus(
+            pData->hIOCP,
+            &bytesTransferred,
+            (PDWORD_PTR)&pClientCon,
+            (LPOVERLAPPED*)&pIOContext,
+            INFINITE
+        );
+
+        if (!ok) {
+            X_ERROR("TelemSrv", "GetQueuedCompletionStatus failed");
+            continue;
+        }
+
+        if (bytesTransferred == 0) {
+            X_ERROR("TelemSrv", "GetQueuedCompletionStatus returned zero bytes");
+            continue;
+        }
+
+        if (!pClientCon) {
+            X_ERROR("TelemSrv", "GetQueuedCompletionStatus returned a invalid client con");
+            return;
+        }
+
+        auto& ioCtx = *pIOContext;
+        ioCtx.bytesTrans += bytesTransferred;
+
+        X_LOG1("TelemSrv", "Recv %" PRIu32 " buffer has %" PRIu32, bytesTransferred, ioCtx.bytesTrans);
+
+        if (ioCtx.op == IOOperation::Recv)
+        {
+            if (ioCtx.bytesTrans >= sizeof(PacketBase))
+            {
+                // we always check for header from start of buffer.
+                auto* pHdr = reinterpret_cast<const PacketBase*>(ioCtx.recvbuf);
+                if (pHdr->dataSize == 0) {
+                    X_ERROR("TelemSrv", "Client sent packet with length zero...");
+                    // TODO: disconnect them.
+                    continue;
+                }
+
+                if (pHdr->dataSize > sizeof(ioCtx.recvbuf)) {
+                    X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<int32_t>(pHdr->dataSize));
+                    // TODO: disconnect them.
+                    continue;
+                }
+
+                // we don't bother starting a job untill we have atleast one packet.
+                if (ioCtx.bytesTrans >= pHdr->dataSize) {
+                    const auto trailingBytes = ioCtx.bytesTrans - pHdr->dataSize;
+
+                    X_LOG1("TelemSrv", "Got packet size: %" PRIu16 " trailingbytes: %" PRIu32, pHdr->dataSize, trailingBytes);
+
+                    pJob = pJobSys->CreateMemberJobAndRun<ClientConnection>(
+                        pClientCon,
+                        &ClientConnection::processNetPacketJob,
+                        nullptr
+                        JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL)
+                        );
+
+                    continue;
+                }
+            }
+
+            ioCtx.buf.buf = ioCtx.recvbuf + ioCtx.bytesTrans;
+            ioCtx.buf.len = sizeof(ioCtx.recvbuf) - ioCtx.bytesTrans;
+
+            X_LOG1("TelemSrv", "Requesting recv with buffer size %" PRIu32, ioCtx.buf.len);
+            X_ASSERT(ioCtx.buf.len > 0 && ioCtx.buf.len <= sizeof(ioCtx.recvbuf), "Length is invalid")(ioCtx.buf);
+
+            auto res = platform::WSARecv(pClientCon->socket_, &ioCtx.buf, 1, &bytesTransferred, &flags, &ioCtx.overlapped, nullptr);
+            if (res == SOCKET_ERROR) {
+                auto err = lastErrorWSA::Get();
+                if (err != ERROR_IO_PENDING) {
+                    X_ERROR("TelemSrv", "failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
+                }
+            }
+
+        }
+        else if (pIOContext->op == IOOperation::Send)
+        {
+            // we sent some data, it might not of been all of it.
+            X_ASSERT_NOT_IMPLEMENTED();
+
+        }
+        else
+        {
+            X_ASSERT_UNREACHABLE();
+        }
+    }
 }
 
 void Server::addTraceForApp(const TelemFixedStr& appName, Trace& trace)

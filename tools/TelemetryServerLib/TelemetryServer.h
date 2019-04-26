@@ -380,6 +380,8 @@ public:
     void handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo* pHdr);
     bool getTraceForGuid(const core::Guid& guid, Trace& traceOut);
 
+    static void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData);
+
 private:
     core::MemoryArenaBase* arena_;
     core::CriticalSection cs_;
