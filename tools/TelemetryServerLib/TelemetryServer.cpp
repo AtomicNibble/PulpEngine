@@ -2652,7 +2652,7 @@ void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Jo
                     continue;
                 }
 
-                // we have the packet?
+                // we don't bother starting a job untill we have atleast one packet.
                 if (ioCtx.bytesTrans >= pHdr->dataSize) {
                     const auto trailingBytes = ioCtx.bytesTrans - pHdr->dataSize;
 
