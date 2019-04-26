@@ -104,9 +104,26 @@ namespace
     };
 
 
-
 } // namespace
 
+
+void ClientConnection::flush(void)
+{
+    if (pPendingJob_) {
+        gEnv->pJobSys->Wait(pPendingJob_);
+    }
+
+    if (type_ == ClientType::TraceStream) {
+        traceBuilder_.flushZoneTree();
+        traceBuilder_.createIndexes();
+    }
+}
+
+void ClientConnection::disconnect(void)
+{
+    flush();
+    srv_.closeClient(this);
+}
 
 void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData)
 {
@@ -165,7 +182,8 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
 
         if (!res) {
             X_ERROR("TelemSrv", "Error processing packet");
-            break;
+            disconnect();
+            return;
         }
 
         // process next packet.
@@ -206,17 +224,18 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
     DWORD bytesTransferred = 0;
     DWORD flags = 0;
 
+    // if we get data back the IOCP gets called anyway.
     auto res = platform::WSARecv(socket_, &io_.buf, 1, &bytesTransferred, &flags, &io_.overlapped, nullptr);
     if (res == SOCKET_ERROR) {
         auto err = lastErrorWSA::Get();
         if (err != ERROR_IO_PENDING) {
             lastErrorWSA::Description errDsc;
             X_ERROR("TelemSrv", "failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
+
+            // is this safe?
+            disconnect();
         }
     }
-
-    // if we got data back the IOCP gets called anyway.
-
 }
 
 
@@ -2648,15 +2667,19 @@ bool Server::listen(void)
         return false;
     }
 
+    auto cleanUp = [&]() {
+        platform::closesocket(listenSocket);
+        ::CloseHandle(hIOCP);
+    };
+
     // start a job to read from the queue.
     auto* pJobSys = gEnv->pJobSys;
 
     IOCPJobData data;
     data.hIOCP = hIOCP;
 
-    auto* pJob = pJobSys->CreateJob(readfromIOCPJob, data JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
+    auto* pJob = pJobSys->CreateMemberJob<Server>(this, &Server::readfromIOCPJob, data JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
     pJobSys->Run(pJob);
-
 
     while (true)
     {
@@ -2667,9 +2690,8 @@ bool Server::listen(void)
 
         clientSocket = platform::WSAAccept(listenSocket, &addr, &addrLen, nullptr, 0);
         if (clientSocket == SOCKET_ERROR) {
-            X_ERROR("TelemSrv", "accept failed. Error: %s", lastErrorWSA::ToString(errDsc));
-            platform::freeaddrinfo(result);
-            platform::closesocket(listenSocket);
+            X_ERROR("TelemSrv", "Accept failed. Error: %s", lastErrorWSA::ToString(errDsc));
+            cleanUp();
             return false;
         }
 
@@ -2692,19 +2714,17 @@ bool Server::listen(void)
 
         X_LOG0("TelemSrv", "Client connected: %s:%s", hostname, servInfo);
 
-        ClientConnection* pClientCon = new ClientConnection(*this, g_TelemSrvLibArena); // TEMP
+        ClientConnection* pClientCon = X_NEW(ClientConnection, arena_, "ClientCon")(*this, g_TelemSrvLibArena); // TEMP
         pClientCon->socket_ = clientSocket;
         memcpy(&pClientCon->clientAddr_, &addr, addrLen);
         pClientCon->host_.set(hostname);
         pClientCon->serv_.set(servInfo);
 
-
         hIOCP = CreateIoCompletionPort((HANDLE)clientSocket, hIOCP, (DWORD_PTR)pClientCon, 0);
         if (hIOCP == nullptr) {
             core::lastError::Description Dsc;
-            X_ERROR("TelemSrv", "failed to create client iocp. Error: %s", core::lastError::ToString(Dsc));
-            platform::freeaddrinfo(result);
-            platform::closesocket(listenSocket);
+            X_ERROR("TelemSrv", "Failed to create client iocp. Error: %s", core::lastError::ToString(Dsc));
+            cleanUp();
             return false;
         }
 
@@ -2718,13 +2738,15 @@ bool Server::listen(void)
         if (res == SOCKET_ERROR) {
             auto err = lastErrorWSA::Get();
             if (err != ERROR_IO_PENDING) {
-                X_ERROR("TelemSrv", "failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
+                // TODO: only disconnect the client?
+                X_ERROR("TelemSrv", "Failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
+                cleanUp();
                 return false;
             }
         }
-
     }
 
+    cleanUp();
     return true;
 }
 
@@ -2752,6 +2774,8 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
             INFINITE
         );
 
+        // is the socket totally fucked if this happens?
+        // or just one client.
         if (!ok) {
             core::lastError::Description Dsc;
             X_ERROR("TelemSrv", "GetQueuedCompletionStatus failed. Error: %s", core::lastError::ToString(Dsc));
@@ -2820,6 +2844,8 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
                 if (err != ERROR_IO_PENDING) {
                     lastErrorWSA::Description errDsc;
                     X_ERROR("TelemSrv", "Failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
+
+                    closeClient(pClientCon);
                 }
             }
 
@@ -2835,6 +2861,11 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
             X_ASSERT_UNREACHABLE();
         }
     }
+}
+
+void Server::closeClient(ClientConnection* pClientCon)
+{
+    X_DELETE(pClientCon, arena_);
 }
 
 void Server::addTraceForApp(const TelemFixedStr& appName, Trace& trace)

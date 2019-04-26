@@ -302,6 +302,9 @@ public:
         pPendingJob_ = nullptr;
     }
 
+    void flush(void);
+    void disconnect(void);
+
     void processNetPacketJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData);
     void processDataStreamJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData);
 
@@ -380,7 +383,8 @@ public:
     void handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo* pHdr);
     bool getTraceForGuid(const core::Guid& guid, Trace& traceOut);
 
-    static void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData);
+    void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData);
+    void closeClient(ClientConnection* pClientCon);
 
 private:
     core::MemoryArenaBase* arena_;
