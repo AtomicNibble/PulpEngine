@@ -79,6 +79,7 @@ namespace
     };
 
     core::CriticalSection cs0, cs1;
+    core::SharedLock sharedLock;
 
     core::Thread::ReturnValue threadFunc(const core::Thread& thread)
     {
@@ -90,9 +91,18 @@ namespace
         ttSetLockName(ctx, &cs0, "Magic lock");
         ttSetLockName(ctx, &cs1, "Stu's lock");
 
+        TtCallStack stack;
+
         for (int i = 0; i < 200; i++)
         {
             ttZone(ctx, "Aint no camel like me! %" PRIi32, i);
+
+            ttGetCallStack(ctx, stack);
+            auto stackID = ttSendCallStack(ctx, &stack);
+
+            ttMessage(ctx, TtLogType::Msg, "Look at my callstack: %t", stackID);
+
+            core::ScopedLockShared locks0(sharedLock);
 
             {
                 ttZoneFilterd(ctx, 200, "Sometimes filtered");
@@ -101,6 +111,8 @@ namespace
                 ttAlloc(ctx, (void*)0x12345678, 0x300 * (i + 1), "Alloc some data!");
                 ttFree(ctx, (void*)0x12345678);
             }
+
+            ttPlot(ctx, TtPlotType::Time, timer.GetMilliSeconds(), "Plot me!");
 
             for (int x = 0; x < 10; x++)
             {
@@ -128,7 +140,6 @@ namespace
                         ttEnter(ctx, "Yep");
                         ttLeave(ctx);
                     }
-
                 }
             }
 
