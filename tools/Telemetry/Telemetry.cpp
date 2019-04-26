@@ -321,7 +321,7 @@ namespace
 
     TELEM_INLINE tt_uint32 getThreadID(void)
     {
-#if 1
+#if X_64
         auto val = __readgsqword(0x30) + 0x48;
         return *reinterpret_cast<const tt_uint32*>(val);
 #else
