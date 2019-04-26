@@ -2666,21 +2666,6 @@ void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Jo
                     );
 
                     continue;
-
-#if 0
-                    pJobSys->Wait(pJob);
-
-                    // shift trailing bytes to start.
-                    if (trailingBytes) {
-                        const auto offset = pHdr->dataSize;
-                        std::memcpy(ioCtx.recvbuf, &ioCtx.recvbuf[offset], trailingBytes);
-                    }
-
-                    // if trailingBytes is zero logic is still correct.
-                    ioCtx.buf.buf = ioCtx.recvbuf + trailingBytes;
-                    ioCtx.buf.len = sizeof(ioCtx.recvbuf) - trailingBytes;
-                    ioCtx.bytesTrans = trailingBytes;
-#endif
                 }
                 else
                 {
