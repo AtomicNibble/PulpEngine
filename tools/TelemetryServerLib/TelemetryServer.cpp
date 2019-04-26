@@ -2667,17 +2667,10 @@ void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Jo
 
                     continue;
                 }
-                else
-                {
-                    ioCtx.buf.buf = ioCtx.recvbuf + ioCtx.bytesTrans;
-                    ioCtx.buf.len = sizeof(ioCtx.recvbuf) - ioCtx.bytesTrans;
-                }
             }
-            else
-            {
-                ioCtx.buf.buf = ioCtx.recvbuf + ioCtx.bytesTrans;
-                ioCtx.buf.len = sizeof(ioCtx.recvbuf) - ioCtx.bytesTrans;
-            }
+            
+            ioCtx.buf.buf = ioCtx.recvbuf + ioCtx.bytesTrans;
+            ioCtx.buf.len = sizeof(ioCtx.recvbuf) - ioCtx.bytesTrans;
 
             X_LOG1("TelemSrv", "Requesting recv with buffer size %" PRIu32, ioCtx.buf.len);
             X_ASSERT(ioCtx.buf.len > 0 && ioCtx.buf.len <= sizeof(ioCtx.recvbuf), "Length is invalid")(ioCtx.buf);
