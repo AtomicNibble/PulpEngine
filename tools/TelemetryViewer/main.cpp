@@ -3,6 +3,8 @@
 
 #include "TelemetryViewer.h"
 
+#include <IConsole.h>
+
 #define _LAUNCHER
 #include <ModuleExports.h>
 
@@ -59,6 +61,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         if (!app.Init(hInstance, lpCmdLine)) {
             return 1;
         }
+
+        core::ICVar* pLogVerbosity = gEnv->pConsole->getCVar(core::string_view("log_verbosity"));
+        pLogVerbosity->Set(0);
 
         TelemetryViewerArena::AllocationPolicy allocator;
         TelemetryViewerArena arena(&allocator, "TelemetryViewerArena");
