@@ -1104,7 +1104,8 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
     auto draw = ImGui::GetWindowDrawList();
 
     const auto ty = ImGui::GetFontSize();
-    const auto ostep = ty + 1;
+    const auto border = 4;
+    const auto ostep = ty + border;
     const auto to = 9.f;
     const auto th = (ty - to) * sqrt(3) * 0.5;
 
@@ -1155,6 +1156,8 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
 
             const auto offset = _offset + ostep * cnt;
             const auto yPos = wpos.y + offset;
+
+            draw->AddRectFilled(wpos + ImVec2(0, offset + ty), wpos + ImVec2(w, offset + ostep), 0x33888888);
 
             if (yPos + ostep >= yMin && yPos <= yMax) {
                 auto& ls = lockData.lockStates;
@@ -1386,6 +1389,8 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
 
                 auto it = std::lower_bound(lt.begin(), lt.end(), view.zvStartNS_, [](const auto& l, const auto& r) { return l.endNano < r; });
                 const auto itend = std::lower_bound(it, lt.end(), view.zvEndNS_, [](const auto& l, const auto& r) { return l.startNano < r; });
+
+                draw->AddRectFilled(wpos + ImVec2(0, offset + ty), wpos + ImVec2(w, offset + ostep), 0x33888888);
 
                 double pxend = 0;
 
