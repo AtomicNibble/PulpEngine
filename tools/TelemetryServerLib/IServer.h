@@ -35,8 +35,6 @@ struct TraceStats
     tt_int64 numFree;
     tt_int64 numMessages;
     tt_int64 durationNano;
-    // will either need to store free in seperate table or manually count them.
-    // tt_int64 numAllocations;
 };
 
 struct TraceInfo
