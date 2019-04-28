@@ -273,7 +273,7 @@ bool ClientConnection::handleConnectionRequest(uint8_t* pData)
     appName.set(pAppNameStr, pAppNameStr + pConReq->appNameLen);
 
     // Create a new trace 
-    Trace trace;
+    TraceInfo trace;
     trace.guid = core::Guid::newGuid();
     trace.buildInfo.assign(pBuildInfoStr, pConReq->buildInfoLen);
     trace.cmdLine.assign(pCmdLineStr, pConReq->cmdLineLen);
@@ -619,7 +619,7 @@ bool ClientConnection::handleOpenTrace(uint8_t* pData)
         return true;
     }
 
-    Trace trace;
+    TraceInfo trace;
     if (!srv_.getTraceForGuid(pHdr->guid, trace)) {
         sendDataToClient(&otr, sizeof(otr));
         return true;
@@ -2547,7 +2547,7 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
             continue;
         }
 
-        Trace trace;
+        TraceInfo trace;
         trace.dbPath = dir / fd.name;
 
         // load info.
@@ -2868,7 +2868,7 @@ void Server::closeClient(ClientConnection* pClientCon)
     X_DELETE(pClientCon, arena_);
 }
 
-void Server::addTraceForApp(const TelemFixedStr& appName, Trace& trace)
+void Server::addTraceForApp(const TelemFixedStr& appName, TraceInfo& trace)
 {
     core::CriticalSection::ScopedLock lock(cs_);
 
@@ -2970,7 +2970,7 @@ void Server::handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo
     }
 }
 
-bool Server::getTraceForGuid(const core::Guid& guid, Trace& traceOut)
+bool Server::getTraceForGuid(const core::Guid& guid, TraceInfo& traceOut)
 {
     core::CriticalSection::ScopedLock lock(cs_);
 

@@ -2982,7 +2982,7 @@ bool handleAppList(Client& client, uint8_t* pData)
         {
             auto& srcTrace = pTraceData[x];
 
-            Trace trace;
+            TraceInfo trace;
             trace.active = srcTrace.active;
             trace.guid = srcTrace.guid;
             trace.ticksPerMicro = srcTrace.ticksPerMicro;

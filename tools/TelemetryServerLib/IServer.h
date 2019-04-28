@@ -36,9 +36,9 @@ struct TraceStats
     // tt_int64 numAllocations;
 };
 
-struct Trace
+struct TraceInfo
 {
-    Trace() :
+    TraceInfo() :
         ticksPerMicro(0),
         ticksPerMs(0),
         active(false)
@@ -74,7 +74,7 @@ struct Trace
     core::Path<> dbPath;
 };
 
-using TraceArr = core::Array<Trace>;
+using TraceInfoArr = core::Array<TraceInfo>;
 
 struct TraceApp
 {
@@ -84,7 +84,7 @@ struct TraceApp
     {}
 
     TelemFixedStr appName;
-    TraceArr traces;
+    TraceInfoArr traces;
 };
 
 using TraceAppArr = core::Array<TraceApp>;

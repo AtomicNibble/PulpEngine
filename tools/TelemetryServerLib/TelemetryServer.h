@@ -105,7 +105,7 @@ struct TraceStream : public TraceDB
     {
     }
 
-    Trace trace;
+    TraceInfo trace;
 };
 
 struct TraceBuilder : public TraceDB
@@ -377,11 +377,11 @@ public:
     bool listen(void) X_FINAL;
 
 public:
-    void addTraceForApp(const TelemFixedStr& appName, Trace& trace);
+    void addTraceForApp(const TelemFixedStr& appName, TraceInfo& trace);
     bool sendAppList(ClientConnection& client);
 
     void handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo* pHdr);
-    bool getTraceForGuid(const core::Guid& guid, Trace& traceOut);
+    bool getTraceForGuid(const core::Guid& guid, TraceInfo& traceOut);
 
     void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData);
     void closeClient(ClientConnection* pClientCon);
