@@ -1113,6 +1113,12 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
     // want to draw all the locks like a dirty sket.
     // have the LockStates then lockTry
 
+    // need to fix overlapping try's either server side or viewer side.
+    // so need to fix this lock displaying issue.
+    // so there is a new angle to this.
+    // shared locks, so now it's possible for multiple threads to hold a lock.
+    // which means we need to keep track of lock count.
+    // which would also solve the overlapping lock states for none shared.
     const bool expanded = true;
 
     if (expanded)
@@ -1151,85 +1157,94 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
                 auto& ls = lockData.lockStates;
 
                 auto vbegin = std::lower_bound(ls.begin(), ls.end(), view.zvStartNS_, [](const auto& l, const auto& r) { return l.timeNano < r; });
-                const auto vend = std::lower_bound(vbegin, ls.end(), view.zvEndNS_, [](const auto& l, const auto& r) { return l.timeNano < r; });
-
-
+                auto vend = std::lower_bound(vbegin, ls.end(), view.zvEndNS_, [](const auto& l, const auto& r) { return l.timeNano < r; });
 
                 const auto lockName = view.strings.getLockName(lockHandle);
                 double pxend = 0;
 
-                auto getNextState = [](const LockState* pBegin, const LockState* pEnd) -> const LockState*
-                {
-                    if (pBegin->state == TtLockState::Locked)
-                    {
-                        ++pBegin;
-
-                        while (pBegin < pEnd)
-                        {
-                            if (pBegin->state == TtLockState::Released)
-                            {
-                                break;
-                            }
-                            
-                            ++pBegin;
-                        }
-                    }
-                    else if (pBegin->state == TtLockState::Released)
-                    {
-                        ++pBegin;
-
-                        while (pBegin < pEnd)
-                        {
-                            if (pBegin->state == TtLockState::Locked)
-                            {
-                                break;
-                            }
-
-                            ++pBegin;
-                        }
-                    }
-                    else
-                    {
-                        X_ASSERT_UNREACHABLE();
-                    }
-
-                    return pBegin;
-                };
 
                 if (vbegin < vend)
                 {
-                    if (vbegin > ls.begin()) {
-                        vbegin--;
-                    }
+                    auto vbeginOrig = vbegin;
+                    auto vendOrig = vend;
 
                     if (vbegin->state != TtLockState::Locked) {
-                        vbegin = getNextState(vbegin, vend);
+                        // find the first lock state?
+                        while (vbegin < vend && vbegin->state != TtLockState::Locked) {
+                            ++vbegin;
+                        }
                     }
+
+                    // we can end up in the middle of nested locking
+                    // so we need to go back
+                    {
+                        auto threadID = vbegin->threadID;
+
+                        while (vbegin > ls.begin() && vbegin[-1].state == TtLockState::Locked && vbegin[-1].threadID == threadID) {
+                            --vbegin;
+                        }
+                    }
+
+                    // make sure end is released.
+                    {
+                        while (vend < ls.end() && vend->state != TtLockState::Released) {
+                            ++vend;
+                        }
+                    }
+
 
                     if (vbegin < vend) {
                         X_ASSERT((*vbegin).state == TtLockState::Locked, "Incorrect state")();
                     }
 
-                    auto vbeginOrig = vbegin;
-                    auto vendOrig = vend;
-
                     X_UNUSED(vbeginOrig, vendOrig);
+
+                    int32_t processed = 0;
 
                     while (vbegin < vend) 
                     {
-                        auto& lockState = (*vbegin);
-                        vbegin = getNextState(vbegin, vend);
+                        X_ASSERT(vbegin->state == TtLockState::Locked, "Incorrect states")();
 
-                        // TODO: support open states.
-                        if (vbegin == vend) {
+                        ++processed;
+                        int32_t depth = 1;
+
+                        auto lockRelease = vbegin;
+                        {
+                            auto threadID = lockRelease->threadID;
+
+                            ++lockRelease;
+
+                            // look for recursion.
+                            while (lockRelease < vend && lockRelease->state == TtLockState::Locked && lockRelease->threadID == threadID) {
+                                ++depth;
+                                ++lockRelease;
+                            }
+
+                            // now we find where this thread released.
+                            // need to do it for depth.
+                            while (lockRelease < vend) {
+                                if (lockRelease->state == TtLockState::Released && lockRelease->threadID == threadID) {
+                                    --depth;
+                                    if (depth == 0) {
+                                        break;
+                                    }
+                                }
+
+                                ++lockRelease;
+                            }
+                        }
+
+                        
+                        if (lockRelease == vend) {
                             break;
                         }
 
-                        auto& lockStateNext = *(vbegin);
-                        ++vbegin;
+                        auto& lockState = (*vbegin);
+                        auto& lockStateRelease = *(lockRelease);
 
-                        X_ASSERT(lockState.state == TtLockState::Locked && lockStateNext.state == TtLockState::Released, "Incorrect states")();
-                        const auto locksz = std::max((lockStateNext.timeNano - lockState.timeNano) * pxns, pxns * 0.5);
+
+                        X_ASSERT(lockState.state == TtLockState::Locked && lockStateRelease.state == TtLockState::Released, "Incorrect states")();
+                        const auto locksz = std::max((lockStateRelease.timeNano - lockState.timeNano) * pxns, pxns * 0.5);
 
                         if (locksz < MinVisSize)
                         {
@@ -1240,12 +1255,11 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
 
 
 
-
                         }
                         else
                         {
                             const auto t0 = lockState.timeNano;
-                            const auto t1 = lockStateNext.timeNano;
+                            const auto t1 = lockStateRelease.timeNano;
                             const auto px0 = std::max(pxend, (t0 - view.zvStartNS_) * pxns);
                             double px1 = (t1 - view.zvStartNS_) * pxns;
 
@@ -1292,8 +1306,32 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
 
                             if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y)))
                             {
-                                LockStateTooltip(view, lockState, lockStateNext);
+                                LockStateTooltip(view, lockState, lockStateRelease);
                             }
+                        }
+
+
+                        auto num = std::distance(vbegin, lockRelease) + 1;
+
+                        if (num % 2 == 0) {
+                            vbegin += num;
+
+                            if (vbegin < vend) {
+                                X_ASSERT(vbegin->state == TtLockState::Locked, "Incorrect states")();
+                            }
+                        }
+                        else {
+
+                            // TODO: 
+                            auto threadID = vbegin->threadID;
+
+                            ++vbegin;
+
+                            while (vbegin < vend && vbegin->threadID == threadID) {
+                                ++vbegin;
+                            }
+
+                            X_ASSERT(vbegin->state == TtLockState::Locked, "Begin should be a lock state")();
                         }
                     }
                 }
