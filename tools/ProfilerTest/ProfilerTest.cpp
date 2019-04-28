@@ -102,7 +102,7 @@ namespace
 
             ttMessage(ctx, TtLogType::Msg, "Look at my callstack: %t", stackID);
 
-            core::ScopedLockShared locks0(sharedLock);
+         //   core::ScopedLockShared locks0(sharedLock);
 
             {
                 ttZoneFilterd(ctx, 200, "Sometimes filtered");
