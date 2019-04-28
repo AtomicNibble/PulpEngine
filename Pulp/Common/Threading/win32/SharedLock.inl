@@ -48,7 +48,7 @@ void SharedLock::EnterShared(void)
     AcquireSRWLockShared(&smtx_);
 
     ttEndTryLock(gEnv->ctx, &smtx_, TtLockResult::Acquired);
-    ttSetLockState(gEnv->ctx, &smtx_, TtLockState::LockedShared);
+    ttSetLockState(gEnv->ctx, &smtx_, TtLockState::Locked);
 }
 
 bool SharedLock::TryEnterShared(void)
@@ -59,7 +59,7 @@ bool SharedLock::TryEnterShared(void)
 
     ttEndTryLock(gEnv->ctx, &smtx_, res ? TtLockResult::Acquired : TtLockResult::Fail);
     if (res) {
-        ttSetLockState(gEnv->ctx, &smtx_, TtLockState::LockedShared);
+        ttSetLockState(gEnv->ctx, &smtx_, TtLockState::Locked);
     }
 
     return res;
@@ -69,7 +69,7 @@ void SharedLock::LeaveShared(void)
 {
     ReleaseSRWLockShared(&smtx_);
 
-    ttSetLockState(gEnv->ctx, &smtx_, TtLockState::ReleasedShared);
+    ttSetLockState(gEnv->ctx, &smtx_, TtLockState::Released);
 }
 
 SRWLOCK* SharedLock::GetNativeObject(void)

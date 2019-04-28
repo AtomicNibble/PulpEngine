@@ -48,8 +48,8 @@ struct TtLockState
         Locked,
         Released,
         // TODO: not sure if will need these.
-        LockedShared,
-        ReleasedShared
+        // LockedShared,
+        // ReleasedShared
     };
 
     static inline const char* ToString(Enum ls)
@@ -60,10 +60,12 @@ struct TtLockState
                 return "Locked";
             case Released:
                 return "Released";
+#if 0
             case LockedShared:
                 return "LockedShared";
             case ReleasedShared:
                 return "ReleasedShared";
+#endif
             default:
                 return "<ukn>";
         }
