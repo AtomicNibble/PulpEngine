@@ -229,7 +229,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
             core::StackString256 name;
             for (int32_t i = 0; i < numThreads; i++) {
-                name.setFmt("Worder %" PRIi32, i);
+                name.setFmt("Worker %" PRIi32, i);
 
                 thread[i].create(name.c_str());
                 thread[i].start(threadFunc);
