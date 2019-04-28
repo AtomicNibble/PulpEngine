@@ -282,6 +282,7 @@ bool ClientConnection::handleConnectionRequest(uint8_t* pData)
     trace.cmdLine.assign(pCmdLineStr, pConReq->cmdLineLen);
     trace.ticksPerMicro = pConReq->ticksPerMicro;
     trace.ticksPerMs = pConReq->ticksPerMs;
+    trace.workerThreadID = pConReq->workerThreadID;
 
     core::Path<> workingDir;
     if (!gEnv->pFileSys->getWorkingDirectory(workingDir)) {
@@ -337,6 +338,7 @@ bool ClientConnection::handleConnectionRequest(uint8_t* pData)
     setMeta &= strm.setMeta("serverVer", serverVer.toString(verStr));
     setMeta &= strm.setMeta<int64_t>("tickPerMicro", static_cast<int64_t>(trace.ticksPerMicro));
     setMeta &= strm.setMeta<int64_t>("tickPerMs", static_cast<int64_t>(trace.ticksPerMs));
+    setMeta &= strm.setMeta<int32_t>("workerThreadID", static_cast<int32_t>(trace.workerThreadID));
 
     if (!setMeta) {
         return false;
@@ -593,6 +595,7 @@ bool ClientConnection::handleOpenTrace(uint8_t* pData)
     otr.type = PacketType::OpenTraceResp;
     otr.guid = pHdr->guid;
     otr.ticksPerMicro = 0;
+    otr.workerThreadID = 0;
     otr.handle = -1_ui8;
 
     // TODO: check we don't have it open already.
@@ -612,6 +615,7 @@ bool ClientConnection::handleOpenTrace(uint8_t* pData)
 
             otr.handle = safe_static_cast<int8_t>(i);
             otr.ticksPerMicro = trace.trace.ticksPerMicro;
+            otr.workerThreadID = trace.trace.workerThreadID;
             sendDataToClient(&otr, sizeof(otr));
             return true;
         }
@@ -1784,6 +1788,24 @@ bool TraceDB::getMetaStr(sql::SqlLiteDb& db, const char* pName, core::string& st
     return true;
 }
 
+bool TraceDB::getMetaUInt32(sql::SqlLiteDb& db, const char* pName, uint32_t& valOut)
+{
+    sql::SqlLiteQuery qry(db, "SELECT value FROM meta WHERE name = ?");
+    qry.bind(1, pName);
+
+    auto it = qry.begin();
+    if (it == qry.end()) {
+        X_ERROR("TelemSrv", "Failed to load meta entry \"%s\"", pName);
+        return false;
+    }
+
+    auto row = *it;
+
+    valOut = static_cast<uint32_t>(row.get<int32_t>(0));
+    return true;
+}
+
+
 bool TraceDB::getMetaUInt64(sql::SqlLiteDb& db, const char* pName, uint64_t& valOut)
 {
     sql::SqlLiteQuery qry(db, "SELECT value FROM meta WHERE name = ?");
@@ -2689,6 +2711,7 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
         loaded &= TraceDB::getMetaStr(db, "cmdLine", trace.cmdLine);
         loaded &= TraceDB::getMetaUInt64(db, "tickPerMicro", trace.ticksPerMicro);
         loaded &= TraceDB::getMetaUInt64(db, "tickPerMs", trace.ticksPerMs);
+        loaded &= TraceDB::getMetaUInt32(db, "workerThreadID", trace.workerThreadID);
 
         if (!loaded) {
             X_ERROR("TelemSrv", "Failed to load meta for: \"%s\"", trace.dbPath.c_str());

@@ -2550,6 +2550,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     cr.cmdLineLen = static_cast<tt_uint16>(cmdLenUtf8);
     cr.ticksPerMicro = gTicksPerMicro;
     cr.ticksPerMs = gTicksPerMicro * 1000;
+    cr.workerThreadID = pCtx->threadId_;
     cr.dataSize = sizeof(cr) + cr.appNameLen + cr.buildInfoLen + cr.cmdLineLen;
 
     sendDataToServer(pCtx, &cr, sizeof(cr));

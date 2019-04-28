@@ -68,6 +68,7 @@ struct TraceInfo
     core::Guid guid;
     uint64_t ticksPerMicro;
     uint64_t ticksPerMs;
+    uint32_t workerThreadID;
     core::DateTimeStamp date;
     core::string hostName;
     core::string buildInfo;

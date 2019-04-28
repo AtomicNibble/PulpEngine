@@ -75,6 +75,7 @@ struct OpenTraceResp : public PacketBase
     core::Guid guid;
     TraceStats stats;
     uint64_t ticksPerMicro;
+    uint32_t workerThreadID;
     tt_int8 handle;
 };
 

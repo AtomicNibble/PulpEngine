@@ -87,6 +87,7 @@ struct TraceDB
 
     static bool getStats(sql::SqlLiteDb& db, TraceStats& stats);
     static bool getMetaStr(sql::SqlLiteDb& db, const char* pName, core::string& strOut);
+    static bool getMetaUInt32(sql::SqlLiteDb& db, const char* pName, uint32_t& valOut);
     static bool getMetaUInt64(sql::SqlLiteDb& db, const char* pName, uint64_t& valOut);
 
 

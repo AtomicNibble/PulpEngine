@@ -123,6 +123,7 @@ struct ConnectionRequestHdr : public PacketBase
     tt_uint16 cmdLineLen;
     tt_uint64 ticksPerMicro;
     tt_uint64 ticksPerMs;
+    tt_uint32 workerThreadID;
 };
 
 struct ConnectionRequestAcceptedHdr : public PacketBase
@@ -144,7 +145,7 @@ TELEM_PACK_POP;
 
 static_assert(sizeof(VersionInfo) == 4, "Incorrect size");
 static_assert(sizeof(PacketBase) == 3, "Incorrect size");
-static_assert(sizeof(ConnectionRequestHdr) == 29, "Incorrect size");
+static_assert(sizeof(ConnectionRequestHdr) == 33, "Incorrect size");
 static_assert(sizeof(ConnectionRequestAcceptedHdr) == 7, "Incorrect size");
 static_assert(sizeof(ConnectionRequestRejectedHdr) == 5, "Incorrect size");
 static_assert(sizeof(DataStreamHdr) == 5, "Incorrect size");
