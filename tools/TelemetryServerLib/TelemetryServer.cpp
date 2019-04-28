@@ -1842,6 +1842,8 @@ bool TraceBuilder::createDB(core::Path<char>& path)
 
 bool TraceBuilder::createIndexes(void)
 {
+    X_LOG0("TelemSrv", "Creating indexes");
+
     sql::SqlLiteTransaction trans(con);
 
     sql::SqlLiteCmd cmd(con, R"(
@@ -2214,6 +2216,7 @@ inline void TraceBuilder::accumulateZoneData(const StringBuf& buf, int32_t strId
 
 void TraceBuilder::flushZoneTree(void)
 {
+    X_LOG0("TelemSrv", "flushing zone tree");
 
     writeZoneTree(zoneTree_, -1);
 }
