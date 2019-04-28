@@ -2878,6 +2878,26 @@ bool handleTraceZoneTree(Client& client, const DataPacketBaseViewer* pBase)
     return true;
 }
 
+bool handleTraceMessages(Client& client, const DataPacketBaseViewer* pBase)
+{
+    auto* pHdr = static_cast<const ReqTraceMessagesResp*>(pBase);
+    if (pHdr->type != DataStreamTypeViewer::TraceMessages) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    // shake it.
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+
+    TraceView* pView = client.viewForHandle(pHdr->handle);
+    if (!pView) {
+        return false;
+    }
+
+    auto& view = *pView;
+    X_UNUSED(view);
+
+    return true;
+}
 
 bool handleDataSream(Client& client, uint8_t* pData)
 {
@@ -2944,6 +2964,8 @@ bool handleDataSream(Client& client, uint8_t* pData)
                 return handleTraceLockNames(client, pPacket);
             case DataStreamTypeViewer::TraceZoneTree:
                 return handleTraceZoneTree(client, pPacket);
+            case DataStreamTypeViewer::TraceMessages:
+                return handleTraceMessages(client, pPacket);
 
             default:
                 X_NO_SWITCH_DEFAULT_ASSERT;
@@ -3095,22 +3117,26 @@ bool handleOpenTraceResp(Client& client, uint8_t* pData)
     trl.handle = pHdr->handle;
     client.sendDataToServer(&trl, sizeof(trl));
 
+
+    auto startNano = 0;
+    auto endNano = 1000_ui64 * 1000_ui64 * 1000_ui64 * 5_ui64;
+
+    ReqTraceZoneMessages rzm;
+    rzm.type = PacketType::ReqTraceMessages;
+    rzm.dataSize = sizeof(rzm);
+    rzm.handle = pHdr->handle;
+
+
     ReqTraceZoneSegment rzs;
     rzs.type = PacketType::ReqTraceZoneSegment;
     rzs.dataSize = sizeof(rzs);
     rzs.handle = pHdr->handle;
-    // so what should i request here?
-    // time segments?
-    // auto start = 0;
-    // auto mid = pHdr->stats.numTicks / 2;
-    // auto trailing = pHdr->stats.numTicks - mid;
-
-    rzs.startNano = 0;
-    rzs.endNano = 1000 * 1000 * 1000;
+    rzs.startNano = startNano;
+    rzs.endNano = endNano;
     client.sendDataToServer(&rzs, sizeof(rzs));
 
 #if 0
-    rzs.endNano = 1000 * 1000 * 500;
+    rzs.endNano = 1000 * 1000 * 1000;
     rzs.endNano = rzs.startNano + 1000 * 1000 * 1000;
     client.sendDataToServer(&rzs, sizeof(rzs));
 #endif
