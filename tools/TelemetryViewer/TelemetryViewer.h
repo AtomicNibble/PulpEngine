@@ -397,6 +397,7 @@ struct Client
     Client(core::MemoryArenaBase* arena);
 
     bool isConnected(void) const;
+    void closeConnection(void);
     void sendDataToServer(const void* pData, int32_t len);
     TraceView* viewForHandle(tt_int8 handle);
 

@@ -3239,6 +3239,13 @@ bool Client::isConnected(void) const
     return socket != INV_SOCKET;
 }
 
+void Client::closeConnection(void)
+{
+    platform::closesocket(socket);
+    socket = INV_SOCKET;
+    conState = ConnectionState::Offline;
+}
+
 TraceView* Client::viewForHandle(tt_int8 handle)
 {
     TraceView* pView = nullptr;
@@ -3365,11 +3372,12 @@ core::Thread::ReturnValue threadFunc(const core::Thread& thread)
         int recvbuflen = sizeof(recvbuf);
 
         if (!readPacket(client, recvbuf, recvbuflen)) {
-            return false;
+            client.closeConnection();
+            continue;
         }
 
         if (!processPacket(client, reinterpret_cast<tt_uint8*>(recvbuf))) {
-            return false;
+            break;
         }
     }
 
