@@ -1708,6 +1708,30 @@ bool TraceDB::getStats(sql::SqlLiteDb& db, TraceStats& stats)
     }
 
     {
+        sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM memory LIMIT 1");
+        auto it = qry.begin();
+        if (it == qry.end()) {
+            X_ERROR("TelemSrv", "Failed to load alloc count");
+            return false;
+        }
+
+        stats.numAlloc = (*it).get<int64_t>(0);
+        stats.numFree = 0;
+    }
+
+    {
+        sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM messages LIMIT 1");
+        auto it = qry.begin();
+        if (it == qry.end()) {
+            X_ERROR("TelemSrv", "Failed to load messages count");
+            return false;
+        }
+
+        stats.numMessages = (*it).get<int64_t>(0);
+    }
+
+
+    {
         sql::SqlLiteQuery qry(db, "SELECT endNano FROM ticks WHERE _rowid_ = (SELECT MAX(_rowid_) FROM ticks)");
         auto it = qry.begin();
         if (it == qry.end()) {

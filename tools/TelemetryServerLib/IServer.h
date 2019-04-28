@@ -31,6 +31,9 @@ struct TraceStats
     tt_int64 numZones;
     tt_int64 numTicks;
     tt_int64 numLockTry;
+    tt_int64 numAlloc;
+    tt_int64 numFree;
+    tt_int64 numMessages;
     tt_int64 durationNano;
     // will either need to store free in seperate table or manually count them.
     // tt_int64 numAllocations;
