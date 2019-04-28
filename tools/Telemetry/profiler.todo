@@ -3,24 +3,19 @@ Runtime:
 
   CallStacks:
     ✔ Send PDB sigs to server @done (19-04-18 19:18)
-    ☐ Callstack cache
-    ☐ Linking callstacks with zones.
-      ☐ Support passing callstacks to printf strings using %t
+    ✔ Callstack cache @done (19-04-18 20:56)
+    ✔ Linking callstacks with zones (you just pass to format string). @done (19-04-18 20:57)
+      ✔ Support passing callstacks to printf strings using %t @done (19-04-18 20:56)
+      - not sure how best to display this
     ✔ Send callstacks to server @done (19-04-13 12:55)
 
   Performance:
-    ☐ Have each thread store a format string cache.
-     Dunno how big this will be rip, but it basically needs to tell me
-     ☐ if we have any format specifiers
-     ☐ if any of them are strings and the indexes (also need to support length prefix)
-         the length prefix can be fixed or dynamic, if it's fixed we don't care.
+    ✘ Have each thread store a format string cache. @cancelled (19-04-26 21:28)
+     ✘ if we have any format specifiers @cancelled (19-04-26 21:28)
+     ✘ if any of them are strings and the indexes (also need to support length prefix) @cancelled (19-04-26 21:28)
+     ✘ Explore having a mini string format cache on each thread to improve tight loop performance. @cancelled (19-04-26 21:28)
 
-     ☐ Explore having a mini string format cache on each thread to improve tight loop performance.
-
-  Zones:
-    ✔ Build total time and counts for each zone. @done (19-04-07 18:43)
-      ☐ Move hot siblings to front of child list.
-    ☐ Support zone counts for each frame.
+   ☐ Make the format praser faster, SIMD maybe.
 
   Strings:
      ✔ Support printf @done (19-03-21 23:34)
@@ -32,6 +27,7 @@ Runtime:
 
   Plots:
     ✔ Implement plots @done (19-04-13 12:56)
+    ☐ Support plot aggregation based on paths in format string.
 
   Polish:
     ☐ Get rid of the CRT (low priority)
@@ -42,22 +38,28 @@ Runtime:
 
 Veiwer:
 
-    ☐ Notice server disconnects and show option to connect again.
+    ✔ Notice server disconnects and show option to connect again. @done (19-04-28 11:53)
     ☐ Support showing zoneData
     ☐ Support showing child time
     ☐ Fix issue with overlapping lock holds due to context switches.
     ☐ Show plots
+    ☐ Show messages
 
 ServerLib:
+
+  Zones:
+    ✔ Build total time and counts for each zone. @done (19-04-07 18:43)
+      ☐ Move hot siblings to front of child list.
+    ☐ Support zone counts for each frame.
 
   ✔ Support clients creating multiple traces per second. @done (19-04-02 22:24)
     Currently this don't work since db names clash.
 
   ☐ Create nice api for the server exe to just run.
-  ☐ Support multiple client connections / data streams
+  ✔ Support multiple client connections / data streams @done (19-04-26 20:53)
 
   ✔ Process the incoming data @done (19-03-17 12:45)
-    ☐ Use a thread pool for processing data from multiple clients.
+    ✔ Use a thread pool for processing data from multiple clients. @done (19-04-26 20:53)
 
   ✔ Have a api for querying data for a given client @done (19-03-17 12:45)
      ✔ Also support a REST like api, so remote viewers can connect. @done (19-03-17 12:45)
@@ -68,8 +70,13 @@ ServerLib:
  ☐ Implment symbol resolving.
    ☐ Add support for symbol paths so the server knows where to look.
    ☐ Add logic for resolving the symbols.
-     Not totally sure i can do this using dbghelp storing the data the way to do.
+     Not totally sure i can do this using dbghelp storing the data the way I do.
      Worst comes to worse i can just write my own code for it.
+
+     We need a proper symbol server also, so we can download missing ones.
+     like user32.dll etc..
+
+
 
 Server:
 
