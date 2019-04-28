@@ -3364,9 +3364,10 @@ core::Thread::ReturnValue threadFunc(const core::Thread& thread)
             if (!connectToServer(client)) {
                 client.conState = Client::ConnectionState::Offline;
             }
+            else {
+                client.conState = Client::ConnectionState::Connected;
+            }
         }
-
-        client.conState = Client::ConnectionState::Connected;
 
         // listen for packets.
         int recvbuflen = sizeof(recvbuf);
