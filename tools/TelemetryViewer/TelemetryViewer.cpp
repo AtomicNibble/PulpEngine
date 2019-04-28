@@ -648,7 +648,7 @@ void LockTryTooltip(TraceView& view, const LockTry& lock)
     ImGui::EndTooltip();
 }
 
-void LockStateTooltip(TraceView& view, const LockState& lockState, const LockState& lockStateNext)
+void LockStateTooltip(TraceView& view, uint64_t lockId, const LockState& lockState, const LockState& lockStateNext)
 {
     X_UNUSED(view);
 
@@ -659,6 +659,7 @@ void LockStateTooltip(TraceView& view, const LockState& lockState, const LockSta
     // currently no.
     X_ASSERT(lockStateNext.threadID == lockState.threadID, "Lock state on diffrent thread")();
 
+    auto strLock = view.strings.getLockName(lockId);
     auto strThread = view.strings.getThreadName(lockState.threadID);
     auto strFunc = view.strings.getString(lockState.strIdxFunction);
     auto strFile = view.strings.getString(lockState.strIdxFile);
@@ -669,6 +670,8 @@ void LockStateTooltip(TraceView& view, const LockState& lockState, const LockSta
 
     ImGui::BeginTooltip();
 
+        ImGui::TextUnformatted(strLock.begin(), strLock.end());
+        ImGui::Separator();
         ImGui::TextUnformatted(str.begin(), str.end());
         ImGui::Separator();
         ImGui::TextUnformatted(strFunc.begin(), strFunc.end());
@@ -1306,7 +1309,7 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
 
                             if (hover && ImGui::IsMouseHoveringRect(wpos + ImVec2(px0, offset), wpos + ImVec2(px1, offset + tsz.y)))
                             {
-                                LockStateTooltip(view, lockState, lockStateRelease);
+                                LockStateTooltip(view, lockHandle, lockState, lockStateRelease);
                             }
                         }
 
