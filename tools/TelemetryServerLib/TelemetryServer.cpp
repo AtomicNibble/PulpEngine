@@ -1708,15 +1708,25 @@ bool TraceDB::getStats(sql::SqlLiteDb& db, TraceStats& stats)
     }
 
     {
-        sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM memory LIMIT 1");
+        sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM memoryAlloc LIMIT 1");
         auto it = qry.begin();
         if (it == qry.end()) {
-            X_ERROR("TelemSrv", "Failed to load alloc count");
+            X_ERROR("TelemSrv", "Failed to load mem alloc count");
             return false;
         }
 
         stats.numAlloc = (*it).get<int64_t>(0);
-        stats.numFree = 0;
+    }
+
+    {
+        sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM memoryFree LIMIT 1");
+        auto it = qry.begin();
+        if (it == qry.end()) {
+            X_ERROR("TelemSrv", "Failed to load mem free count");
+            return false;
+        }
+
+        stats.numFree = (*it).get<int64_t>(0);
     }
 
     {
@@ -1819,7 +1829,8 @@ bool TraceBuilder::createDB(core::Path<char>& path)
     okay &= (sql::Result::OK == cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, timeTicks, strIdx) VALUES(?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, strIdx) VALUES(?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)"));
-    okay &= (sql::Result::OK == cmdInsertMemory.prepare("INSERT INTO memory (allocId, size, threadId, timeTicks, operation, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?,?)"));
+    okay &= (sql::Result::OK == cmdInsertMemAlloc.prepare("INSERT INTO memoryAlloc (allocId, size, threadId, timeTicks, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?)"));
+    okay &= (sql::Result::OK == cmdInsertMemFree.prepare("INSERT INTO memoryFree (allocId, threadId, timeTicks, packedSourceInfo) VALUES(?,?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertMessage.prepare("INSERT INTO messages (timeTicks, type, strIdx) VALUES(?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertZoneNode.prepare("INSERT INTO zoneNodes (setId, parentId, totalTick, count, strIdx) VALUES(?,?,?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertPlot.prepare("INSERT INTO plots (type, timeTicks, value, strIdx) VALUES(?,?,?,?)"));
@@ -1854,6 +1865,12 @@ bool TraceBuilder::createIndexes(void)
         );
         CREATE INDEX IF NOT EXISTS "callstack_id" ON "callstack" (
             "id"	ASC
+        );
+        CREATE INDEX IF NOT EXISTS "memalloc_time" ON "memoryAlloc" (
+            "timeTicks"	ASC
+        );
+        CREATE INDEX IF NOT EXISTS "memfree_time" ON "memoryFree" (
+            "timeTicks"	ASC
         );
     )");
 
@@ -1958,17 +1975,26 @@ CREATE TABLE IF NOT EXISTS "lockStates" (
 	PRIMARY KEY("Id")
 );
 
-CREATE TABLE "memory" (
+CREATE TABLE "memoryAlloc" (
 	"Id"	            INTEGER,
 	"allocId"	        INTEGER NOT NULL,
 	"size"	            INTEGER NOT NULL,
 	"threadId"	        INTEGER NOT NULL,
 	"timeTicks"	        INTEGER NOT NULL,
-	"operation"	        INTEGER NOT NULL,
     "packedSourceInfo"	INTEGER NOT NULL,
 	"strIdx"	        INTEGER,
 	PRIMARY KEY("Id")
 );
+
+CREATE TABLE "memoryFree" (
+	"Id"	            INTEGER,
+	"allocId"	        INTEGER NOT NULL,
+	"threadId"	        INTEGER NOT NULL,
+	"timeTicks"	        INTEGER NOT NULL,
+    "packedSourceInfo"	INTEGER NOT NULL,
+	PRIMARY KEY("Id")
+);
+
 
 CREATE TABLE "messages" (
 	"Id"	            INTEGER,
@@ -2371,14 +2397,13 @@ int32_t TraceBuilder::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
     info.raw.depth = 0;
 
-    auto& cmd = cmdInsertMemory;
+    auto& cmd = cmdInsertMemAlloc;
     cmd.bind(1, static_cast<int32_t>(pData->ptr));
     cmd.bind(2, static_cast<int32_t>(pData->size));
     cmd.bind(3, static_cast<int32_t>(pData->threadID));
     cmd.bind(4, static_cast<int64_t>(pData->time));
-    cmd.bind(5, static_cast<int32_t>(MemOp::Alloc));
-    cmd.bind(6, static_cast<int64_t>(info.packed));
-    cmd.bind(7, strIdx);
+    cmd.bind(5, static_cast<int64_t>(info.packed));
+    cmd.bind(6, strIdx);
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -2397,14 +2422,11 @@ int32_t TraceBuilder::handleDataPacketMemFree(const DataPacketMemFree* pData)
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
     info.raw.depth = 0;
 
-    auto& cmd = cmdInsertMemory;
+    auto& cmd = cmdInsertMemFree;
     cmd.bind(1, static_cast<int32_t>(pData->ptr));
-    cmd.bind(2, -1);
-    cmd.bind(3, static_cast<int32_t>(pData->threadID));
-    cmd.bind(4, static_cast<int64_t>(pData->time));
-    cmd.bind(5, static_cast<int32_t>(MemOp::Free));
-    cmd.bind(6, static_cast<int64_t>(info.packed));
-    cmd.bind(7);
+    cmd.bind(2, static_cast<int32_t>(pData->threadID));
+    cmd.bind(3, static_cast<int64_t>(pData->time));
+    cmd.bind(4, static_cast<int64_t>(info.packed));
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {

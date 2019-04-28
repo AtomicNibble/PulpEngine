@@ -167,7 +167,8 @@ public:
         cmdInsertThreadName(con),
         cmdInsertLockName(con),
         cmdInsertMeta(con),
-        cmdInsertMemory(con),
+        cmdInsertMemAlloc(con),
+        cmdInsertMemFree(con),
         cmdInsertMessage(con),
         cmdInsertZoneNode(con),
         cmdInsertPlot(con),
@@ -223,7 +224,8 @@ private:
     sql::SqlLiteCmd cmdInsertThreadName;
     sql::SqlLiteCmd cmdInsertLockName;
     sql::SqlLiteCmd cmdInsertMeta;
-    sql::SqlLiteCmd cmdInsertMemory;
+    sql::SqlLiteCmd cmdInsertMemAlloc;
+    sql::SqlLiteCmd cmdInsertMemFree;
     sql::SqlLiteCmd cmdInsertMessage;
     sql::SqlLiteCmd cmdInsertZoneNode;
     sql::SqlLiteCmd cmdInsertPlot;
