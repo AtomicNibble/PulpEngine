@@ -1859,6 +1859,8 @@ bool TraceBuilder::createDB(core::Path<char>& path)
     okay &= (sql::Result::OK == cmdInsertPDB.prepare("INSERT INTO sym (modAddr, imageSize, guid, strIdx) VALUES(?,?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertCallstack.prepare("INSERT INTO callstack (id, depth, data) VALUES(?,?,?)"));
 
+    okay &= createIndexes();
+
     return okay;
 }
 
