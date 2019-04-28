@@ -88,19 +88,19 @@ namespace
         core::StopWatch timer;
         int32_t total = 0;
 
-        ttSetLockName(ctx, &cs0, "Magic lock");
-        ttSetLockName(ctx, &cs1, "Stu's lock");
+        ttSetLockName(ctx, &cs0, "lock cs0");
+        ttSetLockName(ctx, &cs1, "lock cs1");
 
         TtCallStack stack;
 
         for (int i = 0; i < 200; i++)
         {
-            ttZone(ctx, "Aint no camel like me! %" PRIi32, i);
+            ttZone(ctx, "Sample zone with arg! %" PRIi32, i);
 
             ttGetCallStack(ctx, stack);
             auto stackID = ttSendCallStack(ctx, &stack);
 
-            ttMessage(ctx, TtLogType::Msg, "Look at my callstack: %t", stackID);
+            ttMessage(ctx, TtLogType::Msg, "Message with callstack: %t", stackID);
 
          //   core::ScopedLockShared locks0(sharedLock);
 
@@ -112,32 +112,32 @@ namespace
                 ttFree(ctx, (void*)0x12345678);
             }
 
-            ttPlot(ctx, TtPlotType::Time, timer.GetMilliSeconds(), "Plot me!");
+            ttPlot(ctx, TtPlotType::Time, timer.GetMilliSeconds(), "A Plot!");
 
             for (int x = 0; x < 10; x++)
             {
                 {
-                    ttEnter(ctx, "Slap my %s!", "goat");
+                    ttEnter(ctx, "empty zone %s!", "scope");
                     ttLeave(ctx);
                 }
 
                 {
                     ScopedLockTelemetry lock(cs0);
 
-                    ttZone(ctx, "Slap a pickle!");
+                    ttZone(ctx, "Sample Zone1");
                     total++;
                     core::Thread::sleep(0);
                 }
 
-                ttZone(ctx, "Stu is that you?");
+                ttZone(ctx, "Sample Zone2");
 
                 for (int j = 0; j < 50; j++)
                 {
-                    ttZone(ctx, "One goat to slap them all");
+                    ttZone(ctx, "Outer loop Zone");
 
                     for (int y = 0; y < 2; y++)
                     {
-                        ttEnter(ctx, "Yep");
+                        ttEnter(ctx, "Inner loop zone");
                         ttLeave(ctx);
                     }
                 }
