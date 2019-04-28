@@ -2820,6 +2820,7 @@ void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const cha
 
 void TelemLeave(TraceContexHandle ctx)
 {
+    auto ticks = getTicks();
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = gThreadData;
 
@@ -2830,7 +2831,7 @@ void TelemLeave(TraceContexHandle ctx)
     auto depth = --pThreadData->stackDepth;
 
     auto& scopeData = pThreadData->zones[depth];
-    scopeData.zone.end = getTicks();
+    scopeData.zone.end = ticks;
 
     queueZone(pCtx, pThreadData, scopeData);
 }
@@ -2874,6 +2875,7 @@ void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint
 
 void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId)
 {
+    auto ticks = getTicks();
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = gThreadData;
 
@@ -2884,7 +2886,7 @@ void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId)
     auto depth = --pThreadData->stackDepth;
 
     auto& scopeData = pThreadData->zones[depth];
-    scopeData.zone.end = getTicks();
+    scopeData.zone.end = ticks;
 
     // work out if we send it.
     auto minMicroSec = matchId;
@@ -2936,6 +2938,7 @@ void TelemSetLockName(TraceContexHandle ctx, const void* pPtr, const char* pFmtS
 
 void TelemTryLock(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...)
 {
+    auto ticks = getTicks();
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
         return;
@@ -2952,7 +2955,7 @@ void TelemTryLock(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const v
     }
 
     auto& lock = pLock->lock;
-    lock.start = getTicks();
+    lock.start = ticks;
     lock.pFmtStr = pFmtString;
     lock.sourceInfo = sourceInfo;
 
@@ -2974,6 +2977,7 @@ void TelemTryLock(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const v
 void TelemTryLockEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, 
     const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...)
 {
+    auto ticks = getTicks();
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
         return;
@@ -2992,7 +2996,7 @@ void TelemTryLockEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_ui
     matchIdOut = minMicroSec;
 
     auto& lock = pLock->lock;
-    lock.start = getTicks();
+    lock.start = ticks;
     lock.pFmtStr = pFmtString;
     lock.sourceInfo = sourceInfo;
 
@@ -3013,6 +3017,7 @@ void TelemTryLockEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_ui
 
 void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult::Enum result)
 {
+    auto ticks = getTicks();
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = gThreadData;
 
@@ -3026,7 +3031,7 @@ void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult::Enum
     }
 
     auto& lock = pLock->lock;
-    lock.end = getTicks();
+    lock.end = ticks;
     lock.result = result;
     lock.depth = static_cast<decltype(lock.depth)>(pThreadData->stackDepth);
 
@@ -3035,6 +3040,7 @@ void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult::Enum
 
 void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPtr, TtLockResult::Enum result)
 {
+    auto ticks = getTicks();
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = gThreadData;
 
@@ -3048,7 +3054,7 @@ void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPt
     }
 
     auto& lock = pLock->lock;
-    lock.end = getTicks();
+    lock.end = ticks;
     lock.result = result;
     lock.depth = static_cast<decltype(lock.depth)>(pThreadData->stackDepth);
 
