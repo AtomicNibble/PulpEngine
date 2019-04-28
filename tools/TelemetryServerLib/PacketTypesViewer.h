@@ -21,7 +21,8 @@ struct DataStreamTypeViewer
         TraceThreadNames,
         TraceLocks,
         TraceLockNames,
-        TraceZoneTree
+        TraceZoneTree,
+        TraceMessages
     };
 };
 
@@ -110,6 +111,14 @@ struct ReqTraceZoneTree : public PacketBase
 {
     tt_int8 handle;
     tt_int32 frameIdx;
+};
+
+struct ReqTraceZoneMessages : public PacketBase
+{
+    tt_int8 handle;
+
+    tt_int64 startNano;
+    tt_int64 endNano;
 };
 
 
@@ -215,6 +224,19 @@ struct TraceZoneTreeData
     tt_int32 parentId;
     tt_uint32 strIdx;
     tt_int64 totalTicks;
+};
+
+struct ReqTraceMessagesResp : public DataPacketBaseViewer
+{
+    tt_int8 handle;
+    tt_int32 num;
+};
+
+struct TraceMessagesData
+{
+    TtLogType::Enum type;
+    tt_int64  timeTicks;
+    tt_uint32 strIdx;
 };
 
 

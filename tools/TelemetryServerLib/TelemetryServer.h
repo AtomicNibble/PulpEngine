@@ -323,6 +323,7 @@ public:
     bool handleReqTraceThreadNames(uint8_t* pData);
     bool handleReqTraceLockNames(uint8_t* pData);
     bool handleReqTraceZoneTree(uint8_t* pData);
+    bool handleReqTraceMessages(uint8_t* pData);
 
     // Tmp public
     void sendDataToClient(const void* pData, size_t len);

@@ -175,6 +175,9 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
             case PacketType::ReqTraceZoneTree:
                 res = handleReqTraceZoneTree(pData);
                 break;
+            case PacketType::ReqTraceMessages:
+                res = handleReqTraceMessages(pData);
+                break;
 
             default:
                 X_ERROR("TelemSrv", "Unknown packet type %" PRIi32, static_cast<int>(pPacketHdr->type));
@@ -1241,6 +1244,70 @@ bool ClientConnection::handleReqTraceZoneTree(uint8_t* pData)
 
     return true;
 }
+
+
+bool ClientConnection::handleReqTraceMessages(uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const ReqTraceZoneMessages*>(pData);
+    if (pHdr->type != PacketType::ReqTraceMessages) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    int32_t handle = pHdr->handle;
+    if (handle < 0 || handle >= static_cast<int32_t>(traces_.size())) {
+        return false;
+    }
+
+    auto& ts = traces_[pHdr->handle];
+
+    auto begin = ts.trace.nanoToTicks(pHdr->startNano);
+    auto end = ts.trace.nanoToTicks(pHdr->endNano);
+
+    sql::SqlLiteQuery qry(ts.con, "SELECT type, timeTicks, strIdx FROM messages WHERE timeTicks >= ? AND timeTicks < ?");
+    qry.bind(1, begin);
+    qry.bind(2, end);
+
+    auto* pMsgHdr = addToCompressionBufferT<ReqTraceMessagesResp>();
+    pMsgHdr->type = DataStreamTypeViewer::TraceMessages;
+    pMsgHdr->handle = pHdr->handle;
+    pMsgHdr->num = 0;
+
+    int32_t num = 0;
+
+    auto it = qry.begin();
+    for (; it != qry.end(); ++it) {
+        auto row = *it;
+
+        TraceMessagesData ztd;
+        ztd.type = static_cast<TtLogType::Enum>(row.get<int32_t>(0));
+        ztd.timeTicks = row.get<int64_t>(1);
+        ztd.strIdx = safe_static_cast<uint32_t>(row.get<int32_t>(2));
+
+        if (getCompressionBufferSpace() < sizeof(ztd)) {
+            pMsgHdr->num = num;
+            num = 0;
+
+            flushCompressionBuffer();
+
+            pMsgHdr = addToCompressionBufferT<ReqTraceMessagesResp>();
+            pMsgHdr->type = DataStreamTypeViewer::TraceMessages;
+            pMsgHdr->handle = pHdr->handle;
+            pMsgHdr->num = 0;
+        }
+
+        addToCompressionBuffer(&ztd, sizeof(ztd));
+
+        num++;
+    }
+
+    if (num) {
+        pMsgHdr->num = num;
+        flushCompressionBuffer();
+    }
+
+    return true;
+}
+
 
 void ClientConnection::sendDataToClient(const void* pData, size_t len)
 {
