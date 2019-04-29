@@ -378,6 +378,17 @@ bool XCore::Init(CoreInitParams& startupParams)
             return false;
         }
 
+#if 1
+        auto res = ttOpen(
+            gEnv->ctx,
+            startupParams.pTelemAppName,
+            X_BUILD_STRING " Version: " X_ENGINE_VERSION_STR " Rev: " X_ENGINE_BUILD_REF_STR,
+            "telem.dat",
+            telem::ConnectionType::File,
+            0,
+            0
+        );
+#else
         auto res = ttOpen(
             gEnv->ctx,
             startupParams.pTelemAppName,
@@ -387,6 +398,7 @@ bool XCore::Init(CoreInitParams& startupParams)
             8001,
             1000
         );
+#endif
 
         // should we try do stuff like auto start a local server?
         if (res != telem::Error::Ok) {
