@@ -53,9 +53,9 @@ struct TTFlag
 };
 
 // IO callbacks.
-using FileOpenFunc = TtFileHandle(*)(const char*);
-using FileCloseFunc = void(*)(TtFileHandle);
-using FileWriteFunc = tt_int32(*)(TtFileHandle, const void*, tt_int32);
+using FileOpenFunc = TtFileHandle(*)(void* pUserData, const char*);
+using FileCloseFunc = void(*)(void* pUserData, TtFileHandle);
+using FileWriteFunc = tt_int32(*)(void* pUserData, TtFileHandle, const void*, tt_int32);
 
 inline TtFileHandle TELEM_INVALID_HANDLE = 0;
 
@@ -154,6 +154,7 @@ extern "C"
     __TELEM_API_VOID(TelemShutdownContext, TraceContexHandle ctx);
 
     __TELEM_API_VOID(TelemSetContextLogFunc, TraceContexHandle ctx, LogFunction func, void* pUserData);
+    __TELEM_API_VOID(TelemSetIoFuncs, TraceContexHandle ctx, FileOpenFunc open, FileCloseFunc close, FileWriteFunc write, void* pUserData);
 
     __TELEM_API_ERR(TelemOpen, TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
         TtConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS);
@@ -250,6 +251,7 @@ namespace telem
             __TELEM_RESOLVE(TelemInitializeContext);
             __TELEM_RESOLVE(TelemShutdownContext);
             __TELEM_RESOLVE(TelemSetContextLogFunc);
+            __TELEM_RESOLVE(TelemSetIoFuncs);
             __TELEM_RESOLVE(TelemOpen);
             __TELEM_RESOLVE(TelemClose);
             __TELEM_RESOLVE(TelemTick);
@@ -292,6 +294,7 @@ namespace telem
             __TELEM_SET_BLANK(TelemInitializeContext);
             __TELEM_SET_BLANK(TelemShutdownContext);
             __TELEM_SET_BLANK(TelemSetContextLogFunc);
+            __TELEM_SET_BLANK(TelemSetIoFuncs);
             __TELEM_SET_BLANK(TelemOpen);
             __TELEM_SET_BLANK(TelemClose);
             __TELEM_SET_BLANK(TelemTick);
@@ -340,6 +343,7 @@ namespace telem
         __TELEM_FUNC_PTR(TelemInitializeContext);
         __TELEM_FUNC_PTR(TelemShutdownContext);
         __TELEM_FUNC_PTR(TelemSetContextLogFunc);
+        __TELEM_FUNC_PTR(TelemSetIoFuncs);
         __TELEM_FUNC_PTR(TelemOpen);
         __TELEM_FUNC_PTR(TelemClose);
         __TELEM_FUNC_PTR(TelemTick);
@@ -463,6 +467,7 @@ namespace telem
 #define ttShutdownContext(ctx) __TELEM_FUNC_NAME(TelemShutdownContext)(ctx)
 
 #define ttSetContextLogFunc(ctx, func, pUserData) __TELEM_FUNC_NAME(TelemSetContextLogFunc)(ctx, func, pUserData)
+#define ttSetContextIoFuncs(ctx, open, close, write, pUserData) __TELEM_FUNC_NAME(TelemSetIoFuncs)(ctx, open, close, write, pUserData)
 
 #define ttOpen(ctx, pAppName, pBuildInfo, pServerAddress, conType, serverPort, timeoutMS) \
     __TELEM_FUNC_NAME(TelemOpen)(ctx, pAppName, pBuildInfo, pServerAddress, conType, serverPort, timeoutMS)
@@ -530,6 +535,7 @@ namespace telem
 #define ttShutDown() 
 
 #define ttSetContextLogFunc(...)
+#define ttSetContextIoFuncs(...)
 
 // Context
 #define ttInitializeContext(...)

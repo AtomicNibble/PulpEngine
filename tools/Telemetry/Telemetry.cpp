@@ -85,8 +85,10 @@ namespace
 
         static_assert(sizeof(TelemFileHdr) == 8, "Size changed");
 
-        TtFileHandle fileOpen(const char* pPath)
+        TtFileHandle fileOpen(void* pUserData, const char* pPath)
         {
+            TELEM_UNUSED(pUserData);
+
             DWORD access = FILE_WRITE_DATA;
             DWORD share = 0;
             DWORD dispo = CREATE_ALWAYS;
@@ -100,13 +102,16 @@ namespace
             return reinterpret_cast<TtFileHandle>(hHandle);
         }
 
-        void fileClose(TtFileHandle handle)
+        void fileClose(void* pUserData, TtFileHandle handle)
         {
+            TELEM_UNUSED(pUserData);
             ::CloseHandle(reinterpret_cast<HANDLE>(handle));
         }
 
-        tt_int32 fileWrite(TtFileHandle handle, const void* pData, tt_int32 length)
+        tt_int32 fileWrite(void* pUserData, TtFileHandle handle, const void* pData, tt_int32 length)
         {
+            TELEM_UNUSED(pUserData);
+
             // i need to support 64bit files.
             // but don't care about offset.
             DWORD bytesWritten = 0;
@@ -585,6 +590,7 @@ namespace
         FileOpenFunc pFileOpen;
         FileCloseFunc pFileClose;
         FileWriteFunc pFileWrite;
+        void* pIOUserData;
     };
 
 //    constexpr size_t size0 = sizeof(TraceContext);
@@ -600,7 +606,7 @@ namespace
 
     TELEM_INLINE tt_int32 fileWrite(TraceContext* pCtx, const void* pData, tt_int32 length)
     {
-        return pCtx->pFileWrite(pCtx->fileHandle, pData, length);
+        return pCtx->pFileWrite(pCtx->pIOUserData, pCtx->fileHandle, pData, length);
     }
 
     template<typename T>
@@ -868,7 +874,7 @@ namespace
         }
 
         if (pCtx->fileHandle != TELEM_INVALID_HANDLE) {
-            pCtx->pFileClose(pCtx->fileHandle);
+            pCtx->pFileClose(pCtx->pIOUserData, pCtx->fileHandle);
             pCtx->fileHandle = TELEM_INVALID_HANDLE;
         }
 
@@ -2684,7 +2690,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     else
     {
         // open a file.
-        pCtx->fileHandle = pCtx->pFileOpen(pPath);
+        pCtx->fileHandle = pCtx->pFileOpen(pCtx->pIOUserData, pPath);
         if (pCtx->fileHandle == TELEM_INVALID_HANDLE) {
             return TtError::Error;
         }
@@ -2715,6 +2721,8 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
         offset += cmdLenUtf8;
 
         if (fileWrite(pCtx, buf, offset) != offset) {
+            pCtx->pFileClose(pCtx->pIOUserData, pCtx->fileHandle);
+            pCtx->fileHandle = TELEM_INVALID_HANDLE;
             return TtError::Error;
         }
         
