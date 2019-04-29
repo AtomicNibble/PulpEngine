@@ -2755,6 +2755,11 @@ bool TelemClose(TraceContexHandle ctx)
         pCtx->socket = INV_SOCKET;
     }
 
+    if (pCtx->fileHandle != TELEM_INVALID_HANDLE) {
+        pCtx->pFileClose(pCtx->pIOUserData, pCtx->fileHandle);
+        pCtx->fileHandle = TELEM_INVALID_HANDLE;
+    }
+
     return true;
 }
 
