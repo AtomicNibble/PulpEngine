@@ -4,7 +4,6 @@
 
 #include <Util/UniquePointer.h>
 #include <Util/Guid.h>
-#include <Time/DateTimeStamp.h>
 
 #include <../TelemetryCommon/TelemetryCommonLib.h>
 
@@ -69,7 +68,7 @@ struct TraceInfo
     uint64_t ticksPerMicro;
     uint64_t ticksPerMs;
     uint32_t workerThreadID;
-    core::DateTimeStamp date;
+    tt_uint64 unixTimestamp;
     core::string hostName;
     core::string buildInfo;
     core::string cmdLine;

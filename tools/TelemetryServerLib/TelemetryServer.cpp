@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "TelemetryServer.h"
 
-#include <Time/DateTimeStamp.h>
 #include <Util/Guid.h>
 
 #include <IFileSys.h>
@@ -282,15 +281,13 @@ bool ClientConnection::handleConnectionRequest(uint8_t* pData)
     trace.cmdLine.assign(pCmdLineStr, pConReq->cmdLineLen);
     trace.ticksPerMicro = pConReq->ticksPerMicro;
     trace.ticksPerMs = pConReq->ticksPerMs;
+    trace.unixTimestamp = pConReq->unixTimestamp;
     trace.workerThreadID = pConReq->workerThreadID;
 
     core::Path<> workingDir;
     if (!gEnv->pFileSys->getWorkingDirectory(workingDir)) {
         return false;
     }
-
-    core::DateTimeStamp date = core::DateTimeStamp::getSystemDateTime();
-    core::DateTimeStamp::Description dateStr;
 
     core::Path<> dbPath(workingDir);
     // want a folder for each app.
@@ -310,7 +307,7 @@ bool ClientConnection::handleConnectionRequest(uint8_t* pData)
     core::Guid::GuidStr guidStr;
 
     dbPath.append("telem_");
-    dbPath.append(date.toString(dateStr));
+    dbPath.appendFmt("%" PRIu64, trace.unixTimestamp);
     dbPath.append("_");
     dbPath.append(trace.guid.toString(guidStr));
     dbPath.setExtension("db");
@@ -333,9 +330,9 @@ bool ClientConnection::handleConnectionRequest(uint8_t* pData)
     setMeta &= strm.setMeta("hostName", core::string_view(host_));
     setMeta &= strm.setMeta("buildInfo", trace.buildInfo);
     setMeta &= strm.setMeta("cmdLine", trace.cmdLine);
-    setMeta &= strm.setMeta("dateStamp", dateStr);
     setMeta &= strm.setMeta("clientVer", clientVer_.toString(verStr));
     setMeta &= strm.setMeta("serverVer", serverVer.toString(verStr));
+    setMeta &= strm.setMeta<int64_t>("unixTimestamp", static_cast<int64_t>(trace.unixTimestamp));
     setMeta &= strm.setMeta<int64_t>("tickPerMicro", static_cast<int64_t>(trace.ticksPerMicro));
     setMeta &= strm.setMeta<int64_t>("tickPerMs", static_cast<int64_t>(trace.ticksPerMs));
     setMeta &= strm.setMeta<int32_t>("workerThreadID", static_cast<int32_t>(trace.workerThreadID));
@@ -596,6 +593,7 @@ bool ClientConnection::handleOpenTrace(uint8_t* pData)
     otr.guid = pHdr->guid;
     otr.ticksPerMicro = 0;
     otr.workerThreadID = 0;
+    otr.unixTimestamp = 0;
     otr.handle = -1_ui8;
 
     // TODO: check we don't have it open already.
@@ -615,6 +613,7 @@ bool ClientConnection::handleOpenTrace(uint8_t* pData)
 
             otr.handle = safe_static_cast<int8_t>(i);
             otr.ticksPerMicro = trace.trace.ticksPerMicro;
+            otr.unixTimestamp = trace.trace.unixTimestamp;
             otr.workerThreadID = trace.trace.workerThreadID;
             sendDataToClient(&otr, sizeof(otr));
             return true;
@@ -2704,23 +2703,18 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
         bool loaded = true;
 
         core::string guidStr;
-        core::string dateStr;
 
         loaded &= TraceDB::getMetaStr(db, "guid", guidStr);
-        loaded &= TraceDB::getMetaStr(db, "dateStamp", dateStr);
         loaded &= TraceDB::getMetaStr(db, "hostName", trace.hostName);
         loaded &= TraceDB::getMetaStr(db, "buildInfo", trace.buildInfo);
         loaded &= TraceDB::getMetaStr(db, "cmdLine", trace.cmdLine);
         loaded &= TraceDB::getMetaUInt64(db, "tickPerMicro", trace.ticksPerMicro);
         loaded &= TraceDB::getMetaUInt64(db, "tickPerMs", trace.ticksPerMs);
+        loaded &= TraceDB::getMetaUInt64(db, "unixTimestamp", trace.unixTimestamp);
         loaded &= TraceDB::getMetaUInt32(db, "workerThreadID", trace.workerThreadID);
 
         if (!loaded) {
             X_ERROR("TelemSrv", "Failed to load meta for: \"%s\"", trace.dbPath.c_str());
-            continue;
-        }
-
-        if (!core::DateTimeStamp::fromString(core::string_view(dateStr), trace.date)) {
             continue;
         }
 
@@ -3064,7 +3058,7 @@ bool Server::sendAppList(ClientConnection& client)
             AppTraceListData tld;
             tld.guid = trace.guid;
             tld.active = trace.active;
-            tld.date = trace.date;
+            tld.unixTimestamp = trace.unixTimestamp;
             strcpy_s(tld.hostName, trace.hostName.c_str());
             strcpy_s(tld.buildInfo, trace.buildInfo.c_str());
 

@@ -354,6 +354,23 @@ namespace
 
     } // namespace PE
 
+    tt_int64 GetSystemTimeAsUnixTime(void)
+    {
+        // January 1, 1970 (start of Unix epoch) in "ticks"
+        const tt_int64 UNIX_TIME_START = 0x019DB1DED53E8000;
+        // tick is 100ns
+        const tt_int64 TICKS_PER_SECOND = 10000000;
+
+        FILETIME ft;
+        GetSystemTimeAsFileTime(&ft);
+
+        LARGE_INTEGER li;
+        li.LowPart = ft.dwLowDateTime;
+        li.HighPart = ft.dwHighDateTime;
+
+        return (li.QuadPart - UNIX_TIME_START) / TICKS_PER_SECOND;
+    }
+
 
     TELEM_PACK_PUSH(8)
     struct THREADNAME_INFO
@@ -2604,6 +2621,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     cr.cmdLineLen = static_cast<tt_uint16>(cmdLenUtf8);
     cr.ticksPerMicro = gTicksPerMicro;
     cr.ticksPerMs = gTicksPerMicro * 1000;
+    cr.unixTimestamp = GetSystemTimeAsUnixTime();
     cr.workerThreadID = pCtx->threadId_;
     cr.dataSize = sizeof(cr) + cr.appNameLen + cr.buildInfoLen + cr.cmdLineLen;
 

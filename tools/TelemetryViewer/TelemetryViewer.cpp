@@ -3066,7 +3066,7 @@ bool handleAppList(Client& client, uint8_t* pData)
             trace.active = srcTrace.active;
             trace.guid = srcTrace.guid;
             trace.ticksPerMicro = srcTrace.ticksPerMicro;
-            trace.date = srcTrace.date;
+            trace.unixTimestamp = srcTrace.unixTimestamp;
             trace.hostName = srcTrace.hostName;
             trace.buildInfo = srcTrace.buildInfo;
 

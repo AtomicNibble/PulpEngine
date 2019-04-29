@@ -48,7 +48,7 @@ struct AppTraceListData
     bool active;
     core::Guid guid;
     uint64_t ticksPerMicro;
-    core::DateTimeStamp date;
+    uint64_t unixTimestamp;
     char hostName[MAX_STRING_LEN];
     char buildInfo[MAX_STRING_LEN];
 };
@@ -75,6 +75,7 @@ struct OpenTraceResp : public PacketBase
     core::Guid guid;
     TraceStats stats;
     uint64_t ticksPerMicro;
+    uint64_t unixTimestamp;
     uint32_t workerThreadID;
     tt_int8 handle;
 };
