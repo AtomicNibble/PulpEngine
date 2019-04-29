@@ -378,7 +378,9 @@ bool XCore::Init(CoreInitParams& startupParams)
             return false;
         }
 
-#if 1
+#if 0
+        // ttSetContextIoFuncs(gEnv->ctx, open, close, write, nullptr);
+
         auto res = ttOpen(
             gEnv->ctx,
             startupParams.pTelemAppName,
