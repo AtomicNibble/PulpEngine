@@ -383,8 +383,8 @@ bool XCore::Init(CoreInitParams& startupParams)
             startupParams.pTelemAppName,
             X_BUILD_STRING " Version: " X_ENGINE_VERSION_STR " Rev: " X_ENGINE_BUILD_REF_STR,
             "127.0.0.1",
-            8001,
             telem::ConnectionType::Tcp,
+            8001,
             1000
         );
 

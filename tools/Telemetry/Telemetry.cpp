@@ -2443,8 +2443,8 @@ void TelemSetContextLogFunc(TraceContexHandle ctx, LogFunction func, void* pUser
     pCtx->logFunc = func;
 }
 
-TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
-    tt_uint16 serverPort, TtConnectionType conType, tt_int32 timeoutMS)
+TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pPath,
+    TtConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS)
 {
     if (!isValidContext(ctx)) {
         return TtError::InvalidContex;

@@ -148,7 +148,7 @@ extern "C"
     __TELEM_API_VOID(TelemSetContextLogFunc, TraceContexHandle ctx, LogFunction func, void* pUserData);
 
     __TELEM_API_ERR(TelemOpen, TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
-        tt_uint16 serverPort, TtConnectionType conType, tt_int32 timeoutMS);
+        TtConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS);
 
     __TELEM_API_BOOL(TelemClose, TraceContexHandle ctx);
 
@@ -456,8 +456,8 @@ namespace telem
 
 #define ttSetContextLogFunc(ctx, func, pUserData) __TELEM_FUNC_NAME(TelemSetContextLogFunc)(ctx, func, pUserData)
 
-#define ttOpen(ctx, pAppName, pBuildInfo, pServerAddress, serverPort, conType, timeoutMS) \
-    __TELEM_FUNC_NAME(TelemOpen)(ctx, pAppName, pBuildInfo, pServerAddress, serverPort, conType, timeoutMS)
+#define ttOpen(ctx, pAppName, pBuildInfo, pServerAddress, conType, serverPort, timeoutMS) \
+    __TELEM_FUNC_NAME(TelemOpen)(ctx, pAppName, pBuildInfo, pServerAddress, conType, serverPort, timeoutMS)
 
 #define ttClose(ctx) __TELEM_FUNC_NAME(TelemClose)(ctx)
 
