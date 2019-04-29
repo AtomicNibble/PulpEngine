@@ -41,6 +41,8 @@ struct TraceInfo
     TraceInfo() :
         ticksPerMicro(0),
         ticksPerMs(0),
+        workerThreadID(0),
+        unixTimestamp(0),
         active(false)
     {}
 
@@ -68,7 +70,7 @@ struct TraceInfo
     uint64_t ticksPerMicro;
     uint64_t ticksPerMs;
     uint32_t workerThreadID;
-    tt_uint64 unixTimestamp;
+    uint64_t unixTimestamp;
     core::string hostName;
     core::string buildInfo;
     core::string cmdLine;
