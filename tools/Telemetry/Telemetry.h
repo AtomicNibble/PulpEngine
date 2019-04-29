@@ -52,15 +52,23 @@ struct TTFlag
     };
 };
 
+// IO callbacks.
+using FileOpenFunc = TtFileHandle(*)(const char*);
+using FileCloseFunc = void(*)(TtFileHandle);
+using FileWriteFunc = tt_int32(*)(TtFileHandle, const void*, tt_int32);
+
+inline TtFileHandle TELEM_INVALID_HANDLE = 0;
+
+
 using LogFunction = void(*)(void* pUserData, TtLogType::Enum type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm);
 using TraceContexHandle = tt_uintptr;
-
 
 inline TraceContexHandle INVALID_TRACE_CONTEX = 0;
 
 enum TtConnectionType
 {
-    Tcp
+    Tcp,
+    File
 };
 
 enum TtError

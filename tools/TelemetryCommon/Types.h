@@ -30,6 +30,10 @@ using tt_size = unsigned int;
 static_assert(sizeof(tt_uintptr) == sizeof(void*), "Size missmatch");
 
 
+using TtFileHandle = tt_uintptr;
+
+
+
 // TODO: find better home.
 // currently in here since they are used in both Telemetry.h and PacketTypes.h
 struct TtLockResult

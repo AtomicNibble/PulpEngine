@@ -59,6 +59,67 @@ namespace
 
     } // namespace Hash
 
+    namespace Io
+    {
+        #define TELEM_TAG(a, b, c, d) (uint32_t)((d << 24) | (c << 16) | (b << 8) | a)
+
+        static const char* TRACE_FILE_EXTENSION = "trace";
+        static const tt_uint32 TRACR_FOURCC = TELEM_TAG('t', 'r', 'a', 'c');
+        static const tt_uint8 TRACE_VERSION = 1;
+
+        // write a header.
+        struct TelemFileHdr
+        {
+            TelemFileHdr() {
+                zero_this(this);
+            }
+
+            tt_uint32 fourCC;
+            tt_uint8 version;
+            tt_uint8 _pad[3];
+
+            bool isValid(void) const {
+                return fourCC == TRACR_FOURCC;
+            }
+        };
+
+        static_assert(sizeof(TelemFileHdr) == 8, "Size changed");
+
+        TtFileHandle fileOpen(const char* pPath)
+        {
+            DWORD access = FILE_WRITE_DATA;
+            DWORD share = 0;
+            DWORD dispo = CREATE_ALWAYS;
+            DWORD flags = 0;
+
+            HANDLE hHandle = ::CreateFileA(pPath, access, share, NULL, dispo, flags, NULL);
+            if (hHandle == INVALID_HANDLE_VALUE) {
+                return TELEM_INVALID_HANDLE;
+            }
+
+            return reinterpret_cast<TtFileHandle>(hHandle);
+        }
+
+        void fileClose(TtFileHandle handle)
+        {
+            ::CloseHandle(reinterpret_cast<HANDLE>(handle));
+        }
+
+        tt_int32 fileWrite(TtFileHandle handle, const void* pData, tt_int32 length)
+        {
+            // i need to support 64bit files.
+            // but don't care about offset.
+            DWORD bytesWritten = 0;
+
+            if (!::WriteFile(reinterpret_cast<HANDLE>(handle), pData, length, &bytesWritten, nullptr)) {
+                return -1;
+            }
+
+            return static_cast<tt_int32>(bytesWritten);
+        }
+
+    } // namespace Io
+
     namespace PE
     {
 
@@ -503,10 +564,10 @@ namespace
         HANDLE hSignal_;
         HANDLE hSignalIdle_;
         volatile tt_int32 shutDownFlag;
-        platform::SOCKET socket;
-
         NetZones* pNetZones;
-        tt_uint8 _lanePad2[8];
+
+        platform::SOCKET socket;
+        TtFileHandle fileHandle;
 
         X86_PAD(28)
 
@@ -520,16 +581,33 @@ namespace
         void* pUserData;
 
         // -- Cace lane boundry --
+
+        FileOpenFunc pFileOpen;
+        FileCloseFunc pFileClose;
+        FileWriteFunc pFileWrite;
     };
 
- //   constexpr size_t size0 = sizeof(TraceContext);
- //   constexpr size_t size1 = TELEM_OFFSETOF(TraceContext, threadId_);
- //   constexpr size_t size2 = TELEM_OFFSETOF(TraceContext, cs_);
+//    constexpr size_t size0 = sizeof(TraceContext);
+//    constexpr size_t size1 = TELEM_OFFSETOF(TraceContext, threadId_);
+//    constexpr size_t size2 = TELEM_OFFSETOF(TraceContext, pFileOpen);
 
     static_assert(TELEM_OFFSETOF(TraceContext, activeTickBufIdx) == 64, "Cold fields not on firstcache lane");
     static_assert(TELEM_OFFSETOF(TraceContext, threadId_) == 128, "Cold fields not on next cache lane");
     static_assert(TELEM_OFFSETOF(TraceContext, cs_) == 192, "cache lane boundry changed");
-    static_assert(sizeof(TraceContext) == 256, "Size changed");
+    static_assert(TELEM_OFFSETOF(TraceContext, pFileOpen) == 256, "cache lane boundry changed");
+    static_assert(sizeof(TraceContext) == 320, "Size changed");
+
+
+    TELEM_INLINE tt_int32 fileWrite(TraceContext* pCtx, const void* pData, tt_int32 length)
+    {
+        return pCtx->pFileWrite(pCtx->fileHandle, pData, length);
+    }
+
+    template<typename T>
+    TELEM_INLINE tt_int32 fileWrite(TraceContext* pCtx, const T& obj)
+    {
+        return fileWrite(pCtx, reinterpret_cast<const void*>(&obj), sizeof(obj));
+    }
 
     TELEM_INLINE TraceContexHandle contextToHandle(TraceContext* pCtx)
     {
@@ -789,13 +867,18 @@ namespace
             pCtx->socket = INV_SOCKET;
         }
 
+        if (pCtx->fileHandle != TELEM_INVALID_HANDLE) {
+            pCtx->pFileClose(pCtx->fileHandle);
+            pCtx->fileHandle = TELEM_INVALID_HANDLE;
+        }
+
         // Also disable telem otherwise we can deadlock.
         pCtx->isEnabled = false;
     }
 
     void sendDataToServer(TraceContext* pCtx, const void* pData, tt_int32 len)
     {
-        if(pCtx->socket == INV_SOCKET) {
+        if(pCtx->socket == INV_SOCKET && pCtx->fileHandle == TELEM_INVALID_HANDLE) {
             return;
         }
 
@@ -811,15 +894,28 @@ namespace
 #endif // NET_ZONES
 
         // send some data...
-        // TODO: none blocking?
-        int res = platform::send(pCtx->socket, reinterpret_cast<const char*>(pData), len, 0);
-        if (res == SOCKET_ERROR) {
-            lastErrorWSA::Description Dsc;
-            const auto err = lastErrorWSA::Get();
 
-            onFatalWorkerError(pCtx);
-            writeLog(pCtx, TtLogType::Error, "Socket: send failed with Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
-            return;
+        if (pCtx->fileHandle != TELEM_INVALID_HANDLE) {
+            // Write to file.
+            auto numWrite = fileWrite(pCtx, reinterpret_cast<const char*>(pData), len);
+            if (numWrite != len) {
+                onFatalWorkerError(pCtx);
+                writeLog(pCtx, TtLogType::Error, "File: write failed");
+                return;
+            }
+        }
+        else {
+
+            // TODO: none blocking?
+            int res = platform::send(pCtx->socket, reinterpret_cast<const char*>(pData), len, 0);
+            if (res == SOCKET_ERROR) {
+                lastErrorWSA::Description Dsc;
+                const auto err = lastErrorWSA::Get();
+
+                onFatalWorkerError(pCtx);
+                writeLog(pCtx, TtLogType::Error, "Socket: send failed with Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
+                return;
+            }
         }
 
 #if NET_ZONES
@@ -2132,7 +2228,7 @@ namespace
 
             // If the socket is dead don't bother processing, but we need to keep flipping to prevent stall.
             // TODO: stall and try reconnect?
-            if (pCtx->socket == INV_SOCKET) {
+            if (pCtx->socket == INV_SOCKET && pCtx->fileHandle == TELEM_INVALID_HANDLE) {
                 continue;
             }
 
@@ -2357,6 +2453,7 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     pCtx->isEnabled = true;
     pCtx->flags = 0;
     pCtx->socket = INV_SOCKET;
+    pCtx->fileHandle = TELEM_INVALID_HANDLE;
     pCtx->pThreadData = reinterpret_cast<TraceThread*>(pThreadDataBuf);
     pCtx->numThreadData = 0;
     pCtx->ticksPerMicro = gTicksPerMicro;
@@ -2399,6 +2496,10 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     pCtx->pUserData = nullptr;
 
     pCtx->numPDBSync = 0;
+
+    pCtx->pFileOpen = Io::fileOpen;
+    pCtx->pFileClose = Io::fileClose;
+    pCtx->pFileWrite = Io::fileWrite;
 
     // initial sync of PDB info.
     syncPDBInfo(pCtx, PE::pdbInfo);
@@ -2450,70 +2551,17 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
         return TtError::InvalidContex;
     }
 
-    if (conType != TtConnectionType::Tcp) {
-        return TtError::InvalidParam;
+    switch (conType)
+    {
+        case TtConnectionType::Tcp:
+        case TtConnectionType::File:
+            break;
+
+        default:
+            return TtError::InvalidParam;
     }
 
     auto* pCtx = handleToContext(ctx);
-
-    TELEM_UNUSED(timeoutMS);
-
-    // need to connect to the server :O
-    struct platform::addrinfo hints, *servinfo = nullptr;
-    zero_object(hints);
-    hints.ai_family = AF_UNSPEC; // ipv4/6
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = platform::IPPROTO_TCP;
-
-    char portStr[32] = {};
-    sprintf(portStr, "%d", serverPort); // TODO: replace
-
-    // Resolve the server address and port
-    auto res = platform::getaddrinfo(pServerAddress, portStr, &hints, &servinfo);
-    if (res != 0) {
-        lastErrorWSA::Description Dsc;
-        const auto err = lastErrorWSA::Get();
-        writeLog(pCtx, TtLogType::Error, "Failed to getaddrinfo. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
-        return TtError::Error;
-    }
-
-    platform::SOCKET connectSocket = INV_SOCKET;
-
-    for (auto pPtr = servinfo; pPtr != nullptr; pPtr = pPtr->ai_next) {
-        // Create a SOCKET for connecting to server
-        connectSocket = platform::socket(pPtr->ai_family, pPtr->ai_socktype, pPtr->ai_protocol);
-        if (connectSocket == INV_SOCKET) {
-            return TtError::Error;
-        }
-
-        // Connect to server.
-        res = connect(connectSocket, pPtr->ai_addr, static_cast<int>(pPtr->ai_addrlen));
-        if (res == SOCKET_ERROR) {
-            platform::closesocket(connectSocket);
-            connectSocket = INV_SOCKET;
-            continue;
-        }
-
-        break;
-    }
-
-    platform::freeaddrinfo(servinfo);
-
-    if (connectSocket == INV_SOCKET) {
-        return TtError::Error;
-    }
-
-    // how big?
-    tt_int32 sock_opt = 1024 * 16;
-    res = platform::setsockopt(connectSocket, SOL_SOCKET, SO_SNDBUF, (char*)&sock_opt, sizeof(sock_opt));
-    if (res != 0) {
-        lastErrorWSA::Description Dsc;
-        const auto err = lastErrorWSA::Get();
-        writeLog(pCtx, TtLogType::Error, "Failed to set sndbuf on socket. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
-        return TtError::Error;
-    }
-   
-    pCtx->socket = connectSocket;
 
     ConnectionRequestHdr cr;
     zero_object(cr);
@@ -2525,9 +2573,9 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
 
     LPWSTR pCmdLine = GetCommandLineW();
 
-    const auto appNameLen = static_cast<tt_uint32>(strlen(pAppName));
-    const auto buildInfoLen = static_cast<tt_uint32>(strlen(pBuildInfo));
-    const auto cmdLineLen = static_cast<tt_uint32>(wcslen(pCmdLine));
+    const auto appNameLen = static_cast<tt_int32>(strlen(pAppName));
+    const auto buildInfoLen = static_cast<tt_int32>(strlen(pBuildInfo));
+    const auto cmdLineLen = static_cast<tt_int32>(wcslen(pCmdLine));
 
     if (appNameLen > MAX_STRING_LEN) {
         return TtError::InvalidParam;
@@ -2553,27 +2601,130 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     cr.workerThreadID = pCtx->threadId_;
     cr.dataSize = sizeof(cr) + cr.appNameLen + cr.buildInfoLen + cr.cmdLineLen;
 
-    sendDataToServer(pCtx, &cr, sizeof(cr));
 
-    sendDataToServer(pCtx, pAppName, appNameLen);
-    sendDataToServer(pCtx, pBuildInfo, buildInfoLen);
-    sendDataToServer(pCtx, cmdLine, cmdLenUtf8);
+    if (conType == TtConnectionType::Tcp)
+    {
+        TELEM_UNUSED(timeoutMS);
 
-    // wait for a response O.O
-    char recvbuf[MAX_PACKET_SIZE];
-    int recvbuflen = sizeof(recvbuf);
+        // need to connect to the server :O
+        struct platform::addrinfo hints, *servinfo = nullptr;
+        zero_object(hints);
+        hints.ai_family = AF_UNSPEC; // ipv4/6
+        hints.ai_socktype = SOCK_STREAM;
+        hints.ai_protocol = platform::IPPROTO_TCP;
 
-    // TODO: support timeout.
-    if (!readPacket(pCtx, recvbuf, recvbuflen)) {
-        return TtError::Error;
+        char portStr[32] = {};
+        sprintf(portStr, "%d", serverPort); // TODO: replace
+
+        // Resolve the server address and port
+        auto res = platform::getaddrinfo(pPath, portStr, &hints, &servinfo);
+        if (res != 0) {
+            lastErrorWSA::Description Dsc;
+            const auto err = lastErrorWSA::Get();
+            writeLog(pCtx, TtLogType::Error, "Failed to getaddrinfo. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
+            return TtError::Error;
+        }
+
+        platform::SOCKET connectSocket = INV_SOCKET;
+
+        for (auto pPtr = servinfo; pPtr != nullptr; pPtr = pPtr->ai_next) {
+            // Create a SOCKET for connecting to server
+            connectSocket = platform::socket(pPtr->ai_family, pPtr->ai_socktype, pPtr->ai_protocol);
+            if (connectSocket == INV_SOCKET) {
+                return TtError::Error;
+            }
+
+            // Connect to server.
+            res = connect(connectSocket, pPtr->ai_addr, static_cast<int>(pPtr->ai_addrlen));
+            if (res == SOCKET_ERROR) {
+                platform::closesocket(connectSocket);
+                connectSocket = INV_SOCKET;
+                continue;
+            }
+
+            break;
+        }
+
+        platform::freeaddrinfo(servinfo);
+
+        if (connectSocket == INV_SOCKET) {
+            return TtError::Error;
+        }
+
+        // how big?
+        tt_int32 sock_opt = 1024 * 16;
+        res = platform::setsockopt(connectSocket, SOL_SOCKET, SO_SNDBUF, (char*)&sock_opt, sizeof(sock_opt));
+        if (res != 0) {
+            lastErrorWSA::Description Dsc;
+            const auto err = lastErrorWSA::Get();
+            writeLog(pCtx, TtLogType::Error, "Failed to set sndbuf on socket. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
+            return TtError::Error;
+        }
+
+        pCtx->socket = connectSocket;
+
+        sendDataToServer(pCtx, &cr, sizeof(cr));
+        sendDataToServer(pCtx, pAppName, appNameLen);
+        sendDataToServer(pCtx, pBuildInfo, buildInfoLen);
+        sendDataToServer(pCtx, cmdLine, cmdLenUtf8);
+
+        // wait for a response O.O
+        char recvbuf[MAX_PACKET_SIZE];
+        int recvbuflen = sizeof(recvbuf);
+
+        // TODO: support timeout.
+        if (!readPacket(pCtx, recvbuf, recvbuflen)) {
+            return TtError::Error;
+        }
+
+        if (!handleConnectionResponse(pCtx, reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(recvbuflen))) {
+            return TtError::HandeshakeFail;
+        }
     }
+    else
+    {
+        // open a file.
+        pCtx->fileHandle = pCtx->pFileOpen(pPath);
+        if (pCtx->fileHandle == TELEM_INVALID_HANDLE) {
+            return TtError::Error;
+        }
 
-    if (!handleConnectionResponse(pCtx, reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(recvbuflen))) {
-        return TtError::HandeshakeFail;
+        uint8_t buf[sizeof(Io::TelemFileHdr) +
+            sizeof(cr) +
+            MAX_CMDLINE_LEN +
+            MAX_STRING_LEN +
+            MAX_STRING_LEN +
+            128
+        ];
+
+        Io::TelemFileHdr hdr;
+        hdr.fourCC = Io::TRACR_FOURCC;
+        hdr.version = Io::TRACE_VERSION;
+
+        tt_int32 offset = 0;
+        memcpy(&buf[offset], &hdr, sizeof(hdr));
+        offset += sizeof(hdr);
+        memcpy(&buf[offset], &cr, sizeof(cr));
+        offset += sizeof(cr);
+
+        memcpy(&buf[offset], pAppName, appNameLen);
+        offset += appNameLen;
+        memcpy(&buf[offset], pBuildInfo, buildInfoLen);
+        offset += buildInfoLen;
+        memcpy(&buf[offset], cmdLine, cmdLenUtf8);
+        offset += cmdLenUtf8;
+
+        if (fileWrite(pCtx, buf, offset) != offset) {
+            return TtError::Error;
+        }
+        
+        // sorted?
+
     }
 
     return TtError::Ok;
 }
+
 
 bool TelemClose(TraceContexHandle ctx)
 {
