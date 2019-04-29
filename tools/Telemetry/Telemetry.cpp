@@ -2695,6 +2695,8 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
             return TtError::Error;
         }
 
+        // lets be nice and only make one IO call.
+        // lengths are validated above.
         uint8_t buf[sizeof(Io::TelemFileHdr) +
             sizeof(cr) +
             MAX_CMDLINE_LEN +
