@@ -2,6 +2,9 @@
 
 #include <EngineCommon.h>
 
+#include "dia2.h"
+X_LINK_LIB("diaguids.lib");
+
 
 #ifndef TELEMETRY_SYMLIB_EXPORT
 
