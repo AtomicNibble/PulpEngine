@@ -591,7 +591,7 @@ namespace
         platform::SOCKET socket;
         TtFileHandle fileHandle;
 
-        X86_PAD(28)
+        X86_PAD(32)
 
         // -- Cace lane boundry --
 
@@ -601,6 +601,8 @@ namespace
 
         LogFunction logFunc;
         void* pUserData;
+
+        X86_PAD(24)
 
         // -- Cace lane boundry --
 
