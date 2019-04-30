@@ -5,6 +5,7 @@
 #include <Compression/LZ4.h>
 
 #include <../TelemetryCommon/TelemetryCommonLib.h>
+#include <../TelemetrySymbols/TelemetrySymLib.h>
 #include <../SqLite/SqlLib.h>
 
 
