@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include <IConverterModule.h>
 #include <IEngineModule.h>
 #include <Extension\XExtensionMacros.h>
 #include <ModuleExports.h> // needed for gEnv
