@@ -24,3 +24,21 @@ X_LINK_LIB("diaguids.lib");
 #endif // TELEM_LIB
 
 #endif // !TELEMETRY_SYMLIB_EXPORT
+
+
+typedef core::MemoryArena<
+    core::MallocFreeAllocator,
+    core::SingleThreadPolicy,
+#if X_DEBUG
+    core::SimpleBoundsChecking,
+    core::SimpleMemoryTracking,
+    core::SimpleMemoryTagging
+#else
+    core::NoBoundsChecking,
+    core::NoMemoryTracking,
+    core::NoMemoryTagging
+#endif // !X_DEBUG
+>
+TelemSymLibArena;
+
+extern TelemSymLibArena* g_TelemSymLibArena;
