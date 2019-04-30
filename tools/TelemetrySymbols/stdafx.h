@@ -3,7 +3,12 @@
 #include <EngineCommon.h>
 
 #include "dia2.h"
+
+#if X_64
+X_LINK_LIB("amd64/diaguids.lib");
+#else
 X_LINK_LIB("diaguids.lib");
+#endif
 
 
 #ifndef TELEMETRY_SYMLIB_EXPORT
