@@ -13,7 +13,7 @@ X_LINK_LIB("diaguids.lib");
 
 #ifndef TELEMETRY_SYMLIB_EXPORT
 
-#ifdef TELEM_LIB
+#ifdef X_LIB
 #define TELEMETRY_SYMLIB_EXPORT
 #else
 #ifdef TELEMETRY_SYM_LIB_EXPORT
@@ -21,7 +21,7 @@ X_LINK_LIB("diaguids.lib");
 #else
 #define TELEMETRY_SYMLIB_EXPORT X_IMPORT
 #endif // !TELEMETRY_SYM_LIB_EXPORT
-#endif // TELEM_LIB
+#endif // X_LIB
 
 #endif // !TELEMETRY_SYMLIB_EXPORT
 

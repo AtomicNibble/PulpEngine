@@ -1,0 +1,19 @@
+#pragma once
+
+
+#ifndef TELEMETRY_SYMLIB_EXPORT
+
+#ifdef X_LIB
+#define TELEMETRY_SYMLIB_EXPORT
+#else
+#ifdef TELEMETRY_SYM_LIB_EXPORT
+#define TELEMETRY_SYMLIB_EXPORT X_EXPORT
+#else
+#define TELEMETRY_SYMLIB_EXPORT X_IMPORT
+#endif // !TELEMETRY_SYM_LIB_EXPORT
+#endif // X_LIB
+
+#endif // !TELEMETRY_SYMLIB_EXPORT
+
+
+#include "SymbolRes.h"
