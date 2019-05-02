@@ -2,6 +2,9 @@
 
 #include <Containers/Array.h>
 
+struct IDiaDataSource;
+struct IDiaSession;
+
 X_NAMESPACE_BEGIN(telemetry)
 
 // Symbol stuff
@@ -15,8 +18,6 @@ struct SymPath
     core::Path<> path;
     SymType::Enum type;
 };
-
-
 
 // TODO: make a seperate lookup array which is more cache friendly.
 struct SymModule
@@ -37,10 +38,6 @@ struct SymModule
     GuidByteArr guid_;
 
     core::string path_;
-
-    // TODO: do i need one of these for each PDB..?
-    IDiaDataSource* pSource_;
-    IDiaSession* pSession_;
 };
 
 class SymResolver
