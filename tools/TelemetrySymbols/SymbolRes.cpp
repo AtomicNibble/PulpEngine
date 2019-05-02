@@ -120,7 +120,7 @@ namespace
         return rva;
     }
 
-    bool isMatchingPE(core::XFile* pFile, const SymModule::GuidByteArr& guid)
+    bool isMatchingPE(core::XFile* pFile, const SymGuid& guid)
     {
         // TODO: be fancy and read in 4k pages from disk so all the header loading is only one disk op.
         MyDosHeader dosHdr;
@@ -193,7 +193,7 @@ namespace
 
         static_assert(sizeof(pdbInfo.Guid) == sizeof(guid), "Size mismatch");
 
-        if(memcmp(pdbInfo.Guid, guid.data(), sizeof(guid)) != 0) {
+        if(memcmp(pdbInfo.Guid, guid.bytes.data(), sizeof(guid)) != 0) {
             return false;
         }
 
@@ -204,7 +204,16 @@ namespace
 
 } // namepace
 
-SymResolver::~SymResolver()
+SymModule::SymModule() :
+    baseAddr_(0),
+    virtualSize_(0),
+    age_(0),
+    pSource_(nullptr),
+    pSession_(nullptr)
+{
+}
+
+SymModule::~SymModule()
 {
     if (pSource_) {
         pSource_->Release();
@@ -214,34 +223,38 @@ SymResolver::~SymResolver()
     }
 }
 
+// ---------------------------------------
+
+SymResolver::SymResolver(core::MemoryArenaBase* arena) :
+    searchPaths_(arena),
+    modules_(arena),
+    comInit_(false)
+{
+}
+
+
+SymResolver::~SymResolver()
+{
+    if (comInit_) {
+        ::CoUninitialize();
+    }
+}
+
 bool SymResolver::init(void)
 {
-    auto hr = CoCreateInstance(
-        CLSID_DiaSource,
-        NULL,
-        CLSCTX_INPROC_SERVER,
-        IID_IDiaDataSource,
-        (void **)&pSource_
-    );
-
-    if (FAILED(hr)) {
+    auto hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    if (hr != S_OK && hr != S_FALSE) {
         X_ERROR("TelemSym", "Failed to create DIA data source. Error: 0x%" PRIu32, hr);
         return false;
     }
 
-    hr = pSource_->openSession(&pSession_);
-    if (FAILED(hr)) {
-        X_ERROR("TelemSym", "Failed to open DIA session. Error: 0x%" PRIu32, hr);
-        return false;
-    }
-
-    // sweet..
+    comInit_ = true;
     return true;
 }
 
-bool SymResolver::loadPDB(uintptr_t baseAddr, uint32_t virtualSize, const GuidByteArr& guid, core::string_view path)
+bool SymResolver::loadPDB(uintptr_t baseAddr, uint32_t virtualSize, const SymGuid& guid, uint32_t age, core::string_view path)
 {
-    if (paths_.isEmpty()) {
+    if (searchPaths_.isEmpty()) {
         X_ERROR("TelemSym", "Can't load PDB not symbol paths defined");
         return false;
     }
@@ -255,16 +268,124 @@ bool SymResolver::loadPDB(uintptr_t baseAddr, uint32_t virtualSize, const GuidBy
     mod.baseAddr_ = baseAddr;
     mod.virtualSize_ = virtualSize;
     mod.guid_ = guid;
+    mod.age_ = age;
     mod.path_.assign(path.begin(), path.length());
 
-    // right now we need to try and actually find the PDB.
-    // we search all the dir and check the guid of the PE.
+    core::Path<> tmp(path.begin(), path.end());
+    tmp.replaceSeprators();
 
 
+    core::Path<> symbolPath;
+    symbolPath.append(tmp.fileName());
+    symbolPath.ensureSlash();
+    symbolPath.appendFmt("%.8" PRIX32, guid.guid.data1);
+    symbolPath.appendFmt("%.4" PRIX16, guid.guid.data2);
+    symbolPath.appendFmt("%.4" PRIX16, guid.guid.data3);
+    for (auto byte : guid.guid.data4) {
+        symbolPath.appendFmt("%.2" PRIX8, byte);
+    }
+    symbolPath.appendFmt("%" PRIX32, age);
+    symbolPath.ensureSlash();
+    symbolPath.append(tmp.fileName());
 
+    core::Path<wchar_t> fullPathW;
+    for (auto& searchPath : searchPaths_)
+    {
+        if (searchPath.type == SymType::Path)
+        {
+            core::Path<> fullPath(searchPath.path);
+            fullPath /= symbolPath;
+
+            fullPathW = core::Path<wchar_t>(fullPath);
+
+            if (gEnv->pFileSys->fileExistsOS(fullPathW))
+            {
+                break;
+            }
+            else
+            {
+                fullPathW.clear();
+            }
+        }
+    }
+
+    if (fullPathW.isEmpty()) {
+        // Failed to find it.
+        return false;
+    }
+
+    // Load the PDB.
+    auto hr = CoCreateInstance(
+        CLSID_DiaSource,
+        NULL,
+        CLSCTX_INPROC_SERVER,
+        IID_IDiaDataSource,
+        (void **)&mod.pSource_
+    );
+
+    if (FAILED(hr)) {
+        X_ERROR("TelemSym", "Failed to create DIA data source. Error: 0x%" PRIu32, hr);
+        return false;
+    }
+
+    hr = mod.pSource_->loadDataFromPdb(fullPathW.c_str());
+    if (FAILED(hr)) {
+        X_ERROR("TelemSym", "loadDataFromPdb failed. Error: 0x%" PRIu32, hr);
+        return false;
+    }
+
+    hr = mod.pSource_->openSession(&mod.pSession_);
+    if (FAILED(hr)) {
+        X_ERROR("TelemSym", "Failed to open DIA session. Error: 0x%" PRIu32, hr);
+        return false;
+    }
+
+    modules_.emplace_back(std::move(mod));
     return true;
 }
 
+void SymResolver::addPath(core::string_view path, SymType::Enum type)
+{
+    // TODO: check unique.
+    SymPath sp;
+    sp.path.set(path.begin(), path.length());
+    sp.path.replaceSeprators();
+    sp.type = type;
+
+    for (auto& searchPath : searchPaths_)
+    {
+        // TODO: do a proper OS level check?
+        if (searchPath.path == sp.path)
+        {
+            X_ERROR("TelemSym", "Duplicate symbol path. \"%s\"", sp.path.c_str());
+            return;
+        }
+    }
+
+    searchPaths_.append(sp);
+}
+
+bool SymResolver::resolveForAddr(uintptr_t addr)
+{
+    for (auto& mod : modules_)
+    {
+        if (mod.containsAddr(addr))
+        {
+            auto rva = static_cast<uint32_t>((addr - mod.baseAddr_) & 0xFFFFFFFF); // 0x1EE30;
+
+            IDiaSymbol* pFunc;
+            LONG disp = 0;
+            mod.pSession_->findSymbolByRVAEx(rva, SymTagFunction, &pFunc, &disp);
+
+            BSTR pName = nullptr;
+            pFunc->get_name(&pName);
+
+            return true;
+        }
+    }
+
+    return false;
+}
 
 bool SymResolver::haveModuleWithBase(uintptr_t baseAddr)
 {
