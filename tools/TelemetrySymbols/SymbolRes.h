@@ -42,7 +42,12 @@ struct SymModule
 
 public:
     SymModule();
+    SymModule(const SymModule&) = delete;
+    SymModule(SymModule&& oth);
     ~SymModule();
+
+    SymModule& operator=(const SymModule&) = delete;
+    SymModule& operator=(SymModule&& oth);
 
     X_INLINE bool containsAddr(uintptr_t addr) const {
         return addr > baseAddr_ && addr < (baseAddr_ + virtualSize_);

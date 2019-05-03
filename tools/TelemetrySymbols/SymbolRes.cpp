@@ -213,6 +213,19 @@ SymModule::SymModule() :
 {
 }
 
+SymModule::SymModule(SymModule&& oth) :
+    baseAddr_(oth.baseAddr_),
+    virtualSize_(oth.virtualSize_),
+    guid_(oth.guid_),
+    age_(oth.age_),
+    path_(oth.path_),
+    pSource_(oth.pSource_),
+    pSession_(oth.pSession_)
+{
+    oth.pSource_ = nullptr;
+    oth.pSession_ = nullptr;
+}
+
 SymModule::~SymModule()
 {
     if (pSource_) {
@@ -222,6 +235,22 @@ SymModule::~SymModule()
         pSession_->Release();
     }
 }
+
+SymModule& SymModule::operator=(SymModule&& oth)
+{
+    baseAddr_ = oth.baseAddr_;
+    virtualSize_ = oth.virtualSize_;
+    guid_ = oth.guid_;
+    age_ = oth.age_;
+    path_ = oth.path_;
+    pSource_ = oth.pSource_;
+    pSession_ = oth.pSession_;
+    
+    oth.pSource_ = nullptr;
+    oth.pSession_ = nullptr;
+    return *this;
+}
+
 
 // ---------------------------------------
 
