@@ -38,7 +38,7 @@ private:
     LoggerBase* listHead_;
     LoggerBase* listTail_;
 
-    int logVerbosity_;
+    int indentLevel_;
 };
 
 X_NAMESPACE_END

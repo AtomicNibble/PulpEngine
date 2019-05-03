@@ -37,7 +37,7 @@ namespace
 XLog::XLog() :
     listHead_(nullptr),
     listTail_(nullptr),
-    logVerbosity_(0)
+    indentLevel_(0)
 {
 }
 
@@ -103,17 +103,17 @@ void XLog::RemoveLogger(LoggerBase* logger)
 const char* XLog::GetIndentation(void)
 {
     // TODO: perf maybe faster to return string_view or just pass length to the format policy since it's just whitespace now.
-    return INDENTATION_STRINGS[logVerbosity_ & 0xF];
+    return INDENTATION_STRINGS[indentLevel_ & 0xF];
 }
 
 void XLog::Indent(void)
 {
-    logVerbosity_++;
+    indentLevel_++;
 }
 
 void XLog::UnIndent(void)
 {
-    --logVerbosity_;
+    --indentLevel_;
 }
 
 void XLog::Log(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, int verbosity, const char* format, ...)
