@@ -22,7 +22,7 @@ TELEM_LINK_LIB("dbghelp.lib");
 TELEM_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
 
 #define PACKET_COMPRESSION 1
-#define NET_ZONES 1
+#define DATA_WRITE_ZONES 1
 
 namespace
 {
@@ -527,24 +527,24 @@ namespace
         ::OutputDebugStringA("\n");
     }
 
-    struct NetZone
+    struct WiteZone
     {
         tt_uint64 start;
         tt_uint64 end;
     };
 
-    TELEM_ALIGNED_SYMBOL(struct NetZones, 64)
+    TELEM_ALIGNED_SYMBOL(struct WriteZones, 64)
     {
         static constexpr int32_t NUM_ZONES = 16;
         static_assert(IsPowerOfTwo(NUM_ZONES), "Must be pow2");
 
-        NetZones() {
+        WriteZones() {
             num = 0;
             zero_object(zones);
         }
 
         int32_t num;
-        NetZone zones[NUM_ZONES];
+        WiteZone zones[NUM_ZONES];
     };
 
     // This is padded to 64bit to make placing TraceThread data on it's own boundy more simple.
@@ -586,7 +586,7 @@ namespace
         HANDLE hSignal_;
         HANDLE hSignalIdle_;
         volatile tt_int32 shutDownFlag;
-        NetZones* pNetZones;
+        WriteZones* pWriteZones;
 
         platform::SOCKET socket;
         TtFileHandle fileHandle;
@@ -913,10 +913,10 @@ namespace
         }
 #endif // X_DEBUG
 
-#if NET_ZONES
-        NetZone nz;
+#if DATA_WRITE_ZONES
+        WiteZone nz;
         nz.start = getTicks();
-#endif // NET_ZONES
+#endif // DATA_WRITE_ZONES
 
         // send some data...
 
@@ -943,16 +943,16 @@ namespace
             }
         }
 
-#if NET_ZONES
+#if DATA_WRITE_ZONES
         nz.end = getTicks();
-        auto& zones = *pCtx->pNetZones;
-        if (zones.num < NetZones::NUM_ZONES) {
+        auto& zones = *pCtx->pWriteZones;
+        if (zones.num < WriteZones::NUM_ZONES) {
             zones.zones[zones.num++] = nz;
         }
         else {
-            writeLog(pCtx, TtLogType::Warning, "Net zone buffer is full");
+            writeLog(pCtx, TtLogType::Warning, "Data write zone buffer is full");
         }
-#endif // NET_ZONES
+#endif // DATA_WRITE_ZONES
     }
 
 #if PACKET_COMPRESSION 
@@ -1125,26 +1125,33 @@ namespace
 
         addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
 
-#if NET_ZONES
+#if DATA_WRITE_ZONES
         // we also add net zones here.
-        auto& netZones = *pComp->pCtx->pNetZones;
-        if (netZones.num) {
+        auto& writeZones = *pComp->pCtx->pWriteZones;
+        if (writeZones.num) {
 
             packet.stackDepth = 2;
-            packet.strIdxFunction = GetStringId(pComp, "SendToServer");
-            packet.strIdxFmt = GetStringId(pComp, "Socket send");
 
-            for (int32_t i = 0; i < netZones.num; i++) {
-                auto& zone = netZones.zones[i];
+            if (pComp->pCtx->fileHandle != TELEM_INVALID_HANDLE) {
+                packet.strIdxFunction = GetStringId(pComp, "WriteToFile");
+                packet.strIdxFmt = GetStringId(pComp, "File Write");
+            }
+            else {
+                packet.strIdxFunction = GetStringId(pComp, "SendToServer");
+                packet.strIdxFmt = GetStringId(pComp, "Socket send");
+            }
+
+            for (int32_t i = 0; i < writeZones.num; i++) {
+                auto& zone = writeZones.zones[i];
 
                 packet.start = toRelativeTicks(pComp->pCtx, zone.start);
                 packet.end = toRelativeTicks(pComp->pCtx, zone.end);
                 addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
             }
 
-            netZones.num = 0;
+            writeZones.num = 0;
         }
-#endif // NET_ZONES
+#endif // DATA_WRITE_ZONES
 
 #else
         TELEM_UNUSED(pComp);
@@ -2436,9 +2443,9 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     // send packets this size?
     constexpr tt_size contexSize = sizeof(TraceContext);
     constexpr tt_size threadDataSize = sizeof(TraceThread) * MAX_ZONE_THREADS;
-    constexpr tt_size netZonesSize = sizeof(NetZones);
+    constexpr tt_size writeZonesSize = sizeof(WriteZones);
     constexpr tt_size minBufferSize = 1024 * 10; // 10kb.. enougth?
-    constexpr tt_size internalSize = contexSize + threadDataSize + netZonesSize;
+    constexpr tt_size internalSize = contexSize + threadDataSize + writeZonesSize;
     if (bufLen < internalSize + minBufferSize) {
         return TtError::ArenaTooSmall;
     }
@@ -2457,8 +2464,8 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     
     tt_uint8* pBufU8 = reinterpret_cast<tt_uint8*>(pBuf);
     tt_uint8* pThreadDataBuf = pBufU8 + contexSize;
-    tt_uint8* pNetZoneBuffer = pThreadDataBuf + threadDataSize;
-    tt_uint8* pTickBuffer0 = reinterpret_cast<tt_uint8*>(AlignTop(pNetZoneBuffer + netZonesSize, 64));
+    tt_uint8* pWriteZoneBuffer = pThreadDataBuf + threadDataSize;
+    tt_uint8* pTickBuffer0 = reinterpret_cast<tt_uint8*>(AlignTop(pWriteZoneBuffer + writeZonesSize, 64));
     tt_uint8* pTickBuffer1 = pTickBuffer0 + tickBufferSize;
 
     // retard check.
@@ -2484,7 +2491,7 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     pCtx->ticksPerMicro = gTicksPerMicro;
     pCtx->baseTicks = pCtx->lastTick;
     pCtx->baseNano = pCtx->lastTickNano;
-    pCtx->pNetZones = new (pNetZoneBuffer) NetZones();
+    pCtx->pWriteZones = new (pWriteZoneBuffer) WriteZones();
 
     pCtx->activeTickBufIdx = 0;
     pCtx->tickBuffers[0].pTickBuf = pTickBuffer0;
