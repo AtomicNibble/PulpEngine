@@ -486,9 +486,9 @@ void ClientConnection::processDataStream(uint8_t* pData, int32_t len)
                 i += strm.handleDataPacketPlot(reinterpret_cast<const DataPacketPlot*>(&pData[i]));
                 break;
             }
-            case DataStreamType::PDB:
+            case DataStreamType::PDBInfo:
             {
-                i += strm.handleDataPacketPDB(reinterpret_cast<const DataPacketPDB*>(&pData[i]));
+                i += strm.handleDataPacketPDB(reinterpret_cast<const DataPacketPDBInfo*>(&pData[i]));
                 break;
             }
             default:
@@ -2532,7 +2532,7 @@ int32_t TraceBuilder::handleDataPacketCallStack(const DataPacketCallStack* pData
     return dataSize;
 }
 
-int32_t TraceBuilder::handleDataPacketPDB(const DataPacketPDB* pData)
+int32_t TraceBuilder::handleDataPacketPDB(const DataPacketPDBInfo* pData)
 {
     StringBuf strBuf;
     int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxName);

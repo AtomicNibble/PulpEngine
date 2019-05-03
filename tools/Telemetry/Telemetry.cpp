@@ -1562,7 +1562,7 @@ namespace
         ArgData argData;
     };
 
-    struct QueueDataPDB : public QueueDataBase
+    struct QueueDataPDBInfo : public QueueDataBase
     {
         tt_uint64 modAddr;
         tt_uint32 imageSize;
@@ -1587,7 +1587,7 @@ namespace
     constexpr size_t size9 = sizeof(QueueDataPlot);
     constexpr size_t size10 = sizeof(QueueDataCallStack);
     constexpr size_t size11 = sizeof(QueueDataTickInfo);
-    constexpr size_t size12 = sizeof(QueueDataPDB);
+    constexpr size_t size12 = sizeof(QueueDataPDBInfo);
 
     constexpr size_t size15 = sizeof(ArgData);
     
@@ -1604,7 +1604,7 @@ namespace
     static_assert(64 == GetSizeWithoutArgData<QueueDataMemFree>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataMessage>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataPlot>());
-    static_assert(48 == sizeof(QueueDataPDB));
+    static_assert(48 == sizeof(QueueDataPDBInfo));
 
     void flipBufferInternal(TraceContext* pCtx, bool force)
     {
@@ -1742,7 +1742,7 @@ namespace
         auto num = info.num - pCtx->numPDBSync;
         for (tt_int32 i = 0; i < num; i++) {
 
-            QueueDataPDB data;
+            QueueDataPDBInfo data;
             data.type = QueueDataType::PDBInfo;
             data.argDataSize = 0;
             data.modAddr = reinterpret_cast<tt_uint64>(info.mods[base + i]);
@@ -2159,10 +2159,10 @@ namespace
         return dataSize;
     }
 
-    tt_int32 queueProcessPDBInfo(PacketCompressor* pComp, const QueueDataPDB* pBuf)
+    tt_int32 queueProcessPDBInfo(PacketCompressor* pComp, const QueueDataPDBInfo* pBuf)
     {
-        DataPacketPDB packet;
-        packet.type = DataStreamType::PDB;
+        DataPacketPDBInfo packet;
+        packet.type = DataStreamType::PDBInfo;
         packet.argDataSize = 0;
         packet.modAddr = pBuf->modAddr;
         packet.imageSize = pBuf->imageSize;
@@ -2309,7 +2309,7 @@ namespace
                         pBuf += queueProcessPlot(&comp, reinterpret_cast<const QueueDataPlot*>(pBuf));
                         break;
                     case QueueDataType::PDBInfo:
-                        pBuf += queueProcessPDBInfo(&comp, reinterpret_cast<const QueueDataPDB*>(pBuf));
+                        pBuf += queueProcessPDBInfo(&comp, reinterpret_cast<const QueueDataPDBInfo*>(pBuf));
                         break;
 
                     default:

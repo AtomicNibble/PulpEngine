@@ -202,7 +202,7 @@ public:
     int32_t handleDataPacketMessage(const DataPacketMessage* pData);
     int32_t handleDataPacketPlot(const DataPacketPlot* pData);
     int32_t handleDataPacketCallStack(const DataPacketCallStack* pData);
-    int32_t handleDataPacketPDB(const DataPacketPDB* pData);
+    int32_t handleDataPacketPDB(const DataPacketPDBInfo* pData);
 
 private:
     bool createTables(void);
