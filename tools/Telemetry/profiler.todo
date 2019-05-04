@@ -24,6 +24,7 @@ Runtime:
 
   Misc:
     ✔ Capture and send program command line @done (19-02-15 17:05)
+    ✔ Support writing trace data to disk. @done (19-04-29 22:16)
 
   Plots:
     ✔ Implement plots @done (19-04-13 12:56)
