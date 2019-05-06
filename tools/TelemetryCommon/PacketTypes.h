@@ -15,6 +15,7 @@ struct PacketType
         ConnectionRequestAccepted,
         ConnectionRequestRejected,
         DataStream,
+        ReqPDB, // sent by server to runtime.
 
         // Used by viewer.
         AppList,
@@ -95,7 +96,7 @@ constexpr tt_size CALLSTACK_CACHE_BUF_SIZE = sizeof(tt_uint32) * 2048;
 constexpr tt_size BACKGROUND_THREAD_STACK_SIZE_BASE = 1024 * 32; // base size for anything that's not a compression buffer.
 constexpr tt_size BACKGROUND_THREAD_STACK_SIZE = Internal::RoundUpToMultiple<tt_size>(
     COMPRESSION_RING_BUFFER_SIZE + 
-    MAX_PACKET_SIZE + 
+    (MAX_PACKET_SIZE * 2) + 
     BACKGROUND_THREAD_STACK_SIZE_BASE + 
     STRING_TABLE_BUF_SIZE +
     CALLSTACK_CACHE_BUF_SIZE,
@@ -137,6 +138,13 @@ struct ConnectionRequestRejectedHdr : public PacketBase
     tt_uint16 reasonLen;
 };
 
+struct RequestPDBHdr : public PacketBase
+{
+    // need some info about the PDB we want.
+    uintptr_t modAddr;
+
+};
+
 struct DataStreamHdr : public PacketBase
 {
     tt_uint16 origSize;
@@ -173,7 +181,7 @@ struct DataStreamType
         Message,
         Plot,
         PDBInfo,
-
+        PDB,
 
         Num
     };
@@ -420,6 +428,14 @@ struct DataPacketPDBInfo : public DataPacketBaseArgData
 
     tt_uint16 strIdxName;
 };
+
+
+// the server will request this.
+struct DataPacketPDB : public DataPacketBaseArgData
+{
+    tt_uint32 fileSize;
+};
+
 
 
 static_assert(sizeof(DataPacketBase) == 1, "Incorrect size");

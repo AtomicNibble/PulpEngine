@@ -488,7 +488,10 @@ void ClientConnection::processDataStream(uint8_t* pData, int32_t len)
             }
             case DataStreamType::PDBInfo:
             {
-                i += strm.handleDataPacketPDB(reinterpret_cast<const DataPacketPDBInfo*>(&pData[i]));
+                auto* pPDBInfo = reinterpret_cast<const DataPacketPDBInfo*>(&pData[i]);
+                i += strm.handleDataPacketPDB(pPDBInfo);
+
+                requestPDBIfMissing(pPDBInfo);
                 break;
             }
             default:
@@ -497,6 +500,20 @@ void ClientConnection::processDataStream(uint8_t* pData, int32_t len)
     }
 
     trans.commit();
+}
+
+void ClientConnection::requestPDBIfMissing(const DataPacketPDBInfo* pInfo)
+{
+    // We should check if we have this PDB.
+    // if we can't find it, ask the runtime to send it us.
+    char buf[sizeof(RequestPDBHdr)];
+
+    auto* pReqPDB = reinterpret_cast<RequestPDBHdr*>(buf);
+    pReqPDB->dataSize = static_cast<tt_uint16>(sizeof(*pReqPDB));
+    pReqPDB->type = PacketType::ReqPDB;
+    pReqPDB->modAddr = pInfo->modAddr;
+
+    sendDataToClient(buf, sizeof(*pReqPDB));
 }
 
 struct ProcessDataStreamJobData

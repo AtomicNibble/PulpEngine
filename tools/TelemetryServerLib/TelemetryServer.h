@@ -332,6 +332,7 @@ public:
     void sendDataToClient(const void* pData, size_t len);
 private:
     void sendConnectionRejected(const char* pReason);
+    void requestPDBIfMissing(const DataPacketPDBInfo* pInfo);
 
     void flushCompressionBuffer(void);
     int32_t getCompressionBufferSize(void) const;
