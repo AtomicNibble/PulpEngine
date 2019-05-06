@@ -78,6 +78,7 @@ inline void StringTableInsert(StringTable& st, const void* pPtr)
 {
     auto index = getIndex(st, pPtr);
 
+    // TODO: handle full table.
     while (st.pTable[index] != nullptr)
     {
         index = (index + 1) & st.sizeMask;
