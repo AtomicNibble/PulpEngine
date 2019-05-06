@@ -2183,6 +2183,108 @@ namespace
     }
 
 
+    struct SocketRecvState
+    {
+        SocketRecvState() {
+            recvPending = false;
+            zero_object(overlapped);
+            totalBytes = 0;
+            buf.buf = recvbuf;
+            buf.len = sizeof(recvbuf);
+        }
+
+        bool recvPending;
+        OVERLAPPED overlapped;
+        uint32_t totalBytes;
+        platform::WSABUF buf;
+        char recvbuf[MAX_PACKET_SIZE];
+    };
+
+    void processServerRequest(TraceContext* pCtx, const PacketBase* pPacket)
+    {
+        switch (pPacket->type)
+        {
+            case PacketType::ReqPDB: {
+                auto* pPDBReq = reinterpret_cast<const RequestPDBHdr*>(pPacket);
+                writeLog(pCtx, TtLogType::Msg, "Request PDB for hMod: %p", pPDBReq->modAddr);
+                break;
+            }
+
+            default:
+#if X_DEBUG
+                ::DebugBreak();
+                break;
+#else
+                TELEM_NO_SWITCH_DEFAULT;
+#endif
+        }
+
+    }
+
+    void readPackets(TraceContext* pCtx, SocketRecvState& recvState)
+    {
+        lastErrorWSA::Description Dsc;
+        DWORD bytesTransferred = 0;
+        DWORD flags = 0;
+
+        if (!recvState.recvPending) {
+            // make request
+            recvState.buf.buf = recvState.recvbuf + recvState.totalBytes;
+            recvState.buf.len = sizeof(recvState.recvbuf) - recvState.totalBytes;
+
+            auto res = platform::WSARecv(pCtx->socket, &recvState.buf, 1, &bytesTransferred, &flags, &recvState.overlapped, nullptr);
+            if (res == SOCKET_ERROR) {
+                auto err = lastErrorWSA::Get();
+                if (err != ERROR_IO_PENDING) {
+                    writeLog(pCtx, TtLogType::Error, "WSARecv failed. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
+                    return;
+                }
+            }
+
+            recvState.recvPending = true;
+        }
+
+        if (!platform::WSAGetOverlappedResult(pCtx->socket, &recvState.overlapped, &bytesTransferred, FALSE, &flags)) {
+            auto err = lastErrorWSA::Get();
+            if (err != WSA_IO_INCOMPLETE) {
+                writeLog(pCtx, TtLogType::Error, "WSAGetOverlappedResult failed. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
+                return;
+            }
+
+            return;
+        }
+
+        recvState.recvPending = false;
+        recvState.totalBytes += bytesTransferred;
+
+        if (recvState.totalBytes < sizeof(PacketBase)) {
+            return;
+        }
+
+        uint32_t bytesLeft = recvState.totalBytes;
+        auto* pData = recvState.recvbuf;
+
+        while(bytesLeft > sizeof(PacketBase)) {
+            auto* pHdr = reinterpret_cast<const PacketBase*>(pData);
+            const uint32_t packetSize = pHdr->dataSize;
+            if (bytesLeft < packetSize) {
+                break;
+            }
+
+            processServerRequest(pCtx, pHdr);
+
+            pData += packetSize;
+            bytesLeft -= packetSize;
+        }
+
+        // shift bytes down.
+        if (bytesLeft > 0) {
+            memcpy(recvState.recvbuf, pData, bytesLeft);
+        }
+
+        recvState.totalBytes = bytesLeft;
+    }
+
     DWORD __stdcall WorkerThread(LPVOID pParam)
     {
         setThreadName(getThreadID(), "Telemetry");
@@ -2219,8 +2321,15 @@ namespace
         // TODO: this seams wrong?
         // static_assert(sizeof(comp) + BACKGROUND_THREAD_STACK_SIZE_BASE >= BACKGROUND_THREAD_STACK_SIZE, "Thread stack is to small");
 
+        SocketRecvState recvState;
+
         for (;;)
         {
+            // Are we writing to socket?
+            if(pCtx->socket != INV_SOCKET) {
+                readPackets(pCtx, recvState);
+            }
+
             ::SetEvent(pCtx->hSignalIdle_);
 
             if (pCtx->shutDownFlag) {
