@@ -228,12 +228,13 @@ SymModule::SymModule(SymModule&& oth) :
 
 SymModule::~SymModule()
 {
-    if (pSource_) {
-        pSource_->Release();
-    }
     if (pSession_) {
         pSession_->Release();
     }
+    if (pSource_) {
+        pSource_->Release();
+    }
+
 }
 
 SymModule& SymModule::operator=(SymModule&& oth)
