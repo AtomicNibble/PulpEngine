@@ -265,6 +265,8 @@ SymResolver::SymResolver(core::MemoryArenaBase* arena) :
 
 SymResolver::~SymResolver()
 {
+    modules_.clear(); // cleanup before we un init com.
+
     if (comInit_) {
         ::CoUninitialize();
     }
