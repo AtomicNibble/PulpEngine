@@ -87,6 +87,8 @@ constexpr tt_size MAX_LOCKS_HELD_PER_THREAD = 16;
 constexpr tt_size MAX_LOCKS = 128; // max locks we can track
 constexpr tt_size MAX_STATIC_STRINGS = 1024 * 4;
 
+constexpr tt_size MAX_PDB_DATA_BLOCK_SIZE = 1024 * 4; // must be smaller than COMPRESSION_MAX_INPUT_SIZE
+
 constexpr tt_size COMPRESSION_MAX_INPUT_SIZE = 1024 * 8;
 constexpr tt_size COMPRESSION_RING_BUFFER_SIZE = 1024 * 64;
 
@@ -141,8 +143,11 @@ struct ConnectionRequestRejectedHdr : public PacketBase
 struct RequestPDBHdr : public PacketBase
 {
     // need some info about the PDB we want.
-    uintptr_t modAddr;
+    tt_uint64 modAddr;
+    tt_uint32 imageSize;
 
+    tt_uint8 guid[16];
+    tt_uint32 age;
 };
 
 struct DataStreamHdr : public PacketBase
@@ -157,6 +162,7 @@ static_assert(sizeof(PacketBase) == 3, "Incorrect size");
 static_assert(sizeof(ConnectionRequestHdr) == 41, "Incorrect size");
 static_assert(sizeof(ConnectionRequestAcceptedHdr) == 7, "Incorrect size");
 static_assert(sizeof(ConnectionRequestRejectedHdr) == 5, "Incorrect size");
+static_assert(sizeof(RequestPDBHdr) == 35, "Incorrect size");
 static_assert(sizeof(DataStreamHdr) == 5, "Incorrect size");
 
 // Not packet types but part of data
@@ -182,6 +188,7 @@ struct DataStreamType
         Plot,
         PDBInfo,
         PDB,
+        PDBBlock,
 
         Num
     };
@@ -425,17 +432,31 @@ struct DataPacketPDBInfo : public DataPacketBaseArgData
     tt_uint32 imageSize;
 
     tt_uint8 guid[16];
+    tt_uint32 age;
 
     tt_uint16 strIdxName;
 };
 
-
 // the server will request this.
 struct DataPacketPDB : public DataPacketBaseArgData
 {
+    tt_uint64 modAddr;
+    tt_uint32 imageSize;
     tt_uint32 fileSize;
+
+    tt_uint8 guid[16];
+    tt_uint32 age;
+
+    tt_uint64 pdbSize;
 };
 
+struct DataPacketPDBBlock : public DataPacketBaseArgData
+{
+    tt_uint64 modAddr; // something to link the blocks.
+
+    tt_uint32 blockSize;
+    tt_uint32 offset;
+};
 
 
 static_assert(sizeof(DataPacketBase) == 1, "Incorrect size");
@@ -450,7 +471,9 @@ static_assert(sizeof(DataPacketMemAlloc) == 34, "Incorrect size");
 static_assert(sizeof(DataPacketMemFree) == 27, "Incorrect size");
 static_assert(sizeof(DataPacketMessage) == 13, "Incorrect size");
 static_assert(sizeof(DataPacketPlot) == 22, "Incorrect size");
-static_assert(sizeof(DataPacketPDBInfo) == 32, "Incorrect size");
+static_assert(sizeof(DataPacketPDBInfo) == 36, "Incorrect size");
+static_assert(sizeof(DataPacketPDB) == 46, "Incorrect size");
+static_assert(sizeof(DataPacketPDBBlock) == 18, "Incorrect size");
 
 
 TELEM_PACK_POP

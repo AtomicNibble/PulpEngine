@@ -7,6 +7,10 @@
 #include <Memory/SimpleMemoryArena.h>
 #include <Memory/VirtualMem.h>
 
+X_NAMESPACE_DECLARE(core,
+    struct XFileAsync;
+)
+
 X_NAMESPACE_BEGIN(telemetry)
 
 const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
@@ -158,7 +162,7 @@ public:
     TraceBuilder(const TraceBuilder& oth) = delete;
     TraceBuilder& operator=(const TraceBuilder& oth) = delete;
 
-    TraceBuilder() :
+    TraceBuilder(core::MemoryArenaBase* arena) :
         cmdInsertZone(con),
         cmdInsertString(con),
         cmdInsertTickInfo(con),
@@ -175,8 +179,8 @@ public:
         cmdInsertPlot(con),
         cmdInsertPDB(con),
         cmdInsertCallstack(con),
-        stringMap(g_TelemSrvLibArena, 1024 * 64),
-        indexMap(g_TelemSrvLibArena, 1024 * 8)
+        stringMap(arena, 1024 * 64),
+        indexMap(arena, 1024 * 8)
     {
         // std::fill(indexMap.begin(), indexMap.end(), std::numeric_limits<uint16_t>::max());
     }
@@ -202,7 +206,7 @@ public:
     int32_t handleDataPacketMessage(const DataPacketMessage* pData);
     int32_t handleDataPacketPlot(const DataPacketPlot* pData);
     int32_t handleDataPacketCallStack(const DataPacketCallStack* pData);
-    int32_t handleDataPacketPDB(const DataPacketPDBInfo* pData);
+    int32_t handleDataPacketPDBInfo(const DataPacketPDBInfo* pData);
 
 private:
     bool createTables(void);
@@ -286,10 +290,39 @@ struct ClientConnection
 
     using TraceStreamArr = core::Array<TraceStream>;
 
+    struct PDBData
+    {
+        PDBData(core::MemoryArenaBase* arena) :
+            modAddr(0),
+            imageSize(0),
+            fileSize(0),
+            age(0),
+            pFile(nullptr),
+            tmpBuf(arena)
+        {
+        }
+
+        uint64_t modAddr;
+        tt_uint32 imageSize;
+        tt_uint32 fileSize;
+
+        core::Guid guid;
+        tt_uint32 age;
+
+        core::XFileAsync* pFile;
+        // core::XOsFileAsyncOperation op;
+
+        core::Array<uint8_t> tmpBuf;
+    };
+
+    using PDBDataArr = core::Array<PDBData>;
+
 public:
     ClientConnection(Server& srv, core::MemoryArenaBase* arena) :
         srv_(srv),
-        traces_(arena)
+        traces_(arena),
+        traceBuilder_(arena),
+        pdbData_(arena)
     {
         core::zero_object(clientVer_);
         socket_ = INV_SOCKET;
@@ -332,7 +365,11 @@ public:
     void sendDataToClient(const void* pData, size_t len);
 private:
     void sendConnectionRejected(const char* pReason);
+
+    // PDB stuff.
     void requestPDBIfMissing(const DataPacketPDBInfo* pInfo);
+    int32_t handleDataPacketPDB(const DataPacketPDB* pData);
+    int32_t handleDataPacketPDBBlock(const DataPacketPDBBlock* pData);
 
     void flushCompressionBuffer(void);
     int32_t getCompressionBufferSize(void) const;
@@ -367,6 +404,8 @@ public:
     core::Compression::LZ4Stream lz4Stream_;
 
     core::V2::Job* pPendingJob_;
+
+    PDBDataArr pdbData_;
 };
 
 struct QueryTraceInfo;

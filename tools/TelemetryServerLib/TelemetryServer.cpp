@@ -489,9 +489,21 @@ void ClientConnection::processDataStream(uint8_t* pData, int32_t len)
             case DataStreamType::PDBInfo:
             {
                 auto* pPDBInfo = reinterpret_cast<const DataPacketPDBInfo*>(&pData[i]);
-                i += strm.handleDataPacketPDB(pPDBInfo);
+                i += strm.handleDataPacketPDBInfo(pPDBInfo);
 
                 requestPDBIfMissing(pPDBInfo);
+                break;
+            }
+            case DataStreamType::PDB:
+            {
+                auto* pPDB = reinterpret_cast<const DataPacketPDB*>(&pData[i]);
+                i += handleDataPacketPDB(pPDB);
+                break;
+            }
+            case DataStreamType::PDBBlock:
+            {
+                auto* pPDBBlock = reinterpret_cast<const DataPacketPDBBlock*>(&pData[i]);
+                i += handleDataPacketPDBBlock(pPDBBlock);
                 break;
             }
             default:
@@ -506,6 +518,20 @@ void ClientConnection::requestPDBIfMissing(const DataPacketPDBInfo* pInfo)
 {
     // We should check if we have this PDB.
     // if we can't find it, ask the runtime to send it us.
+    auto it = std::find_if(pdbData_.begin(), pdbData_.end(), [pInfo](const PDBData& pdb) {
+        return pdb.modAddr == pInfo->modAddr;
+    });
+
+    if (it != pdbData_.end()) {
+        return;
+    }
+
+    // we not seen this PDB.
+    // see if we can find it in symbols cache / paths.
+    // ...
+
+
+    // we could not find it ask client to stream it me.
     char buf[sizeof(RequestPDBHdr)];
 
     auto* pReqPDB = reinterpret_cast<RequestPDBHdr*>(buf);
@@ -514,6 +540,81 @@ void ClientConnection::requestPDBIfMissing(const DataPacketPDBInfo* pInfo)
     pReqPDB->modAddr = pInfo->modAddr;
 
     sendDataToClient(buf, sizeof(*pReqPDB));
+
+    PDBData& data = pdbData_.AddOne(g_TelemSrvLibArena);
+    data.modAddr = pInfo->modAddr;
+    data.imageSize = pInfo->imageSize;
+    data.guid = core::Guid(pInfo->guid);
+    data.age = pInfo->age;
+
+    data.tmpBuf.reserve(MAX_PDB_DATA_BLOCK_SIZE);
+}
+
+int32_t ClientConnection::handleDataPacketPDB(const DataPacketPDB* pData)
+{
+    auto it = std::find_if(pdbData_.begin(), pdbData_.end(), [pData](const PDBData& pdb) {
+        return pdb.modAddr == pData->modAddr;
+    });
+
+    if (it == pdbData_.end()) {
+        X_ERROR("TelemServ", "Recived unexpected PDB for modAddr: %" PRIx64, pData->modAddr);
+        X_ASSERT_UNREACHABLE();
+        return sizeof(*pData);
+    }
+
+    it->fileSize = pData->fileSize;
+
+    // TODO: make a proper path.
+    core::Path<> relPath;
+    relPath.appendFmt("%" PRIx64 ".pdb", it->modAddr);
+
+    it->pFile = gEnv->pFileSys->openFileAsync(relPath, core::FileFlag::WRITE | core::FileFlag::RECREATE);
+    if (!it->pFile) {
+        X_ERROR("TelemServer", "Failed to open output for PDB stream");
+    }
+
+    return sizeof(*pData);
+}
+
+int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pData)
+{
+    const int32_t totalSize = sizeof(*pData) + pData->blockSize;
+
+    auto it = std::find_if(pdbData_.begin(), pdbData_.end(), [pData](const PDBData& pdb) {
+        return pdb.modAddr == pData->modAddr;
+    });
+
+    if (it == pdbData_.end()) {
+        X_ERROR("TelemServ", "Recived unexpected PDB data for modAddr: %" PRIx64, pData->modAddr);
+        X_ASSERT_UNREACHABLE();
+        return totalSize;
+    }
+
+    // we just wanna write some data!
+    // fuck the data is not going to stay around lol.
+    auto* pSrcBuf = reinterpret_cast<const uint8_t*>(pData + 1);
+
+    auto& tmpBuf = it->tmpBuf;
+    tmpBuf.resize(pData->blockSize);
+    std::memcpy(tmpBuf.data(), pSrcBuf, pData->blockSize);
+
+    // TODO: store this somewhere...
+    auto op = it->pFile->writeAsync(tmpBuf.data(), tmpBuf.size(), pData->offset);
+
+    op.waitUntilFinished();
+
+    // if we reached end close.
+    const uint32_t bytesWrriten = pData->offset + pData->blockSize;
+
+    X_LOG0("TelemServ", "Got %" PRIu32, bytesWrriten);
+
+    if (bytesWrriten >= it->fileSize) {
+        X_ASSERT(bytesWrriten == it->fileSize, "Recived too many bytes")(bytesWrriten, it->fileSize);
+        gEnv->pFileSys->closeFileAsync(it->pFile);
+        it->pFile = nullptr;
+    }
+
+    return totalSize;
 }
 
 struct ProcessDataStreamJobData
@@ -2549,7 +2650,7 @@ int32_t TraceBuilder::handleDataPacketCallStack(const DataPacketCallStack* pData
     return dataSize;
 }
 
-int32_t TraceBuilder::handleDataPacketPDB(const DataPacketPDBInfo* pData)
+int32_t TraceBuilder::handleDataPacketPDBInfo(const DataPacketPDBInfo* pData)
 {
     StringBuf strBuf;
     int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxName);
@@ -2568,7 +2669,6 @@ int32_t TraceBuilder::handleDataPacketPDB(const DataPacketPDBInfo* pData)
     cmd.reset();
     return sizeof(*pData);
 }
-
 
 // --------------------------------
 

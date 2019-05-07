@@ -354,6 +354,19 @@ namespace
 
     } // namespace PE
 
+
+    template<class T>
+    TELEM_INLINE constexpr const T& Max(const T& x, const T& y)
+    {
+        return (x > y) ? x : y;
+    }
+
+    template<class T>
+    TELEM_INLINE constexpr const T& Min(const T& x, const T& y)
+    {
+        return (x < y) ? x : y;
+    }
+
     tt_int64 GetSystemTimeAsUnixTime(void)
     {
         // January 1, 1970 (start of Unix epoch) in "ticks"
@@ -2174,6 +2187,7 @@ namespace
         packet.modAddr = pBuf->modAddr;
         packet.imageSize = pBuf->imageSize;
         memcpy(packet.guid, pBuf->guid, sizeof(pBuf->guid));
+        packet.age = pBuf->age;
         packet.strIdxName = GetStringId(pComp, pBuf->pFilename);
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
@@ -2200,13 +2214,112 @@ namespace
         char recvbuf[MAX_PACKET_SIZE];
     };
 
-    void processServerRequest(TraceContext* pCtx, const PacketBase* pPacket)
+    void handlePDBRequest(PacketCompressor* pComp, const RequestPDBHdr* pPDBReq)
+    {
+
+        // need to find PDB info baby.
+        IMAGEHLP_MODULEW64 modInfo;
+        zero_object(modInfo);
+        modInfo.SizeOfStruct = sizeof(modInfo);
+
+        if (!SymGetModuleInfoW64(::GetCurrentProcess(), pPDBReq->modAddr, &modInfo)) {
+            // TODO: tell server we suck.
+            return;
+        }
+
+        if (modInfo.SymType != SymPdb) {
+            // rip.
+            return;
+        }
+
+        // we have a path to the PDB, yay.
+        // load it into memory in fixed blocks.
+        // then send it down the network.
+        // could this make us stall a lot?
+        // if we are loading 100MB of data shit could get goaty.
+        // can we async it up?
+        // could have like pending PDB reads and shit, starts getting complex.
+        // but doable.
+        auto* pPath = modInfo.LoadedPdbName;
+
+        DWORD access = FILE_READ_DATA;
+        DWORD share = FILE_SHARE_READ;
+        DWORD dispo = OPEN_EXISTING;
+        DWORD flags = FILE_FLAG_SEQUENTIAL_SCAN;
+
+        HANDLE hHandle = ::CreateFileW(pPath, access, share, NULL, dispo, flags, NULL);
+        if (hHandle == INVALID_HANDLE_VALUE) {
+            // TODO: rip
+            return;
+        }
+
+        _BY_HANDLE_FILE_INFORMATION info;
+        if (!GetFileInformationByHandle(hHandle, &info)) {
+            // TODO: rip
+            ::CloseHandle(hHandle);
+            return;
+        }
+
+        // should never be above 1<<31 but whatever,
+        const tt_uint32 fileSize = info.nFileSizeLow;
+        tt_uint32 bytesLeft = fileSize;
+
+
+        DataPacketPDB hdr;
+        hdr.type = DataStreamType::PDB;
+        hdr.modAddr = modInfo.BaseOfImage;
+        hdr.imageSize = modInfo.ImageSize;
+        hdr.fileSize = fileSize;
+        memcpy(&hdr.guid, &modInfo.PdbSig70, sizeof(modInfo.PdbSig70));
+        hdr.age = modInfo.PdbAge;
+        hdr.pdbSize = fileSize;
+
+        addToCompressionBuffer(pComp, &hdr, sizeof(hdr));
+
+        // nned to read this bad boy in.
+        constexpr tt_uint32 bufSize = MAX_PDB_DATA_BLOCK_SIZE;
+        tt_uint8 buf[bufSize + sizeof(DataPacketPDBBlock)];
+
+        static_assert(sizeof(buf) <= COMPRESSION_MAX_INPUT_SIZE, "Buf bigger than max comp input");
+
+        uint32_t offset = 0;
+
+        while (bytesLeft > 0)
+        {
+            auto readSize = static_cast<tt_uint32>(Min(bytesLeft, bufSize));
+
+            DWORD bytesRead = 0;
+            if (!::ReadFile(hHandle, buf + sizeof(DataPacketPDBBlock), readSize, &bytesRead, 0)) {
+                // TODO: rip
+            }
+
+            if (bytesRead != readSize) {
+                // TODO: rip
+            }
+
+            DataPacketPDBBlock* pBlockHdr = reinterpret_cast<DataPacketPDBBlock*>(buf);
+            pBlockHdr->type = DataStreamType::PDBBlock;
+            pBlockHdr->modAddr = modInfo.BaseOfImage;
+            pBlockHdr->blockSize = readSize;
+            pBlockHdr->offset = offset;
+
+            addToCompressionBuffer(pComp, pBlockHdr, bytesRead + sizeof(DataPacketPDBBlock));
+
+            bytesLeft -= readSize;
+            offset += readSize;
+        }
+            
+        ::CloseHandle(hHandle);
+
+        // writeLog(pCtx, TtLogType::Msg, "Request PDB for hMod: %p", pPDBReq->modAddr);
+    }
+
+    void processServerRequest(PacketCompressor* pComp, const PacketBase* pPacket)
     {
         switch (pPacket->type)
         {
             case PacketType::ReqPDB: {
-                auto* pPDBReq = reinterpret_cast<const RequestPDBHdr*>(pPacket);
-                writeLog(pCtx, TtLogType::Msg, "Request PDB for hMod: %p", pPDBReq->modAddr);
+                handlePDBRequest(pComp, reinterpret_cast<const RequestPDBHdr*>(pPacket));
                 break;
             }
 
@@ -2221,7 +2334,7 @@ namespace
 
     }
 
-    void readPackets(TraceContext* pCtx, SocketRecvState& recvState)
+    void readPackets(TraceContext* pCtx, PacketCompressor* pComp, SocketRecvState& recvState)
     {
         lastErrorWSA::Description Dsc;
         DWORD bytesTransferred = 0;
@@ -2271,7 +2384,7 @@ namespace
                 break;
             }
 
-            processServerRequest(pCtx, pHdr);
+            processServerRequest(pComp, pHdr);
 
             pData += packetSize;
             bytesLeft -= packetSize;
@@ -2327,7 +2440,7 @@ namespace
         {
             // Are we writing to socket?
             if(pCtx->socket != INV_SOCKET) {
-                readPackets(pCtx, recvState);
+                readPackets(pCtx, &comp, recvState);
             }
 
             ::SetEvent(pCtx->hSignalIdle_);
