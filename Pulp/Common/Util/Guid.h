@@ -1,6 +1,5 @@
 #pragma once
 
-
 X_NAMESPACE_BEGIN(core)
 
 class Guid
@@ -13,6 +12,8 @@ public:
 public:
     Guid();
     explicit Guid(const GuidByteArr& bytes);
+    template<size_t N>
+    explicit Guid(const uint8_t (&bytes)[N]);
     explicit Guid(core::string_view str);
 
     Guid(const Guid &other) = default;
@@ -33,6 +34,13 @@ private:
     GuidByteArr bytes_;
 };
 
+
+template<size_t N>
+inline Guid::Guid(const uint8_t(&bytes)[N])
+{
+    static_assert(N == 16, "Invalid number of bytes");
+    std::memcpy(bytes_.data(), bytes, bytes_.size());
+}
 
 
 X_NAMESPACE_END
