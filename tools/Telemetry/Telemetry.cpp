@@ -2302,22 +2302,34 @@ namespace
         {
             auto readSize = static_cast<tt_uint32>(Min(bytesLeft, bufSize));
 
-            DWORD bytesRead = 0;
-            if (!::ReadFile(hHandle, buf + sizeof(DataPacketPDBBlock), readSize, &bytesRead, 0)) {
-                // TODO: rip
-            }
-
-            if (bytesRead != readSize) {
-                // TODO: rip
-            }
-
             DataPacketPDBBlock* pBlockHdr = reinterpret_cast<DataPacketPDBBlock*>(buf);
             pBlockHdr->type = DataStreamType::PDBBlock;
             pBlockHdr->modAddr = modInfo.BaseOfImage;
             pBlockHdr->blockSize = readSize;
             pBlockHdr->offset = offset;
 
+            DWORD bytesRead = 0;
+            bool failed = false;
+
+            if (!::ReadFile(hHandle, buf + sizeof(DataPacketPDBBlock), readSize, &bytesRead, 0)) {
+                failed = true;
+                return;
+            }
+
+            if (bytesRead != readSize) {
+                failed = true;
+                return;
+            }
+
+            if (failed) {
+                pBlockHdr->blockSize = 0;
+            }
+
             addToCompressionBuffer(pComp, pBlockHdr, bytesRead + sizeof(DataPacketPDBBlock));
+
+            if (failed) {
+                return;
+            }
 
             bytesLeft -= readSize;
             offset += readSize;
