@@ -2214,6 +2214,19 @@ namespace
         char recvbuf[MAX_PACKET_SIZE];
     };
 
+    struct ScopedHandle
+    {
+        ScopedHandle(HANDLE hHandle) :
+            hHandle(hHandle)
+        {}
+
+        ~ScopedHandle() {
+            ::CloseHandle(hHandle);
+        }
+
+        HANDLE hHandle;
+    };
+
     void handlePDBRequest(PacketCompressor* pComp, const RequestPDBHdr* pPDBReq)
     {
 
@@ -2253,10 +2266,11 @@ namespace
             return;
         }
 
+        ScopedHandle handleClose(hHandle);
+
         _BY_HANDLE_FILE_INFORMATION info;
         if (!GetFileInformationByHandle(hHandle, &info)) {
             // TODO: rip
-            ::CloseHandle(hHandle);
             return;
         }
 
@@ -2309,8 +2323,6 @@ namespace
             offset += readSize;
         }
             
-        ::CloseHandle(hHandle);
-
         // writeLog(pCtx, TtLogType::Msg, "Request PDB for hMod: %p", pPDBReq->modAddr);
     }
 
