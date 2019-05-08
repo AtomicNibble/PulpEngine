@@ -2235,6 +2235,14 @@ int32_t TraceBuilder::addString(core::string_view str)
     return static_cast<int32_t>(idx);
 }
 
+core::string_view TraceBuilder::getString(int32_t strIdx) const
+{
+    auto fmtStrIdx = indexMap[strIdx].idx;
+    auto fmtIt = stringMap.at(fmtStrIdx);
+
+    return core::string_view(fmtIt->first);
+}
+
 int32_t TraceBuilder::indexForString(core::string_view str)
 {
     auto it = stringMap.find(str);

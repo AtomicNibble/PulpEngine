@@ -208,6 +208,8 @@ public:
     int32_t handleDataPacketCallStack(const DataPacketCallStack* pData);
     int32_t handleDataPacketPDBInfo(const DataPacketPDBInfo* pData);
 
+    core::string_view getString(int32_t strIdx) const;
+
 private:
     bool createTables(void);
 
