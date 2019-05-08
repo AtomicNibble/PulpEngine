@@ -575,7 +575,8 @@ int32_t ClientConnection::handleDataPacketPDB(const DataPacketPDB* pData)
 
     if (!pFileSys->directoryExists(relPath, core::VirtualDirectory::BASE)) {
         if (!pFileSys->createDirectoryTree(relPath, core::VirtualDirectory::BASE)) {
-
+            X_ERROR("TelemServ", "Failed to create directory for writing PDB stream. Path: %s", relPath.c_str());
+            return sizeof(*pData);
         }
     }
 
