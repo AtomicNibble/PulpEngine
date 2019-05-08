@@ -526,6 +526,7 @@ void ClientConnection::requestPDBIfMissing(const DataPacketPDBInfo* pInfo)
         return;
     }
 
+    auto path = traceBuilder_.getString(pInfo->strIdxName);
     // we not seen this PDB.
     // see if we can find it in symbols cache / paths.
     // ...
@@ -546,6 +547,7 @@ void ClientConnection::requestPDBIfMissing(const DataPacketPDBInfo* pInfo)
     data.imageSize = pInfo->imageSize;
     data.guid = core::Guid(pInfo->guid);
     data.age = pInfo->age;
+    data.path.set(path.begin(), path.end());
 
     data.tmpBuf.reserve(MAX_PDB_DATA_BLOCK_SIZE);
 }
@@ -566,7 +568,8 @@ int32_t ClientConnection::handleDataPacketPDB(const DataPacketPDB* pData)
 
     // TODO: make a proper path.
     core::Path<> relPath;
-    relPath.appendFmt("%" PRIx64 ".pdb", it->modAddr);
+    relPath.append("symbols/.tmp/");
+    relPath.append(it->path.fileName());
 
     it->pFile = gEnv->pFileSys->openFileAsync(relPath, core::FileFlag::WRITE | core::FileFlag::RECREATE);
     if (!it->pFile) {

@@ -311,6 +311,8 @@ struct ClientConnection
         core::Guid guid;
         tt_uint32 age;
 
+        core::Path<> path;
+
         core::XFileAsync* pFile;
         // core::XOsFileAsyncOperation op;
 
