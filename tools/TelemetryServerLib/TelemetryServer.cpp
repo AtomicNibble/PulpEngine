@@ -593,6 +593,12 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
         return totalSize;
     }
 
+    if (pData->blockSize == 0) {
+        // There was a issue in the runtime reading the data.
+        X_ERROR("TelemServ", "Runtime failed to read PDB for streaming at offset: %" PRIx32, pData->offset);
+        return totalSize;
+    }
+
     // we just wanna write some data!
     // fuck the data is not going to stay around lol.
     auto* pSrcBuf = reinterpret_cast<const uint8_t*>(pData + 1);
