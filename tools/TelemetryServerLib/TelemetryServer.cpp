@@ -602,37 +602,39 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
         return totalSize;
     }
 
+    auto& pdb = *it;
+
     if (pData->blockSize == 0) {
         // There was a issue in the runtime reading the data.
         X_ERROR("TelemServ", "Runtime failed to read PDB for streaming at offset: %" PRIx32, pData->offset);
         return totalSize;
     }
 
-    if (it->op) {
-        it->op->waitUntilFinished();
+    if (pdb.op) {
+        pdb.op->waitUntilFinished();
     }
 
     // we just wanna write some data!
     // fuck the data is not going to stay around lol.
     auto* pSrcBuf = reinterpret_cast<const uint8_t*>(pData + 1);
 
-    auto& tmpBuf = it->tmpBuf;
+    auto& tmpBuf = pdb.tmpBuf;
     tmpBuf.resize(pData->blockSize);
     std::memcpy(tmpBuf.data(), pSrcBuf, pData->blockSize);
 
-    it->op = it->pFile->writeAsync(tmpBuf.data(), tmpBuf.size(), pData->offset);
+    pdb.op = pdb.pFile->writeAsync(tmpBuf.data(), tmpBuf.size(), pData->offset);
 
     // if we reached end close.
     const uint32_t bytesWrriten = pData->offset + pData->blockSize;
 
-    if (bytesWrriten >= it->fileSize) {
-        X_ASSERT(bytesWrriten == it->fileSize, "Recived too many bytes")(bytesWrriten, it->fileSize);
-        X_ASSERT(it->op.has_value(), "Async op has no value")(it->op.has_value());
+    if (bytesWrriten >= pdb.fileSize) {
+        X_ASSERT(bytesWrriten == pdb.fileSize, "Recived too many bytes")(bytesWrriten, pdb.fileSize);
+        X_ASSERT(pdb.op.has_value(), "Async op has no value")(pdb.op.has_value());
 
-        it->op->waitUntilFinished();
+        pdb.op->waitUntilFinished();
 
-        gEnv->pFileSys->closeFileAsync(it->pFile);
-        it->pFile = nullptr;
+        gEnv->pFileSys->closeFileAsync(pdb.pFile);
+        pdb.pFile = nullptr;
     }
 
     return totalSize;
