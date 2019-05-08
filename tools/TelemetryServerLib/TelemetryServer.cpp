@@ -571,7 +571,15 @@ int32_t ClientConnection::handleDataPacketPDB(const DataPacketPDB* pData)
     relPath.append("symbols/.tmp/");
     relPath.append(it->path.fileName());
 
-    it->pFile = gEnv->pFileSys->openFileAsync(relPath, core::FileFlag::WRITE | core::FileFlag::RECREATE);
+    auto* pFileSys = gEnv->pFileSys;
+
+    if (!pFileSys->directoryExists(relPath, core::VirtualDirectory::BASE)) {
+        if (!pFileSys->createDirectoryTree(relPath, core::VirtualDirectory::BASE)) {
+
+        }
+    }
+
+    it->pFile = pFileSys->openFileAsync(relPath, core::FileFlag::WRITE | core::FileFlag::RECREATE, core::VirtualDirectory::BASE);
     if (!it->pFile) {
         X_ERROR("TelemServer", "Failed to open output for PDB stream");
     }
