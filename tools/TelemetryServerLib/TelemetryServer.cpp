@@ -608,6 +608,10 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
         return totalSize;
     }
 
+    if (it->op) {
+        it->op->waitUntilFinished();
+    }
+
     // we just wanna write some data!
     // fuck the data is not going to stay around lol.
     auto* pSrcBuf = reinterpret_cast<const uint8_t*>(pData + 1);
@@ -616,18 +620,17 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
     tmpBuf.resize(pData->blockSize);
     std::memcpy(tmpBuf.data(), pSrcBuf, pData->blockSize);
 
-    // TODO: store this somewhere...
-    auto op = it->pFile->writeAsync(tmpBuf.data(), tmpBuf.size(), pData->offset);
-
-    op.waitUntilFinished();
+    it->op = it->pFile->writeAsync(tmpBuf.data(), tmpBuf.size(), pData->offset);
 
     // if we reached end close.
     const uint32_t bytesWrriten = pData->offset + pData->blockSize;
 
-    X_LOG0("TelemServ", "Got %" PRIu32, bytesWrriten);
-
     if (bytesWrriten >= it->fileSize) {
         X_ASSERT(bytesWrriten == it->fileSize, "Recived too many bytes")(bytesWrriten, it->fileSize);
+        X_ASSERT(it->op.has_value(), "Async op has no value")(it->op.has_value());
+
+        it->op->waitUntilFinished();
+
         gEnv->pFileSys->closeFileAsync(it->pFile);
         it->pFile = nullptr;
     }

@@ -1,11 +1,16 @@
 #pragma once
 
 #include "IServer.h"
+
+#include <IFileSys.h>
+
 #include <Containers/FixedHashTable.h>
 
 #include <Memory/AllocationPolicies/LinearAllocator.h>
 #include <Memory/SimpleMemoryArena.h>
 #include <Memory/VirtualMem.h>
+
+#include <optional>
 
 X_NAMESPACE_DECLARE(core,
     struct XFileAsync;
@@ -314,7 +319,7 @@ struct ClientConnection
         core::Path<> path;
 
         core::XFileAsync* pFile;
-        // core::XOsFileAsyncOperation op;
+        std::optional<core::XOsFileAsyncOperation> op;
 
         core::Array<uint8_t> tmpBuf;
     };
