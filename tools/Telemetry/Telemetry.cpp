@@ -3023,6 +3023,10 @@ bool TelemClose(TraceContexHandle ctx)
 
     TelemFlush(ctx);
 
+    // TODO: make sure we finish sending PDB data to server and shit?
+    // should we do a shutdown handshake or something?
+    // maybe thread should just make sure it's responded to everything.
+
     // flush
     int res = platform::shutdown(pCtx->socket, SD_BOTH);
     if (res == SOCKET_ERROR) {
