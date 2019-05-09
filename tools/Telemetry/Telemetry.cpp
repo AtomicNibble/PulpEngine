@@ -575,7 +575,8 @@ namespace
 
         bool isEnabled;
         tt_uint8 flags;
-        bool _pad[2];
+        tt_uint8 connFlags;
+        bool _pad[1];
 
         tt_int32 numPDBSync;
 
@@ -2730,6 +2731,7 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     pCtx->lastTickNano = gSysTimer.GetNano();
     pCtx->isEnabled = true;
     pCtx->flags = 0;
+    pCtx->connFlags = 0;
     pCtx->socket = INV_SOCKET;
     pCtx->fileHandle = TELEM_INVALID_HANDLE;
     pCtx->pThreadData = reinterpret_cast<TraceThread*>(pThreadDataBuf);
@@ -2823,7 +2825,7 @@ void TelemSetContextLogFunc(TraceContexHandle ctx, LogFunction func, void* pUser
 }
 
 TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pPath,
-    TtConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS)
+    TtConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS, TtConnectionFlags flags)
 {
     if (!isValidContext(ctx)) {
         return TtError::InvalidContex;
@@ -2879,7 +2881,8 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     cr.unixTimestamp = GetSystemTimeAsUnixTime();
     cr.workerThreadID = pCtx->threadId_;
     cr.dataSize = sizeof(cr) + cr.appNameLen + cr.buildInfoLen + cr.cmdLineLen;
-
+    cr.connFlags = flags;
+    pCtx->connFlags = static_cast<tt_uint8>(flags);
 
     if (conType == TtConnectionType::Tcp)
     {

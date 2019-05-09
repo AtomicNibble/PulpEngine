@@ -388,6 +388,7 @@ bool XCore::Init(CoreInitParams& startupParams)
             "telem.dat",
             telem::ConnectionType::File,
             0,
+            0,
             0
         );
 #else
@@ -398,7 +399,8 @@ bool XCore::Init(CoreInitParams& startupParams)
             "127.0.0.1",
             telem::ConnectionType::Tcp,
             8001,
-            1000
+            1000,
+            0
         );
 #endif
 

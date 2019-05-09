@@ -283,6 +283,7 @@ bool ClientConnection::handleConnectionRequest(uint8_t* pData)
     trace.ticksPerMs = pConReq->ticksPerMs;
     trace.unixTimestamp = pConReq->unixTimestamp;
     trace.workerThreadID = pConReq->workerThreadID;
+    trace.connFlags = pConReq->connFlags;
 
     core::Path<> workingDir;
     if (!gEnv->pFileSys->getWorkingDirectory(workingDir)) {

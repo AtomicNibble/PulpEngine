@@ -52,6 +52,18 @@ struct TtFlag
     };
 };
 
+struct TtConnectionFlag
+{
+    enum Enum : tt_uint8
+    {
+        // Runtime will stream missing PDB to server on demand.
+        // not needed if you copy PDB to symbol server.
+        StreamPDB = 1,
+    };
+};
+
+using TtConnectionFlags = tt_uint32;
+
 // IO callbacks.
 using FileOpenFunc = TtFileHandle(*)(void* pUserData, const char*);
 using FileCloseFunc = void(*)(void* pUserData, TtFileHandle);
@@ -157,7 +169,7 @@ extern "C"
     __TELEM_API_VOID(TelemSetIoFuncs, TraceContexHandle ctx, FileOpenFunc open, FileCloseFunc close, FileWriteFunc write, void* pUserData);
 
     __TELEM_API_ERR(TelemOpen, TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
-        TtConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS);
+        TtConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS, TtConnectionFlags flags);
 
     __TELEM_API_BOOL(TelemClose, TraceContexHandle ctx);
 
@@ -469,8 +481,8 @@ namespace telem
 #define ttSetContextLogFunc(ctx, func, pUserData) __TELEM_FUNC_NAME(TelemSetContextLogFunc)(ctx, func, pUserData)
 #define ttSetContextIoFuncs(ctx, open, close, write, pUserData) __TELEM_FUNC_NAME(TelemSetIoFuncs)(ctx, open, close, write, pUserData)
 
-#define ttOpen(ctx, pAppName, pBuildInfo, pServerAddress, conType, serverPort, timeoutMS) \
-    __TELEM_FUNC_NAME(TelemOpen)(ctx, pAppName, pBuildInfo, pServerAddress, conType, serverPort, timeoutMS)
+#define ttOpen(ctx, pAppName, pBuildInfo, pServerAddress, conType, serverPort, timeoutMS, flags) \
+    __TELEM_FUNC_NAME(TelemOpen)(ctx, pAppName, pBuildInfo, pServerAddress, conType, serverPort, timeoutMS, flags)
 
 #define ttClose(ctx) __TELEM_FUNC_NAME(TelemClose)(ctx)
 

@@ -39,13 +39,13 @@ struct TraceStats
 struct TraceInfo
 {
     TraceInfo() :
+        active(false),
         ticksPerMicro(0),
         ticksPerMs(0),
         workerThreadID(0),
         unixTimestamp(0),
-        active(false)
+        connFlags(0)
     {}
-
 
     TELEM_INLINE int64_t ticksToNano(tt_int64 tsc) const
     {
@@ -65,12 +65,14 @@ struct TraceInfo
         return whole + part;
     }
 
+public:
     bool active;
     core::Guid guid;
     uint64_t ticksPerMicro;
     uint64_t ticksPerMs;
     uint32_t workerThreadID;
     uint64_t unixTimestamp;
+    uint32_t connFlags;
     core::string hostName;
     core::string buildInfo;
     core::string cmdLine;
