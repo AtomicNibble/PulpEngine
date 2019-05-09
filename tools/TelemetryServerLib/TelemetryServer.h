@@ -118,7 +118,7 @@ struct TraceStream : public TraceDB
     TraceInfo trace;
 };
 
-struct TraceBuilder : public TraceDB
+struct TraceBuilder : public TraceStream
 {
     // maybe drop this and just use -1?
     enum class MemOp

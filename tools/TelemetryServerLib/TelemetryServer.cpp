@@ -323,6 +323,8 @@ bool ClientConnection::handleConnectionRequest(uint8_t* pData)
         return false;
     }
 
+    strm.trace = trace;
+
     bool setMeta = true;
 
     VersionInfo::Description verStr;
