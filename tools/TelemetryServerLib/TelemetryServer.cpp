@@ -3154,7 +3154,7 @@ void Server::closeClient(ClientConnection* pClientCon)
     X_DELETE(pClientCon, arena_);
 }
 
-void Server::addTraceForApp(const TelemFixedStr& appName, TraceInfo& trace)
+void Server::addTraceForApp(const TelemFixedStr& appName, const TraceInfo& trace)
 {
     core::CriticalSection::ScopedLock lock(cs_);
 

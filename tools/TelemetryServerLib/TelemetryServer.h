@@ -430,7 +430,7 @@ public:
     bool listen(void) X_FINAL;
 
 public:
-    void addTraceForApp(const TelemFixedStr& appName, TraceInfo& trace);
+    void addTraceForApp(const TelemFixedStr& appName, const TraceInfo& trace);
     bool sendAppList(ClientConnection& client);
 
     void handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo* pHdr);
