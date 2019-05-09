@@ -2361,6 +2361,11 @@ namespace
 
     void readPackets(TraceContext* pCtx, PacketCompressor* pComp, SocketRecvState& recvState)
     {
+        // don't bother reading packets if not going to get any.
+        if ((pCtx->connFlags & TtConnectionFlag::StreamPDB) != 0) {
+            return;
+        }
+
         lastErrorWSA::Description Dsc;
         DWORD bytesTransferred = 0;
         DWORD flags = 0;
