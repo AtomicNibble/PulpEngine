@@ -2510,7 +2510,7 @@ namespace
                 continue;
             }
 
-            if ((pCtx->flags & TTFlag::DropData) != 0) {
+            if ((pCtx->flags & TtFlag::DropData) != 0) {
                 continue;
             }
 
@@ -3119,7 +3119,7 @@ bool TelemIsPaused(TraceContexHandle ctx)
     return handleToContext(ctx)->isEnabled;
 }
 
-void TelemSetFlag(TraceContexHandle ctx, TTFlag::Enum flag, bool set)
+void TelemSetFlag(TraceContexHandle ctx, TtFlag::Enum flag, bool set)
 {
     if (!isValidContext(ctx)) {
         return;

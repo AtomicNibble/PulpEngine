@@ -44,7 +44,7 @@ struct TtLogType
 
 typedef TtLogType TtMsgType;
 
-struct TTFlag
+struct TtFlag
 {
     enum Enum : tt_uint8
     {
@@ -168,7 +168,7 @@ extern "C"
     __TELEM_API_VOID(TelemPause, TraceContexHandle ctx, bool pause);
     __TELEM_API_BOOL(TelemIsPaused, TraceContexHandle ctx);
 
-    __TELEM_API_VOID(TelemSetFlag, TraceContexHandle ctx, TTFlag::Enum flag, bool set);
+    __TELEM_API_VOID(TelemSetFlag, TraceContexHandle ctx, TtFlag::Enum flag, bool set);
 
     // Thread
     __TELEM_API_VOID(TelemSetThreadName, TraceContexHandle ctx, tt_uint32 threadID, const char* pFmtString, tt_int32 numArgs, ...);
