@@ -295,13 +295,13 @@ inline void Path<wchar_t>::replaceSeprators(void)
 template<>
 inline void Path<char>::removeFileName(void)
 {
-    this->replace(this->fileName(), "");
+    replace(fileName(), "");
 }
 
 template<>
 inline void Path<wchar_t>::removeFileName(void)
 {
-    this->replace(this->fileName(), L"");
+    replace(fileName(), L"");
 }
 
 template<>
