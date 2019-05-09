@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Containers/Array.h>
+#include <Util/Guid.h>
 
 struct IDiaDataSource;
 struct IDiaSession;
@@ -18,23 +19,6 @@ struct SymPath
     core::Path<> path;
     SymType::Enum type;
 };
-
-
-struct SymGuid
-{
-    using ByteArr = std::array<uint8_t, 16>;
-    union {
-        ByteArr bytes;
-        struct GUID {
-            unsigned long  data1;
-            unsigned short data2;
-            unsigned short data3;
-            unsigned char  data4[8];
-        } guid;
-    };
-};
-
-static_assert(sizeof(SymGuid) == 16, "SymGuid has incorrect size");
 
 // TODO: make a seperate lookup array which is more cache friendly.
 struct SymModule
@@ -57,7 +41,7 @@ public:
     uintptr_t baseAddr_;
     uint32_t virtualSize_;
 
-    SymGuid guid_;
+    core::Guid guid_;
     uint32_t age_;
 
     core::string path_;
@@ -78,12 +62,14 @@ public:
     TELEMETRY_SYMLIB_EXPORT ~SymResolver();
 
     TELEMETRY_SYMLIB_EXPORT bool init(void);
-    TELEMETRY_SYMLIB_EXPORT bool loadPDB(uintptr_t baseAddr, uint32_t virtualSize, const SymGuid& guid, uint32_t age, core::string_view path);
+    TELEMETRY_SYMLIB_EXPORT bool loadPDB(uintptr_t baseAddr, uint32_t virtualSize, const core::Guid& guid, uint32_t age, core::string_view path);
 
     TELEMETRY_SYMLIB_EXPORT void addPath(core::string_view path, SymType::Enum type);
 
     // want some api for getting functions names?
     TELEMETRY_SYMLIB_EXPORT bool resolveForAddr(uintptr_t addr);
+
+    TELEMETRY_SYMLIB_EXPORT static void addSymSrvFolderNameForPDB(core::Path<>& path, const core::Guid& guid, uint32_t age);
 
 private:
     bool haveModuleWithBase(uintptr_t baseAddr);

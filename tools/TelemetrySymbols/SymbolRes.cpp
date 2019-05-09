@@ -120,7 +120,7 @@ namespace
         return rva;
     }
 
-    bool isMatchingPE(core::XFile* pFile, const SymGuid& guid)
+    bool isMatchingPE(core::XFile* pFile, const core::Guid& guid)
     {
         // TODO: be fancy and read in 4k pages from disk so all the header loading is only one disk op.
         MyDosHeader dosHdr;
@@ -193,7 +193,7 @@ namespace
 
         static_assert(sizeof(pdbInfo.Guid) == sizeof(guid), "Size mismatch");
 
-        if(memcmp(pdbInfo.Guid, guid.bytes.data(), sizeof(guid)) != 0) {
+        if(memcmp(pdbInfo.Guid, guid.bytes().data(), sizeof(guid)) != 0) {
             return false;
         }
 
@@ -284,7 +284,7 @@ bool SymResolver::init(void)
     return true;
 }
 
-bool SymResolver::loadPDB(uintptr_t baseAddr, uint32_t virtualSize, const SymGuid& guid, uint32_t age, core::string_view path)
+bool SymResolver::loadPDB(uintptr_t baseAddr, uint32_t virtualSize, const core::Guid& guid, uint32_t age, core::string_view path)
 {
     if (searchPaths_.isEmpty()) {
         X_ERROR("TelemSym", "Can't load PDB not symbol paths defined");
@@ -309,15 +309,7 @@ bool SymResolver::loadPDB(uintptr_t baseAddr, uint32_t virtualSize, const SymGui
 
     core::Path<> symbolPath;
     symbolPath.append(tmp.fileName());
-    symbolPath.ensureSlash();
-    symbolPath.appendFmt("%.8" PRIX32, guid.guid.data1);
-    symbolPath.appendFmt("%.4" PRIX16, guid.guid.data2);
-    symbolPath.appendFmt("%.4" PRIX16, guid.guid.data3);
-    for (auto byte : guid.guid.data4) {
-        symbolPath.appendFmt("%.2" PRIX8, byte);
-    }
-    symbolPath.appendFmt("%" PRIX32, age);
-    symbolPath.ensureSlash();
+    addSymSrvFolderNameForPDB(symbolPath, guid, age);
     symbolPath.append(tmp.fileName());
 
     core::Path<wchar_t> fullPathW;
@@ -419,11 +411,28 @@ bool SymResolver::resolveForAddr(uintptr_t addr)
     return false;
 }
 
+void SymResolver::addSymSrvFolderNameForPDB(core::Path<>& path, const core::Guid& guid, uint32_t age)
+{
+    auto& g = guid.guid();
+
+    path.ensureSlash();
+    path.appendFmt("%.8" PRIX32, g.data1);
+    path.appendFmt("%.4" PRIX16, g.data2);
+    path.appendFmt("%.4" PRIX16, g.data3);
+    for (auto byte : g.data4) {
+        path.appendFmt("%.2" PRIX8, byte);
+    }
+    path.appendFmt("%" PRIX32, age);
+    path.ensureSlash();
+}
+
+
 bool SymResolver::haveModuleWithBase(uintptr_t baseAddr)
 {
     return std::find_if(modules_.begin(), modules_.end(), [baseAddr](const SymModuleArr::Type& mod) {
         return mod.baseAddr_ == baseAddr;
     }) != modules_.end();
 }
+
 
 X_NAMESPACE_END
