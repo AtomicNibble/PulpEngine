@@ -323,7 +323,7 @@ bool ClientConnection::handleConnectionRequest(uint8_t* pData)
         return false;
     }
 
-    strm.trace = trace;
+    strm.traceInfo = trace;
 
     bool setMeta = true;
 
@@ -744,30 +744,30 @@ bool ClientConnection::handleOpenTrace(uint8_t* pData)
 
     // TODO: check we don't have it open already.
     // TODO: thread safety etc..
-    for (size_t i = 0; i < traces_.size(); i++)
+    for (size_t i = 0; i < tracesStreams_.size(); i++)
     {
-        auto& trace = traces_[i];
-        if (trace.trace.guid == pHdr->guid)
+        auto& ts = tracesStreams_[i];
+        if (ts.traceInfo.guid == pHdr->guid)
         {
             X_WARNING("TelemSrv", "Client opened a trace they already have open");
 
-            if (!TraceDB::getStats(trace.con, otr.stats))
+            if (!TraceDB::getStats(ts.con, otr.stats))
             {
                 X_ERROR("TelemSrv", "Failed to get stats for openDb request");
                 return true;
             }
 
             otr.handle = safe_static_cast<int8_t>(i);
-            otr.ticksPerMicro = trace.trace.ticksPerMicro;
-            otr.unixTimestamp = trace.trace.unixTimestamp;
-            otr.workerThreadID = trace.trace.workerThreadID;
+            otr.ticksPerMicro = ts.traceInfo.ticksPerMicro;
+            otr.unixTimestamp = ts.traceInfo.unixTimestamp;
+            otr.workerThreadID = ts.traceInfo.workerThreadID;
             sendDataToClient(&otr, sizeof(otr));
             return true;
         }
     }
 
     // TODO: can't open any more, tell the client?
-    if (traces_.size() >= MAX_TRACES_OPEN_PER_CLIENT) {
+    if (tracesStreams_.size() >= MAX_TRACES_OPEN_PER_CLIENT) {
         return true;
     }
 
@@ -778,7 +778,7 @@ bool ClientConnection::handleOpenTrace(uint8_t* pData)
     }
 
     TraceStream ts;
-    ts.trace = trace;
+    ts.traceInfo = trace;
     if (!ts.openDB(trace.dbPath)) {
         sendDataToClient(&otr, sizeof(otr));
         return true;
@@ -790,8 +790,8 @@ bool ClientConnection::handleOpenTrace(uint8_t* pData)
         return true;
     }
 
-    auto id = traces_.size();
-    traces_.emplace_back(std::move(ts));
+    auto id = tracesStreams_.size();
+    tracesStreams_.emplace_back(std::move(ts));
 
     otr.handle = safe_static_cast<int8_t>(id);
     otr.ticksPerMicro = trace.ticksPerMicro;
@@ -814,11 +814,11 @@ bool ClientConnection::handleReqTraceZoneSegment(uint8_t* pData)
     // MEOW
     // load me the ticks!
     int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(traces_.size())) {
+    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
         return false;
     }
 
-    auto& ts = traces_[pHdr->handle];
+    auto& ts = tracesStreams_[pHdr->handle];
     DataPacketTickInfo startTick;
     DataPacketTickInfo endTick;
 
@@ -828,8 +828,8 @@ bool ClientConnection::handleReqTraceZoneSegment(uint8_t* pData)
         pTickHdr->num = 0;
         pTickHdr->handle = pHdr->handle;
 
-        auto begin = ts.trace.nanoToTicks(pHdr->startNano);
-        auto end = ts.trace.nanoToTicks(pHdr->endNano);
+        auto begin = ts.traceInfo.nanoToTicks(pHdr->startNano);
+        auto end = ts.traceInfo.nanoToTicks(pHdr->endNano);
 
         sql::SqlLiteQuery qry(ts.con, "SELECT threadId, startTick, endTick, startNano, endNano FROM ticks WHERE startTick >= ? AND startTick < ?");
         qry.bind(1, begin);
@@ -1086,11 +1086,11 @@ bool ClientConnection::handleReqTraceLocks(uint8_t* pData)
     }
 
     int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(traces_.size())) {
+    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
         return false;
     }
 
-    auto& ts = traces_[pHdr->handle];
+    auto& ts = tracesStreams_[pHdr->handle];
 
     auto* pLocksHdr = addToCompressionBufferT<ReqTraceLocksResp>();
     pLocksHdr->type = DataStreamTypeViewer::TraceLocks;
@@ -1138,11 +1138,11 @@ bool ClientConnection::handleReqTraceStrings(uint8_t* pData)
     }
 
     int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(traces_.size())) {
+    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
         return false;
     }
 
-    auto& ts = traces_[pHdr->handle];
+    auto& ts = tracesStreams_[pHdr->handle];
 
     ReqTraceStringsRespInfo info;
     info.type = DataStreamTypeViewer::TraceStringsInfo;
@@ -1229,11 +1229,11 @@ bool ClientConnection::handleReqTraceThreadNames(uint8_t* pData)
     }
 
     int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(traces_.size())) {
+    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
         return false;
     }
 
-    auto& ts = traces_[pHdr->handle];
+    auto& ts = tracesStreams_[pHdr->handle];
 
     auto* pNamesHdr = addToCompressionBufferT<ReqTraceThreadNamesResp>();
     core::zero_this(pNamesHdr);
@@ -1286,11 +1286,11 @@ bool ClientConnection::handleReqTraceLockNames(uint8_t* pData)
     }
 
     int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(traces_.size())) {
+    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
         return false;
     }
 
-    auto& ts = traces_[pHdr->handle];
+    auto& ts = tracesStreams_[pHdr->handle];
 
     auto* pNamesHdr = addToCompressionBufferT<ReqTraceLockNamesResp>();
     core::zero_this(pNamesHdr);
@@ -1344,11 +1344,11 @@ bool ClientConnection::handleReqTraceZoneTree(uint8_t* pData)
     }
 
     int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(traces_.size())) {
+    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
         return false;
     }
 
-    auto& ts = traces_[pHdr->handle];
+    auto& ts = tracesStreams_[pHdr->handle];
 
     auto* pTreeHdr = addToCompressionBufferT<ReqTraceZoneTreeResp>();
     core::zero_this(pTreeHdr);
@@ -1403,14 +1403,14 @@ bool ClientConnection::handleReqTraceMessages(uint8_t* pData)
     }
 
     int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(traces_.size())) {
+    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
         return false;
     }
 
-    auto& ts = traces_[pHdr->handle];
+    auto& ts = tracesStreams_[pHdr->handle];
 
-    auto begin = ts.trace.nanoToTicks(pHdr->startNano);
-    auto end = ts.trace.nanoToTicks(pHdr->endNano);
+    auto begin = ts.traceInfo.nanoToTicks(pHdr->startNano);
+    auto end = ts.traceInfo.nanoToTicks(pHdr->endNano);
 
     sql::SqlLiteQuery qry(ts.con, "SELECT type, timeTicks, strIdx FROM messages WHERE timeTicks >= ? AND timeTicks < ?");
     qry.bind(1, begin);

@@ -108,14 +108,14 @@ struct TraceStream : public TraceDB
 {
     TraceStream(TraceStream&& oth) :
         TraceDB(std::move(oth)),
-        trace(std::move(oth.trace))
+        traceInfo(std::move(oth.traceInfo))
     {
     }
     TraceStream() 
     {
     }
 
-    TraceInfo trace;
+    TraceInfo traceInfo;
 };
 
 struct TraceBuilder : public TraceStream
@@ -329,7 +329,7 @@ struct ClientConnection
 public:
     ClientConnection(Server& srv, core::MemoryArenaBase* arena) :
         srv_(srv),
-        traces_(arena),
+        tracesStreams_(arena),
         traceBuilder_(arena),
         pdbData_(arena)
     {
@@ -400,7 +400,7 @@ public:
 
     PerClientIoData io_;
 
-    TraceStreamArr traces_;
+    TraceStreamArr tracesStreams_;
     TraceBuilder traceBuilder_;
 
     // this is used for both incoming and outgoing streams.
