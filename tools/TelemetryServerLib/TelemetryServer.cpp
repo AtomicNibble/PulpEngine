@@ -614,10 +614,9 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
         pdb.op->waitUntilFinished();
     }
 
-    // we just wanna write some data!
-    // fuck the data is not going to stay around lol.
     auto* pSrcBuf = reinterpret_cast<const uint8_t*>(pData + 1);
 
+    // Copy data to temp buffer for the Async IO op.
     auto& tmpBuf = pdb.tmpBuf;
     tmpBuf.resize(pData->blockSize);
     std::memcpy(tmpBuf.data(), pSrcBuf, pData->blockSize);
