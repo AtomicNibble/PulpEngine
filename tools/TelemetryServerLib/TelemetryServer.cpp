@@ -634,6 +634,7 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
 
         gEnv->pFileSys->closeFileAsync(pdb.pFile);
         pdb.pFile = nullptr;
+        pdb.tmpBuf.free();
     }
 
     return totalSize;
