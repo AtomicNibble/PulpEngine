@@ -526,6 +526,7 @@ void ClientConnection::requestPDBIfMissing(const DataPacketPDBInfo* pInfo)
     });
 
     if (it != pdbData_.end()) {
+        X_ERROR("TelemSrv", "Recived multiple PDB info blocks for module at addr: %" PRIx64, pInfo->modAddr);
         return;
     }
 
@@ -551,6 +552,7 @@ void ClientConnection::requestPDBIfMissing(const DataPacketPDBInfo* pInfo)
     data.guid = core::Guid(pInfo->guid);
     data.age = pInfo->age;
     data.path.set(path.begin(), path.end());
+}
 
     data.tmpBuf.reserve(MAX_PDB_DATA_BLOCK_SIZE);
 }
@@ -562,7 +564,7 @@ int32_t ClientConnection::handleDataPacketPDB(const DataPacketPDB* pData)
     });
 
     if (it == pdbData_.end()) {
-        X_ERROR("TelemServ", "Recived unexpected PDB for modAddr: %" PRIx64, pData->modAddr);
+        X_ERROR("TelemSrv", "Recived unexpected PDB for modAddr: %" PRIx64, pData->modAddr);
         X_ASSERT_UNREACHABLE();
         return sizeof(*pData);
     }
@@ -578,7 +580,7 @@ int32_t ClientConnection::handleDataPacketPDB(const DataPacketPDB* pData)
 
     if (!pFileSys->directoryExists(relPath, core::VirtualDirectory::BASE)) {
         if (!pFileSys->createDirectoryTree(relPath, core::VirtualDirectory::BASE)) {
-            X_ERROR("TelemServ", "Failed to create directory for writing PDB stream. Path: %s", relPath.c_str());
+            X_ERROR("TelemSrv", "Failed to create directory for writing PDB stream. Path: %s", relPath.c_str());
             return sizeof(*pData);
         }
     }
@@ -600,7 +602,7 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
     });
 
     if (it == pdbData_.end()) {
-        X_ERROR("TelemServ", "Recived unexpected PDB data for modAddr: %" PRIx64, pData->modAddr);
+        X_ERROR("TelemSrv", "Recived unexpected PDB data for modAddr: %" PRIx64, pData->modAddr);
         X_ASSERT_UNREACHABLE();
         return totalSize;
     }
@@ -609,7 +611,7 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
 
     if (pData->blockSize == 0) {
         // There was a issue in the runtime reading the data.
-        X_ERROR("TelemServ", "Runtime failed to read PDB for streaming at offset: %" PRIx32, pData->offset);
+        X_ERROR("TelemSrv", "Runtime failed to read PDB for streaming at offset: %" PRIx32, pData->offset);
         return totalSize;
     }
 
