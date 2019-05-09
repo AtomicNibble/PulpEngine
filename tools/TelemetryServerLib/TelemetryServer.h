@@ -300,6 +300,7 @@ struct ClientConnection
     struct PDBData
     {
         PDBData(core::MemoryArenaBase* arena) :
+            havePDB(false),
             modAddr(0),
             imageSize(0),
             fileSize(0),
@@ -309,6 +310,8 @@ struct ClientConnection
         {
         }
 
+        bool havePDB;
+
         uint64_t modAddr;
         tt_uint32 imageSize;
         tt_uint32 fileSize;
@@ -316,11 +319,12 @@ struct ClientConnection
         core::Guid guid;
         tt_uint32 age;
 
+        // The path the runtime gave us.
         core::Path<> path;
 
+        // Used when streaming from client.
         core::XFileAsync* pFile;
         std::optional<core::XOsFileAsyncOperation> op;
-
         core::Array<uint8_t> tmpBuf;
     };
 
@@ -376,7 +380,8 @@ private:
     void sendConnectionRejected(const char* pReason);
 
     // PDB stuff.
-    void requestPDBIfMissing(const DataPacketPDBInfo* pInfo);
+    void registerPDB(const DataPacketPDBInfo* pInfo);
+    void requestMissingPDB(const DataPacketCallStack* pData);
     int32_t handleDataPacketPDB(const DataPacketPDB* pData);
     int32_t handleDataPacketPDBBlock(const DataPacketPDBBlock* pData);
 

@@ -446,7 +446,12 @@ void ClientConnection::processDataStream(uint8_t* pData, int32_t len)
             }
             case DataStreamType::CallStack:
             {
-                i += strm.handleDataPacketCallStack(reinterpret_cast<const DataPacketCallStack*>(&pData[i]));
+                auto* pCallsTack = reinterpret_cast<const DataPacketCallStack*>(&pData[i]);
+                i += strm.handleDataPacketCallStack(pCallsTack);
+
+                if (core::bitUtil::IsBitFlagSet(strm.traceInfo.connFlags, TtConnectionFlag::StreamPDB)) {
+                    requestMissingPDB(pCallsTack);
+                }
                 break;
             }
             case DataStreamType::LockSetName:
@@ -494,7 +499,7 @@ void ClientConnection::processDataStream(uint8_t* pData, int32_t len)
                 auto* pPDBInfo = reinterpret_cast<const DataPacketPDBInfo*>(&pData[i]);
                 i += strm.handleDataPacketPDBInfo(pPDBInfo);
 
-                requestPDBIfMissing(pPDBInfo);
+                registerPDB(pPDBInfo);
                 break;
             }
             case DataStreamType::PDB:
@@ -517,10 +522,12 @@ void ClientConnection::processDataStream(uint8_t* pData, int32_t len)
     trans.commit();
 }
 
-void ClientConnection::requestPDBIfMissing(const DataPacketPDBInfo* pInfo)
+void ClientConnection::registerPDB(const DataPacketPDBInfo* pInfo)
 {
-    // We should check if we have this PDB.
-    // if we can't find it, ask the runtime to send it us.
+    if (!core::bitUtil::IsBitFlagSet(traceBuilder_.traceInfo.connFlags, TtConnectionFlag::StreamPDB)) {
+        return;
+    }
+
     auto it = std::find_if(pdbData_.begin(), pdbData_.end(), [pInfo](const PDBData& pdb) {
         return pdb.modAddr == pInfo->modAddr;
     });
@@ -531,20 +538,6 @@ void ClientConnection::requestPDBIfMissing(const DataPacketPDBInfo* pInfo)
     }
 
     auto path = traceBuilder_.getString(pInfo->strIdxName);
-    // we not seen this PDB.
-    // see if we can find it in symbols cache / paths.
-    // ...
-
-
-    // we could not find it ask client to stream it me.
-    char buf[sizeof(RequestPDBHdr)];
-
-    auto* pReqPDB = reinterpret_cast<RequestPDBHdr*>(buf);
-    pReqPDB->dataSize = static_cast<tt_uint16>(sizeof(*pReqPDB));
-    pReqPDB->type = PacketType::ReqPDB;
-    pReqPDB->modAddr = pInfo->modAddr;
-
-    sendDataToClient(buf, sizeof(*pReqPDB));
 
     PDBData& data = pdbData_.AddOne(g_TelemSrvLibArena);
     data.modAddr = pInfo->modAddr;
@@ -554,11 +547,72 @@ void ClientConnection::requestPDBIfMissing(const DataPacketPDBInfo* pInfo)
     data.path.set(path.begin(), path.end());
 }
 
-    data.tmpBuf.reserve(MAX_PDB_DATA_BLOCK_SIZE);
+void ClientConnection::requestMissingPDB(const DataPacketCallStack* pData)
+{
+    // This is called for every callstack so needs to be fast.
+    // we basically want to look and see if need any PDB.
+    const tt_int32 numFrames = pData->numFrames;
+    const tt_uint64* pFrames = reinterpret_cast<const tt_uint64*>(pData + 1);
+
+    for (tt_int32 i = 0; i < numFrames; i++)
+    {
+        auto addr = pFrames[i];
+
+        // TODO: make this a more cache friendly.
+        auto it = std::find_if(pdbData_.begin(), pdbData_.end(), [addr](const PDBData& pdb) {
+            auto begin = pdb.modAddr;
+            auto end = begin + pdb.imageSize;
+            return addr >= begin && addr < end;
+        });
+
+        // We have PDB info for this module?
+        if (it == pdbData_.end()) {
+            continue;
+        }
+
+        // we have PDB for it?
+        auto& pdb = *it;
+        if (pdb.havePDB) {
+            continue;
+        }
+
+        // TODO: this should be a enum propbs so we can know it's pending.
+        pdb.havePDB = true;
+
+        // Okay so now we see if we can just resolve the PDB.
+        // which means checking the PDB paths and maybe even checking a server?
+        // then finally we ask the client to send it us.
+        // now this will invole IO operations so maybe something that should
+        // be done in the background.
+        // but one problem is that if we don't ask the client soon enougth it might go away.
+        // rip.
+
+
+        // Request it from the client.
+        X_LOG0("TelemSrv", "Requesting PDB from client for modAddr: 0x%" PRIu64, pdb.modAddr);
+
+        pdb.tmpBuf.reserve(MAX_PDB_DATA_BLOCK_SIZE);
+
+        char buf[sizeof(RequestPDBHdr)];
+
+        auto* pReqPDB = reinterpret_cast<RequestPDBHdr*>(buf);
+        pReqPDB->dataSize = static_cast<tt_uint16>(sizeof(*pReqPDB));
+        pReqPDB->type = PacketType::ReqPDB;
+        pReqPDB->modAddr = pdb.modAddr;
+        std::memcpy(pReqPDB->guid, pdb.guid.bytes().data(), sizeof(pReqPDB->guid));
+        pReqPDB->age = pdb.age;
+
+        sendDataToClient(buf, sizeof(*pReqPDB));
+    }
+
 }
 
 int32_t ClientConnection::handleDataPacketPDB(const DataPacketPDB* pData)
 {
+    if (!core::bitUtil::IsBitFlagSet(traceBuilder_.traceInfo.connFlags, TtConnectionFlag::StreamPDB)) {
+        X_ERROR("TelemSrv", "Recived PDB data while PDB streaming is not active");
+    }
+
     auto it = std::find_if(pdbData_.begin(), pdbData_.end(), [pData](const PDBData& pdb) {
         return pdb.modAddr == pData->modAddr;
     });
@@ -595,6 +649,10 @@ int32_t ClientConnection::handleDataPacketPDB(const DataPacketPDB* pData)
 
 int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pData)
 {
+    if (!core::bitUtil::IsBitFlagSet(traceBuilder_.traceInfo.connFlags, TtConnectionFlag::StreamPDB)) {
+        X_ERROR("TelemSrv", "Recived PDB block while PDB streaming is not active");
+    }
+
     const int32_t totalSize = sizeof(*pData) + pData->blockSize;
 
     auto it = std::find_if(pdbData_.begin(), pdbData_.end(), [pData](const PDBData& pdb) {
