@@ -58,13 +58,12 @@ namespace
 }
 
 // create empty guid
-Guid::Guid() : 
-    bytes_{ {0} }
-{ 
+Guid::Guid()
+{
 }
 
 Guid::Guid(const GuidByteArr& bytes) :
-    bytes_(bytes)
+    data_(bytes)
 {
 }
 
@@ -84,7 +83,7 @@ Guid::Guid(core::string_view str)
         if (numByte >= 16 || !isValidHexChar(ch))
         {
             // Invalid string so bail
-            bytes_.fill(0);
+            data_.bytes.fill(0);
             return;
         }
 
@@ -97,21 +96,21 @@ Guid::Guid(core::string_view str)
         {
             charTwo = ch;
             auto byte = hexPairToChar(charOne, charTwo);
-            bytes_[numByte++] = byte;
+            data_.bytes[numByte++] = byte;
             lookingForFirstChar = true;
         }
     }
 
     if (numByte < 16)
     {
-        bytes_.fill(0);
+        data_.bytes.fill(0);
         return;
     }
 }
 
 bool Guid::operator==(const Guid& oth) const
 {
-    return bytes_ == oth.bytes_;
+    return data_.bytes == oth.data_.bytes;
 }
 
 bool Guid::operator!=(const Guid& oth) const
@@ -121,7 +120,12 @@ bool Guid::operator!=(const Guid& oth) const
 
 const Guid::GuidByteArr& Guid::bytes(void) const
 {
-    return bytes_;
+    return data_.bytes;
+}
+
+const Guid::GUID& Guid::guid(void) const
+{
+    return data_.guid;
 }
 
 bool Guid::isValid(void) const
@@ -132,23 +136,25 @@ bool Guid::isValid(void) const
 
 const char* Guid::toString(GuidStr& buf) const
 {
+    auto& bytes = data_.bytes;
+
     buf.setFmt("%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x", 
-        bytes_[0],
-        bytes_[1],
-        bytes_[2],
-        bytes_[3],
-        bytes_[4],
-        bytes_[5],
-        bytes_[6],
-        bytes_[7],
-        bytes_[8],
-        bytes_[9],
-        bytes_[10],
-        bytes_[11],
-        bytes_[12],
-        bytes_[13],
-        bytes_[14],
-        bytes_[15]
+        bytes[0],
+        bytes[1],
+        bytes[2],
+        bytes[3],
+        bytes[4],
+        bytes[5],
+        bytes[6],
+        bytes[7],
+        bytes[8],
+        bytes[9],
+        bytes[10],
+        bytes[11],
+        bytes[12],
+        bytes[13],
+        bytes[14],
+        bytes[15]
     );
 
     return buf.c_str();
@@ -160,7 +166,7 @@ Guid Guid::newGuid(void)
     (void)UuidCreateSequential(&newId);
 
     Guid myGuid;
-    myGuid.bytes_ = {
+    myGuid.data_.bytes = {
         static_cast<uint8_t>((newId.Data1 >> 24) & 0xFF),
         static_cast<uint8_t>((newId.Data1 >> 16) & 0xFF),
         static_cast<uint8_t>((newId.Data1 >> 8) & 0xFF),
