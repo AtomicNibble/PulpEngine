@@ -143,7 +143,7 @@ extern "C"
 #define __TELEM_API_BLANK(func) func
 #endif
 
-#define __TELEM_API_VOID(name, ...) TELEMETRYLIB_EXPORT void  name(__VA_ARGS__); \
+#define __TELEM_API_VOID(name, ...) TELEMETRYLIB_EXPORT void name(__VA_ARGS__); \
         __TELEM_API_BLANK(inline void __blank##name(__VA_ARGS__) {})
 
 #define __TELEM_API_BOOL(name, ...) TELEMETRYLIB_EXPORT bool name(__VA_ARGS__); \
