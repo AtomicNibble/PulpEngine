@@ -623,24 +623,32 @@ int32_t ClientConnection::handleDataPacketPDB(const DataPacketPDB* pData)
         return sizeof(*pData);
     }
 
-    it->fileSize = pData->fileSize;
+    auto& pdb = *it;
+
+    pdb.fileSize = pData->fileSize;
 
     // TODO: make a proper path.
     core::Path<> relPath;
     relPath.append("symbols/.tmp/");
-    relPath.append(it->path.fileName());
+    relPath.append(pdb.path.fileName());
+    SymResolver::addSymSrvFolderNameForPDB(relPath, pdb.guid, pdb.age);
+    relPath.append(pdb.path.fileName());
 
     auto* pFileSys = gEnv->pFileSys;
 
-    if (!pFileSys->directoryExists(relPath, core::VirtualDirectory::BASE)) {
-        if (!pFileSys->createDirectoryTree(relPath, core::VirtualDirectory::BASE)) {
-            X_ERROR("TelemSrv", "Failed to create directory for writing PDB stream. Path: %s", relPath.c_str());
+    core::Path<> folder(relPath);
+    folder.removeFileName();
+    folder.ensureSlash();
+
+    if (!pFileSys->directoryExists(folder, core::VirtualDirectory::BASE)) {
+        if (!pFileSys->createDirectoryTree(folder, core::VirtualDirectory::BASE)) {
+            X_ERROR("TelemSrv", "Failed to create directory for writing PDB stream. Path: %s", folder.c_str());
             return sizeof(*pData);
         }
     }
 
-    it->pFile = pFileSys->openFileAsync(relPath, core::FileFlag::WRITE | core::FileFlag::RECREATE, core::VirtualDirectory::BASE);
-    if (!it->pFile) {
+    pdb.pFile = pFileSys->openFileAsync(relPath, core::FileFlag::WRITE | core::FileFlag::RECREATE, core::VirtualDirectory::BASE);
+    if (!pdb.pFile) {
         X_ERROR("TelemServer", "Failed to open output for PDB stream");
     }
 
