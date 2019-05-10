@@ -3241,6 +3241,12 @@ tt_int32 TelemSendCallStack(TraceContexHandle ctx, const TtCallStack* pStack)
     return stack.id;
 }
 
+tt_int32 TelemSendCallStackSkip(TraceContexHandle ctx, const TtCallStack* pStack, tt_int32 numToSkip)
+{
+    TELEM_UNUSED(numToSkip);
+    return TelemSendCallStack(ctx, pStack);
+}
+
 // ----------- Zones -----------
 
 // TODO: have a overload that don't take args so can skip the conditional?

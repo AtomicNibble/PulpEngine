@@ -188,7 +188,7 @@ extern "C"
     // Callstack
     __TELEM_API_INT(TelemGetCallStack, TraceContexHandle ctx, TtCallStack& stackOut);
     __TELEM_API_INT(TelemSendCallStack, TraceContexHandle ctx, const TtCallStack* pStack);
-    __TELEM_API_VOID(TelemSendCallStackSkip, TraceContexHandle ctx, const TtCallStack* pStack, tt_int32 numToSkip);
+    __TELEM_API_INT(TelemSendCallStackSkip, TraceContexHandle ctx, const TtCallStack* pStack, tt_int32 numToSkip);
 
     // Zones
     __TELEM_API_VOID(TelemEnter, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pFmtString, tt_int32 numArgs, ...);
