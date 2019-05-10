@@ -2829,6 +2829,15 @@ void TelemSetContextLogFunc(TraceContexHandle ctx, LogFunction func, void* pUser
     pCtx->logFunc = func;
 }
 
+void TelemSetIoFuncs(TraceContexHandle ctx, FileOpenFunc open, FileCloseFunc close, FileWriteFunc write, void* pUserData)
+{
+    auto* pCtx = handleToContext(ctx);
+    pCtx->pUserData = pUserData;
+    pCtx->pFileOpen = open;
+    pCtx->pFileClose = close;
+    pCtx->pFileWrite = write;
+}
+
 TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pPath,
     TtConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS, TtConnectionFlags flags)
 {
