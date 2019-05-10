@@ -133,6 +133,7 @@ const TChar* Path<TChar>::extension(bool incDot) const
     }
     return res + 1;
 }
+
 template<typename TChar>
 void Path<TChar>::setExtension(const TChar* pExtension)
 {
@@ -295,13 +296,25 @@ inline void Path<wchar_t>::replaceSeprators(void)
 template<>
 inline void Path<char>::removeFileName(void)
 {
-    replace(fileName(), "");
+    auto* pFileName = fileName();
+    if (pFileName) {
+        auto newLength = pFileName - BaseType::str_;
+
+        BaseType::str_[newLength] = 0;
+        BaseType::len_ = newLength;
+    }
 }
 
 template<>
 inline void Path<wchar_t>::removeFileName(void)
 {
-    replace(fileName(), L"");
+    auto* pFileName = fileName();
+    if (pFileName) {
+        auto newLength = pFileName - BaseType::str_;
+
+        BaseType::str_[newLength] = 0;
+        BaseType::len_ = newLength;
+    }
 }
 
 template<>

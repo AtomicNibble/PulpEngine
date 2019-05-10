@@ -833,6 +833,16 @@ TEST(Path, RemoveFileName)
         path.removeFileName();
         EXPECT_STREQ("c:\\", path.c_str());
     }
+    {
+        core::Path<char> path("c:\\goat.ext\\folder\\file.name");
+        path.removeFileName();
+        EXPECT_STREQ("c:\\goat.ext\\folder\\", path.c_str());
+    }
+    {
+        core::Path<char> path("c:\\file.name\\folder\\file.name");
+        path.removeFileName();
+        EXPECT_STREQ("c:\\file.name\\folder\\", path.c_str());
+    }
 }
 
 TEST(Path, RemoveFileNameW)
@@ -861,6 +871,16 @@ TEST(Path, RemoveFileNameW)
         core::Path<wchar_t> path(L"c:\\goat.ext");
         path.removeFileName();
         EXPECT_STREQ(L"c:\\", path.c_str());
+    }
+    {
+        core::Path<wchar_t> path(L"c:\\goat.ext\\folder\\file.name");
+        path.removeFileName();
+        EXPECT_STREQ(L"c:\\goat.ext\\folder\\", path.c_str());
+    }
+    {
+        core::Path<wchar_t> path(L"c:\\file.name\\folder\\file.name");
+        path.removeFileName();
+        EXPECT_STREQ(L"c:\\file.name\\folder\\", path.c_str());
     }
 }
 
