@@ -237,8 +237,10 @@ namespace telem
 
 #if TTELEMETRY_LINK
 #define __TELEM_FUNC_NAME(name) name
+#define TELEM_DYNAMIC_POINTERS 
 #else
 #define __TELEM_FUNC_NAME(name) telem::gTelemApi.p##name
+#define TELEM_DYNAMIC_POINTERS telem::TelemetryAPI telem::gTelemApi;
 
     struct TelemetryAPI
     {
@@ -397,7 +399,7 @@ namespace telem
     // so you would have to call it in each dll init.
     // but also means you can conditionally enable telemetry for various modules.
     // it's not safe to resole functions during a zone for the same module.
-    static TelemetryAPI gTelemApi;
+    extern TelemetryAPI gTelemApi;
 
 #endif // TTELEMETRY_LINK
 
