@@ -33,10 +33,10 @@ namespace
 
     namespace Hash
     {
-        typedef uint32_t Fnv1aVal;
+        typedef tt_uint32 Fnv1aVal;
 
-        static const uint32_t FNV_32_PRIME = 16777619u;
-        static const uint32_t FNV1_32_INIT = 2166136261u;
+        static const tt_uint32 FNV_32_PRIME = 16777619u;
+        static const tt_uint32 FNV1_32_INIT = 2166136261u;
 
 
         TELEM_INLINE Fnv1aVal Fnv1aHash(const void* key, size_t length, Fnv1aVal seed)
@@ -44,8 +44,8 @@ namespace
             Fnv1aVal hash = seed;
             auto* s = reinterpret_cast<const uint8_t*>(key);
 
-            for (uint32_t i = 0; i < length; ++i) {
-                hash ^= (uint32_t)*s++;
+            for (tt_uint32 i = 0; i < length; ++i) {
+                hash ^= (tt_uint32)*s++;
                 hash *= FNV_32_PRIME;
             }
 
@@ -61,7 +61,7 @@ namespace
 
     namespace Io
     {
-        #define TELEM_TAG(a, b, c, d) (uint32_t)((d << 24) | (c << 16) | (b << 8) | a)
+        #define TELEM_TAG(a, b, c, d) (tt_uint32)((d << 24) | (c << 16) | (b << 8) | a)
 
         static const char* TRACE_FILE_EXTENSION = "trace";
         static const tt_uint32 TRACR_FOURCC = TELEM_TAG('t', 'r', 'a', 'c');
@@ -2210,7 +2210,7 @@ namespace
 
         bool recvPending;
         OVERLAPPED overlapped;
-        uint32_t totalBytes;
+        tt_uint32 totalBytes;
         platform::WSABUF buf;
         char recvbuf[MAX_PACKET_SIZE];
     };
@@ -2296,8 +2296,8 @@ namespace
         tt_uint8 buf[bufSize + sizeof(DataPacketPDBBlock)];
 
         static_assert(sizeof(buf) <= COMPRESSION_MAX_INPUT_SIZE, "Buf bigger than max comp input");
+        tt_uint32 offset = 0;
 
-        uint32_t offset = 0;
 
         while (bytesLeft > 0)
         {
@@ -2404,12 +2404,12 @@ namespace
             return;
         }
 
-        uint32_t bytesLeft = recvState.totalBytes;
+        tt_uint32 bytesLeft = recvState.totalBytes;
         auto* pData = recvState.recvbuf;
 
         while(bytesLeft > sizeof(PacketBase)) {
             auto* pHdr = reinterpret_cast<const PacketBase*>(pData);
-            const uint32_t packetSize = pHdr->dataSize;
+            const tt_uint32 packetSize = pHdr->dataSize;
             if (bytesLeft < packetSize) {
                 break;
             }
