@@ -685,6 +685,11 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
         pdb.op->waitUntilFinished();
     }
 
+    if (!pdb.pFile) {
+        // We failed to open file so drop data. :(
+        return totalSize;
+    }
+
     auto* pSrcBuf = reinterpret_cast<const uint8_t*>(pData + 1);
 
     // Copy data to temp buffer for the Async IO op.
