@@ -706,11 +706,45 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
         X_ASSERT(bytesWrriten == pdb.fileSize, "Recived too many bytes")(bytesWrriten, pdb.fileSize);
         X_ASSERT(pdb.op.has_value(), "Async op has no value")(pdb.op.has_value());
 
+        const bool valid = bytesWrriten == pdb.fileSize;
+
         pdb.op->waitUntilFinished();
 
         gEnv->pFileSys->closeFileAsync(pdb.pFile);
         pdb.pFile = nullptr;
         pdb.tmpBuf.free();
+
+        if (valid) {
+
+            // move the file into place.
+            core::Path<> subPath;
+            subPath.append(pdb.path.fileName());
+            SymResolver::addSymSrvFolderNameForPDB(subPath, pdb.guid, pdb.age);
+            subPath.append(pdb.path.fileName());
+
+            core::Path<> tmpPath("symbols/.tmp/");
+            tmpPath += subPath;
+            core::Path<> newPath("symbols/");
+            newPath += subPath;
+
+            core::Path<> newFolder(newPath);
+            newFolder.removeFileName();
+            newFolder.ensureSlash();
+
+            auto* pFileSys = gEnv->pFileSys;
+
+            if (!pFileSys->directoryExists(newFolder, core::VirtualDirectory::BASE)) {
+                if (!pFileSys->createDirectoryTree(newFolder, core::VirtualDirectory::BASE)) {
+                    X_ERROR("TelemSrv", "Failed to create directory for moving PDB too. Path: %s", newFolder.c_str());
+                }
+            }
+
+            if (!pFileSys->moveFile(tmpPath, newPath, core::VirtualDirectory::BASE)) {
+                X_ERROR("TelemSrv", "Failed to move PDB from tmp location to final location. TargetPath: %s", newPath.c_str());
+            }
+
+            // TODO: remove old sub folder?
+        }
     }
 
     return totalSize;
