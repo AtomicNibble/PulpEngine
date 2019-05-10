@@ -354,21 +354,27 @@ bool XCore::Init(CoreInitParams& startupParams)
     env_.dedicated_ = false;
 
 #if TTELEMETRY_ENABLED
-    
-    if (!ttLoadLibary()) {
-        return false;
+
+    // if we don't link we can skip loading
+#if !TTELEMETRY_LINK
+    if (startupParams.bTelem)
+#endif // TTELEMETRY_LINK
+    {
+        if (!ttLoadLibary()) {
+            return false;
+        }
+
+        // Setup telem.
+        if (!ttInit()) {
+            return false;
+        }
+
+        // i need to make this from something.
+        const size_t telemBufSize = 1024 * 1024 * 4;
+        static uint8_t telemBuf[telemBufSize];
+
+        ttInitializeContext(gEnv->ctx, telemBuf, sizeof(telemBuf));
     }
-
-    // Setup telem.
-    if (!ttInit()) {
-        return false;
-    }
-
-    // i need to make this from something.
-    const size_t telemBufSize = 1024 * 1024 * 4;
-    static uint8_t telemBuf[telemBufSize];
-
-    ttInitializeContext(gEnv->ctx, telemBuf, sizeof(telemBuf));
 
     if (startupParams.bTelem)
     {
