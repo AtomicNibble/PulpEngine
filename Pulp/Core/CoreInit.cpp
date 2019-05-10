@@ -353,8 +353,8 @@ bool XCore::Init(CoreInitParams& startupParams)
     env_.client_ = true;
     env_.dedicated_ = false;
 
-    // TELEM ME !
-    // link me like a slut.
+#if TTELEMETRY_ENABLED
+    
     if (!ttLoadLibary()) {
         return false;
     }
@@ -363,8 +363,6 @@ bool XCore::Init(CoreInitParams& startupParams)
     if (!ttInit()) {
         return false;
     }
-
-#if TTELEMETRY_ENABLED
 
     // i need to make this from something.
     const size_t telemBufSize = 1024 * 1024 * 4;
