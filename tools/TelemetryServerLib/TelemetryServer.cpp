@@ -3046,7 +3046,7 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
     X_LOG_BULLET;
     for (const auto& trace : app.traces)
     {
-        X_LOG0("TelemSrv", "Trace \"%s\"", trace.dbPath.fileName());
+        X_LOG1("TelemSrv", "Trace \"%s\"", trace.dbPath.fileName());
     }
 
     apps_.push_back(std::move(app));
