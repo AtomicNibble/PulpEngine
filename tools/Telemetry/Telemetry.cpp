@@ -2215,6 +2215,7 @@ namespace
         char recvbuf[MAX_PACKET_SIZE];
     };
 
+#if 0
     struct ScopedHandle
     {
         ScopedHandle(HANDLE hHandle) :
@@ -2227,116 +2228,264 @@ namespace
 
         HANDLE hHandle;
     };
+#endif
 
-    void handlePDBRequest(PacketCompressor* pComp, const RequestPDBHdr* pPDBReq)
+    TELEM_ALIGNED_SYMBOL(struct MyOverlapped, 64) : public OVERLAPPED
     {
+        tt_uint32 readSize;
+        tt_uint32 bytesRead;
+        bool pending = true;
+    };
 
-        // need to find PDB info baby.
-        IMAGEHLP_MODULEW64 modInfo;
-        zero_object(modInfo);
-        modInfo.SizeOfStruct = sizeof(modInfo);
+    struct PDBSender
+    {
+        static constexpr tt_uint32 BUF_SIZE = MAX_PDB_DATA_BLOCK_SIZE;
 
-        if (!SymGetModuleInfoW64(::GetCurrentProcess(), pPDBReq->modAddr, &modInfo)) {
+        PDBSender(PacketCompressor* pComp, tt_uint64 modAddr) :
+            pComp_(pComp),
+            modAddr_(modAddr)
+        {
+            hFile_ = INVALID_HANDLE_VALUE;
+            zero_object(overlapped_);
+            zero_object(modInfo_);
+
+        }
+
+        ~PDBSender() {
+            if (hFile_ != INVALID_HANDLE_VALUE) {
+                ::CloseHandle(hFile_);
+            }
+
+            if (overlapped_[0].hEvent) {
+                ::CloseHandle(overlapped_[0].hEvent);
+            }
+            if (overlapped_[1].hEvent) {
+                ::CloseHandle(overlapped_[1].hEvent);
+            }
+        }
+
+        bool send(void);
+
+    private:
+        bool dispatchRead(tt_int32 bufIdx);
+        bool waitForBuf(tt_int32 bufIdx);
+        void addToCompBuf(tt_int32 bufIdx);
+        bool waitForBufAndComp(tt_int32 bufIdx);
+        bool isPending(tt_int32 bufIdx);
+
+    private:
+        PacketCompressor* pComp_;
+        tt_uint64 modAddr_;
+
+        HANDLE hFile_;
+        tt_uint32 fileSize_;
+        tt_uint32 offset_;
+        IMAGEHLP_MODULEW64 modInfo_;
+
+        MyOverlapped overlapped_[2];
+        tt_uint8 bufs[2][RoundUpToMultiple(BUF_SIZE + sizeof(DataPacketPDBBlock), 64)];
+    };
+
+    bool PDBSender::dispatchRead(tt_int32 bufIdx)
+    {
+        const auto bytesLeft = fileSize_ - offset_;
+        const auto readSize = static_cast<tt_uint32>(Min(bytesLeft, BUF_SIZE));
+
+        auto* pBuf = bufs[bufIdx];
+        auto* pDataBuf = pBuf + sizeof(DataPacketPDBBlock);
+
+        // Fill in header
+        DataPacketPDBBlock* pBlockHdr = reinterpret_cast<DataPacketPDBBlock*>(pBuf);
+        pBlockHdr->type = DataStreamType::PDBBlock;
+        pBlockHdr->modAddr = modInfo_.BaseOfImage;
+        pBlockHdr->blockSize = readSize;
+        pBlockHdr->offset = offset_;
+
+        auto& over = overlapped_[bufIdx];
+        if (over.pending) {
+            ::DebugBreak();
+        }
+
+        over.Offset = offset_;
+        over.readSize = readSize;
+        over.pending = true;
+
+        if (!::ReadFile(hFile_, pDataBuf, readSize, nullptr, &over)) {
+            auto err = ::GetLastError();
+            if (err != ERROR_IO_PENDING) {
+                return false;
+            }
+        }
+
+        offset_ += readSize;
+        return true;
+    };
+
+    bool PDBSender::waitForBuf(tt_int32 bufIdx)
+    {
+        auto& over = overlapped_[bufIdx];
+
+        if (!over.pending) {
+            ::DebugBreak();
+        }
+
+        DWORD bytesRead;
+        if (!::GetOverlappedResult(hFile_, &over, &bytesRead, TRUE)) {
+            return false;
+        }
+
+        over.bytesRead = bytesRead;
+        over.pending = false;
+
+        return over.bytesRead == over.readSize;
+    };
+
+    void PDBSender::addToCompBuf(tt_int32 bufIdx)
+    {
+        auto* pBuf = bufs[bufIdx];
+        const auto& over = overlapped_[bufIdx];
+        tt_int32 totalSize = over.bytesRead + sizeof(DataPacketPDBBlock);
+
+        addToCompressionBuffer(pComp_, pBuf, totalSize);
+    };
+
+    bool PDBSender::waitForBufAndComp(tt_int32 bufIdx)
+    {
+        if (!waitForBuf(bufIdx)) {
+            return false;
+        }
+
+        addToCompBuf(bufIdx);
+        return true;
+    };
+
+    bool PDBSender::isPending(tt_int32 bufIdx)
+    {
+        const auto& over = overlapped_[bufIdx];
+        return over.pending;
+    };
+
+
+    bool PDBSender::send(void)
+    {
+        modInfo_.SizeOfStruct = sizeof(modInfo_);
+        if (!SymGetModuleInfoW64(::GetCurrentProcess(), modAddr_, &modInfo_)) {
             // TODO: tell server we suck.
-            return;
+            return false;
         }
 
-        if (modInfo.SymType != SymPdb) {
+        if (modInfo_.SymType != SymPdb) {
             // rip.
-            return;
+            return false;
         }
 
-        // we have a path to the PDB, yay.
-        // load it into memory in fixed blocks.
-        // then send it down the network.
-        // could this make us stall a lot?
-        // if we are loading 100MB of data shit could get goaty.
-        // can we async it up?
-        // could have like pending PDB reads and shit, starts getting complex.
-        // but doable.
-        auto* pPath = modInfo.LoadedPdbName;
+        auto* pPath = modInfo_.LoadedPdbName;
 
         DWORD access = FILE_READ_DATA;
         DWORD share = FILE_SHARE_READ;
         DWORD dispo = OPEN_EXISTING;
-        DWORD flags = FILE_FLAG_SEQUENTIAL_SCAN;
+        DWORD flags = FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_OVERLAPPED;
 
-        HANDLE hHandle = ::CreateFileW(pPath, access, share, NULL, dispo, flags, NULL);
-        if (hHandle == INVALID_HANDLE_VALUE) {
+        hFile_ = ::CreateFileW(pPath, access, share, NULL, dispo, flags, NULL);
+        if (hFile_ == INVALID_HANDLE_VALUE) {
             // TODO: rip
-            return;
+            return false;
         }
-
-        ScopedHandle handleClose(hHandle);
 
         _BY_HANDLE_FILE_INFORMATION info;
-        if (!GetFileInformationByHandle(hHandle, &info)) {
+        if (!GetFileInformationByHandle(hFile_, &info)) {
             // TODO: rip
-            return;
+            return false;
         }
 
-        // should never be above 1<<31 but whatever,
-        const tt_uint32 fileSize = info.nFileSizeLow;
-        tt_uint32 bytesLeft = fileSize;
+        overlapped_[0].hEvent = ::CreateEventW(nullptr, true, false, nullptr);
+        if (!overlapped_[0].hEvent) {
+            return false;
+        }
+        overlapped_[1].hEvent = ::CreateEventW(nullptr, true, false, nullptr);
+        if (!overlapped_[0].hEvent) {
+            return false;
+        }
 
+        // should never be above 1<<31,
+        fileSize_ = info.nFileSizeLow;
+        offset_ = 0;
 
         DataPacketPDB hdr;
         hdr.type = DataStreamType::PDB;
-        hdr.modAddr = modInfo.BaseOfImage;
-        hdr.imageSize = modInfo.ImageSize;
-        hdr.fileSize = fileSize;
-        memcpy(&hdr.guid, &modInfo.PdbSig70, sizeof(modInfo.PdbSig70));
-        hdr.age = modInfo.PdbAge;
-        hdr.pdbSize = fileSize;
+        hdr.modAddr = modInfo_.BaseOfImage;
+        hdr.imageSize = modInfo_.ImageSize;
+        hdr.fileSize = fileSize_;
+        memcpy(&hdr.guid, &modInfo_.PdbSig70, sizeof(modInfo_.PdbSig70));
+        hdr.age = modInfo_.PdbAge;
 
-        addToCompressionBuffer(pComp, &hdr, sizeof(hdr));
+        addToCompressionBuffer(pComp_, &hdr, sizeof(hdr));
 
-        // nned to read this bad boy in.
-        constexpr tt_uint32 bufSize = MAX_PDB_DATA_BLOCK_SIZE;
-        tt_uint8 buf[bufSize + sizeof(DataPacketPDBBlock)];
+        tt_int32 bufIdx = 0;
 
-        static_assert(sizeof(buf) <= COMPRESSION_MAX_INPUT_SIZE, "Buf bigger than max comp input");
-        tt_uint32 offset = 0;
-
-
-        while (bytesLeft > 0)
-        {
-            auto readSize = static_cast<tt_uint32>(Min(bytesLeft, bufSize));
-
-            DataPacketPDBBlock* pBlockHdr = reinterpret_cast<DataPacketPDBBlock*>(buf);
-            pBlockHdr->type = DataStreamType::PDBBlock;
-            pBlockHdr->modAddr = modInfo.BaseOfImage;
-            pBlockHdr->blockSize = readSize;
-            pBlockHdr->offset = offset;
-
-            DWORD bytesRead = 0;
-            bool failed = false;
-
-            if (!::ReadFile(hHandle, buf + sizeof(DataPacketPDBBlock), readSize, &bytesRead, 0)) {
-                failed = true;
-                return;
-            }
-
-            if (bytesRead != readSize) {
-                failed = true;
-                return;
-            }
-
-            if (failed) {
-                pBlockHdr->blockSize = 0;
-            }
-
-            addToCompressionBuffer(pComp, pBlockHdr, bytesRead + sizeof(DataPacketPDBBlock));
-
-            if (failed) {
-                return;
-            }
-
-            bytesLeft -= readSize;
-            offset += readSize;
+        if (!dispatchRead(bufIdx)) {
+            return false;
         }
-            
-        // writeLog(pCtx, TtLogType::Msg, "Request PDB for hMod: %p", pPDBReq->modAddr);
+
+        // we already finished reading?
+        if (offset_ < fileSize_) {
+            if (!dispatchRead(bufIdx ^ 1)) {
+                return false;
+            }
+        }
+
+        while (offset_ < fileSize_)
+        {
+            if (!waitForBufAndComp(bufIdx)) {
+                return false;
+            }
+
+            // we can dispatch another read now this buffer is done.
+            if (!dispatchRead(bufIdx)) {
+                return false;
+            }
+
+            bufIdx ^= 1;
+
+#if X_DEBUG
+            // Make sure th other buffer was reading in the background.
+            if (!isPending(bufIdx)) {
+                ::DebugBreak();
+            }
+#endif // X_DEBUG
+        }
+
+#if X_DEBUG
+        // This one should be pending
+        if (!isPending(bufIdx)) {
+            ::DebugBreak();
+        }
+#endif // X_DEBUG
+
+        // finish off.
+        if (isPending(bufIdx)) {
+            if (!waitForBufAndComp(bufIdx)) {
+                return false;
+            }
+        }
+
+        if (isPending(bufIdx ^ 1)) {
+            if (!waitForBufAndComp(bufIdx ^ 1)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    void handlePDBRequest(PacketCompressor* pComp, const RequestPDBHdr* pPDBReq)
+    {
+        // Return to sender... do do do
+        PDBSender sender(pComp, pPDBReq->modAddr);
+
+        if (!sender.send()) {
+            return;
+        }
     }
 
     void processServerRequest(PacketCompressor* pComp, const PacketBase* pPacket)

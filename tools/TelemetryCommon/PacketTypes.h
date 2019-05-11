@@ -101,7 +101,8 @@ constexpr tt_size BACKGROUND_THREAD_STACK_SIZE = Internal::RoundUpToMultiple<tt_
     (MAX_PACKET_SIZE * 2) + 
     BACKGROUND_THREAD_STACK_SIZE_BASE + 
     STRING_TABLE_BUF_SIZE +
-    CALLSTACK_CACHE_BUF_SIZE,
+    CALLSTACK_CACHE_BUF_SIZE +
+    (MAX_PDB_DATA_BLOCK_SIZE * 2),
     1024 * 4
 );
 
@@ -447,8 +448,6 @@ struct DataPacketPDB : public DataPacketBaseArgData
 
     tt_uint8 guid[16];
     tt_uint32 age;
-
-    tt_uint64 pdbSize;
 };
 
 struct DataPacketPDBBlock : public DataPacketBaseArgData
@@ -473,7 +472,7 @@ static_assert(sizeof(DataPacketMemFree) == 27, "Incorrect size");
 static_assert(sizeof(DataPacketMessage) == 13, "Incorrect size");
 static_assert(sizeof(DataPacketPlot) == 22, "Incorrect size");
 static_assert(sizeof(DataPacketPDBInfo) == 36, "Incorrect size");
-static_assert(sizeof(DataPacketPDB) == 46, "Incorrect size");
+static_assert(sizeof(DataPacketPDB) == 38, "Incorrect size");
 static_assert(sizeof(DataPacketPDBBlock) == 18, "Incorrect size");
 
 
