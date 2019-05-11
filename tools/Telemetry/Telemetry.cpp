@@ -3978,7 +3978,7 @@ void TelemPlotU64(TraceContexHandle ctx, TtPlotType::Enum type, tt_uint64 value,
 // ----------- Message Stuff -----------
 
 
-void TelemMessage(TraceContexHandle ctx, TtLogType::Enum type, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemMessage(TraceContexHandle ctx, TtMsgType::Enum type, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {

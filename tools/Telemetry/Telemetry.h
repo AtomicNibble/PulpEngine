@@ -533,9 +533,9 @@ namespace telem
 #define ttPlotU64(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotU64)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 
 #define ttMessage(ctx, type, pFmtString, ...)  __TELEM_FUNC_NAME(TelemMessage)(ctx, type, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttLog(ctx, pFmtString, ...) ttMessage(ctx, TtLogType::Msg, pFmtString, __VA_ARGS__)
-#define ttWarning(ctx, pFmtString, ...) ttMessage(ctx, TtLogType::Warning, pFmtString, __VA_ARGS__)
-#define ttError(ctx, pFmtString, ...) ttMessage(ctx, TtLogType::Error, pFmtString,  __VA_ARGS__)
+#define ttLog(ctx, pFmtString, ...) ttMessage(ctx, TtMsgType::Msg, pFmtString, __VA_ARGS__)
+#define ttWarning(ctx, pFmtString, ...) ttMessage(ctx, TtMsgType::Warning, pFmtString, __VA_ARGS__)
+#define ttError(ctx, pFmtString, ...) ttMessage(ctx, TtMsgType::Error, pFmtString,  __VA_ARGS__)
 
 
 #else // TTELEMETRY_ENABLED
