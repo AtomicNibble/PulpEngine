@@ -597,7 +597,8 @@ void ClientConnection::requestMissingPDB(const DataPacketCallStack* pData)
         // Request it from the client.
         X_LOG0("TelemSrv", "Requesting PDB from client for modAddr: 0x%" PRIu64, pdb.modAddr);
 
-        pdb.tmpBuf.reserve(MAX_PDB_DATA_BLOCK_SIZE);
+        // Lets buffer 32k for each IO write
+        pdb.tmpBuf.reserve(MAX_PDB_DATA_BLOCK_SIZE * 8);
 
         char buf[sizeof(RequestPDBHdr)];
 
@@ -653,6 +654,7 @@ int32_t ClientConnection::handleDataPacketPDB(const DataPacketPDB* pData)
         }
     }
 
+    pdb.offset_ = 0;
     pdb.pFile = pFileSys->openFileAsync(relPath, core::FileFlag::WRITE | core::FileFlag::RECREATE, core::VirtualDirectory::BASE);
     if (!pdb.pFile) {
         X_ERROR("TelemServer", "Failed to open output for PDB stream");
@@ -690,6 +692,8 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
 
     if (pdb.op) {
         pdb.op->waitUntilFinished();
+        pdb.op.reset();
+        pdb.tmpBuf.reset();
     }
 
     if (!pdb.pFile) {
@@ -701,13 +705,15 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
 
     // Copy data to temp buffer for the Async IO op.
     auto& tmpBuf = pdb.tmpBuf;
-    tmpBuf.resize(pData->blockSize);
-    std::memcpy(tmpBuf.data(), pSrcBuf, pData->blockSize);
+    tmpBuf.write(pSrcBuf, pData->blockSize);
 
-    pdb.op = pdb.pFile->writeAsync(tmpBuf.data(), tmpBuf.size(), pData->offset);
+    // Is this the last write?
+    const tt_uint32 bytesWrriten = pdb.offset_ + static_cast<uint32_t>(tmpBuf.size());
 
-    // if we reached end close.
-    const uint32_t bytesWrriten = pData->offset + pData->blockSize;
+    if (tmpBuf.freeSpace() < MAX_PDB_DATA_BLOCK_SIZE || bytesWrriten >= pdb.fileSize) {
+        pdb.op = pdb.pFile->writeAsync(tmpBuf.data(), tmpBuf.size(), pdb.offset_);
+        pdb.offset_ += static_cast<uint32_t>(tmpBuf.size());
+    }
 
     if (bytesWrriten >= pdb.fileSize) {
         X_ASSERT(bytesWrriten == pdb.fileSize, "Recived too many bytes")(bytesWrriten, pdb.fileSize);

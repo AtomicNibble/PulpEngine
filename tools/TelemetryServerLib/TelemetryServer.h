@@ -5,6 +5,7 @@
 #include <IFileSys.h>
 
 #include <Containers/FixedHashTable.h>
+#include <Containers/ByteStream.h>
 
 #include <Memory/AllocationPolicies/LinearAllocator.h>
 #include <Memory/SimpleMemoryArena.h>
@@ -306,6 +307,7 @@ struct ClientConnection
             fileSize(0),
             age(0),
             pFile(nullptr),
+            offset_(0),
             tmpBuf(arena)
         {
         }
@@ -323,9 +325,10 @@ struct ClientConnection
         core::Path<> path;
 
         // Used when streaming from client.
+        tt_uint32 offset_;
         core::XFileAsync* pFile;
         std::optional<core::XOsFileAsyncOperation> op;
-        core::Array<uint8_t> tmpBuf;
+        core::ByteStream tmpBuf;
     };
 
     using PDBDataArr = core::Array<PDBData>;
