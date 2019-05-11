@@ -738,6 +738,10 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
             newFolder.removeFileName();
             newFolder.ensureSlash();
 
+            core::Path<> oldFolder(tmpPath);
+            oldFolder.removeFileName();
+            oldFolder.ensureSlash();
+
             auto* pFileSys = gEnv->pFileSys;
 
             if (!pFileSys->directoryExists(newFolder, core::VirtualDirectory::BASE)) {
@@ -750,7 +754,10 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
                 X_ERROR("TelemSrv", "Failed to move PDB from tmp location to final location. TargetPath: %s", newPath.c_str());
             }
 
-            // TODO: remove old sub folder?
+            // I want to remove the PDB folder.
+            if (!pFileSys->deleteDirectory(oldFolder, core::VirtualDirectory::BASE, true)) {
+                X_ERROR("TelemSrv", "Failed to cleanup tmp PDB folder. Path: %s", oldFolder.c_str());
+            }
         }
     }
 
