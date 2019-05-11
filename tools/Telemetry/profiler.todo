@@ -69,14 +69,9 @@ ServerLib:
    ✔ Might have to map plain strings to new indexes since the set will be much bigger. @done (19-03-23 10:59)
 
  ☐ Implment symbol resolving.
-   ☐ Add support for symbol paths so the server knows where to look.
+   ☐ Add support for symbol paths
+     ☐ Support downloading symbols from remove servers.
    ☐ Add logic for resolving the symbols.
-     Not totally sure i can do this using dbghelp storing the data the way I do.
-     Worst comes to worse i can just write my own code for it.
-
-     We need a proper symbol server also, so we can download missing ones.
-     like user32.dll etc..
-
 
 
 Server:
