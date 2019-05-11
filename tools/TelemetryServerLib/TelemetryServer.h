@@ -384,6 +384,7 @@ private:
     void requestMissingPDB(const DataPacketCallStack* pData);
     int32_t handleDataPacketPDB(const DataPacketPDB* pData);
     int32_t handleDataPacketPDBBlock(const DataPacketPDBBlock* pData);
+    int32_t handleDataPacketPDBError(const DataPacketPDBError* pData);
 
     void flushCompressionBuffer(void);
     int32_t getCompressionBufferSize(void) const;

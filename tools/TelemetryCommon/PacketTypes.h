@@ -191,6 +191,7 @@ struct DataStreamType
         PDBInfo,
         PDB,
         PDBBlock,
+        PDBError,
 
         Num
     };
@@ -457,6 +458,12 @@ struct DataPacketPDBBlock : public DataPacketBaseArgData
     tt_uint32 blockSize;
     tt_uint32 offset;
 };
+
+struct DataPacketPDBError : public DataPacketBaseArgData
+{
+    tt_uint64 modAddr;
+};
+
 
 
 static_assert(sizeof(DataPacketBase) == 1, "Incorrect size");

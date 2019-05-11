@@ -514,6 +514,12 @@ void ClientConnection::processDataStream(uint8_t* pData, int32_t len)
                 i += handleDataPacketPDBBlock(pPDBBlock);
                 break;
             }
+            case DataStreamType::PDBError:
+            {
+                auto* pPDBError = reinterpret_cast<const DataPacketPDBError*>(&pData[i]);
+                i += handleDataPacketPDBError(pPDBError);
+                break;
+            }
             default:
                 X_NO_SWITCH_DEFAULT_ASSERT;
         }
@@ -677,7 +683,8 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
 
     if (pData->blockSize == 0) {
         // There was a issue in the runtime reading the data.
-        X_ERROR("TelemSrv", "Runtime failed to read PDB for streaming at offset: %" PRIx32, pData->offset);
+        // TODO: cleanup..
+        X_ERROR("TelemSrv", "Recived empty block");
         return totalSize;
     }
 
@@ -748,6 +755,44 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
     }
 
     return totalSize;
+}
+
+
+int32_t ClientConnection::handleDataPacketPDBError(const DataPacketPDBError* pData)
+{
+    if (!core::bitUtil::IsBitFlagSet(traceBuilder_.traceInfo.connFlags, TtConnectionFlag::StreamPDB)) {
+        X_ERROR("TelemSrv", "Recived PDB error while PDB streaming is not active");
+    }
+
+    auto it = std::find_if(pdbData_.begin(), pdbData_.end(), [pData](const PDBData& pdb) {
+        return pdb.modAddr == pData->modAddr;
+    });
+
+    if (it == pdbData_.end()) {
+        X_ERROR("TelemSrv", "Recived unexpected PDB error for modAddr: %" PRIx64, pData->modAddr);
+        X_ASSERT_UNREACHABLE();
+        return sizeof(*pData);
+    }
+
+    auto& pdb = *it;
+
+    X_ERROR("TelemSrv", "Client rumtine encounterd a error while sending PDB for modAddr: %" PRIx64, pData->modAddr);
+
+    // cancel it..
+    if (pdb.op) {
+        pdb.op->waitUntilFinished();
+    }
+
+    if (pdb.pFile) {
+        gEnv->pFileSys->closeFileAsync(pdb.pFile);
+        pdb.pFile = nullptr;
+
+        // TODO: delete file?
+    }
+
+    pdb.tmpBuf.free();
+
+    return sizeof(*pData);
 }
 
 struct ProcessDataStreamJobData

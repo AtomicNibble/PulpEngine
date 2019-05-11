@@ -2531,9 +2531,11 @@ namespace
 #endif // RUNTIME_ZONE_PDB_SEND
 
         if (!sender.send()) {
-
             // need to tell server we failed.
-
+            DataPacketPDBError errorHdr;
+            errorHdr.type = DataStreamType::PDBError;
+            errorHdr.modAddr = pPDBReq->modAddr;
+            addToCompressionBuffer(pComp, &errorHdr, sizeof(errorHdr));
         }
 
 #if RUNTIME_ZONE_PDB_SEND
