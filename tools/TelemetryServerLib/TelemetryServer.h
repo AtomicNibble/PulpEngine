@@ -300,8 +300,16 @@ struct ClientConnection
 
     struct PDBData
     {
+        X_DECLARE_ENUM(Status)(
+            Unknown,
+            Pending,
+            Exsists,
+            Missing,
+            Error
+        );
+
         PDBData(core::MemoryArenaBase* arena) :
-            havePDB(false),
+            status(Status::Unknown),
             modAddr(0),
             imageSize(0),
             fileSize(0),
@@ -312,7 +320,7 @@ struct ClientConnection
         {
         }
 
-        bool havePDB;
+        Status::Enum status;
 
         uint64_t modAddr;
         tt_uint32 imageSize;

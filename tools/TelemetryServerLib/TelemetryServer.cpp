@@ -578,12 +578,9 @@ void ClientConnection::requestMissingPDB(const DataPacketCallStack* pData)
 
         // we have PDB for it?
         auto& pdb = *it;
-        if (pdb.havePDB) {
+        if (pdb.status != PDBData::Status::Unknown) {
             continue;
         }
-
-        // TODO: this should be a enum propbs so we can know it's pending.
-        pdb.havePDB = true;
 
         // Okay so now we see if we can just resolve the PDB.
         // which means checking the PDB paths and maybe even checking a server?
@@ -592,10 +589,20 @@ void ClientConnection::requestMissingPDB(const DataPacketCallStack* pData)
         // be done in the background.
         // but one problem is that if we don't ask the client soon enougth it might go away.
         // rip.
+        core::Path<> path("symbols/");
+        path.append(pdb.path.fileName());
+        SymResolver::addSymSrvFolderNameForPDB(path, pdb.guid, pdb.age);
+        path.append(pdb.path.fileName());
 
+        if (gEnv->pFileSys->fileExists(path)) {
+            pdb.status = PDBData::Status::Exsists;
+            continue;
+        }
+
+        pdb.status = PDBData::Status::Pending;
 
         // Request it from the client.
-        X_LOG0("TelemSrv", "Requesting PDB from client for modAddr: 0x%" PRIu64, pdb.modAddr);
+        X_LOG0("TelemSrv", "Requesting PDB from client for modAddr: 0x%" PRIu64 " fileName: %s", pdb.modAddr, pdb.path.fileName());
 
         // Lets buffer 32k for each IO write
         pdb.tmpBuf.reserve(MAX_PDB_DATA_BLOCK_SIZE * 8);
@@ -764,6 +771,11 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
             if (!pFileSys->deleteDirectory(oldFolder, core::VirtualDirectory::BASE, true)) {
                 X_ERROR("TelemSrv", "Failed to cleanup tmp PDB folder. Path: %s", oldFolder.c_str());
             }
+
+            pdb.status = PDBData::Status::Exsists;
+        }
+        else {
+            pdb.status = PDBData::Status::Error;
         }
     }
 
@@ -804,6 +816,7 @@ int32_t ClientConnection::handleDataPacketPDBError(const DataPacketPDBError* pDa
     }
 
     pdb.tmpBuf.free();
+    pdb.status = PDBData::Status::Error;
 
     return sizeof(*pData);
 }
