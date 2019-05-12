@@ -3322,14 +3322,7 @@ void TelemFlush(TraceContexHandle ctx)
 
 void TelemUpdateSymbolData(TraceContexHandle ctx)
 {
-    TELEM_UNUSED(ctx);
-
-    // so i want to just find any new modules and try get PDB sig info for them.
-    // TODO: put this on the context?
-    // surley it should just be global.
-    // like if you have multiple context in a single address space, it's still the same adress space.
-    // oh i guess what really matters is if that context is in sync.
-    // aka do we need to send anything to the server for this context.
+    // Sending new PDB sig info to server for this given context.
     PE::updatePDBInfo(PE::pdbInfo);
 
     auto* pCtx = handleToContext(ctx);
