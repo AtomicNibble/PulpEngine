@@ -73,6 +73,9 @@ ServerLib:
      ☐ Support downloading symbols from remove servers.
    ☐ Add logic for resolving the symbols.
 
+     - The symbol resolving needs to be lazy so the viewer requests it to be done.
+       This way the symbols can be added after a trace was made and they will resolve.
+
 
 Server:
 
