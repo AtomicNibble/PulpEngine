@@ -448,7 +448,7 @@ public:
     ~Server() X_OVERRIDE;
 
     bool loadApps() X_FINAL;
-    bool loadAppTraces(core::Path<> appName, const core::Path<>& dir);
+    bool loadAppTraces(core::string_view appName, const core::Path<>& dir);
 
     bool listen(void) X_FINAL;
 

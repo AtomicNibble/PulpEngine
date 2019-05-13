@@ -2952,7 +2952,7 @@ bool Server::loadApps()
     return true;
 }
 
-bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
+bool Server::loadAppTraces(core::string_view appName, const core::Path<>& dir)
 {
     TraceApp app(TelemFixedStr(appName.begin(), appName.end()), arena_);
 
@@ -2966,7 +2966,7 @@ bool Server::loadAppTraces(core::Path<> appName, const core::Path<>& dir)
     auto findPair = pFileSys->findFirst(dirSearch, fd);
     if (findPair.handle == core::IFileSys::INVALID_FIND_HANDLE) {
         if (findPair.valid) {
-            X_WARNING("TelemSrv", "no traces found for app: \"%s\"", appName.c_str());
+            X_WARNING("TelemSrv", "no traces found for app: \"%.*s\"", appName.length(), appName.data());
             return true;
         }
 
