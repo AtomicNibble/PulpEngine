@@ -642,8 +642,7 @@ int32_t ClientConnection::handleDataPacketPDB(const DataPacketPDB* pData)
     pdb.fileSize = pData->fileSize;
 
     // TODO: make a proper path.
-    core::Path<> relPath;
-    relPath.append("symbols/.tmp/");
+    core::Path<> relPath = srv_.getsettings().symbolTmpDir;
     relPath.append(pdb.path.fileName());
     SymResolver::addSymSrvFolderNameForPDB(relPath, pdb.guid, pdb.age);
     relPath.append(pdb.path.fileName());
@@ -742,9 +741,11 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
             SymResolver::addSymSrvFolderNameForPDB(subPath, pdb.guid, pdb.age);
             subPath.append(pdb.path.fileName());
 
-            core::Path<> tmpPath("symbols/.tmp/");
+            auto& settings = srv_.getsettings();
+
+            core::Path<> tmpPath = settings.symbolTmpDir;
             tmpPath += subPath;
-            core::Path<> newPath("symbols/");
+            core::Path<> newPath = settings.symbolDir;
             newPath += subPath;
 
             core::Path<> newFolder(newPath);
@@ -2900,46 +2901,8 @@ Server::Server(core::MemoryArenaBase* arena) :
      
     }
 
-#if 0
-    DataPacketZone zone;
-    zone.start = 0;
-    zone.end = 1000;
-
-    StringBuf str;
-
-    ZoneTree tree;
-
-    str.set("(goat/boat/moat)");
-    tree.addZone(str, &zone);
-
-    str.set("(goat/moat)");
-    tree.addZone(str, &zone);
-
-    str.set("(goat)");
-    tree.addZone(str, &zone);
-
-    str.set("(goat/pickle)");
-    tree.addZone(str, &zone);
-
-    str.set("(goat/meow?)");
-    tree.addZone(str, &zone);
-
-    str.set("(goat/defook)");
-    tree.addZone(str, &zone);
-
-    tree.addZone(str, &zone);
-    tree.addZone(str, &zone);
-    tree.addZone(str, &zone);
-    tree.addZone(str, &zone);
-
-    tree.print();
-
-    ZoneTree::NodeFlatArr arr(g_TelemSrvLibArena);
-    tree.getNodes(arr);
-#endif
-
-    // so need to save these to db
-
+    settings_.symbolDir.set("symbols/");
+    settings_.symbolTmpDir.set("symbols/.tmp/");
 }
 
 Server::~Server()

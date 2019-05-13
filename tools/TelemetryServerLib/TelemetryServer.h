@@ -23,6 +23,12 @@ const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
 
 using StringBuf = core::StackString<MAX_STRING_LEN, char>;
 
+struct Settings
+{
+    core::Path<> symbolDir;
+    core::Path<> symbolTmpDir;
+};
+
 
 struct ZoneTree
 {
@@ -456,9 +462,15 @@ public:
     void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData);
     void closeClient(ClientConnection* pClientCon);
 
+    const Settings& getsettings(void) const {
+        return settings_;
+    }
+
 private:
     core::MemoryArenaBase* arena_;
     core::CriticalSection cs_;
+
+    Settings settings_;
 
     TraceAppArr apps_;
 };
