@@ -2898,7 +2898,7 @@ Server::Server(core::MemoryArenaBase* arena) :
 {
     // TODO: better place?
     if (!winSockInit()) {
-     
+        X_FATAL("TelemSrv", "Failed to init winsock");
     }
 
     settings_.symbolDir.set("symbols/");
