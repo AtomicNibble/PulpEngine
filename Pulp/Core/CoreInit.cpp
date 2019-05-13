@@ -814,6 +814,7 @@ bool XCore::Init(CoreInitParams& startupParams)
     }
 
     ttUpdateSymbolData(gEnv->ctx);
+    ttSyncSymbols(gEnv->ctx);
 
     X_LOG1("Core", "Core startup: ^6%gms", time.GetMilliSeconds());
 
