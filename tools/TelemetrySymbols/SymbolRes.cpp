@@ -315,7 +315,7 @@ bool SymResolver::loadPDB(uintptr_t baseAddr, uint32_t virtualSize, const core::
     core::Path<wchar_t> fullPathW;
     for (auto& searchPath : searchPaths_)
     {
-        if (searchPath.type == SymType::Path)
+        if (searchPath.type == SymPathType::Path || searchPath.type == SymPathType::Cache)
         {
             core::Path<> fullPath(searchPath.path);
             fullPath /= symbolPath;
@@ -368,7 +368,26 @@ bool SymResolver::loadPDB(uintptr_t baseAddr, uint32_t virtualSize, const core::
     return true;
 }
 
-void SymResolver::addPath(core::string_view path, SymType::Enum type)
+void SymResolver::setCachePath(core::string_view path)
+{
+    SymPath sp;
+    sp.path.set(path.begin(), path.length());
+    sp.path.replaceSeprators();
+    sp.type = SymPathType::Cache;
+
+    // Make sure the cache is always at front.
+    if (searchPaths_.isNotEmpty()) {
+        auto& firstSp = searchPaths_.front();
+        if (firstSp.type == SymPathType::Cache) {
+            firstSp = sp;
+            return;
+        }
+    }
+
+    searchPaths_.append(sp);
+}
+
+void SymResolver::addPath(core::string_view path, SymPathType::Enum type)
 {
     // TODO: check unique.
     SymPath sp;

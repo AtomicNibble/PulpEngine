@@ -9,15 +9,17 @@ struct IDiaSession;
 X_NAMESPACE_BEGIN(telemetry)
 
 // Symbol stuff
-X_DECLARE_ENUM(SymType)(
+X_DECLARE_ENUM(SymPathType)(
+    Cache,
     Path,
     Server
 );
 
+
 struct SymPath
 {
     core::Path<> path;
-    SymType::Enum type;
+    SymPathType::Enum type;
 };
 
 // TODO: make a seperate lookup array which is more cache friendly.
@@ -64,7 +66,8 @@ public:
     TELEMETRY_SYMLIB_EXPORT bool init(void);
     TELEMETRY_SYMLIB_EXPORT bool loadPDB(uintptr_t baseAddr, uint32_t virtualSize, const core::Guid& guid, uint32_t age, core::string_view path);
 
-    TELEMETRY_SYMLIB_EXPORT void addPath(core::string_view path, SymType::Enum type);
+    TELEMETRY_SYMLIB_EXPORT void setCachePath(core::string_view path);
+    TELEMETRY_SYMLIB_EXPORT void addPath(core::string_view path, SymPathType::Enum type);
 
     // want some api for getting functions names?
     TELEMETRY_SYMLIB_EXPORT bool resolveForAddr(uintptr_t addr);
