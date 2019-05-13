@@ -176,6 +176,7 @@ extern "C"
     __TELEM_API_VOID(TelemTick, TraceContexHandle ctx);
     __TELEM_API_VOID(TelemFlush, TraceContexHandle ctx);
     __TELEM_API_VOID(TelemUpdateSymbolData, TraceContexHandle ctx);
+    __TELEM_API_VOID(TelemSyncSymbols, TraceContexHandle ctx);
 
     __TELEM_API_VOID(TelemPause, TraceContexHandle ctx, bool pause);
     __TELEM_API_BOOL(TelemIsPaused, TraceContexHandle ctx);
@@ -271,6 +272,7 @@ namespace telem
             __TELEM_RESOLVE(TelemTick);
             __TELEM_RESOLVE(TelemFlush);
             __TELEM_RESOLVE(TelemUpdateSymbolData);
+            __TELEM_RESOLVE(TelemSyncSymbols);
             __TELEM_RESOLVE(TelemPause);
             __TELEM_RESOLVE(TelemIsPaused);
             __TELEM_RESOLVE(TelemSetFlag);
@@ -314,6 +316,7 @@ namespace telem
             __TELEM_SET_BLANK(TelemTick);
             __TELEM_SET_BLANK(TelemFlush);
             __TELEM_SET_BLANK(TelemUpdateSymbolData);
+            __TELEM_SET_BLANK(TelemSyncSymbols);
             __TELEM_SET_BLANK(TelemPause);
             __TELEM_SET_BLANK(TelemIsPaused);
             __TELEM_SET_BLANK(TelemSetFlag);
@@ -363,6 +366,7 @@ namespace telem
         __TELEM_FUNC_PTR(TelemTick);
         __TELEM_FUNC_PTR(TelemFlush);
         __TELEM_FUNC_PTR(TelemUpdateSymbolData);
+        __TELEM_FUNC_PTR(TelemSyncSymbols);
         __TELEM_FUNC_PTR(TelemPause);
         __TELEM_FUNC_PTR(TelemIsPaused);
         __TELEM_FUNC_PTR(TelemSetFlag);
@@ -491,6 +495,7 @@ namespace telem
 #define ttTick(ctx) __TELEM_FUNC_NAME(TelemTick)(ctx)
 #define ttFlush(ctx) __TELEM_FUNC_NAME(TelemFlush)(ctx)
 #define ttUpdateSymbolData(ctx) __TELEM_FUNC_NAME(TelemUpdateSymbolData)(ctx)
+#define ttSyncSymbols(ctx) __TELEM_FUNC_NAME(TelemSyncSymbols)(ctx)
 
 #define ttPause(ctx, pause) __TELEM_FUNC_NAME(TelemPause)(ctx, pause)
 #define ttIsPaused(ctx) __TELEM_FUNC_NAME(TelemIsPaused)(ctx)
@@ -562,6 +567,7 @@ namespace telem
 #define ttTick(...)
 #define ttFlush(...)
 #define ttUpdateSymbolData(...)
+#define ttSyncSymbols(...)
 
 #define ttPause(...)
 #define ttIsPaused(...)

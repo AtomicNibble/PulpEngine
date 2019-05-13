@@ -3330,6 +3330,18 @@ void TelemUpdateSymbolData(TraceContexHandle ctx)
     syncPDBInfo(pCtx, PE::pdbInfo);
 }
 
+void TelemSyncSymbols(TraceContexHandle ctx)
+{
+    // Send PDB files to server.
+    auto* pCtx = handleToContext(ctx);
+
+    // This is going to be a little bit complex.
+    // We need to send packet to server and it will request PDB.
+    // how do i wait for that?
+
+    TELEM_UNUSED(pCtx);
+}
+
 void TelemPause(TraceContexHandle ctx, bool pause)
 {
     if (!isValidContext(ctx)) {
