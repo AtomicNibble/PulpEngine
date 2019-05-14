@@ -22,8 +22,9 @@ private:
     ThreadPolicy& policy_;
 };
 
+TELEM_DISABLE_WARNING(4324) // structure was padded due to alignment specifier
 
-class CriticalSection
+TELEM_ALIGNED_SYMBOL(class CriticalSection, 64)
 {
 public:
     typedef ScopedLock<CriticalSection> ScopedLock;
@@ -45,6 +46,8 @@ public:
 private:
     CRITICAL_SECTION cs_;
 };
+
+TELEM_ENABLE_WARNING(4324)
 
 
 CriticalSection::CriticalSection(void)
