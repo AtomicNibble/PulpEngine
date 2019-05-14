@@ -581,8 +581,9 @@ namespace
         tt_uint64 lastTick;
         tt_uint64 lastTickNano;
 
-        TraceThread* pThreadData;
+        TraceThread* pThreadData; // this is only read from when adding new thread.
         tt_int32 numThreadData;
+        tt_int32 _pad0;
 
         tt_uint64 ticksPerMicro;
         tt_uint64 baseTicks;
@@ -591,18 +592,17 @@ namespace
         bool isEnabled;
         tt_uint8 flags;
         tt_uint8 connFlags;
-        bool _pad[1];
+        bool _pad1[1];
 
         tt_int32 numPDBSync;
 
-    //    tt_uint8 _lanePad0[6];
         X86_PAD(8)
 
         // -- Cace lane boundry --
+        // This lane is very hot and should have no writes expect tickerBuf flip.
 
         volatile tt_int32 activeTickBufIdx;
         TickBuffer tickBuffers[2];
-
         tt_int32 tickBufCapacity;
 
         tt_uint8 _lanePad1[20];
@@ -625,11 +625,18 @@ namespace
         // -- Cace lane boundry --
 
         CriticalSection cs_;
+
+        // -- Cace lane boundry --
+
+        tt_uint64 lastFlipTick;
+
         tt_int32 numStalls;
         tt_int32 totalEvents;
 
         LogFunction logFunc;
         void* pUserData;
+
+        tt_uint8 _lanePad2[32];
 
         X86_PAD(24)
 
@@ -644,14 +651,15 @@ namespace
     };
 
 //    constexpr size_t size0 = sizeof(TraceContext);
-//    constexpr size_t size1 = TELEM_OFFSETOF(TraceContext, threadId_);
+//    constexpr size_t size1 = TELEM_OFFSETOF(TraceContext, pFileOpen);
 //    constexpr size_t size2 = TELEM_OFFSETOF(TraceContext, pFileOpen);
 
     static_assert(TELEM_OFFSETOF(TraceContext, activeTickBufIdx) == 64, "Cold fields not on firstcache lane");
     static_assert(TELEM_OFFSETOF(TraceContext, threadId_) == 128, "Cold fields not on next cache lane");
     static_assert(TELEM_OFFSETOF(TraceContext, cs_) == 192, "cache lane boundry changed");
-    static_assert(TELEM_OFFSETOF(TraceContext, pFileOpen) == 256, "cache lane boundry changed");
-    static_assert(sizeof(TraceContext) == 320, "Size changed");
+    static_assert(TELEM_OFFSETOF(TraceContext, lastFlipTick) == 256, "cache lane boundry changed");
+    static_assert(TELEM_OFFSETOF(TraceContext, pFileOpen) == 320, "cache lane boundry changed");
+    static_assert(sizeof(TraceContext) == 384, "Size changed");
 
 
     TELEM_INLINE tt_int32 fileWrite(TraceContext* pCtx, const void* pData, tt_int32 length)
@@ -1731,12 +1739,42 @@ namespace
     void flipBuffer(TraceContext* pCtx, bool stalled, bool force)
     {
         // this can be entered from multiple threads but we only want to flip once.
-        // TODO: if we just flipped we should not flip again
         if (pCtx->cs_.TryEnter())
         {
             if (stalled) {
+
+                auto halfBufferCap = pCtx->tickBufCapacity / 2;
+                auto bufSize = getActiveTickBufferSize(pCtx);
+                if (bufSize < halfBufferCap) {
+                    // This is a extra thread trying to flip from stall.
+                    return;
+                }
+
                 pCtx->numStalls++;
             }
+
+            // work out how long since last tick.
+            auto nowTicks = getTicks();
+
+            if (!stalled && !force)
+            {
+                auto ellapsedTicks = nowTicks - pCtx->lastFlipTick;
+                auto ellapsedNano = ticksToNano(pCtx, ellapsedTicks);
+
+                if (ellapsedNano < 100'000'000) {
+
+                    auto halfBufferCap = pCtx->tickBufCapacity / 2;
+                    auto bufSize = getActiveTickBufferSize(pCtx);
+
+                    if (bufSize < halfBufferCap) {
+                        // Skip the flip.
+                        return;
+                    }
+                }
+            }
+
+
+            pCtx->lastFlipTick = nowTicks;
 
             flipBufferInternal(pCtx, force);
 
@@ -1754,8 +1792,13 @@ namespace
 
     TELEM_INLINE void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_int32 copySize, tt_int32 size);
 
+    // This is just a helper to flip buffer than add the data.
+    // But keeps this logic outside the hot functio.n
     TELEM_NO_INLINE void addToTickBufferFull(TraceContext* pCtx, const void* pPtr, tt_int32 copySize, tt_int32 size)
     {
+        // We  don't pass force so that if multiple threads end up in here
+        // the buffer is only flipped if actually running out of space still.
+        // Prevents multiple flips.
         flipBuffer(pCtx, true, false);
         addToTickBuffer(pCtx, pPtr, copySize, size);
     }
@@ -2942,6 +2985,7 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
 
     TraceContext* pCtx = new (pBuf) TraceContext();
     pCtx->lastTick = getTicks();
+    pCtx->lastFlipTick = getTicks();
     pCtx->lastTickNano = gSysTimer.GetNano();
     pCtx->isEnabled = true;
     pCtx->flags = 0;
@@ -3278,28 +3322,13 @@ void TelemTick(TraceContexHandle ctx)
 
     auto curTick = getTicks();
     auto curTimeNano = gSysTimer.GetNano();
-    auto sinceLastNano = curTimeNano - pCtx->lastTickNano;
 
-    // we queue a tick even if don't flush.
     queueTickInfo(pCtx, pCtx->lastTick, curTick, pCtx->lastTickNano, curTimeNano);
 
-    // I update these even if we don't flip, so the tick timing is correct.
-    // if want the time to accumlate need another field to track it.
     pCtx->lastTick = curTick;
     pCtx->lastTickNano = curTimeNano;
 
-    // if we are been called at a very high freq don't bother sending unless needed.
-    if (sinceLastNano < 100'000'000) {
-        // if the buffer is half full send it!
-        auto halfBufferCap = pCtx->tickBufCapacity / 2;
-        auto bufSize = getActiveTickBufferSize(pCtx);
-
-        if (bufSize < halfBufferCap) {
-            return;
-        }
-    }
-
-    flipBuffer(pCtx, false, true);
+    flipBuffer(pCtx, false, false);
     return;
 }
 
@@ -3312,6 +3341,7 @@ void TelemFlush(TraceContexHandle ctx)
         return;
     }
 
+    // this forces the flip.
     flipBuffer(pCtx, false, true);
 }
 
