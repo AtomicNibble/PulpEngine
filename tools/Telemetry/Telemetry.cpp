@@ -1752,11 +1752,6 @@ namespace
     }
 
 
-    TELEM_NO_INLINE void tickBufferFull(TraceContext* pCtx)
-    {
-        flipBuffer(pCtx, true, false);
-    }
-
     TELEM_INLINE void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_int32 copySize, tt_int32 size);
 
     TELEM_NO_INLINE void addToTickBufferFull(TraceContext* pCtx, const void* pPtr, tt_int32 copySize, tt_int32 size)
