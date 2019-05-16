@@ -1763,7 +1763,10 @@ namespace
                 auto ellapsedTicks = nowTicks - pCtx->lastFlipTick;
                 auto ellapsedNano = ticksToNano(pCtx, ellapsedTicks);
 
-                if (ellapsedNano < 100'000'000) {
+                constexpr tt_uint64 nanoPerMS = 1'000'000;
+                constexpr tt_uint64 nanoThreshold = nanoPerMS * 10;
+
+                if (ellapsedNano < nanoThreshold) {
 
                     auto halfBufferCap = pCtx->tickBufCapacity / 2;
                     auto bufSize = getActiveTickBufferSize(pCtx);
