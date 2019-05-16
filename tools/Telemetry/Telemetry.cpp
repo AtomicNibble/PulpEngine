@@ -1683,33 +1683,13 @@ namespace
         // i would like to know about trace stalls.
         ttZoneFilterd(contextToHandle(pCtx), 100, "FlipBuffers");
 
-        {
-            auto waitStart = getTicks();
-
-            // wait for the background thread to finish process that last buffer.
-            // TODO: maybe come up with a fast path for when we don't need to wait.
-            // check if the signal has a userspace atomic it checks before waiting.
-            DWORD result = WaitForSingleObjectEx(pCtx->hSignalIdle_, INFINITE, false);
-            if (result != WAIT_OBJECT_0) {
-                ::DebugBreak();
-                return;
-            }
-
-            auto waitEnd = getTicks();
-            auto ellapsedNano = ticksToNano(pCtx, waitEnd - waitStart);
-
-            // There is a dead lock issue with this if the log function takes a lock
-            // that has tracing.
-#if 0
-            // did we have to wait more than 0.1ms?
-            if (ellapsedNano > 100'000)
-            {
-                
-                writeLog(pCtx, TtLogType::Warning, "Flip stalled for: %lluns", ellapsedNano);
-            }
-#else
-            TELEM_UNUSED(ellapsedNano);
-#endif
+        // wait for the background thread to finish process that last buffer.
+        // TODO: maybe come up with a fast path for when we don't need to wait.
+        // check if the signal has a userspace atomic it checks before waiting.
+        DWORD result = WaitForSingleObjectEx(pCtx->hSignalIdle_, INFINITE, false);
+        if (result != WAIT_OBJECT_0) {
+            ::DebugBreak();
+            return;
         }
 
         // the background thread has finished with old buffer.
