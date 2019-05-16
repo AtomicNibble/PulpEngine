@@ -427,7 +427,7 @@ public:
     TraceBuilder traceBuilder_;
 
     // this is used for both incoming and outgoing streams.
-    // depending on if it'sincoming trace data or a viewer connection.
+    // depending on if it's incoming trace data or a viewer connection.
     int32_t cmpBufBegin_;
     int32_t cmpBufEnd_;
     uint8_t cmpRingBuf_[COMPRESSION_RING_BUFFER_SIZE];
