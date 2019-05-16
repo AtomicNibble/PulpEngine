@@ -49,7 +49,6 @@ namespace
         HANDLE hIOCP;
     };
 
-
 } // namespace
 
 
@@ -75,9 +74,10 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
 {
     X_UNUSED(jobSys, threadIdx, pJob, pJobData);
 
-    // we get called when we have atleast one packet in buffer maybe more.
-    auto* pData = reinterpret_cast<uint8_t*>(io_.recvbuf);
-    auto bytesLeft = io_.bytesTrans;
+    auto& curBuf = io_.buffer;
+    
+    auto* pData = reinterpret_cast<uint8_t*>(curBuf.buffer.data());
+    auto bytesLeft = curBuf.bytesTrans;
 
     while (1)
     {
@@ -157,24 +157,23 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
     // we need to read more data.
     // first shift the data down.
     auto trailingBytes = bytesLeft;
-    auto offset = std::distance(reinterpret_cast<uint8_t*>(io_.recvbuf), pData);
-    std::memcpy(io_.recvbuf, &io_.recvbuf[offset], trailingBytes);
 
-    uint32_t freeSpace = sizeof(io_.recvbuf) - trailingBytes;
+    if (trailingBytes > 0) {
+        auto offset = std::distance(reinterpret_cast<uint8_t*>(curBuf.buffer.data()), pData);
+        std::memcpy(curBuf.buffer.data(), &curBuf.buffer[offset], trailingBytes);
+    }
 
-    io_.buf.buf = io_.recvbuf + trailingBytes;
-    io_.buf.len = freeSpace;
-    io_.bytesTrans = trailingBytes;
+    curBuf.bytesTrans = trailingBytes;
+    curBuf.setBufferLength();
 
     // post a recv.
-    X_LOG1("TelemSrv", "Requesting recv with buffer size %" PRIu32, io_.buf.len);
-    X_ASSERT(io_.buf.len > 0 && io_.buf.len <= sizeof(io_.recvbuf), "Length is invalid")(io_.buf);
+    X_LOG1("TelemSrv", "Requesting recv with buffer size %" PRIu32, curBuf.buf.len);
 
     DWORD bytesTransferred = 0;
     DWORD flags = 0;
 
     // if we get data back the IOCP gets called anyway.
-    auto res = platform::WSARecv(socket_, &io_.buf, 1, &bytesTransferred, &flags, &io_.overlapped, nullptr);
+    auto res = platform::WSARecv(socket_, &curBuf.buf, 1, &bytesTransferred, &flags, &io_.overlapped, nullptr);
     if (res == SOCKET_ERROR) {
         auto err = lastErrorWSA::Get();
         if (err != ERROR_IO_PENDING) {
@@ -3107,10 +3106,12 @@ bool Server::listen(void)
         auto& io = pClientCon->io_;
         io.op = IOOperation::Recv;
 
+        auto& buf = io.buffer;
+
         // wait for some data.
         DWORD flags = 0;
         DWORD recvBytes = 0;
-        res = platform::WSARecv(clientSocket, &io.buf, 1, &recvBytes, &flags, &io.overlapped, nullptr);
+        res = platform::WSARecv(clientSocket, &buf.buf, 1, &recvBytes, &flags, &io.overlapped, nullptr);
         if (res == SOCKET_ERROR) {
             auto err = lastErrorWSA::Get();
             if (err != ERROR_IO_PENDING) {
@@ -3169,31 +3170,33 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
         }
 
         auto& ioCtx = *pIOContext;
-        ioCtx.bytesTrans += bytesTransferred;
+        auto& curBuf = ioCtx.buffer;
 
-        X_LOG1("TelemSrv", "Recv %" PRIu32 " buffer has %" PRIu32, bytesTransferred, ioCtx.bytesTrans);
+        curBuf.bytesTrans += bytesTransferred;
+
+        X_LOG1("TelemSrv", "Recv %" PRIu32 " buffer has %" PRIu32, bytesTransferred, curBuf.bytesTrans);
 
         if (ioCtx.op == IOOperation::Recv)
         {
-            if (ioCtx.bytesTrans >= sizeof(PacketBase))
+            if (curBuf.bytesTrans >= sizeof(PacketBase))
             {
                 // we always check for header from start of buffer.
-                auto* pHdr = reinterpret_cast<const PacketBase*>(ioCtx.recvbuf);
+                auto* pHdr = reinterpret_cast<const PacketBase*>(curBuf.buffer.data());
                 if (pHdr->dataSize == 0) {
                     X_ERROR("TelemSrv", "Client sent packet with length zero...");
                     // TODO: disconnect them.
                     continue;
                 }
 
-                if (pHdr->dataSize > sizeof(ioCtx.recvbuf)) {
+                if (pHdr->dataSize > MAX_PACKET_SIZE) {
                     X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<int32_t>(pHdr->dataSize));
                     // TODO: disconnect them.
                     continue;
                 }
 
                 // we don't bother starting a job untill we have atleast one packet.
-                if (ioCtx.bytesTrans >= pHdr->dataSize) {
-                    const auto trailingBytes = ioCtx.bytesTrans - pHdr->dataSize;
+                if (curBuf.bytesTrans >= pHdr->dataSize) {
+                    const auto trailingBytes = curBuf.bytesTrans - pHdr->dataSize;
 
                     X_LOG1("TelemSrv", "Got packet size: %" PRIu16 " trailingbytes: %" PRIu32, pHdr->dataSize, trailingBytes);
 
@@ -3206,15 +3209,16 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
 
                     continue;
                 }
+                else {
+                    X_LOG1("TelemSrv", "Waiting for more data need: %" PRIu16 " have: %" PRIu32, pHdr->dataSize, curBuf.bytesTrans);
+                }
             }
 
-            ioCtx.buf.buf = ioCtx.recvbuf + ioCtx.bytesTrans;
-            ioCtx.buf.len = sizeof(ioCtx.recvbuf) - ioCtx.bytesTrans;
+            curBuf.setBufferLength();
 
-            X_LOG1("TelemSrv", "Requesting recv with buffer size %" PRIu32, ioCtx.buf.len);
-            X_ASSERT(ioCtx.buf.len > 0 && ioCtx.buf.len <= sizeof(ioCtx.recvbuf), "Length is invalid")(ioCtx.buf);
+            X_LOG1("TelemSrv", "Requesting recv with buffer size %" PRIu32, curBuf.buf.len);
 
-            auto res = platform::WSARecv(pClientCon->socket_, &ioCtx.buf, 1, &bytesTransferred, &flags, &ioCtx.overlapped, nullptr);
+            auto res = platform::WSARecv(pClientCon->socket_, &curBuf.buf, 1, &bytesTransferred, &flags, &ioCtx.overlapped, nullptr);
             if (res == SOCKET_ERROR) {
                 auto err = lastErrorWSA::Get();
                 if (err != ERROR_IO_PENDING) {

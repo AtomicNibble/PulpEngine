@@ -272,25 +272,45 @@ X_DECLARE_ENUM(IOOperation)(
     Recv
 );
 
-struct PerClientIoData
+struct SocketBuffer
 {
-    PerClientIoData()
-    {
-        core::zero_object(overlapped);
+    using ByteArr = core::Array<char>;
+    static constexpr size_t BUFF_SIZE = 1024 * 256;
 
-        op = IOOperation::Invalid;
-        bytesTrans = 0;
-        buf.buf = recvbuf;
-        buf.len = sizeof(recvbuf);
+    static_assert(BUFF_SIZE >= MAX_PACKET_SIZE, "Buffer size is too small");
+
+    SocketBuffer(core::MemoryArenaBase* arena) :
+        bytesTrans(0),
+        buffer(arena, BUFF_SIZE)
+    {
+        buf.buf = buffer.data();
+        buf.len = static_cast<int32_t>(buffer.size());
     }
 
-    OVERLAPPED overlapped;
-    IOOperation::Enum op;
+    void setBufferLength(void) {
+        buf.buf = buffer.data() + bytesTrans;
+        buf.len = static_cast<int32_t>(buffer.size() - bytesTrans);
+        X_ASSERT(buf.len > 0 && buf.len <= buffer.size(), "Length is invalid")(buffer.size());
+    }
 
     uint32_t bytesTrans;
-
+    ByteArr buffer;
     platform::WSABUF buf;
-    char recvbuf[MAX_PACKET_SIZE];
+};
+
+struct PerClientIoData
+{
+    PerClientIoData(core::MemoryArenaBase* arena) :
+        buffer(arena)
+    {
+        core::zero_object(overlapped);
+        op = IOOperation::Invalid;
+    }
+
+public:
+    OVERLAPPED overlapped;
+    IOOperation::Enum op;
+    SocketBuffer buffer;
 };
 
 static_assert(X_OFFSETOF(PerClientIoData, overlapped) == 0, "Overlapped must be at start");
@@ -350,6 +370,7 @@ struct ClientConnection
 public:
     ClientConnection(Server& srv, core::MemoryArenaBase* arena) :
         srv_(srv),
+        io_(arena),
         tracesStreams_(arena),
         traceBuilder_(arena),
         pdbData_(arena)
