@@ -76,6 +76,9 @@ ServerLib:
      - The symbol resolving needs to be lazy so the viewer requests it to be done.
        This way the symbols can be added after a trace was made and they will resolve.
 
+ ✔ Explore having a buffer for incoming socket data rather than letting it sit in the socket buffer. @done (19-05-16 20:21)
+   this way we can grab more than MAX_PACKET_SIZE at a time and can make the buffer pretty big like 1MB
+   see if it helps reduce stalls.
 
 Server:
 
