@@ -1,5 +1,11 @@
 #pragma once
 
+struct adopt_lock_t
+{
+};
+
+constexpr adopt_lock_t adopt_lock{};
+
 
 template<class ThreadPolicy>
 class ScopedLock
@@ -9,6 +15,11 @@ public:
         policy_(policy)
     {
         policy_.Enter();
+    }
+
+    inline ScopedLock(ThreadPolicy& policy, adopt_lock_t) :
+        policy_(policy)
+    {
     }
 
     inline ~ScopedLock(void) {

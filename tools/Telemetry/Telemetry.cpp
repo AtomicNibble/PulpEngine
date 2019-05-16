@@ -1741,6 +1741,8 @@ namespace
         // this can be entered from multiple threads but we only want to flip once.
         if (pCtx->cs_.TryEnter())
         {
+            ScopedLock<decltype(pCtx->cs_)> lock(pCtx->cs_, adopt_lock);
+
             if (stalled) {
 
                 auto halfBufferCap = pCtx->tickBufCapacity / 2;
@@ -1777,8 +1779,6 @@ namespace
             pCtx->lastFlipTick = nowTicks;
 
             flipBufferInternal(pCtx, force);
-
-            pCtx->cs_.Leave();
         }
         else
         {
