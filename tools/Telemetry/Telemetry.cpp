@@ -1677,19 +1677,8 @@ namespace
     static_assert(64 == GetSizeWithoutArgData<QueueDataPlot>());
     static_assert(48 == sizeof(QueueDataPDBInfo));
 
-    void flipBufferInternal(TraceContext* pCtx, bool force)
+    void flipBufferInternal(TraceContext* pCtx)
     {
-        auto bufSize = getActiveTickBufferSize(pCtx);
-        if (bufSize == 0) {
-            return;
-        }
-
-        // don't flip if not half full and force is false.
-        auto halfBufferCap = pCtx->tickBufCapacity / 2;
-        if (!force && bufSize < halfBufferCap) {
-            return;
-        }
-
         // trace ourself :D
         // i would like to know about trace stalls.
         ttZoneFilterd(contextToHandle(pCtx), 100, "FlipBuffers");
@@ -1778,10 +1767,9 @@ namespace
                 }
             }
 
-
             pCtx->lastFlipTick = nowTicks;
 
-            flipBufferInternal(pCtx, force);
+            flipBufferInternal(pCtx);
         }
         else
         {
