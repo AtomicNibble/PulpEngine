@@ -1744,11 +1744,11 @@ namespace
             ScopedLock<decltype(pCtx->cs_)> lock(pCtx->cs_, adopt_lock);
 
             if (stalled) {
-
+                // Catch threads trying to flip right after we just flipped.
+                // basically a race condition where we think still need to flip.
                 auto halfBufferCap = pCtx->tickBufCapacity / 2;
                 auto bufSize = getActiveTickBufferSize(pCtx);
                 if (bufSize < halfBufferCap) {
-                    // This is a extra thread trying to flip from stall.
                     return;
                 }
 
