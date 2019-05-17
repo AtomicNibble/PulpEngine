@@ -3372,6 +3372,25 @@ void TelemSetFlag(TraceContexHandle ctx, TtFlag::Enum flag, bool set)
     }
 }
 
+tt_int32 TelemGetStatI(TraceContexHandle ctx, TtStat::Enum stat)
+{
+    if (!isValidContext(ctx)) {
+        return 0;
+    }
+
+    auto* pCtx = handleToContext(ctx);
+
+    switch (stat)
+    {
+        case TtStat::NumStalls:
+            return pCtx->numStalls;
+        default:
+            break;
+    }
+
+    return 0;
+}
+
 void TelemSetThreadName(TraceContexHandle ctx, tt_uint32 threadID, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);

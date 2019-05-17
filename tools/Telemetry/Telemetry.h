@@ -64,6 +64,15 @@ struct TtConnectionFlag
 
 using TtConnectionFlags = tt_uint32;
 
+struct TtStat
+{
+    enum Enum : tt_uint8
+    {
+        NumStalls,
+    };
+};
+
+
 // IO callbacks.
 using FileOpenFunc = TtFileHandle(*)(void* pUserData, const char*);
 using FileCloseFunc = void(*)(void* pUserData, TtFileHandle);
@@ -183,6 +192,8 @@ extern "C"
 
     __TELEM_API_VOID(TelemSetFlag, TraceContexHandle ctx, TtFlag::Enum flag, bool set);
 
+    __TELEM_API_INT(TelemGetStatI, TraceContexHandle ctx, TtStat::Enum stat);
+
     // Thread
     __TELEM_API_VOID(TelemSetThreadName, TraceContexHandle ctx, tt_uint32 threadID, const char* pFmtString, tt_int32 numArgs, ...);
 
@@ -276,6 +287,7 @@ namespace telem
             __TELEM_RESOLVE(TelemPause);
             __TELEM_RESOLVE(TelemIsPaused);
             __TELEM_RESOLVE(TelemSetFlag);
+            __TELEM_RESOLVE(TelemGetStatI);
             __TELEM_RESOLVE(TelemSetThreadName);
             __TELEM_RESOLVE(TelemGetCallStack);
             __TELEM_RESOLVE(TelemSendCallStack);
@@ -320,6 +332,7 @@ namespace telem
             __TELEM_SET_BLANK(TelemPause);
             __TELEM_SET_BLANK(TelemIsPaused);
             __TELEM_SET_BLANK(TelemSetFlag);
+            __TELEM_SET_BLANK(TelemGetStatI);
             __TELEM_SET_BLANK(TelemSetThreadName);
             __TELEM_SET_BLANK(TelemGetCallStack);
             __TELEM_SET_BLANK(TelemSendCallStack);
@@ -370,6 +383,7 @@ namespace telem
         __TELEM_FUNC_PTR(TelemPause);
         __TELEM_FUNC_PTR(TelemIsPaused);
         __TELEM_FUNC_PTR(TelemSetFlag);
+        __TELEM_FUNC_PTR(TelemGetStatI);
         __TELEM_FUNC_PTR(TelemSetThreadName);
         __TELEM_FUNC_PTR(TelemGetCallStack);
         __TELEM_FUNC_PTR(TelemSendCallStack);
@@ -502,6 +516,8 @@ namespace telem
 
 #define ttSetFlag(ctx, flag, set) __TELEM_FUNC_NAME(TelemSetFlag)(ctx, flag, set)
 
+#define ttGetStati(ctx, stat) __TELEM_FUNC_NAME(TelemGetStatI)(ctx, stat)
+
 // Thread
 #define ttSetThreadName(ctx, threadID, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetThreadName)(ctx, threadID, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 
@@ -573,6 +589,8 @@ namespace telem
 #define ttIsPaused(...)
 
 #define ttSetFlag(...)
+
+#define ttGetStati(...)
 
 // Thread
 #define ttSetThreadName(...);
