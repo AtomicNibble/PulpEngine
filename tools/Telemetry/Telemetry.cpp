@@ -502,7 +502,6 @@ namespace
             id = getThreadID();
             stackDepth = 0;
 
-            // TODO: Debug only?
 #if X_DEBUG
             zero_object(zones);
             zero_object(locks);
@@ -1285,7 +1284,6 @@ namespace
             strLen = MAX_STRING_LEN;
         }
 
-        // TODO: skip the copy and write this directly to packet buffer?
         tt_int32 packetLen = sizeof(DataPacketStringTableAdd) + static_cast<tt_int32>(strLen);
 
         DataPacketStringTableAdd hdr;
@@ -1679,8 +1677,6 @@ namespace
 
     void flipBufferInternal(TraceContext* pCtx)
     {
-        // trace ourself :D
-        // i would like to know about trace stalls.
         ttZoneFilterd(contextToHandle(pCtx), 100, "FlipBuffers");
 
         // wait for the background thread to finish process that last buffer.
@@ -1695,7 +1691,7 @@ namespace
         // the background thread has finished with old buffer.
         // make sure that buffers offset is reset before making it live.
         const auto oldIdx = pCtx->activeTickBufIdx ^ 1;
-        _InterlockedExchange(reinterpret_cast<volatile long*>(&pCtx->tickBuffers[oldIdx].bufOffset), 0l);
+        (void)_InterlockedExchange(reinterpret_cast<volatile long*>(&pCtx->tickBuffers[oldIdx].bufOffset), 0l);
 
         // flip the buffers.
         (void)_InterlockedXor(reinterpret_cast<volatile long*>(&pCtx->activeTickBufIdx), 1l);
@@ -1809,7 +1805,6 @@ namespace
             return;
         }
 
-        // TODO: lock?
         auto base = pCtx->numPDBSync;
         auto num = info.num - pCtx->numPDBSync;
         for (tt_int32 i = 0; i < num; i++) {
@@ -2682,9 +2677,6 @@ namespace
         }
 #endif // !PACKET_COMPRESSION
 
-        // TODO: this seams wrong?
-        // static_assert(sizeof(comp) + BACKGROUND_THREAD_STACK_SIZE_BASE >= BACKGROUND_THREAD_STACK_SIZE, "Thread stack is to small");
-
         SocketRecvState recvState;
 
         for (;;)
@@ -2732,7 +2724,6 @@ namespace
             }
 
             // If the socket is dead don't bother processing, but we need to keep flipping to prevent stall.
-            // TODO: stall and try reconnect?
             if (pCtx->socket == INV_SOCKET && pCtx->fileHandle == TELEM_INVALID_HANDLE) {
                 continue;
             }
@@ -3285,8 +3276,6 @@ bool TelemClose(TraceContexHandle ctx)
 void TelemTick(TraceContexHandle ctx)
 {
     auto* pCtx = handleToContext(ctx);
-
-    // TODO: maybe not return
     if (!pCtx->isEnabled) {
         return;
     }
@@ -3306,8 +3295,6 @@ void TelemTick(TraceContexHandle ctx)
 void TelemFlush(TraceContexHandle ctx)
 {
     auto* pCtx = handleToContext(ctx);
-
-    // TODO: maybe not return
     if (!pCtx->isEnabled) {
         return;
     }
