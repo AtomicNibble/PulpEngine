@@ -166,6 +166,9 @@ namespace
         X_UNUSED(lenWithoutTerm);
 
 #if 1
+        if (!gEnv->pLog) {
+            return;
+        }
         switch (type)
         {
             case TtLogType::Msg:
