@@ -252,6 +252,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 thread[i].destroy();
             }
 
+            // how many stalls?
+            auto numStalls = ttGetStati(ctx, TtStat::NumStalls);
+
+            X_LOG0("Main", "TelemStalled: %" PRIi32, numStalls);
+
             gEnv->pConsoleWnd->pressToContinue();
         }
     }
