@@ -25,6 +25,15 @@ TELEM_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
 #define RUNTIME_ZONE_WRITES 1
 #define RUNTIME_ZONE_PDB_SEND 1
 
+TELEM_INTRINSIC(_BitScanReverse)
+TELEM_INTRINSIC(_BitScanForward)
+
+#if X_64
+TELEM_INTRINSIC(_BitScanReverse64)
+TELEM_INTRINSIC(_BitScanForward64)
+#endif // !X_64
+
+
 namespace
 {
     static const char* TELEM_ZONE_SOURCE_FILE = "Telem.cpp";
@@ -355,6 +364,121 @@ namespace
 
     } // namespace PE
 
+    namespace bitUtil
+    {
+        constexpr tt_uint32 NO_BIT_SET = 255;
+
+        template<size_t N>
+        struct Implementation
+        {
+        };
+
+        template<>
+        struct Implementation<8u>
+        {
+            template<typename T>
+            static inline tt_uint32 ScanBitsForward(T value)
+            {
+                static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
+
+                DWORD index;
+#if X_64
+                const unsigned char result = _BitScanForward64(&index, static_cast<tt_uint64>(value));
+                if (result == 0) {
+                    return NO_BIT_SET;
+                }
+
+                return index;
+#else
+                if (value) {
+                    value = (value ^ (value - 1)) >> 1; // Set v's trailing 0s to 1s and zero rest
+                    for (index = 0; value; index++) {
+                        value >>= 1;
+                    }
+                    return index;
+                }
+                return NO_BIT_SET;
+#endif // !X_64
+            }
+        };
+
+        template<>
+        struct Implementation<4u>
+        {
+            template<typename T>
+            static inline tt_uint32 ScanBitsForward(T value)
+            {
+                static_assert(sizeof(T) == 4, "sizeof(T) is not 4 bytes.");
+
+                DWORD index;
+                const unsigned char result = _BitScanForward(&index, static_cast<tt_uint32>(value));
+                if (result == 0) {
+                    return NO_BIT_SET;
+                }
+
+                return index;
+            }
+        };
+
+
+        template<typename T>
+        inline tt_uint32 ScanBitsForward(T value)
+        {
+            return Implementation<sizeof(T)>::ScanBitsForward(value);
+        }
+
+    } // namespace bitUtil
+
+    namespace strUtil
+    {
+
+#if X_64
+
+    static size_t strlen(const char* str)
+    {
+        __m128i zero = _mm_set1_epi8(0);
+        __m128i* s_aligned = (__m128i*)(((uint64_t)str) & -0x10L);
+        uint8_t misbits = (uint8_t)(((uint64_t)str) & 0xf);
+        __m128i s16cs = _mm_load_si128(s_aligned);
+        __m128i bytemask = _mm_cmpeq_epi8(s16cs, zero);
+        int bitmask = _mm_movemask_epi8(bytemask);
+        bitmask = (bitmask >> misbits) << misbits;
+
+        // Alternative: use TEST instead of BSF, then BSF at end (only). Much better on older CPUs
+        // TEST has latency 1, while BSF has 3!
+        while (bitmask == 0) {
+            s16cs = _mm_load_si128(++s_aligned);
+            bytemask = _mm_cmpeq_epi8(s16cs, zero);
+            bitmask = _mm_movemask_epi8(bytemask);
+        }
+
+        return (((const char*)s_aligned) - str) + (size_t)bitUtil::ScanBitsForward(bitmask);
+    }
+
+#else
+
+    static size_t strlen(const char* str)
+    {
+        __m128i zero = _mm_set1_epi8(0);
+        __m128i* s_aligned = (__m128i*)(((long)str) & -0x10L);
+        uint8_t misbits = (uint8_t)(((long)str) & 0xf);
+        __m128i s16cs = _mm_load_si128(s_aligned);
+        __m128i bytemask = _mm_cmpeq_epi8(s16cs, zero);
+        int bitmask = _mm_movemask_epi8(bytemask);
+        bitmask = (bitmask >> misbits) << misbits;
+
+        while (bitmask == 0) {
+            s16cs = _mm_load_si128(++s_aligned);
+            bytemask = _mm_cmpeq_epi8(s16cs, zero);
+            bitmask = _mm_movemask_epi8(bytemask);
+        }
+
+        return (((const char*)s_aligned) - str) + bitUtil::ScanBitsForward(bitmask);
+    }
+
+#endif
+
+    } // namespace StrUtil
 
     template<class T>
     TELEM_INLINE constexpr const T& Max(const T& x, const T& y)
@@ -1279,7 +1403,7 @@ namespace
 
     TELEM_NO_INLINE void writeStringCompressionBuffer(PacketCompressor* pComp, StringTableIndex idx, const char* pStr)
     {
-        tt_int32 strLen = static_cast<tt_int32>(strlen(pStr));
+        tt_int32 strLen = static_cast<tt_int32>(strUtil::strlen(pStr));
         if (strLen > MAX_STRING_LEN) {
             strLen = MAX_STRING_LEN;
         }
@@ -3083,8 +3207,8 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
 
     LPWSTR pCmdLine = GetCommandLineW();
 
-    const auto appNameLen = static_cast<tt_int32>(strlen(pAppName));
-    const auto buildInfoLen = static_cast<tt_int32>(strlen(pBuildInfo));
+    const auto appNameLen = static_cast<tt_int32>(strUtil::strlen(pAppName));
+    const auto buildInfoLen = static_cast<tt_int32>(strUtil::strlen(pBuildInfo));
     const auto cmdLineLen = static_cast<tt_int32>(wcslen(pCmdLine));
 
     if (appNameLen > MAX_STRING_LEN) {

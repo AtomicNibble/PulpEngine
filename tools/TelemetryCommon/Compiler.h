@@ -25,6 +25,7 @@
 #define TELEM_ALIGNED_SYMBOL(symbol, alignment)     __declspec(align(alignment)) symbol
 #define TELEM_ALIGN_OF(type)                        __alignof(type)
 #define TELEM_OFFSETOF(s, m)                        offsetof(s, m)
+#define TELEM_INTRINSIC(func)                       TELEM_PRAGMA(intrinsic(func))
 
 #define TELEM_PACK_PUSH(val)                        TELEM_PRAGMA(pack(push, val))
 #define TELEM_PACK_POP                              TELEM_PRAGMA(pack(pop))
