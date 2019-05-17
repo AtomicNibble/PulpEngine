@@ -3370,7 +3370,7 @@ bool TelemClose(TraceContexHandle ctx)
 {
     auto* pCtx = handleToContext(ctx);
 
-    TelemFlush(ctx);
+    flipBuffer(pCtx, false, true);
 
     // TODO: make sure we finish sending PDB data to server and shit?
     // should we do a shutdown handshake or something?
