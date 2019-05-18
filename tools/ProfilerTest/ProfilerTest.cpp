@@ -80,6 +80,7 @@ namespace
 
     core::CriticalSection cs0, cs1;
     core::SharedLock sharedLock;
+    volatile bool running = true;
 
     core::Thread::ReturnValue threadFunc(const core::Thread& thread)
     {
@@ -93,9 +94,10 @@ namespace
 
         TtCallStack stack;
 
-        for (int i = 0; i < 200; i++)
+        int32_t i = 0;
+        while(running)
         {
-            ttZone(ctx, "Sample zone with arg! %" PRIi32, i);
+            ttZone(ctx, "Sample zone with arg! %" PRIi32, i++);
 
             ttGetCallStack(ctx, stack);
             auto stackID = ttSendCallStack(ctx, &stack);
@@ -241,14 +243,25 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 ttSetThreadName(ctx, thread[i].getID(), "%s", name.c_str());
             }
 
+            float numMS = 1000 * 1;
+
+            core::StopWatch timer;
+
             // main loop
-            for (int32_t i = 0; i < 16; i++) {
+            while(timer.GetMilliSeconds() < numMS)
+            {
                 ttTick(ctx);
                 ttZone(ctx, "Frame");
 
-                core::Thread::sleep(32);
+                {
+                    ttZone(ctx, "Sleep");
+                    core::Thread::sleep(16);
+                }
+
                 X_LOG0("Main", "tick");
             }
+
+            running = false;
 
             for (int32_t i = 0; i < numThreads; i++) {
                 thread[i].join();
