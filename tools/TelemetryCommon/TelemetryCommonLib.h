@@ -5,6 +5,9 @@
 #include "Configuration.h"
 #include "PlatformWin32.h"
 
+// just going to always make this a lib.
+#define TELEMETRY_COMLIB_EXPORT
+
 #ifndef TELEMETRY_COMLIB_EXPORT
 
 #ifdef TELEM_LIB
