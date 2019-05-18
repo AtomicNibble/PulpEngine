@@ -262,10 +262,8 @@ void XDirectoryWatcher::tick(void)
 {
     X_PROFILE_BEGIN("DirectoryWatcher", core::profiler::SubSys::CORE);
     // check all the directorys.
-    Directorys::Iterator it = dirs_.begin();
-
-    for (; it != dirs_.end(); ++it) {
-        checkDirectory(*it);
+    for (auto& dir : dirs_) {
+        checkDirectory(dir);
     }
 }
 
@@ -277,9 +275,8 @@ bool XDirectoryWatcher::IsRepeat(const core::Path<char>& path)
 
     Info_t info(st.st_mtime, st.st_size);
 
-    Fifo<Info_t>::const_iterator it = cache_.begin();
-    for (; it != cache_.end(); ++it) {
-        if ((*it) == info) {
+    for (const auto& e : cache_) {
+        if (e == info) {
             return true;
         }
     }
@@ -300,9 +297,8 @@ bool XDirectoryWatcher::IsRepeat(const core::Path<wchar_t>& path)
 
     Info_t info(st.st_mtime, st.st_size);
 
-    Fifo<Info_t>::const_iterator it = cache_.begin();
-    for (; it != cache_.end(); ++it) {
-        if ((*it) == info) {
+    for (const auto& e : cache_) {
+        if (e == info) {
             return true;
         }
     }
