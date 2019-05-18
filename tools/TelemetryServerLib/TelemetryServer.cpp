@@ -3155,6 +3155,15 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
         // or just one client.
         if (!ok) {
             core::lastError::Description Dsc;
+
+            //  failed completion packet
+            if (pIOContext) {
+                X_ERROR("TelemSrv", "Failed completion packet. Error: %s", core::lastError::ToString(Dsc));
+                X_ASSERT_NOT_NULL(pClientCon);
+                closeClient(pClientCon);
+                continue;
+            }
+
             X_ERROR("TelemSrv", "GetQueuedCompletionStatus failed. Error: %s", core::lastError::ToString(Dsc));
             continue;
         }
