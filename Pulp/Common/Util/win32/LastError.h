@@ -11,9 +11,9 @@ namespace lastError
 
     unsigned int Get(void);
 
-    const char* ToString(DWORD error, Description& desc);
+    X_NO_INLINE const char* ToString(DWORD error, Description& desc);
+    X_NO_INLINE const char* ToString(Description& desc);
 
-    const char* ToString(Description& desc);
 } // namespace lastError
 
 X_NAMESPACE_END

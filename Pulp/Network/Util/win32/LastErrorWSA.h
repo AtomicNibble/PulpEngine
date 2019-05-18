@@ -8,8 +8,8 @@ namespace lastErrorWSA
 
     int32_t Get(void);
 
-    const char* ToString(int32_t error, Description& desc);
-    const char* ToString(Description& desc);
+    X_NO_INLINE const char* ToString(int32_t error, Description& desc);
+    X_NO_INLINE const char* ToString(Description& desc);
 
 } // namespace lastErrorWSA
 
