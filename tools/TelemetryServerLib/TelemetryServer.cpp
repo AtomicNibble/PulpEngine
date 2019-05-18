@@ -3136,13 +3136,13 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
 
     auto* pData = reinterpret_cast<const IOCPJobData*>(pJobData);
 
-    ClientConnection* pClientCon = nullptr;
-    PerClientIoData* pIOContext = nullptr;
-    DWORD bytesTransferred = 0;
-    DWORD flags = 0;
-
     while (1)
     {
+        ClientConnection* pClientCon = nullptr;
+        PerClientIoData* pIOContext = nullptr;
+        DWORD bytesTransferred = 0;
+        DWORD flags = 0;
+
         auto ok = GetQueuedCompletionStatus(
             pData->hIOCP,
             &bytesTransferred,
