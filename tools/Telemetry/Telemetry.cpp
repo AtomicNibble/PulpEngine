@@ -3602,7 +3602,7 @@ void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const cha
     ++pThreadData->stackDepth;
 
     auto& scopeData = pThreadData->zones[depth];
-    scopeData.zone.start = getTicks();
+    scopeData.zone.start = getTicks(); // Moving this call to the bottom slows the function down a few ns.
     scopeData.zone.pFmtStr = pFmtString;
     scopeData.zone.sourceInfo = sourceInfo;
 
