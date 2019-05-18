@@ -3184,13 +3184,13 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
                 auto* pHdr = reinterpret_cast<const PacketBase*>(curBuf.buffer.data());
                 if (pHdr->dataSize == 0) {
                     X_ERROR("TelemSrv", "Client sent packet with length zero...");
-                    // TODO: disconnect them.
+                    closeClient(pClientCon);
                     continue;
                 }
 
                 if (pHdr->dataSize > MAX_PACKET_SIZE) {
                     X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<int32_t>(pHdr->dataSize));
-                    // TODO: disconnect them.
+                    closeClient(pClientCon);
                     continue;
                 }
 
