@@ -47,6 +47,12 @@ BENCHMARK_DEFINE_F(TelemFixture, zone_simple)(benchmark::State& state) {
     }
 }
 
+BENCHMARK_DEFINE_F(TelemFixture, zone_simple_cpp)(benchmark::State& state) {
+    for (auto _ : state) {
+        ttZone(ctx, "meow");
+    }
+}
+
 
 BENCHMARK_DEFINE_F(TelemFixture, zone_printf_str)(benchmark::State& state) {
     for (auto _ : state) {
@@ -114,6 +120,8 @@ BENCHMARK_DEFINE_F(TelemFixture, msg_printf)(benchmark::State& state) {
 BENCHMARK_REGISTER_F(TelemFixture, zone_paused);
 BENCHMARK_REGISTER_F(TelemFixture, zone_simple);
 BENCHMARK_REGISTER_F(TelemFixture, zone_simple)->Threads(4);
+BENCHMARK_REGISTER_F(TelemFixture, zone_simple_cpp);
+BENCHMARK_REGISTER_F(TelemFixture, zone_simple_cpp)->Threads(4);
 BENCHMARK_REGISTER_F(TelemFixture, zone_printf_str);
 BENCHMARK_REGISTER_F(TelemFixture, zone_printf_str)->Threads(4);
 BENCHMARK_REGISTER_F(TelemFixture, zone_printf_int);
