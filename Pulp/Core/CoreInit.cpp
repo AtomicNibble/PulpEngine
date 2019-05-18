@@ -404,7 +404,7 @@ bool XCore::Init(CoreInitParams& startupParams)
             telem::ConnectionType::Tcp,
             8001,
             1000,
-            TtConnectionFlag::StreamPDB
+            TtConnectionFlag::None
         );
 #endif
 

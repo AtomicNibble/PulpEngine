@@ -58,6 +58,7 @@ struct TtConnectionFlag
     {
         // Runtime will stream missing PDB to server on demand.
         // not needed if you copy PDB to symbol server.
+        None = 0,
         StreamPDB = 1,
     };
 };
