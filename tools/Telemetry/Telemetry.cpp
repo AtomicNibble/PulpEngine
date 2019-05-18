@@ -610,14 +610,11 @@ namespace
         TtSourceInfo sourceInfo;
     };
 
-    // TODO: don't bother storing argData if not passed.
     struct TraceZoneBuilder
     {
         TraceZone zone;
         tt_int32 argDataSize;
-        ArgData argData;
     };
-
 
     // some data for each thread!
     TELEM_ALIGNED_SYMBOL(struct TraceThread, 64)
@@ -636,6 +633,7 @@ namespace
         tt_int32 stackDepth;
 
         TraceZoneBuilder zones[MAX_ZONE_DEPTH];
+        ArgData argData[MAX_ZONE_DEPTH];
         TraceLocks locks;
     };
 
@@ -1987,8 +1985,9 @@ namespace
         addToTickBuffer(pCtx, &data, copySize, size);
     }
 
-    TELEM_INLINE void queueZone(TraceContext* pCtx, TraceThread* pThread, TraceZoneBuilder& scopeData)
+    TELEM_INLINE void queueZone(TraceContext* pCtx, TraceThread* pThread, tt_int32 depth)
     {
+        auto& scopeData = pThread->zones[depth];
         const bool hasArgData = scopeData.argDataSize;
 
         QueueDataZone data;
@@ -2007,7 +2006,8 @@ namespace
             size = GetSizeWithoutArgData<decltype(data)>();
         }
         else {
-            memcpy(&data.argData, &scopeData.argData, scopeData.argDataSize);
+            auto& argData = pThread->argData[depth];
+            memcpy(&data.argData, &argData, scopeData.argDataSize);
             copySize = GetDataSizeNoAlign<decltype(data)>(scopeData.argDataSize);
             size = RoundUpToMultiple(copySize, 64);
         }
@@ -3621,7 +3621,7 @@ void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const cha
         va_list l;
         va_start(l, numArgs);
 
-        scopeData.argDataSize = BuildArgData(scopeData.argData, pFmtString, numArgs, l);
+        scopeData.argDataSize = BuildArgData(pThreadData->argData[depth], pFmtString, numArgs, l);
 
         va_end(l);
     }
@@ -3646,7 +3646,7 @@ void TelemLeave(TraceContexHandle ctx)
     auto& scopeData = pThreadData->zones[depth];
     scopeData.zone.end = ticks;
 
-    queueZone(pCtx, pThreadData, scopeData);
+    queueZone(pCtx, pThreadData, depth);
 }
 
 void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const char* pFmtString, tt_int32 numArgs, ...)
@@ -3675,7 +3675,7 @@ void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint
         va_list l;
         va_start(l, numArgs);
 
-        scopeData.argDataSize = BuildArgData(scopeData.argData, pFmtString, numArgs, l);
+        scopeData.argDataSize = BuildArgData(pThreadData->argData[depth], pFmtString, numArgs, l);
 
         va_end(l);
     }
@@ -3710,7 +3710,7 @@ void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId)
         return;
     }
 
-    queueZone(pCtx, pThreadData, scopeData);
+    queueZone(pCtx, pThreadData, depth);
 }
 
 
