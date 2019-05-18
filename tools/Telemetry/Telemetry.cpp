@@ -3539,20 +3539,10 @@ void TelemSetThreadName(TraceContexHandle ctx, tt_uint32 threadID, const char* p
     }
 }
 
-
-void caclHash(TtCallStack& stack)
-{
-    // don't think i'm going to cap the hash actually since if we cap it.
-    // displaying the stack above that is pointless as it could be totally wrong.
-    // so we might as well just collect less data.
-
-    auto hash = Hash::Fnv1aHash(stack.frames, sizeof(stack.frames[0]) * stack.num);
-
-    stack.id = hash;
-}
-
 tt_int32 TelemGetCallStack(TraceContexHandle ctx, TtCallStack& stackOut)
 {
+    static_assert((sizeof(TtCallStack) % 64) == 0, "Should be multiple of 64");
+
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
         return -1;
@@ -3564,7 +3554,10 @@ tt_int32 TelemGetCallStack(TraceContexHandle ctx, TtCallStack& stackOut)
 
     stackOut.num = pRtlWalkFrameChain(stackOut.frames, TtCallStack::MAX_FRAMES, 0);
 
-    caclHash(stackOut);
+    // don't think i'm going to cap the hash actually since if we cap it.
+    // displaying the stack above that is pointless as it could be totally wrong.
+    // so we might as well just collect less data.
+    stackOut.id = Hash::Fnv1aHash(stackOut.frames, sizeof(stackOut.frames[0]) * stackOut.num);
 
     return stackOut.id;
 }

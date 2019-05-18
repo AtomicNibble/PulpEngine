@@ -106,7 +106,7 @@ enum TtError
 
 struct TtCallStack
 {
-    static const tt_uint32 MAX_FRAMES = 31;
+    static const tt_uint32 MAX_FRAMES = 15;
 
     TtCallStack() {
         id = -1;
