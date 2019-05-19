@@ -25,15 +25,22 @@ Runtime:
   Misc:
     ✔ Capture and send program command line @done (19-02-15 17:05)
     ✔ Support writing trace data to disk. @done (19-04-29 22:16)
+    ✔ Support sending thread group info @done (19-05-19 17:10)
 
   Plots:
     ✔ Implement plots @done (19-04-13 12:56)
     ☐ Support plot aggregation based on paths in format string.
 
   Polish:
+    ☐ Handle TelemStartup been called multiple times better.
+    ☐ Remove the need for dbgHelp.
     ☐ Get rid of the CRT (low priority)
-    ☐ Handle disconnects better
-      ☐ Try reconnect?
+      * spintf
+      * memcpy : wonder if could get some speed up by making a fixed sized memcpy
+      * malloc
+      *
+    ✔ Handle disconnects better @done (19-05-18 14:07)
+      ✘ Try reconnect? @cancelled (19-05-18 14:07)
         Sounds painful unless you can resume.
 
 
@@ -45,6 +52,9 @@ Veiwer:
     ☐ Fix issue with overlapping lock holds due to context switches.
     ☐ Show plots
     ☐ Show messages
+    ☐ Support thread group info.
+      ☐ Allow overrides in viewer (drag to resort etc..)
+
 
 ServerLib:
 
