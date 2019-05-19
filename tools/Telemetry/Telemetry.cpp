@@ -1739,7 +1739,7 @@ namespace
         ArgData argData;
     };
 
-    TELEM_ALIGNED_SYMBOL(struct QueueDataMemFree, 64) : public QueueDataBase
+    struct QueueDataMemFree : public QueueDataBase
     {
         TtthreadId threadID;
         tt_uint64 time;
@@ -1808,7 +1808,7 @@ namespace
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockState>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockCount>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataMemAlloc>());
-    static_assert(64 == sizeof(QueueDataMemFree));
+    static_assert(56 == sizeof(QueueDataMemFree));
     static_assert(64 == GetSizeWithoutArgData<QueueDataMessage>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataPlot>());
     static_assert(48 == sizeof(QueueDataPDBInfo));
@@ -4043,7 +4043,7 @@ void TelemFree(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr
     data.threadID = getThreadID();
     data.sourceInfo = sourceInfo;
 
-    addToTickBuffer64(pCtx, data);
+    addToTickBuffer(pCtx, &data, sizeof(data), GetSizeNotArgData<decltype(data)>());
 }
 
 // ----------- Plot stuff -----------
