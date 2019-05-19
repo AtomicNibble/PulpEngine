@@ -241,6 +241,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
                 // TODO: Support dynamic strings.
                 ttSetThreadName(ctx, thread[i].getID(), "%s", name.c_str());
+                ttSetThreadGroup(gEnv->ctx, thread[i].getID(), 1);
             }
 
             float numMS = 1000 * 1;

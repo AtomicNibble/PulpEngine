@@ -339,6 +339,7 @@ namespace V2
 
             // TODO: support dynamic string?
             ttSetThreadName(gEnv->ctx, threadId, "%s", name.c_str());
+            ttSetThreadGroup(gEnv->ctx, threadId, 1);
         }
         for (i = 0; i < numThreads_; i++) {
             threads_[i].start(ThreadRun_s);

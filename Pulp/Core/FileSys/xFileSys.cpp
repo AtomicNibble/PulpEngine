@@ -1455,6 +1455,7 @@ void xFileSys::updatePendingOpsStats(void)
 Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 {
     ttSetThreadName(gEnv->ctx, 0, "FileSys Worker");
+    ttSetThreadGroup(gEnv->ctx, 0, 2);
 
     gEnv->pJobSys->CreateQueForCurrentThread();
 
