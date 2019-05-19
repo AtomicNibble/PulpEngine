@@ -593,7 +593,7 @@ void XCore::ListProgramArgs(void)
         const auto& arg = args_[i];
         size_t j, argsNum = arg.getArgc();
 
-        merged.appendFmt("(%" PRIuS ") ", i);
+        merged.setFmt("(%" PRIuS ") ", i);
 
         for (j = 0; j < argsNum; j++) {
             merged.appendFmt("^2%ls^7", arg.getArgv(j));
