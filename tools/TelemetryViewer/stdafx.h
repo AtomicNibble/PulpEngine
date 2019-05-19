@@ -22,7 +22,7 @@
 #include <examples/libs/gl3w/GL/gl3w.h>
 
 
-// X_LINK_ENGINE_LIB("TelemetryServerLib");
+X_LINK_ENGINE_LIB("TelemetryCommonLib");
 
 X_LINK_LIB("opengl32.lib");
 X_LINK_LIB("SDL2.lib");

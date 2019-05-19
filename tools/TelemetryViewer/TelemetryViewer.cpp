@@ -3249,7 +3249,8 @@ void Client::sendDataToServer(const void* pData, int32_t len)
     // TODO: none blocking?
     int res = platform::send(socket, reinterpret_cast<const char*>(pData), len, 0);
     if (res == SOCKET_ERROR) {
-        X_ERROR("Telem", "Socket: send failed with error: %d", platform::WSAGetLastError());
+        lastErrorWSA::Description Dsc;
+        X_ERROR("Telem", "Socket: send failed with error: %s", lastErrorWSA::ToString(Dsc));
         return;
     }
 }
@@ -3269,7 +3270,8 @@ bool readPacket(Client& client, char* pBuffer, int& bufLengthInOut)
             return false;
         }
         else if (res < 0) {
-            X_ERROR("Telem", "recv failed with error: %d", platform::WSAGetLastError());
+            lastErrorWSA::Description Dsc;
+            X_ERROR("Telem", "recv failed with error: %s", lastErrorWSA::ToString(Dsc));
             return false;
         }
 
@@ -3364,7 +3366,8 @@ bool connectToServer(Client& client)
 
     auto res = platform::getaddrinfo(client.addr.c_str(), portStr.c_str(), &hints, &servinfo);
     if (res != 0) {
-        X_ERROR("Telem", "Failed to get addre info. Error: %d", platform::WSAGetLastError());
+        lastErrorWSA::Description Dsc;
+        X_ERROR("Telem", "Failed to get addre info. Error: %s", lastErrorWSA::ToString(Dsc));
         return false;
     }
 
@@ -3398,7 +3401,8 @@ bool connectToServer(Client& client)
     tt_int32 sock_opt = 1024 * 16;
     res = platform::setsockopt(connectSocket, SOL_SOCKET, SO_SNDBUF, (char*)&sock_opt, sizeof(sock_opt));
     if (res != 0) {
-        X_ERROR("Telem", "Failed to set sndbuf on socket. Error: %d", platform::WSAGetLastError());
+        lastErrorWSA::Description Dsc;
+        X_ERROR("Telem", "Failed to set sndbuf on socket. Error: %s", lastErrorWSA::ToString(Dsc));
         return false;
     }
 
