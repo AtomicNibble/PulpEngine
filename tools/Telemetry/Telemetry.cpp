@@ -2005,6 +2005,12 @@ namespace
 
     TELEM_INLINE void queueZone(TraceContext* pCtx, TraceThread* pThread, tt_int32 depth)
     {
+#if X_DEBUG
+        if (depth < 0) {
+            ::DebugBreak();
+        }
+#endif // X_DEBUG
+
         auto& scopeData = pThread->zones[depth];
         const bool hasArgData = scopeData.argDataSize;
 
