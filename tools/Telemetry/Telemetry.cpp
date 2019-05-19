@@ -1674,7 +1674,7 @@ namespace
     {
         TtCallStack callstack;
     };
-
+    
     struct QueueDataZone : public QueueDataBase
     {
         tt_int8 stackDepth;
@@ -1739,15 +1739,13 @@ namespace
         ArgData argData;
     };
 
-    struct QueueDataMemFree : public QueueDataBase
+    TELEM_ALIGNED_SYMBOL(struct QueueDataMemFree, 64) : public QueueDataBase
     {
         TtthreadId threadID;
         tt_uint64 time;
         TtSourceInfo sourceInfo;
         const void* pPtr;
         const char* pFmtStr;
-
-        ArgData argData;
     };
 
     struct QueueDataMessage : public QueueDataBase
@@ -1810,7 +1808,7 @@ namespace
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockState>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockCount>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataMemAlloc>());
-    static_assert(64 == GetSizeWithoutArgData<QueueDataMemFree>());
+    static_assert(64 == sizeof(QueueDataMemFree));
     static_assert(64 == GetSizeWithoutArgData<QueueDataMessage>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataPlot>());
     static_assert(48 == sizeof(QueueDataPDBInfo));
@@ -1937,6 +1935,29 @@ namespace
     TELEM_INLINE void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_int32 size)
     {
         addToTickBuffer(pCtx, pPtr, size, size);
+    }
+
+    template<typename T>
+    TELEM_INLINE void addToTickBuffer64(TraceContext* pCtx, const T& obj)
+    {
+        static_assert(sizeof(T) == 64);
+
+        auto& buf = pCtx->tickBuffers[pCtx->activeTickBufIdx];
+        long offset = _InterlockedExchangeAdd(reinterpret_cast<volatile long*>(&buf.bufOffset), 64);
+
+        if (offset + 64 <= pCtx->tickBufCapacity) {
+            memcpy(buf.pTickBuf + offset, &obj, 64);
+            return;
+        }
+
+        // no space,
+#if X_DEBUG && 0
+        if (offset + 64 > pCtx->tickBufCapacity) {
+            ::DebugBreak();
+        }
+#endif // X_DEBUG
+
+        addToTickBufferFull(pCtx, &obj, 64, 64);
     }
 
     void syncPDBInfo(TraceContext* pCtx, const PE::PDBInfo& info)
@@ -2084,19 +2105,6 @@ namespace
         data.threadID = getThreadID();
         data.sourceInfo = sourceInfo;
         data.pFmtStr = "<none>";
-
-        addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
-    }
-
-    TELEM_INLINE void queueMemFree(TraceContext* pCtx, const TtSourceInfo& sourceInfo, const void* pPtr)
-    {
-        QueueDataMemFree data;
-        data.type = QueueDataType::MemFree;
-        data.argDataSize = 0;
-        data.time = getRelativeTicks(pCtx);
-        data.pPtr = pPtr;
-        data.threadID = getThreadID();
-        data.sourceInfo = sourceInfo;
 
         addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
     }
@@ -2353,7 +2361,7 @@ namespace
 #endif // !TELEM_DEBUG
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
-        return GetSizeWithoutArgData<std::remove_pointer_t<decltype(pBuf)>>();
+        return GetSizeNotArgData<std::remove_pointer_t<decltype(pBuf)>>();
     }
 
     tt_int32 queueProcessMessage(PacketCompressor* pComp, const QueueDataMessage* pBuf)
@@ -4028,15 +4036,14 @@ void TelemFree(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr
         return;
     }
 
-    QueueDataMemFree data;
+    alignas(64) QueueDataMemFree data;
     data.type = QueueDataType::MemFree;
-    data.argDataSize = 0;
     data.time = getRelativeTicks(pCtx);
     data.pPtr = pPtr;
     data.threadID = getThreadID();
     data.sourceInfo = sourceInfo;
 
-    addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
+    addToTickBuffer64(pCtx, data);
 }
 
 // ----------- Plot stuff -----------
