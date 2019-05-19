@@ -43,6 +43,8 @@ bool XCore::Update(void)
     ttPause(gEnv->ctx, vars_.getTelemPaused());
     ttZone(gEnv->ctx, "(Core) Update");
 
+    core::TelemSpikeDetector frameSpike(gEnv->ctx, "Frame spike", 40.f);
+
     ++numFrames_;
 
     if ((numFrames_ & 0xff) == 0 && core::SysTimer::HasFreqChanged()) {
