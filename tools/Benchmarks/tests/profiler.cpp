@@ -105,6 +105,18 @@ BENCHMARK_DEFINE_F(TelemFixture, plot)(benchmark::State& state) {
     }
 }
 
+BENCHMARK_DEFINE_F(TelemFixture, alloc)(benchmark::State& state) {
+    for (auto _ : state) {
+        ttAlloc(ctx, &state, 1024, "my alloc");
+    }
+}
+
+BENCHMARK_DEFINE_F(TelemFixture, free)(benchmark::State& state) {
+    for (auto _ : state) {
+        ttFree(ctx, &state);
+    }
+}
+
 BENCHMARK_DEFINE_F(TelemFixture, msg)(benchmark::State& state) {
     for (auto _ : state) {
         ttMessage(ctx, TtMsgType::Msg, "this is a msg for you!");
@@ -134,6 +146,10 @@ BENCHMARK_REGISTER_F(TelemFixture, lock_setstate);
 BENCHMARK_REGISTER_F(TelemFixture, lock_setstate)->Threads(4);
 BENCHMARK_REGISTER_F(TelemFixture, plot);
 BENCHMARK_REGISTER_F(TelemFixture, plot)->Threads(4);
+BENCHMARK_REGISTER_F(TelemFixture, alloc);
+BENCHMARK_REGISTER_F(TelemFixture, alloc)->Threads(4);
+BENCHMARK_REGISTER_F(TelemFixture, free);
+BENCHMARK_REGISTER_F(TelemFixture, free)->Threads(4);
 BENCHMARK_REGISTER_F(TelemFixture, msg);
 BENCHMARK_REGISTER_F(TelemFixture, msg)->Threads(4);
 BENCHMARK_REGISTER_F(TelemFixture, msg_printf);
