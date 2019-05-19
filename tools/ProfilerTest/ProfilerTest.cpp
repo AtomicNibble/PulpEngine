@@ -248,6 +248,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
             core::StopWatch timer;
 
+            auto time0 = ttFastTime();
+            core::Thread::sleep(50);
+            auto time1 = ttFastTime();
+            auto ellapsed = ttFastTimeToMs(ctx, time1 - time0);
+
+            X_LOG0("Main", "fasttime check: %f", ellapsed);
+
             // main loop
             while(timer.GetMilliSeconds() < numMS)
             {
