@@ -2977,7 +2977,9 @@ bool TelemInit(void)
     }
 
     SymSetOptions(SYMOPT_LOAD_LINES);
-    SymInitialize(GetCurrentProcess(), nullptr, true);
+    if (!SymInitialize(GetCurrentProcess(), nullptr, true)) {
+        return false;
+    }
 
     PE::updatePDBInfo(PE::pdbInfo);
 
