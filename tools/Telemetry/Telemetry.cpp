@@ -1937,6 +1937,7 @@ namespace
         addToTickBuffer(pCtx, pPtr, size, size);
     }
 
+#if 0
     template<typename T>
     TELEM_INLINE void addToTickBuffer64(TraceContext* pCtx, const T& obj)
     {
@@ -1959,6 +1960,7 @@ namespace
 
         addToTickBufferFull(pCtx, &obj, 64, 64);
     }
+#endif
 
     void syncPDBInfo(TraceContext* pCtx, const PE::PDBInfo& info)
     {
