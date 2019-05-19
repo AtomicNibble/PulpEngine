@@ -295,18 +295,8 @@ void XCore::ShutDown()
 
         // Loggers last.
         if (env_.pLog) {
-            //  No need to remove them, if log system is closing.
-            //	if (pVsLogger_)
-            //		env_.pLog->RemoveLogger(pVsLogger_);
-            //	if (pConsoleLogger_)
-            //		env_.pLog->RemoveLogger(pConsoleLogger_);
 
             env_.pLog->ShutDown();
-
-            //if (pConsole)
-            //	pConsole->Show(false);
-
-            //	system("PAUSE");
 
             X_DELETE(pVsLogger_, &coreArena_);
             X_DELETE(pConsoleLogger_, &coreArena_);
