@@ -25,6 +25,10 @@ CoreVars::CoreVars() :
     winWidth_ = 800;
     winHeight_ = 600;
 
+#if TTELEMETRY_ENABLED
+    telemPause_ = 0;
+#endif // !TTELEMETRY_ENABLED
+
     fullscreen_ = 0;
     monitor_ = -1; // detect default monitor.
     videoMode_ = -1;
@@ -70,6 +74,10 @@ void CoreVars::registerVars(void)
         VarFlag::SYSTEM | VarFlag::READONLY, "Engine Version");
     ADD_CVAR_STRING("build_date", X_ENGINE_BUILD_DATE,
         VarFlag::SYSTEM | VarFlag::READONLY, "Engine Build Date");
+
+#if TTELEMETRY_ENABLED
+    ADD_CVAR_REF("telem_pause", telemPause_, telemPause_, 0, 1, VarFlag::SYSTEM, "Pause telemetry collection");
+#endif // !TTELEMETRY_ENABLED
 }
 
 void CoreVars::setFullScreen(int32_t val)

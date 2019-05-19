@@ -40,6 +40,7 @@ bool XCore::Update(void)
     using namespace core::V2;
 
     ttTick(gEnv->ctx);
+    ttPause(gEnv->ctx, vars_.getTelemPaused());
     ttZone(gEnv->ctx, "(Core) Update");
 
     ++numFrames_;

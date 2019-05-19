@@ -51,6 +51,15 @@ X_INLINE int32_t CoreVars::getWinVideoMode(void) const
     return videoMode_;
 }
 
+X_INLINE int32_t CoreVars::getTelemPaused(void) const
+{
+#if TTELEMETRY_ENABLED
+    return telemPause_;
+#else
+    return 0;
+#endif // !TTELEMETRY_ENABLED
+}
+
 X_INLINE core::ICVar* CoreVars::getVarWinPosX(void)
 {
     return pWinPosX_;

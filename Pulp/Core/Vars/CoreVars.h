@@ -27,6 +27,7 @@ public:
     X_INLINE int32_t getFullscreen(void) const;
     X_INLINE int32_t getMonitor(void) const;
     X_INLINE int32_t getWinVideoMode(void) const;
+    X_INLINE int32_t getTelemPaused(void) const;
 
     X_INLINE core::ICVar* getVarWinPosX(void);
     X_INLINE core::ICVar* getVarWinPosY(void);
@@ -47,6 +48,10 @@ private:
     int32_t fullscreen_;
     int32_t monitor_;
     int32_t videoMode_;
+
+#if TTELEMETRY_ENABLED
+    int32_t telemPause_;
+#endif // !TTELEMETRY_ENABLED
 
 private:
     core::ICVar* pWinPosX_;
