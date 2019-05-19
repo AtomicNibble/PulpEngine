@@ -2011,7 +2011,7 @@ namespace
         }
 #endif // X_DEBUG
 
-        auto& scopeData = pThread->zones[depth];
+        const auto& scopeData = pThread->zones[depth];
         const bool hasArgData = scopeData.argDataSize;
 
         QueueDataZone data;
