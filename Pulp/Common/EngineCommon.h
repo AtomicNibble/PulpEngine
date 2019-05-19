@@ -20,6 +20,7 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #define TTELEMETRY_ENABLED 1
 #include <TelemetryLib.h>
 
+
 // Util
 #include "Util\UserLiterals.h"
 #include "Util\ClassMacros.h"
@@ -80,6 +81,9 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include "IProfile.h"
 #include "IEngineSysBase.h"
 #include "ICore.h"
+
+// Profiler
+#include "Profile\Telem.h"
 
 // threading
 #include "Threading\Atomic.h"

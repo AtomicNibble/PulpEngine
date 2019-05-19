@@ -1369,6 +1369,9 @@
     <ClInclude Include="Util\Guid.h">
       <Filter>Headers\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Profile\Telem.h">
+      <Filter>Headers\Profile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">

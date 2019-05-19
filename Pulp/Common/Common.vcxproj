@@ -321,6 +321,7 @@
     <ClInclude Include="IPrimativeContext.h" />
     <ClInclude Include="Prepro\PreproWiden.h" />
     <ClInclude Include="Profile\ProfilerTypes.h" />
+    <ClInclude Include="Profile\Telem.h" />
     <ClInclude Include="Random\CryptRand.h" />
     <ClInclude Include="Random\MultiplyWithCarry.h" />
     <ClInclude Include="Random\XorShift.h" />
