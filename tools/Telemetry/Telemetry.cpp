@@ -3571,6 +3571,22 @@ tt_int32 TelemGetStatI(TraceContexHandle ctx, TtStat::Enum stat)
     return 0;
 }
 
+tt_uint64 TelemFastTime()
+{
+    return getTicks();
+}
+
+float TelemFastTimeToMs(TraceContexHandle ctx, tt_uint64 time)
+{
+    if (!isValidContext(ctx)) {
+        return 0.f;
+    }
+
+    auto* pCtx = handleToContext(ctx);
+    double ticksPerMs = static_cast<double>(pCtx->ticksPerMicro * 1000);
+    return static_cast<float>(static_cast<double>(time) / ticksPerMs);
+}
+
 void TelemSetThreadName(TraceContexHandle ctx, tt_uint32 threadID, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);

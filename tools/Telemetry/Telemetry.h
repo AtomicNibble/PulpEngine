@@ -163,6 +163,12 @@ extern "C"
 #define __TELEM_API_INT(name, ...) TELEMETRYLIB_EXPORT tt_int32 name(__VA_ARGS__); \
         __TELEM_API_BLANK(inline tt_int32 __blank##name(__VA_ARGS__) { return -1; })
 
+#define __TELEM_API_UINT64(name, ...) TELEMETRYLIB_EXPORT tt_uint64 name(__VA_ARGS__); \
+        __TELEM_API_BLANK(inline tt_uint64 __blank##name(__VA_ARGS__) { return 0; })
+
+#define __TELEM_API_F32(name, ...) TELEMETRYLIB_EXPORT float name(__VA_ARGS__); \
+        __TELEM_API_BLANK(inline float __blank##name(__VA_ARGS__) { return 0.f; })
+
 #define __TELEM_API_ERR(name, ...) TELEMETRYLIB_EXPORT TtError name(__VA_ARGS__); \
         __TELEM_API_BLANK(inline TtError __blank##name(__VA_ARGS__) { return TtError::Ok; })
 
@@ -195,6 +201,9 @@ extern "C"
     __TELEM_API_VOID(TelemSetFlag, TraceContexHandle ctx, TtFlag::Enum flag, bool set);
 
     __TELEM_API_INT(TelemGetStatI, TraceContexHandle ctx, TtStat::Enum stat);
+
+    __TELEM_API_UINT64(TelemFastTime);
+    __TELEM_API_F32(TelemFastTimeToMs, TraceContexHandle ctx, tt_uint64 time);
 
     // Thread
     __TELEM_API_VOID(TelemSetThreadName, TraceContexHandle ctx, tt_uint32 threadID, const char* pFmtString, tt_int32 numArgs, ...);
@@ -292,6 +301,8 @@ namespace telem
             __TELEM_RESOLVE(TelemIsPaused);
             __TELEM_RESOLVE(TelemSetFlag);
             __TELEM_RESOLVE(TelemGetStatI);
+            __TELEM_RESOLVE(TelemFastTime);
+            __TELEM_RESOLVE(TelemFastTimeToMs);
             __TELEM_RESOLVE(TelemSetThreadName);
             __TELEM_RESOLVE(TelemSetThreadGroup);
             __TELEM_RESOLVE(TelemSetThreadGroupDefaultSort);
@@ -339,6 +350,8 @@ namespace telem
             __TELEM_SET_BLANK(TelemIsPaused);
             __TELEM_SET_BLANK(TelemSetFlag);
             __TELEM_SET_BLANK(TelemGetStatI);
+            __TELEM_SET_BLANK(TelemFastTime);
+            __TELEM_SET_BLANK(TelemFastTimeToMs);
             __TELEM_SET_BLANK(TelemSetThreadName);
             __TELEM_SET_BLANK(TelemSetThreadGroup);
             __TELEM_SET_BLANK(TelemSetThreadGroupDefaultSort);
@@ -392,6 +405,8 @@ namespace telem
         __TELEM_FUNC_PTR(TelemIsPaused);
         __TELEM_FUNC_PTR(TelemSetFlag);
         __TELEM_FUNC_PTR(TelemGetStatI);
+        __TELEM_FUNC_PTR(TelemFastTime);
+        __TELEM_FUNC_PTR(TelemFastTimeToMs);
         __TELEM_FUNC_PTR(TelemSetThreadName);
         __TELEM_FUNC_PTR(TelemSetThreadGroup);
         __TELEM_FUNC_PTR(TelemSetThreadGroupDefaultSort);
@@ -527,6 +542,9 @@ namespace telem
 #define ttSetFlag(ctx, flag, set) __TELEM_FUNC_NAME(TelemSetFlag)(ctx, flag, set)
 
 #define ttGetStati(ctx, stat) __TELEM_FUNC_NAME(TelemGetStatI)(ctx, stat)
+
+#define ttFastTime() __TELEM_FUNC_NAME(TelemFastTime)()
+#define ttFastTimeToMs(ctx, time) __TELEM_FUNC_NAME(TelemFastTimeToMs)(ctx, time)
 
 // Thread
 #define ttSetThreadName(ctx, threadID, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetThreadName)(ctx, threadID, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
