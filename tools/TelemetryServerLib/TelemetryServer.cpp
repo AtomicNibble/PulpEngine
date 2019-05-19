@@ -390,6 +390,16 @@ void ClientConnection::processDataStream(uint8_t* pData, int32_t len)
                 i += strm.handleDataPacketThreadSetName(reinterpret_cast<const DataPacketThreadSetName*>(&pData[i]));
                 break;
             }
+            case DataStreamType::ThreadSetGroup:
+            {
+                i += strm.handleDataPacketThreadSetGroup(reinterpret_cast<const DataPacketThreadSetGroup*>(&pData[i]));
+                break;
+            }
+            case DataStreamType::ThreadSetGroupSort:
+            {
+                i += strm.handleDataPacketThreadSetGroupSort(reinterpret_cast<const DataPacketThreadSetGroupSort*>(&pData[i]));
+                break;
+            }
             case DataStreamType::CallStack:
             {
                 auto* pCallsTack = reinterpret_cast<const DataPacketCallStack*>(&pData[i]);
@@ -2120,6 +2130,8 @@ bool TraceBuilder::createDB(core::Path<char>& path)
     okay &= (sql::Result::OK == cmdInsertLockState.prepare("INSERT INTO lockStates (lockId, threadId, timeTicks, state, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, timeTicks, strIdx) VALUES(?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, strIdx) VALUES(?,?,?)"));
+    okay &= (sql::Result::OK == cmdInsertThreadGroup.prepare("INSERT INTO threadGroups (threadId, groupId) VALUES(?,?)"));
+    okay &= (sql::Result::OK == cmdInsertThreadGroupSort.prepare("INSERT INTO threadGroupSort (groupId, sortVal) VALUES(?,?)"));
     okay &= (sql::Result::OK == cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)"));
     okay &= (sql::Result::OK == cmdInsertMemAlloc.prepare("INSERT INTO memoryAlloc (allocId, size, threadId, timeTicks, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertMemFree.prepare("INSERT INTO memoryFree (allocId, threadId, timeTicks, packedSourceInfo) VALUES(?,?,?,?)"));
@@ -2207,6 +2219,19 @@ CREATE TABLE IF NOT EXISTS "threadNames" (
     "timeTicks"         INTEGER NOT NULL,
     "strIdx"            INTEGER NOT NULL,
     PRIMARY KEY("Id")
+);
+
+CREATE TABLE IF NOT EXISTS "threadGroups" (
+    "Id"                INTEGER,
+    "threadId"          INTEGER NOT NULL,
+    "groupId"           INTEGER NOT NULL,
+    PRIMARY KEY("Id")
+);
+
+CREATE TABLE IF NOT EXISTS "threadGroupSort" (
+    "groupId"           INTEGER NOT NULL,
+    "sortVal"           INTEGER NOT NULL,
+    PRIMARY KEY("groupId")
 );
 
 CREATE TABLE IF NOT EXISTS "strings" (
@@ -2681,6 +2706,36 @@ int32_t TraceBuilder::handleDataPacketThreadSetName(const DataPacketThreadSetNam
 
     cmd.reset();
     return getPacketSizeIncArgData(pData);
+}
+
+int32_t TraceBuilder::handleDataPacketThreadSetGroup(const DataPacketThreadSetGroup* pData)
+{
+    auto& cmd = cmdInsertThreadGroup;
+    cmd.bind(1, static_cast<int32_t>(pData->threadID));
+    cmd.bind(2, static_cast<int32_t>(pData->groupID));
+
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
+    }
+
+    cmd.reset();
+    return sizeof(*pData);
+}
+
+int32_t TraceBuilder::handleDataPacketThreadSetGroupSort(const DataPacketThreadSetGroupSort* pData)
+{
+    auto& cmd = cmdInsertThreadGroupSort;
+    cmd.bind(1, static_cast<int32_t>(pData->groupID));
+    cmd.bind(2, static_cast<int32_t>(pData->sortVal));
+
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
+    }
+
+    cmd.reset();
+    return sizeof(*pData);
 }
 
 int32_t TraceBuilder::handleDataPacketLockCount(const DataPacketLockCount* pData)

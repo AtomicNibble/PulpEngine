@@ -179,6 +179,8 @@ struct DataStreamType
         Zone,
         TickInfo,
         ThreadSetName,
+        ThreadSetGroup,
+        ThreadSetGroupSort,
         CallStack,
         LockSetName,
         LockTry,
@@ -256,6 +258,22 @@ struct DataPacketThreadSetName : public DataPacketBaseArgData
     TtthreadId threadID;
     // 2
     tt_uint16 strIdxFmt;
+};
+
+struct DataPacketThreadSetGroup : public DataPacketBase
+{
+    // 4
+    TtthreadId threadID;
+    // 4
+    tt_int32 groupID;
+};
+
+struct DataPacketThreadSetGroupSort : public DataPacketBase
+{
+    // 4
+    tt_int32 groupID;
+    // 4
+    tt_int32 sortVal;
 };
 
 struct DataPacketCallStack : public DataPacketBase

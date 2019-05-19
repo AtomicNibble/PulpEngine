@@ -80,6 +80,7 @@ using FileCloseFunc = void(*)(void* pUserData, TtFileHandle);
 using FileWriteFunc = tt_int32(*)(void* pUserData, TtFileHandle, const void*, tt_int32);
 
 inline TtFileHandle TELEM_INVALID_HANDLE = 0;
+inline tt_int32 TELEM_INTERNAL_THREAD_GROUP_ID = -1;
 
 
 using LogFunction = void(*)(void* pUserData, TtLogType::Enum type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm);
@@ -197,6 +198,8 @@ extern "C"
 
     // Thread
     __TELEM_API_VOID(TelemSetThreadName, TraceContexHandle ctx, tt_uint32 threadID, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemSetThreadGroup, TraceContexHandle ctx, tt_uint32 threadID, tt_int32 groupID);
+    __TELEM_API_VOID(TelemSetThreadGroupDefaultSort, TraceContexHandle ctx, tt_int32 groupID, tt_int32 sortVal);
 
     // Callstack
     __TELEM_API_INT(TelemGetCallStack, TraceContexHandle ctx, TtCallStack& stackOut);
@@ -290,6 +293,8 @@ namespace telem
             __TELEM_RESOLVE(TelemSetFlag);
             __TELEM_RESOLVE(TelemGetStatI);
             __TELEM_RESOLVE(TelemSetThreadName);
+            __TELEM_RESOLVE(TelemSetThreadGroup);
+            __TELEM_RESOLVE(TelemSetThreadGroupDefaultSort);
             __TELEM_RESOLVE(TelemGetCallStack);
             __TELEM_RESOLVE(TelemSendCallStack);
             __TELEM_RESOLVE(TelemSendCallStackSkip);
@@ -335,6 +340,8 @@ namespace telem
             __TELEM_SET_BLANK(TelemSetFlag);
             __TELEM_SET_BLANK(TelemGetStatI);
             __TELEM_SET_BLANK(TelemSetThreadName);
+            __TELEM_SET_BLANK(TelemSetThreadGroup);
+            __TELEM_SET_BLANK(TelemSetThreadGroupDefaultSort);
             __TELEM_SET_BLANK(TelemGetCallStack);
             __TELEM_SET_BLANK(TelemSendCallStack);
             __TELEM_SET_BLANK(TelemSendCallStackSkip);
@@ -386,6 +393,8 @@ namespace telem
         __TELEM_FUNC_PTR(TelemSetFlag);
         __TELEM_FUNC_PTR(TelemGetStatI);
         __TELEM_FUNC_PTR(TelemSetThreadName);
+        __TELEM_FUNC_PTR(TelemSetThreadGroup);
+        __TELEM_FUNC_PTR(TelemSetThreadGroupDefaultSort);
         __TELEM_FUNC_PTR(TelemGetCallStack);
         __TELEM_FUNC_PTR(TelemSendCallStack);
         __TELEM_FUNC_PTR(TelemSendCallStackSkip);
@@ -521,6 +530,8 @@ namespace telem
 
 // Thread
 #define ttSetThreadName(ctx, threadID, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetThreadName)(ctx, threadID, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttSetThreadGroup(ctx, threadID, groupID) __TELEM_FUNC_NAME(TelemSetThreadGroup)(ctx, threadID, groupID)
+#define ttSetThreadGroupDefaultSort(ctx, groupID, idx) __TELEM_FUNC_NAME(TelemSetThreadGroupDefaultSort)(ctx, groupID, idx)
 
 #define ttGetCallStack(ctx, stackOut) __TELEM_FUNC_NAME(TelemGetCallStack)(ctx, stackOut)
 #define ttSendCallStack(ctx, pStack) __TELEM_FUNC_NAME(TelemSendCallStack)(ctx, pStack)
@@ -594,7 +605,9 @@ namespace telem
 #define ttGetStati(...)
 
 // Thread
-#define ttSetThreadName(...);
+#define ttSetThreadName(...)
+#define ttSetThreadGroup(...)
+#define ttSetThreadGroupDefaultSort(...)
 
 #define ttGetCallStack(...)
 #define ttSendCallStack(...)

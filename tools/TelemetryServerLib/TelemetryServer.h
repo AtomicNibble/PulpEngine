@@ -182,6 +182,8 @@ public:
         cmdInsertLockTry(con),
         cmdInsertLockState(con),
         cmdInsertThreadName(con),
+        cmdInsertThreadGroup(con),
+        cmdInsertThreadGroupSort(con),
         cmdInsertLockName(con),
         cmdInsertMeta(con),
         cmdInsertMemAlloc(con),
@@ -212,6 +214,8 @@ public:
     int32_t handleDataPacketLockState(const DataPacketLockState* pData);
     int32_t handleDataPacketLockSetName(const DataPacketLockSetName* pData);
     int32_t handleDataPacketThreadSetName(const DataPacketThreadSetName* pData);
+    int32_t handleDataPacketThreadSetGroup(const DataPacketThreadSetGroup* pData);
+    int32_t handleDataPacketThreadSetGroupSort(const DataPacketThreadSetGroupSort* pData);
     int32_t handleDataPacketLockCount(const DataPacketLockCount* pData);
     int32_t handleDataPacketMemAlloc(const DataPacketMemAlloc* pData);
     int32_t handleDataPacketMemFree(const DataPacketMemFree* pData);
@@ -241,6 +245,8 @@ private:
     sql::SqlLiteCmd cmdInsertLockTry;
     sql::SqlLiteCmd cmdInsertLockState;
     sql::SqlLiteCmd cmdInsertThreadName;
+    sql::SqlLiteCmd cmdInsertThreadGroup;
+    sql::SqlLiteCmd cmdInsertThreadGroupSort;
     sql::SqlLiteCmd cmdInsertLockName;
     sql::SqlLiteCmd cmdInsertMeta;
     sql::SqlLiteCmd cmdInsertMemAlloc;
