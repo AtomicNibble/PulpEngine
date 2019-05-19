@@ -39,6 +39,7 @@ void* MallocFreeAllocator::allocate(size_t Origsize, size_t alignment, size_t of
     ttEnterEx(gEnv->ctx, matchId, 1000, "(Memory) Alloc");
 
     void* pMem = malloc(size);
+    ttAlloc(gEnv->ctx, pMem, size, "Malloc");
 
     ttLeaveEx(gEnv->ctx, matchId);
 
@@ -110,6 +111,9 @@ void MallocFreeAllocator::free(void* ptr)
     statistics_.internalOverhead_ -= SIZE_OF_HEADER;
     statistics_.wasteAlignment_ -= AlignmentWaste;
 #endif
+
+    // must read adddress before we free, or make a copy.
+    ttFree(gEnv->ctx, as_header->originalAllocation_);
 
     ::free(as_header->originalAllocation_);
 }
