@@ -4036,7 +4036,7 @@ void TelemFree(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr
         return;
     }
 
-    alignas(64) QueueDataMemFree data;
+    QueueDataMemFree data;
     data.type = QueueDataType::MemFree;
     data.time = getRelativeTicks(pCtx);
     data.pPtr = pPtr;
