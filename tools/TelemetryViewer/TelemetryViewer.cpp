@@ -3398,12 +3398,20 @@ bool connectToServer(Client& client)
     }
 
     // how big?
-    tt_int32 sock_opt = 1024 * 16;
+    int32_t sock_opt = 1024 * 16;
     res = platform::setsockopt(connectSocket, SOL_SOCKET, SO_SNDBUF, (char*)&sock_opt, sizeof(sock_opt));
     if (res != 0) {
         lastErrorWSA::Description Dsc;
         X_ERROR("Telem", "Failed to set sndbuf on socket. Error: %s", lastErrorWSA::ToString(Dsc));
         return false;
+    }
+
+    // Set a big recive buffer.
+    sock_opt = 1024 * 256;
+    res = platform::setsockopt(connectSocket, SOL_SOCKET, SO_RCVBUF, (char*)&sock_opt, sizeof(sock_opt));
+    if (res != 0) {
+        lastErrorWSA::Description Dsc;
+        X_ERROR("TelemSrv", "Failed to set rcvbuf on socket. Error: %s", lastErrorWSA::ToString(Dsc));
     }
 
     ConnectionRequestViewerHdr cr;
