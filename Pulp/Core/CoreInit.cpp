@@ -417,6 +417,10 @@ bool XCore::Init(CoreInitParams& startupParams)
         ttSetThreadName(gEnv->ctx, 0, "Main");
         ttSetThreadGroup(gEnv->ctx, 0, 0);
 
+        ttSetThreadGroupName(gEnv->ctx, 0, "Main");
+        ttSetThreadGroupName(gEnv->ctx, 1, "Workers");
+        ttSetThreadGroupName(gEnv->ctx, 2, "IO");
+
         ttSetThreadGroupDefaultSort(gEnv->ctx, TELEM_INTERNAL_THREAD_GROUP_ID, 0);
         ttSetThreadGroupDefaultSort(gEnv->ctx, 0, 1);
         ttSetThreadGroupDefaultSort(gEnv->ctx, 1, 2);
