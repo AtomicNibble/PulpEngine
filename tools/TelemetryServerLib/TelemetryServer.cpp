@@ -2844,7 +2844,7 @@ int32_t TraceBuilder::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
     info.raw.depth = 0;
 
     auto& cmd = cmdInsertMemAlloc;
-    cmd.bind(1, static_cast<int32_t>(pData->ptr));
+    cmd.bind(1, static_cast<int64_t>(pData->ptr));
     cmd.bind(2, static_cast<int32_t>(pData->size));
     cmd.bind(3, static_cast<int32_t>(pData->threadID));
     cmd.bind(4, static_cast<int64_t>(pData->time));
@@ -2869,7 +2869,7 @@ int32_t TraceBuilder::handleDataPacketMemFree(const DataPacketMemFree* pData)
     info.raw.depth = 0;
 
     auto& cmd = cmdInsertMemFree;
-    cmd.bind(1, static_cast<int32_t>(pData->ptr));
+    cmd.bind(1, static_cast<int64_t>(pData->ptr));
     cmd.bind(2, static_cast<int32_t>(pData->threadID));
     cmd.bind(3, static_cast<int64_t>(pData->time));
     cmd.bind(4, static_cast<int64_t>(info.packed));
