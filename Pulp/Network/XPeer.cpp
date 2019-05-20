@@ -2688,6 +2688,9 @@ core::Thread::ReturnValue XPeer::socketRecvThreadProc(const core::Thread& thread
 
     RecvData* pData = allocRecvData();
 
+    ttSetThreadName(gEnv->ctx, 0, "Socket Worker");
+    ttSetThreadGroup(gEnv->ctx, 0, 2);
+
     while (thread.shouldRun()) {
         auto res = pSocket->recv(*pData);
 
