@@ -208,6 +208,7 @@ extern "C"
     // Thread
     __TELEM_API_VOID(TelemSetThreadName, TraceContexHandle ctx, tt_uint32 threadID, const char* pFmtString, tt_int32 numArgs, ...);
     __TELEM_API_VOID(TelemSetThreadGroup, TraceContexHandle ctx, tt_uint32 threadID, tt_int32 groupID);
+    __TELEM_API_VOID(TelemSetThreadGroupName, TraceContexHandle ctx, tt_int32 groupID, const char* pFmtString, tt_int32 numArgs, ...);
     __TELEM_API_VOID(TelemSetThreadGroupDefaultSort, TraceContexHandle ctx, tt_int32 groupID, tt_int32 sortVal);
 
     // Callstack
@@ -305,6 +306,7 @@ namespace telem
             __TELEM_RESOLVE(TelemFastTimeToMs);
             __TELEM_RESOLVE(TelemSetThreadName);
             __TELEM_RESOLVE(TelemSetThreadGroup);
+            __TELEM_RESOLVE(TelemSetThreadGroupName);
             __TELEM_RESOLVE(TelemSetThreadGroupDefaultSort);
             __TELEM_RESOLVE(TelemGetCallStack);
             __TELEM_RESOLVE(TelemSendCallStack);
@@ -354,6 +356,7 @@ namespace telem
             __TELEM_SET_BLANK(TelemFastTimeToMs);
             __TELEM_SET_BLANK(TelemSetThreadName);
             __TELEM_SET_BLANK(TelemSetThreadGroup);
+            __TELEM_SET_BLANK(TelemSetThreadGroupName);
             __TELEM_SET_BLANK(TelemSetThreadGroupDefaultSort);
             __TELEM_SET_BLANK(TelemGetCallStack);
             __TELEM_SET_BLANK(TelemSendCallStack);
@@ -409,6 +412,7 @@ namespace telem
         __TELEM_FUNC_PTR(TelemFastTimeToMs);
         __TELEM_FUNC_PTR(TelemSetThreadName);
         __TELEM_FUNC_PTR(TelemSetThreadGroup);
+        __TELEM_FUNC_PTR(TelemSetThreadGroupName);
         __TELEM_FUNC_PTR(TelemSetThreadGroupDefaultSort);
         __TELEM_FUNC_PTR(TelemGetCallStack);
         __TELEM_FUNC_PTR(TelemSendCallStack);
@@ -549,6 +553,7 @@ namespace telem
 // Thread
 #define ttSetThreadName(ctx, threadID, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetThreadName)(ctx, threadID, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ttSetThreadGroup(ctx, threadID, groupID) __TELEM_FUNC_NAME(TelemSetThreadGroup)(ctx, threadID, groupID)
+#define ttSetThreadGroupName(ctx, groupID, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetThreadGroupName)(ctx, groupID, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ttSetThreadGroupDefaultSort(ctx, groupID, idx) __TELEM_FUNC_NAME(TelemSetThreadGroupDefaultSort)(ctx, groupID, idx)
 
 #define ttGetCallStack(ctx, stackOut) __TELEM_FUNC_NAME(TelemGetCallStack)(ctx, stackOut)
@@ -625,6 +630,7 @@ namespace telem
 // Thread
 #define ttSetThreadName(...)
 #define ttSetThreadGroup(...)
+#define ttSetThreadGroupName(...)
 #define ttSetThreadGroupDefaultSort(...)
 
 #define ttGetCallStack(...)

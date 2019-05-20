@@ -115,6 +115,9 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
             case PacketType::ReqTraceThreadNames:
                 res = handleReqTraceThreadNames(pData);
                 break;
+            case PacketType::ReqTraceThreadGroupNames:
+                res = handleReqTraceThreadGroupNames(pData);
+                break;
             case PacketType::ReqTraceThreadGroups:
                 res = handleReqTraceThreadGroups(pData);
                 break;
@@ -396,6 +399,11 @@ void ClientConnection::processDataStream(uint8_t* pData, int32_t len)
             case DataStreamType::ThreadSetGroup:
             {
                 i += strm.handleDataPacketThreadSetGroup(reinterpret_cast<const DataPacketThreadSetGroup*>(&pData[i]));
+                break;
+            }
+            case DataStreamType::ThreadSetGroupName:
+            {
+                i += strm.handleDataPacketThreadSetGroupName(reinterpret_cast<const DataPacketThreadSetGroupName*>(&pData[i]));
                 break;
             }
             case DataStreamType::ThreadSetGroupSort:
@@ -1499,6 +1507,62 @@ bool ClientConnection::handleReqTraceThreadGroups(uint8_t* pData)
     return true;
 }
 
+bool ClientConnection::handleReqTraceThreadGroupNames(uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const ReqTraceThreadGroupNames*>(pData);
+    if (pHdr->type != PacketType::ReqTraceThreadGroupNames) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    int32_t handle = pHdr->handle;
+    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
+        return false;
+    }
+
+    auto& ts = tracesStreams_[pHdr->handle];
+
+    auto* pNamesHdr = addToCompressionBufferT<ReqTraceThreadGroupNamesResp>();
+    core::zero_this(pNamesHdr);
+    pNamesHdr->type = DataStreamTypeViewer::TraceThreadGroupNames;
+    pNamesHdr->handle = pHdr->handle;
+
+    int32_t num = 0;
+
+    sql::SqlLiteQuery qry(ts.con, "SELECT groupId, strIdx FROM threadGroupNames");
+
+    auto it = qry.begin();
+    for (; it != qry.end(); ++it) {
+        auto row = *it;
+
+        TraceThreadGroupNameData tgnd;
+        tgnd.groupId = row.get<int32_t>(0);
+        tgnd.strIdx = safe_static_cast<uint16_t>(row.get<int32_t>(1));
+
+        if (getCompressionBufferSpace() < sizeof(tgnd)) {
+            pNamesHdr->num = num;
+            num = 0;
+
+            flushCompressionBuffer();
+
+            pNamesHdr = addToCompressionBufferT<ReqTraceThreadGroupNamesResp>();
+            core::zero_this(pNamesHdr);
+            pNamesHdr->type = DataStreamTypeViewer::TraceThreadNames;
+            pNamesHdr->handle = pHdr->handle;
+        }
+
+        addToCompressionBuffer(&tgnd, sizeof(tgnd));
+
+        num++;
+    }
+
+    if (num) {
+        pNamesHdr->num = num;
+        flushCompressionBuffer();
+    }
+
+    return true;
+}
+
 bool ClientConnection::handleReqTraceLockNames(uint8_t* pData)
 {
     auto* pHdr = reinterpret_cast<const ReqTraceLockNames*>(pData);
@@ -2217,6 +2281,7 @@ bool TraceBuilder::createDB(core::Path<char>& path)
     okay &= (sql::Result::OK == cmdInsertLockName.prepare("INSERT INTO lockNames (lockId, timeTicks, strIdx) VALUES(?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertThreadName.prepare("INSERT INTO threadNames (threadId, timeTicks, strIdx) VALUES(?,?,?)"));
     okay &= (sql::Result::OK == cmdInsertThreadGroup.prepare("INSERT INTO threadGroups (threadId, groupId) VALUES(?,?)"));
+    okay &= (sql::Result::OK == cmdInsertThreadGroupName.prepare("INSERT INTO threadGroupNames (groupId, strIdx) VALUES(?,?)"));
     okay &= (sql::Result::OK == cmdInsertThreadGroupSort.prepare("INSERT INTO threadGroupSort (groupId, sortVal) VALUES(?,?)"));
     okay &= (sql::Result::OK == cmdInsertMeta.prepare("INSERT INTO meta (name, value) VALUES(?,?)"));
     okay &= (sql::Result::OK == cmdInsertMemAlloc.prepare("INSERT INTO memoryAlloc (allocId, size, threadId, timeTicks, packedSourceInfo, strIdx) VALUES(?,?,?,?,?,?)"));
@@ -2311,6 +2376,13 @@ CREATE TABLE IF NOT EXISTS "threadGroups" (
     "Id"                INTEGER,
     "threadId"          INTEGER NOT NULL,
     "groupId"           INTEGER NOT NULL,
+    PRIMARY KEY("Id")
+);
+
+CREATE TABLE IF NOT EXISTS "threadGroupNames" (
+    "Id"                INTEGER,
+    "groupId"           INTEGER NOT NULL,
+    "strIdx"            INTEGER NOT NULL,
     PRIMARY KEY("Id")
 );
 
@@ -2799,6 +2871,24 @@ int32_t TraceBuilder::handleDataPacketThreadSetGroup(const DataPacketThreadSetGr
     auto& cmd = cmdInsertThreadGroup;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
     cmd.bind(2, static_cast<int32_t>(pData->groupID));
+
+    auto res = cmd.execute();
+    if (res != sql::Result::OK) {
+        X_ERROR("TelemSrv", "insert err(%i): \"%s\"", res, con.errorMsg());
+    }
+
+    cmd.reset();
+    return sizeof(*pData);
+}
+
+int32_t TraceBuilder::handleDataPacketThreadSetGroupName(const DataPacketThreadSetGroupName* pData)
+{
+    StringBuf strBuf;
+    int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxFmt);
+
+    auto& cmd = cmdInsertThreadGroupName;
+    cmd.bind(1, static_cast<int32_t>(pData->groupID));
+    cmd.bind(2, static_cast<int32_t>(strIdx));
 
     auto res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -3311,6 +3401,9 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
 
         if (bytesTransferred == 0) {
             X_ERROR("TelemSrv", "GetQueuedCompletionStatus returned zero bytes");
+            if (pClientCon) {
+                closeClient(pClientCon);
+            }
             continue;
         }
 

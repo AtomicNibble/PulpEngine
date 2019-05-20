@@ -183,6 +183,7 @@ public:
         cmdInsertLockState(con),
         cmdInsertThreadName(con),
         cmdInsertThreadGroup(con),
+        cmdInsertThreadGroupName(con),
         cmdInsertThreadGroupSort(con),
         cmdInsertLockName(con),
         cmdInsertMeta(con),
@@ -215,6 +216,7 @@ public:
     int32_t handleDataPacketLockSetName(const DataPacketLockSetName* pData);
     int32_t handleDataPacketThreadSetName(const DataPacketThreadSetName* pData);
     int32_t handleDataPacketThreadSetGroup(const DataPacketThreadSetGroup* pData);
+    int32_t handleDataPacketThreadSetGroupName(const DataPacketThreadSetGroupName* pData);
     int32_t handleDataPacketThreadSetGroupSort(const DataPacketThreadSetGroupSort* pData);
     int32_t handleDataPacketLockCount(const DataPacketLockCount* pData);
     int32_t handleDataPacketMemAlloc(const DataPacketMemAlloc* pData);
@@ -246,6 +248,7 @@ private:
     sql::SqlLiteCmd cmdInsertLockState;
     sql::SqlLiteCmd cmdInsertThreadName;
     sql::SqlLiteCmd cmdInsertThreadGroup;
+    sql::SqlLiteCmd cmdInsertThreadGroupName;
     sql::SqlLiteCmd cmdInsertThreadGroupSort;
     sql::SqlLiteCmd cmdInsertLockName;
     sql::SqlLiteCmd cmdInsertMeta;
@@ -414,6 +417,7 @@ public:
     bool handleReqTraceLocks(uint8_t* pData);
     bool handleReqTraceStrings(uint8_t* pData);
     bool handleReqTraceThreadNames(uint8_t* pData);
+    bool handleReqTraceThreadGroupNames(uint8_t* pData);
     bool handleReqTraceThreadGroups(uint8_t* pData);
     bool handleReqTraceLockNames(uint8_t* pData);
     bool handleReqTraceZoneTree(uint8_t* pData);

@@ -31,6 +31,7 @@ struct PacketType
         ReqTraceLocks,
         ReqTraceStrings,
         ReqTraceThreadNames,
+        ReqTraceThreadGroupNames,
         ReqTraceThreadGroups,
         ReqTraceLockNames,
         ReqTraceZoneTree,
@@ -181,6 +182,7 @@ struct DataStreamType
         TickInfo,
         ThreadSetName,
         ThreadSetGroup,
+        ThreadSetGroupName,
         ThreadSetGroupSort,
         CallStack,
         LockSetName,
@@ -267,6 +269,14 @@ struct DataPacketThreadSetGroup : public DataPacketBase
     TtthreadId threadID;
     // 4
     tt_int32 groupID;
+};
+
+struct DataPacketThreadSetGroupName : public DataPacketBaseArgData
+{
+    // 4
+    tt_int32 groupID;
+    // 2
+    tt_uint16 strIdxFmt;
 };
 
 struct DataPacketThreadSetGroupSort : public DataPacketBase

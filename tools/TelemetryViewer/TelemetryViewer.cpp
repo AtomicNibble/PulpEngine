@@ -2874,13 +2874,44 @@ bool handleTraceThreadNames(Client& client, const DataPacketBaseViewer* pBase)
 
     auto& view = *pView;
     auto& strings = view.strings;
+    auto& threadNames = strings.threadNames;
 
-    strings.threadNames.reserve(strings.threadNames.size() + pHdr->num);
+    threadNames.reserve(threadNames.size() + pHdr->num);
 
     auto* pData = reinterpret_cast<const TraceThreadNameData*>(pHdr + 1);
     for (int32_t i = 0; i < pHdr->num; i++)
     {
-        strings.threadNames.append(pData[i]);
+        threadNames.append(pData[i]);
+    }
+
+    return true;
+}
+
+bool handleTraceThreadGroupNames(Client& client, const DataPacketBaseViewer* pBase)
+{
+    auto* pHdr = static_cast<const ReqTraceThreadGroupNamesResp*>(pBase);
+    if (pHdr->type != DataStreamTypeViewer::TraceThreadGroupNames) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    // shake it.
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+
+    TraceView* pView = client.viewForHandle(pHdr->handle);
+    if (!pView) {
+        return false;
+    }
+
+    auto& view = *pView;
+    auto& strings = view.strings;
+    auto& threadGroupNames = strings.threadGroupNames;
+
+    threadGroupNames.reserve(threadGroupNames.size() + pHdr->num);
+
+    auto* pData = reinterpret_cast<const TraceThreadGroupNameData*>(pHdr + 1);
+    for (int32_t i = 0; i < pHdr->num; i++)
+    {
+        threadGroupNames.append(pData[i]);
     }
 
     return true;
@@ -3046,6 +3077,8 @@ bool handleDataSream(Client& client, uint8_t* pData)
                 return handleTraceStrings(client, pPacket);
             case DataStreamTypeViewer::TraceThreadNames:
                 return handleTraceThreadNames(client, pPacket);
+            case DataStreamTypeViewer::TraceThreadGroupNames:
+                return handleTraceThreadGroupNames(client, pPacket);
             case DataStreamTypeViewer::TraceThreadGroups:
                 return handleTraceThreadGroups(client, pPacket);
             case DataStreamTypeViewer::TraceLockNames:
@@ -3188,9 +3221,15 @@ bool handleOpenTraceResp(Client& client, uint8_t* pData)
 
     ReqTraceThreadGroups rtg;
     rtg.type = PacketType::ReqTraceThreadGroups;
-    rtg.dataSize = sizeof(rttn);
+    rtg.dataSize = sizeof(rtg);
     rtg.handle = pHdr->handle;
     client.sendDataToServer(&rtg, sizeof(rtg));
+
+    ReqTraceThreadGroupNames rthn;
+    rthn.type = PacketType::ReqTraceThreadGroupNames;
+    rthn.dataSize = sizeof(rthn);
+    rthn.handle = pHdr->handle;
+    client.sendDataToServer(&rthn, sizeof(rthn));
 
     ReqTraceLockNames rtln;
     rtln.type = PacketType::ReqTraceLockNames;

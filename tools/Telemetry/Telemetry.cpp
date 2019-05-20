@@ -1619,6 +1619,7 @@ namespace
         TickInfo,
         ThreadSetName,
         ThreadSetGroup,
+        ThreadSetGroupName,
         ThreadSetGroupSort,
         CallStack,
         LockSetName,
@@ -1662,6 +1663,14 @@ namespace
     {
         TtthreadId threadID;
         tt_int32 groupID;
+    };
+
+    struct QueueDataThreadSetGroupName : public QueueDataBase
+    {
+        tt_int32 groupID;
+        const char* pFmtStr;
+
+        ArgData argData;
     };
 
     struct QueueDataThreadSetGroupSort : public QueueDataBase
@@ -1799,6 +1808,7 @@ namespace
 
     static_assert(64 == GetSizeWithoutArgData<QueueDataThreadSetName>());
     static_assert(12 == sizeof(QueueDataThreadSetGroup));
+    static_assert(64 == GetSizeWithoutArgData<QueueDataThreadSetGroupName>());
     static_assert(12 == sizeof(QueueDataThreadSetGroupSort));
     static_assert(40 == sizeof(QueueDataTickInfo));
     static_assert(64 == GetSizeWithoutArgData<QueueDataZone>());
@@ -2181,6 +2191,24 @@ namespace
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
         return GetSizeNotArgData<std::remove_pointer_t<decltype(pBuf)>>();
+    }
+
+    tt_int32 queueProcessThreadSetGroupName(PacketCompressor* pComp, const QueueDataThreadSetGroupName* pBuf)
+    {
+        DataPacketThreadSetGroupName packet;
+        packet.type = DataStreamType::ThreadSetGroupName;
+        packet.groupID = pBuf->groupID;
+        packet.strIdxFmt = GetStringId(pComp, pBuf->pFmtStr);
+
+        const auto dataSize = GetDataSize<std::remove_pointer_t<decltype(pBuf)>>(pBuf->argDataSize);
+        flushCompressionBufferIfrequired(pComp, dataSize);
+
+        addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
+        if (pBuf->argDataSize) {
+            addToCompressionBufferNoFlush(pComp, &pBuf->argData, pBuf->argDataSize);
+        }
+
+        return dataSize;
     }
 
     tt_int32 queueProcessThreadSetGroupSort(PacketCompressor* pComp, const QueueDataThreadSetGroupSort* pBuf)
@@ -2936,6 +2964,9 @@ namespace
                     case QueueDataType::ThreadSetGroup:
                         pBuf += queueProcessThreadSetGroup(&comp, reinterpret_cast<const QueueDataThreadSetGroup*>(pBuf));
                         break;
+                    case QueueDataType::ThreadSetGroupName:
+                        pBuf += queueProcessThreadSetGroupName(&comp, reinterpret_cast<const QueueDataThreadSetGroupName*>(pBuf));
+                        break;
                     case QueueDataType::ThreadSetGroupSort:
                         pBuf += queueProcessThreadSetGroupSort(&comp, reinterpret_cast<const QueueDataThreadSetGroupSort*>(pBuf));
                         break;
@@ -3638,6 +3669,35 @@ void TelemSetThreadGroup(TraceContexHandle ctx, tt_uint32 threadID, tt_int32 gro
     data.groupID = groupID;
 
     addToTickBuffer(pCtx, &data, sizeof(data), GetSizeNotArgData<decltype(data)>());
+}
+
+void TelemSetThreadGroupName(TraceContexHandle ctx, tt_int32 groupID, const char* pFmtString, tt_int32 numArgs, ...)
+{
+    auto* pCtx = handleToContext(ctx);
+
+    QueueDataThreadSetGroupName data;
+    data.type = QueueDataType::ThreadSetGroupName;
+    data.groupID = groupID;
+    data.pFmtStr = pFmtString;
+
+    if (!numArgs)
+    {
+        constexpr auto size = GetSizeWithoutArgData<decltype(data)>();
+        data.argDataSize = 0;
+        addToTickBuffer(pCtx, &data, size);
+    }
+    else
+    {
+        va_list l;
+        va_start(l, numArgs);
+
+        auto argDataSize = BuildArgData(data.argData, pFmtString, numArgs, l);
+        data.argDataSize = static_cast<tt_int8>(argDataSize & 0xFF);
+
+        va_end(l);
+
+        addToTickBuffer(pCtx, &data, GetDataSize<decltype(data)>(argDataSize));
+    }
 }
 
 void TelemSetThreadGroupDefaultSort(TraceContexHandle ctx, tt_int32 groupID, tt_int32 idx)
