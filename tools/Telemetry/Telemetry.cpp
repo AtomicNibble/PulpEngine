@@ -4116,6 +4116,9 @@ void TelemFree(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr
 
     QueueDataMemFree data;
     data.type = QueueDataType::MemFree;
+#if X_DEBUG
+    data.argDataSize = 0;
+#endif // !TELEM_DEBUG
     data.time = getRelativeTicks(pCtx);
     data.pPtr = pPtr;
     data.threadID = getThreadID();
