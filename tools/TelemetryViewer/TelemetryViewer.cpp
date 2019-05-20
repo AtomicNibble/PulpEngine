@@ -2886,6 +2886,34 @@ bool handleTraceThreadNames(Client& client, const DataPacketBaseViewer* pBase)
     return true;
 }
 
+bool handleTraceThreadGroups(Client& client, const DataPacketBaseViewer* pBase)
+{
+    auto* pHdr = static_cast<const ReqTraceThreadGroupsResp*>(pBase);
+    if (pHdr->type != DataStreamTypeViewer::TraceThreadGroups) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+
+    TraceView* pView = client.viewForHandle(pHdr->handle);
+    if (!pView) {
+        return false;
+    }
+
+    auto& view = *pView;
+    auto& threadGroups = view.threadGroups;
+
+    threadGroups.reserve(threadGroups.size() + pHdr->num);
+
+    auto* pData = reinterpret_cast<const TraceThreadGroupData*>(pHdr + 1);
+    for (int32_t i = 0; i < pHdr->num; i++)
+    {
+        threadGroups.append(pData[i]);
+    }
+
+    return true;
+}
+
 bool handleTraceLockNames(Client& client, const DataPacketBaseViewer* pBase)
 {
     auto* pHdr = static_cast<const ReqTraceLockNamesResp*>(pBase);
@@ -3018,6 +3046,8 @@ bool handleDataSream(Client& client, uint8_t* pData)
                 return handleTraceStrings(client, pPacket);
             case DataStreamTypeViewer::TraceThreadNames:
                 return handleTraceThreadNames(client, pPacket);
+            case DataStreamTypeViewer::TraceThreadGroups:
+                return handleTraceThreadGroups(client, pPacket);
             case DataStreamTypeViewer::TraceLockNames:
                 return handleTraceLockNames(client, pPacket);
             case DataStreamTypeViewer::TraceZoneTree:
@@ -3155,6 +3185,12 @@ bool handleOpenTraceResp(Client& client, uint8_t* pData)
     rttn.dataSize = sizeof(rttn);
     rttn.handle = pHdr->handle;
     client.sendDataToServer(&rttn, sizeof(rttn));
+
+    ReqTraceThreadGroups rtg;
+    rtg.type = PacketType::ReqTraceThreadGroups;
+    rtg.dataSize = sizeof(rttn);
+    rtg.handle = pHdr->handle;
+    client.sendDataToServer(&rtg, sizeof(rtg));
 
     ReqTraceLockNames rtln;
     rtln.type = PacketType::ReqTraceLockNames;

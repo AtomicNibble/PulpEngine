@@ -115,6 +115,9 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
             case PacketType::ReqTraceThreadNames:
                 res = handleReqTraceThreadNames(pData);
                 break;
+            case PacketType::ReqTraceThreadGroups:
+                res = handleReqTraceThreadGroups(pData);
+                break;
             case PacketType::ReqTraceLockNames:
                 res = handleReqTraceLockNames(pData);
                 break;
@@ -1407,6 +1410,89 @@ bool ClientConnection::handleReqTraceThreadNames(uint8_t* pData)
 
     if (num) {
         pNamesHdr->num = num;
+        flushCompressionBuffer();
+    }
+
+    return true;
+}
+
+bool ClientConnection::handleReqTraceThreadGroups(uint8_t* pData)
+{
+    auto* pHdr = reinterpret_cast<const ReqTraceThreadGroups*>(pData);
+    if (pHdr->type != PacketType::ReqTraceThreadGroups) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    int32_t handle = pHdr->handle;
+    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
+        return false;
+    }
+
+    auto& ts = tracesStreams_[pHdr->handle];
+
+    // Should not be very many so build up the data.
+    core::Array<TraceThreadGroupData> groupData(g_TelemSrvLibArena);
+
+    {
+        sql::SqlLiteQuery qry(ts.con, "SELECT threadId, groupId FROM threadGroups");
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            TraceThreadGroupData data;
+            data.threadId = static_cast<uint32_t>(row.get<int32_t>(0));
+            data.groupId = row.get<int32_t>(1);
+            data.sortVal = data.groupId;
+            groupData.append(data);
+        }
+    }
+
+    {
+        sql::SqlLiteQuery qry(ts.con, "SELECT groupId, sortVal FROM threadGroupSort");
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            auto groupId = row.get<int32_t>(0);
+            auto sortVal = row.get<int32_t>(1);
+
+            for (auto& gp : groupData) {
+                if (gp.groupId == groupId) {
+                    gp.sortVal = sortVal;
+                }
+            }
+        }
+    }
+
+    auto* pGroupsHdr = addToCompressionBufferT<ReqTraceThreadGroupsResp>();
+    core::zero_this(pGroupsHdr);
+    pGroupsHdr->type = DataStreamTypeViewer::TraceThreadGroups;
+    pGroupsHdr->handle = pHdr->handle;
+
+    int32_t num = 0;
+
+    for (auto& gp : groupData)
+    {
+        if (getCompressionBufferSpace() < sizeof(gp)) {
+            pGroupsHdr->num = num;
+            num = 0;
+
+            flushCompressionBuffer();
+
+            pGroupsHdr = addToCompressionBufferT<ReqTraceThreadGroupsResp>();
+            core::zero_this(pGroupsHdr);
+            pGroupsHdr->type = DataStreamTypeViewer::TraceThreadGroups;
+            pGroupsHdr->handle = pHdr->handle;
+        }
+
+        addToCompressionBuffer(&gp, sizeof(gp));
+        num++;
+    }
+
+    if (num) {
+        pGroupsHdr->num = num;
         flushCompressionBuffer();
     }
 

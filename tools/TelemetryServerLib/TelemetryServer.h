@@ -414,6 +414,7 @@ public:
     bool handleReqTraceLocks(uint8_t* pData);
     bool handleReqTraceStrings(uint8_t* pData);
     bool handleReqTraceThreadNames(uint8_t* pData);
+    bool handleReqTraceThreadGroups(uint8_t* pData);
     bool handleReqTraceLockNames(uint8_t* pData);
     bool handleReqTraceZoneTree(uint8_t* pData);
     bool handleReqTraceMessages(uint8_t* pData);

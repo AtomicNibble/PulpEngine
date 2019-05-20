@@ -301,6 +301,7 @@ struct TraceView
 {
     using ZoneSegmentArr = core::Array<ZoneSegment>;
     using TraceLockDataArr = core::Array<TraceLockData>;
+    using TraceThreadGroupDataArr = core::Array<TraceThreadGroupData>;
 
 public:
     TraceView(core::Guid guid, uint64_t ticksPerMicro, TraceStats stats, int8_t handle, core::MemoryArenaBase* arena) :
@@ -310,7 +311,8 @@ public:
         handle(handle),
         segments(arena),
         locks(arena),
-        strings(arena)
+        strings(arena),
+        threadGroups(arena)
     {
         open_ = true;
 
@@ -379,6 +381,7 @@ public:
     ZoneSegmentArr segments;
     TraceLockDataArr locks;
     TraceStrings strings;
+    TraceThreadGroupDataArr threadGroups;
 };
 
 using GuidTraceStats = std::pair<core::Guid, TraceStats>;
