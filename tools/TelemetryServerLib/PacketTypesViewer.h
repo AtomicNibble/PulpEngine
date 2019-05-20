@@ -19,6 +19,7 @@ struct DataStreamTypeViewer
         TraceStringsInfo,
         TraceStrings,
         TraceThreadNames,
+        TraceThreadGroupNames,
         TraceThreadGroups,
         TraceLocks,
         TraceLockNames,
@@ -88,6 +89,11 @@ struct ReqTraceStrings : public PacketBase
 };
 
 struct ReqTraceThreadNames : public PacketBase
+{
+    tt_int8 handle;
+};
+
+struct ReqTraceThreadGroupNames : public PacketBase
 {
     tt_int8 handle;
 };
@@ -204,6 +210,18 @@ struct TraceThreadNameData
 {
     tt_uint32 threadId;
     tt_int64  timeTicks;
+    tt_uint16 strIdx;
+};
+
+struct ReqTraceThreadGroupNamesResp : public DataPacketBaseViewer
+{
+    tt_int8 handle;
+    tt_int32 num;
+};
+
+struct TraceThreadGroupNameData
+{
+    tt_int32 groupId;
     tt_uint16 strIdx;
 };
 
