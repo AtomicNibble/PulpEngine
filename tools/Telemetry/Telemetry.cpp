@@ -3779,9 +3779,6 @@ void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const cha
     scopeData.zone.pFmtStr = pFmtString;
     scopeData.zone.sourceInfo = sourceInfo;
 
-    // for this arg data it would be nicer to be like a linera array.
-    // basically a fixed sized buffer we just offset from.
-    // can do that later tho.
     if (numArgs)
     {
         va_list l;
