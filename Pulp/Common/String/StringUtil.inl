@@ -188,10 +188,22 @@ namespace strUtil
         return Convert(input.begin(), input.end(), output, N * sizeof(wchar_t));
     }
 
+    inline const char* Convert(const wchar_t* input, char* output, size_t outputBytes)
+    {
+        size_t bytesOut;
+        return Convert(input, input + strlen(input), output, outputBytes, bytesOut);
+    }
+
     inline const char* Convert(const wchar_t* startInclusive, const wchar_t* endExclusive, char* output, size_t outputBytes)
     {
         size_t bytesOut;
         return Convert(startInclusive, endExclusive, output, outputBytes, bytesOut);
+    }
+
+    inline const wchar_t* Convert(const char* input, wchar_t* output, size_t outputBytes)
+    {
+        size_t bytesOut;
+        return Convert(input, input + strlen(input), output, outputBytes, bytesOut);
     }
 
     inline const wchar_t* Convert(const char* startInclusive, const char* endExclusive, wchar_t* output, size_t outputBytes)
