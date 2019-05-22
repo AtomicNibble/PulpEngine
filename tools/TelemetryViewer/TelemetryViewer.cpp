@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "TelemetryViewer.h"
 
+
 X_NAMESPACE_BEGIN(telemetry)
 
 using namespace core::string_view_literals;
@@ -24,6 +25,69 @@ namespace
     X_DISABLE_WARNING(4244)
 
     using StringBuf = core::StackString<64,char>;
+
+
+    int64_t GetSystemTimeAsUnixTime(void)
+    {
+        // January 1, 1970 (start of Unix epoch) in "ticks"
+        const int64_t UNIX_TIME_START = 0x019DB1DED53E8000;
+        // tick is 100ns
+        const int64_t TICKS_PER_SECOND = 10000000;
+
+        FILETIME ft;
+        GetSystemTimeAsFileTime(&ft);
+
+        LARGE_INTEGER li;
+        li.LowPart = ft.dwLowDateTime;
+        li.HighPart = ft.dwHighDateTime;
+
+        return (li.QuadPart - UNIX_TIME_START) / TICKS_PER_SECOND;
+    }
+
+
+    void unixToHumanAgeStr(StringBuf& buf, int64_t seconds)
+    {
+        // ermm some nice format.
+        if (seconds < 60) {
+            buf.setFmt("%" PRId64 "s ago", seconds);
+            return;
+        }
+
+        auto min = seconds / 60;
+
+        if (min < 60) {
+            buf.setFmt("%" PRId64 "m ago", min);
+            return;
+        }
+
+        auto hour = min / 60;
+        min %= 60;
+
+        if (hour < 24) {
+            buf.setFmt("%" PRId64 "h %" PRId64 "m ago", hour, min);
+            return;
+        }
+
+        auto days = hour / 24;
+
+        buf.setFmt("%" PRId64 " days ago", days);
+    }
+
+    const char* unixToLocalTimeStr(StringBuf& buf, int64_t seconds)
+    {
+        time_t tt = seconds;
+
+        char buff[32];
+        auto len = strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S", std::localtime(&tt));
+        if (len <= 0) {
+            buf.clear();
+        }
+        else {
+            buf.set(buff, buff + len);
+        }
+
+        return buf.c_str();
+    }
 
 
     inline void PrintTinyInt(StringBuf& buf, uint64_t v)

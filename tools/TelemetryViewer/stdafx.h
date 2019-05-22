@@ -21,6 +21,8 @@
 #include <examples/imgui_impl_opengl3.h>
 #include <examples/libs/gl3w/GL/gl3w.h>
 
+// std
+#include <ctime>
 
 X_LINK_ENGINE_LIB("TelemetryCommonLib");
 
