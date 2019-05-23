@@ -2217,6 +2217,7 @@ void DrawZones(TraceView& view)
 
 }
 
+
 void DrawFrame(Client& client, float ww, float wh)
 {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -2318,156 +2319,188 @@ void DrawFrame(Client& client, float ww, float wh)
 
                 ImGui::BeginChild("##TraceList", ImVec2(0, h - 200.f));
                 {
-                    if (client.isConnected())
+                    core::CriticalSection::ScopedLock lock(client.dataCS);
+
                     {
-                        core::CriticalSection::ScopedLock lock(client.dataCS);
-
-                        // need to be able to select one but across many.
-                        // so it should just be guid.
-                        for (const auto& app : client.apps)
+                        if (client.isConnected())
                         {
-                            if (ImGui::CollapsingHeader(app.appName.c_str()))
+                            // need to be able to select one but across many.
+                            // so it should just be guid.
+                            for (const auto& app : client.apps)
                             {
-                                // ImGui::Text(app.appName.c_str());
-                                // ImGui::Text("Num %" PRIuS, app.traces.size());
-                                ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor(0.2f, 0.2f, 0.2f));
-
-                                for (int32_t i = 0; i < static_cast<int32_t>(app.traces.size()); i++)
+                                if (ImGui::CollapsingHeader(app.appName.c_str()))
                                 {
-                                    const auto& trace = app.traces[i % app.traces.size()];
+                                    // ImGui::Text(app.appName.c_str());
+                                    // ImGui::Text("Num %" PRIuS, app.traces.size());
+                                    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor(0.2f, 0.2f, 0.2f));
 
-                                    // want to build a string like:
-                                    // hostname - 6 min ago
-                                    // auto timeNow = core::DateTimeStamp::getSystemDateTime();
-                                    ImGui::PushID(i);
-
-                                    core::StackString256 label(trace.hostName.begin(), trace.hostName.end());
-                                    label.appendFmt(" - %" PRId32, i);
-
-                                    if (ImGui::Selectable(label.c_str(), trace.guid == selectGuid))
+                                    for (int32_t i = 0; i < static_cast<int32_t>(app.traces.size()); i++)
                                     {
-                                        selectGuid = trace.guid;
+                                        const auto& trace = app.traces[i % app.traces.size()];
 
-                                        // need to dispatch a request to get the stats.
-                                        QueryTraceInfo qti;
-                                        qti.dataSize = sizeof(qti);
-                                        qti.type = PacketType::QueryTraceInfo;
-                                        qti.guid = trace.guid;
-                                        client.sendDataToServer(&qti, sizeof(qti));
+                                        // want to build a string like:
+                                        // hostname - 6 min ago
+                                        // auto timeNow = core::DateTimeStamp::getSystemDateTime();
+                                        ImGui::PushID(i);
+
+                                        auto secondsSinceTraceStart = GetSystemTimeAsUnixTime() - trace.unixTimestamp;
+
+                                        StringBuf ageStr;
+                                        unixToHumanAgeStr(ageStr, secondsSinceTraceStart);
+
+                                        core::StackString256 label(trace.hostName.begin(), trace.hostName.end());
+                                        label.appendFmt(" - [%s]", ageStr.c_str());
+
+                                        if (ImGui::Selectable(label.c_str(), trace.guid == selectGuid))
+                                        {
+                                            selectGuid = trace.guid;
+
+                                            // need to dispatch a request to get the stats.
+                                            QueryTraceInfo qti;
+                                            qti.dataSize = sizeof(qti);
+                                            qti.type = PacketType::QueryTraceInfo;
+                                            qti.guid = trace.guid;
+                                            client.sendDataToServer(&qti, sizeof(qti));
+                                        }
+
+                                        ImGui::PopID();
                                     }
 
-                                    ImGui::PopID();
+                                    ImGui::PopStyleColor(1);
                                 }
-
-                                ImGui::PopStyleColor(1);
                             }
-                        }
-                    }
-                    else
-                    {
-                        // show some connect button.
-                        ImGui::Separator();
-                        ImGui::TextUnformatted("Connect to server");
-
-                        const bool connecting = client.conState == Client::ConnectionState::Connecting;
-
-                        if (connecting)
-                        {
-                            ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-                            ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-                        }
-
-                        static char addr[256] = { "127.0.0.1" };
-                        bool connectClicked = false;
-                        connectClicked |= ImGui::InputText("", addr, sizeof(addr), ImGuiInputTextFlags_EnterReturnsTrue);
-                        connectClicked |= ImGui::Button("Connect");
-
-                        if (connecting)
-                        {
-                            ImGui::PopItemFlag();
-                            ImGui::PopStyleVar();
-                        }
-                        else if (connectClicked && *addr)
-                        {
-                            client.addr.set(addr);
-
-                            // how to know connecting?
-                            client.connectSignal.raise();
-                        }
-                    }
-
-                }
-                ImGui::EndChild();
-
-                // stats.
-                {
-                    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.15f, 0.15f, 0.15f, 1.f));
-                   // ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0,0));
-                    //ImGui::SetNextWindowPos(ImVec2(0, 0));
-                  //  ImGui::SetNextWindowSize(ImVec2(-1, 100));
-
-
-                    ImGui::BeginChild("##TraceInfo", ImVec2(-1, -1), true);
-
-                    if (selectGuid.isValid())
-                    {
-                        // need stats for this trace.
-                        core::CriticalSection::ScopedLock lock(client.dataCS);
-
-                        auto& ts = client.traceStats;
-                        auto it = std::find_if(ts.begin(), ts.end(), [](const GuidTraceStats& lhs) {
-                            return selectGuid == lhs.first;
-                        });
-
-                        if (it != ts.end())
-                        {
-                            auto& stats = it->second;
-
-                            core::HumanDuration::Str durStr0;
-                            HumanNumber::Str numStr;
-
-                            ImGui::Text("Duration: %s", core::HumanDuration::toStringNano(durStr0, stats.durationNano));
-                            ImGui::Text("Zones: %s", HumanNumber::toString(numStr, stats.numZones));
-                            ImGui::SameLine();
-                            if (ImGui::Button("Open"))
-                            {
-                                // TODO: check if exsists  then open / focus.
-                                OpenTrace ot;
-                                ot.dataSize = sizeof(ot);
-                                ot.type = PacketType::OpenTrace;
-                                ot.guid = it->first;
-                                client.sendDataToServer(&ot, sizeof(ot));
-                            }
-
-                            ImGui::Text("Allocations: %" PRId64, stats.numAlloc);
-                            ImGui::SameLine();
-                            if (ImGui::Button("Open"))
-                            {
-
-                            }
-
-                            ImGui::Text("Messages: %" PRId64, stats.numMessages);
-                            ImGui::SameLine();
-                            if (ImGui::Button("Open"))
-                            {
-
-                            }
-
-                            ImGui::Text("Locks Taken: %s", HumanNumber::toString(numStr, stats.numLockTry));
-
                         }
                         else
                         {
-                            ImGui::Text("Duration: -");
-                            ImGui::Text("Zones: -");
-                            ImGui::Text("Allocations: -");
+                            // show some connect button.
+                            ImGui::Separator();
+                            ImGui::TextUnformatted("Connect to server");
+
+                            const bool connecting = client.conState == Client::ConnectionState::Connecting;
+
+                            if (connecting)
+                            {
+                                ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+                                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+                            }
+
+                            static char addr[256] = { "127.0.0.1" };
+                            bool connectClicked = false;
+                            connectClicked |= ImGui::InputText("", addr, sizeof(addr), ImGuiInputTextFlags_EnterReturnsTrue);
+                            connectClicked |= ImGui::Button("Connect");
+
+                            if (connecting)
+                            {
+                                ImGui::PopItemFlag();
+                                ImGui::PopStyleVar();
+                            }
+                            else if (connectClicked && *addr)
+                            {
+                                client.addr.set(addr);
+
+                                // how to know connecting?
+                                client.connectSignal.raise();
+                            }
                         }
+
                     }
-                    
                     ImGui::EndChild();
 
-                    ImGui::PopStyleColor();
-                 //   ImGui::PopStyleVar();
+                    // stats.
+                    {
+                        ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.15f, 0.15f, 0.15f, 1.f));
+                        // ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0,0));
+                         //ImGui::SetNextWindowPos(ImVec2(0, 0));
+                       //  ImGui::SetNextWindowSize(ImVec2(-1, 100));
+
+
+                        ImGui::BeginChild("##TraceInfo", ImVec2(-1, -1), true);
+
+                        if (selectGuid.isValid())
+                        {
+                            // need stats for this trace.
+                            auto& ts = client.traceStats;
+                            auto it = std::find_if(ts.begin(), ts.end(), [](const GuidTraceStats& lhs) {
+                                return selectGuid == lhs.first;
+                            });
+
+                            // find the tracenfo also.
+                            TraceInfo* pSelectedTrace = nullptr;
+
+                            for (auto& app : client.apps)
+                            {
+                                for (auto& trace : app.traces)
+                                {
+                                    if (trace.guid == selectGuid)
+                                    {
+                                        pSelectedTrace = &trace;
+                                        break;
+                                    }
+                                }
+
+                                if (pSelectedTrace) {
+                                    break;
+                                }
+                            }
+
+                            if (it != ts.end())
+                            {
+                                X_ASSERT_NOT_NULL(pSelectedTrace);
+
+                                auto& stats = it->second;
+
+                                core::HumanDuration::Str durStr0;
+                                HumanNumber::Str numStr;
+                                StringBuf dateStr;
+
+                                ImGui::Text("Date: %s", unixToLocalTimeStr(dateStr, pSelectedTrace->unixTimestamp));
+                                ImGui::Text("Duration: %s", core::HumanDuration::toStringNano(durStr0, stats.durationNano));
+                                ImGui::Text("Zones: %s", HumanNumber::toString(numStr, stats.numZones));
+                                ImGui::SameLine();
+                                if (ImGui::Button("Open"))
+                                {
+                                    // TODO: check if exsists  then open / focus.
+                                    OpenTrace ot;
+                                    ot.dataSize = sizeof(ot);
+                                    ot.type = PacketType::OpenTrace;
+                                    ot.guid = it->first;
+                                    client.sendDataToServer(&ot, sizeof(ot));
+                                }
+
+                                ImGui::Text("Allocations: %" PRId64, stats.numAlloc);
+                                ImGui::SameLine();
+                                if (ImGui::Button("Open"))
+                                {
+
+                                }
+
+                                ImGui::Text("Messages: %" PRId64, stats.numMessages);
+                                ImGui::SameLine();
+                                if (ImGui::Button("Open"))
+                                {
+                                    // just need to open the messages.
+                                    // i think ideally the data should be shared across views so
+                                    // we can see the messages in the zone view and also in the message list.
+                                    // maybe this should just be a pop up?
+
+                                }
+
+                                ImGui::Text("Locks Taken: %s", HumanNumber::toString(numStr, stats.numLockTry));
+
+                            }
+                            else
+                            {
+                                ImGui::Text("Duration: -");
+                                ImGui::Text("Zones: -");
+                                ImGui::Text("Allocations: -");
+                            }
+                        }
+
+                        ImGui::EndChild();
+
+                        ImGui::PopStyleColor();
+                        //   ImGui::PopStyleVar();
+                    }
                 }
 
                 ImGui::EndTabItem();
