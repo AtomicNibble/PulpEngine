@@ -277,39 +277,6 @@ namespace
         X_UNUSED(separator);
 
         buf.setFmt("%f", val);
-        
-#if false
-        auto ptr = buf;
-        if (*ptr == '-') ptr++;
-
-        const auto vbegin = ptr;
-
-        if (separator)
-        {
-            while (*ptr != '\0' && *ptr != ',' && *ptr != '.') ptr++;
-            auto end = ptr;
-            while (*end != '\0') end++;
-            auto sz = end - ptr;
-
-            while (ptr - vbegin > 3)
-            {
-                ptr -= 3;
-                memmove(ptr + 1, ptr, sz);
-                *ptr = ',';
-                sz += 4;
-            }
-        }
-
-        while (*ptr != '\0' && *ptr != ',' && *ptr != '.') ptr++;
-
-        if (*ptr == '\0') return buf;
-        while (*ptr != '\0') ptr++;
-        ptr--;
-        while (*ptr == '0') ptr--;
-        if (*ptr != '.' && *ptr != ',') ptr++;
-        *ptr = '\0';
-#endif
-
         return buf.c_str();
     }
 
