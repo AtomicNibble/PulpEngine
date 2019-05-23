@@ -41,6 +41,8 @@ namespace
     typedef unsigned long(__stdcall *RtlWalkFrameChainFunc)(void**, unsigned long, unsigned long);
     RtlWalkFrameChainFunc pRtlWalkFrameChain = nullptr;
 
+    tt_int32 gTelemInitCount = 0;
+
     namespace Hash
     {
         typedef tt_uint32 Fnv1aVal;
@@ -3051,6 +3053,11 @@ namespace
 
 bool TelemInit(void)
 {
+    if (gTelemInitCount > 0) {
+        ++gTelemInitCount;
+        return true;
+    }
+
     // Just stop it, ok?
     _CrtSetDebugFillThreshold(0);
 
@@ -3072,6 +3079,7 @@ bool TelemInit(void)
 
     SymSetOptions(SYMOPT_LOAD_LINES);
     if (!SymInitialize(GetCurrentProcess(), nullptr, true)) {
+        // this will fail if called multiple times.
         return false;
     }
 
@@ -3096,14 +3104,20 @@ bool TelemInit(void)
         gTicksPerMicro = (tsc_end - tsc_start) / (micro_end - micro_start);
     }
 
+    gTelemInitCount = 1;
     return true;
 }
 
 void TelemShutDown(void)
 {
-    if (platform::WSACleanup() != 0) {
-        // rip
+    --gTelemInitCount;
+
+    if (gTelemInitCount > 0) {
         return;
+    }
+
+    if (platform::WSACleanup() != 0) {
+        // report error but keep going.
     }
 
     if (!SymCleanup(GetCurrentProcess())) {
