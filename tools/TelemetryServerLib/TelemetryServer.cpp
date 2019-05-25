@@ -77,6 +77,9 @@ void ClientConnection::flush(void)
     if (type_ == ClientType::TraceStream) {
         traceBuilder_.flushZoneTree();
         traceBuilder_.createIndexes();
+
+        // TODO: Tell clients the trace is no longer active.
+        traceBuilder_.traceInfo.active = false;
     }
 }
 
@@ -244,6 +247,7 @@ bool ClientConnection::handleConnectionRequest(uint8_t* pData)
 
     // Create a new trace 
     TraceInfo trace;
+    trace.active = true;
     trace.guid = core::Guid::newGuid();
     trace.buildInfo.assign(pBuildInfoStr, pConReq->buildInfoLen);
     trace.cmdLine.assign(pCmdLineStr, pConReq->cmdLineLen);
