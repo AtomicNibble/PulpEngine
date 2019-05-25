@@ -3589,7 +3589,7 @@ void Server::handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo
                         }
                     }
 
-                    if (stats.guid == pHdr->guid)
+                    if (stats.guid != pHdr->guid)
                     {
                         X_ERROR("TelemSrv", "Failed to get stats for active trace: \"%s\"", pHdr->guid.toString(guidStr));
                         return;
