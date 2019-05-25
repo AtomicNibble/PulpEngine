@@ -25,6 +25,10 @@ using TelemFixedStr = core::StackString<MAX_STRING_LEN, char>;
 
 struct TraceStats
 {
+    TraceStats() {
+        core::zero_this(this);
+    }
+
     core::Guid guid;
     tt_int64 numStrings;
     tt_int64 numZones;
