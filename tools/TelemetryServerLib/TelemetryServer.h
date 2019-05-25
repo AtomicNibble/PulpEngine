@@ -496,6 +496,7 @@ public:
     void closeClient(ClientConnection* pClientCon);
 
     void addTraceForApp(const TelemFixedStr& appName, const TraceInfo& trace);
+    void onTraceEnd(const core::Guid& guid);
     bool getTraceForGuid(const core::Guid& guid, TraceInfo& traceOut);
 
     const Settings& getsettings(void) const;

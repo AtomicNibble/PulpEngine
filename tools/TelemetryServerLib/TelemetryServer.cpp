@@ -78,8 +78,10 @@ void ClientConnection::flush(void)
         traceBuilder_.flushZoneTree();
         traceBuilder_.createIndexes();
 
-        // TODO: Tell clients the trace is no longer active.
         traceBuilder_.traceInfo.active = false;
+
+        // Tell clients the trace is no longer active.
+        srv_.onTraceEnd(traceBuilder_.traceInfo.guid);
     }
 }
 
@@ -3633,6 +3635,23 @@ void Server::addTraceForApp(const TelemFixedStr& appName, const TraceInfo& trace
         }
 
         client->sendDataToClient(&data, sizeof(data));
+    }
+}
+
+void Server::onTraceEnd(const core::Guid& guid)
+{
+    TraceEndedHdr hdr;
+    hdr.dataSize = sizeof(hdr);
+    hdr.type = PacketType::TraceEnded;
+    hdr.guid = guid;
+
+    for (auto& client : clientConns_)
+    {
+        if (client->type_ != ClientType::Viewer) {
+            continue;
+        }
+
+        client->sendDataToClient(&hdr, sizeof(hdr));
     }
 }
 

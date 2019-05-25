@@ -19,6 +19,7 @@ struct PacketType
 
         // Used by viewer.
         AppList,
+        TraceEnded,
         // AppTraceList, <- we just send the traces with the apps.
         
         QueryTraceInfo,

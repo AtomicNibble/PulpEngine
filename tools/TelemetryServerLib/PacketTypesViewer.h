@@ -59,6 +59,11 @@ struct AppTraceListData
     char cmdLine[MAX_STRING_LEN];
 };
 
+struct TraceEndedHdr : public PacketBase
+{
+    core::Guid guid;
+};
+
 struct QueryTraceInfo : public PacketBase
 {
     core::Guid guid;

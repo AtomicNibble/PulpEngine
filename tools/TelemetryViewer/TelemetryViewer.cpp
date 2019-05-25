@@ -3242,6 +3242,40 @@ bool handleAppList(Client& client, uint8_t* pData)
 }
 
 
+bool handleTraceEnded(Client& client, uint8_t* pData)
+{
+    X_UNUSED(client, pData);
+
+    auto* pHdr = reinterpret_cast<const TraceEndedHdr*>(pData);
+    if (pHdr->type != PacketType::TraceEnded) {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    core::CriticalSection::ScopedLock lock(client.dataCS);
+
+    for (auto& view : client.views)
+    {
+        if (view.info.guid == pHdr->guid) {
+            view.info.active = false;
+            break;
+        }
+    }
+
+    for (auto& app : client.apps)
+    {
+        for (auto& trace : app.traces)
+        {
+            if (trace.guid == pHdr->guid)
+            {
+                trace.active = false;
+                break;
+            }
+        }
+    }
+
+    return true;
+}
+
 bool handleQueryTraceInfoResp(Client& client, uint8_t* pData)
 {
     X_UNUSED(client, pData);
@@ -3403,6 +3437,8 @@ bool processPacket(Client& client, uint8_t* pData)
 
         case PacketType::AppList:
             return handleAppList(client, pData);
+        case PacketType::TraceEnded:
+            return handleTraceEnded(client, pData);
         case PacketType::QueryTraceInfoResp:
             return handleQueryTraceInfoResp(client, pData);
         case PacketType::OpenTraceResp:
