@@ -487,18 +487,15 @@ public:
     bool listen(void) X_FINAL;
 
 public:
-    void addTraceForApp(const TelemFixedStr& appName, const TraceInfo& trace);
-    bool sendAppList(ClientConnection& client);
-
-    void handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo* pHdr);
-    bool getTraceForGuid(const core::Guid& guid, TraceInfo& traceOut);
-
     void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData);
+    bool sendAppList(ClientConnection& client);
+    void handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo* pHdr);
     void closeClient(ClientConnection* pClientCon);
 
-    const Settings& getsettings(void) const {
-        return settings_;
-    }
+    void addTraceForApp(const TelemFixedStr& appName, const TraceInfo& trace);
+    bool getTraceForGuid(const core::Guid& guid, TraceInfo& traceOut);
+
+    const Settings& getsettings(void) const;
 
 private:
     core::MemoryArenaBase* arena_;

@@ -3471,32 +3471,7 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
     }
 }
 
-void Server::closeClient(ClientConnection* pClientCon)
-{
-    X_DELETE(pClientCon, arena_);
-}
 
-void Server::addTraceForApp(const TelemFixedStr& appName, const TraceInfo& trace)
-{
-    core::CriticalSection::ScopedLock lock(cs_);
-
-    auto it = std::find_if(apps_.begin(), apps_.end(), [&appName](const TraceApp& app) {
-        return app.appName == appName;
-    });
-
-    TraceApp* pApp = nullptr;
-    if (it == apps_.end())
-    {
-        apps_.emplace_back(appName, g_TelemSrvLibArena);
-        pApp = &apps_.back();
-    }
-    else
-    {
-        pApp = it;
-    }
-
-    pApp->traces.append(trace);
-}
 
 // i need to send list of apps to client
 bool Server::sendAppList(ClientConnection& client)
@@ -3582,6 +3557,33 @@ void Server::handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo
     }
 }
 
+void Server::closeClient(ClientConnection* pClientCon)
+{
+    X_DELETE(pClientCon, arena_);
+}
+
+void Server::addTraceForApp(const TelemFixedStr& appName, const TraceInfo& trace)
+{
+    core::CriticalSection::ScopedLock lock(cs_);
+
+    auto it = std::find_if(apps_.begin(), apps_.end(), [&appName](const TraceApp& app) {
+        return app.appName == appName;
+    });
+
+    TraceApp* pApp = nullptr;
+    if (it == apps_.end())
+    {
+        apps_.emplace_back(appName, g_TelemSrvLibArena);
+        pApp = &apps_.back();
+    }
+    else
+    {
+        pApp = it;
+    }
+
+    pApp->traces.append(trace);
+}
+
 bool Server::getTraceForGuid(const core::Guid& guid, TraceInfo& traceOut)
 {
     core::CriticalSection::ScopedLock lock(cs_);
@@ -3601,6 +3603,9 @@ bool Server::getTraceForGuid(const core::Guid& guid, TraceInfo& traceOut)
     return false;
 }
 
-
+const Settings& Server::getsettings(void) const
+{
+    return settings_;
+}
 
 X_NAMESPACE_END
