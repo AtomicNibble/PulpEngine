@@ -3572,16 +3572,41 @@ void Server::handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo
         {
             if (trace.guid == pHdr->guid)
             {
-                sql::SqlLiteDb db;
-                if (!db.connect(trace.dbPath.c_str(), sql::OpenFlags())) {
-                    X_ERROR("TelemSrv", "Failed to openDB for trace info: \"%s\"", trace.dbPath.c_str());
-                    continue;
-                }
-
                 TraceStats stats;
-                if (!TraceDB::getStats(db, stats)) {
-                    X_ERROR("TelemSrv", "Failed to get db stats for trace info: \"%s\"", trace.dbPath.c_str());
-                    return;
+
+                if (trace.active)
+                {
+                    // TODO: something nicer?
+                    for (auto* pClient : clientConns_)
+                    {
+                        if (pClient->type_ == ClientType::TraceStream)
+                        {
+                            if (pClient->traceBuilder_.traceInfo.guid == pHdr->guid)
+                            {
+                                pClient->traceBuilder_.getStats(stats);
+                                break;
+                            }
+                        }
+                    }
+
+                    if (stats.guid == pHdr->guid)
+                    {
+                        X_ERROR("TelemSrv", "Failed to get stats for active trace: \"%s\"", pHdr->guid.toString(guidStr));
+                        return;
+                    }
+                }
+                else
+                {
+                    sql::SqlLiteDb db;
+                    if (!db.connect(trace.dbPath.c_str(), sql::OpenFlags())) {
+                        X_ERROR("TelemSrv", "Failed to openDB for trace info: \"%s\"", trace.dbPath.c_str());
+                        continue;
+                    }
+
+                    if (!TraceDB::getStats(db, stats)) {
+                        X_ERROR("TelemSrv", "Failed to get db stats for trace info: \"%s\"", trace.dbPath.c_str());
+                        return;
+                    }
                 }
 
                 QueryTraceInfoResp resp;
