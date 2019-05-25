@@ -2,6 +2,8 @@
 #include "TelemetryViewer.h"
 
 
+#include <Time/StopWatch.h>
+
 X_NAMESPACE_BEGIN(telemetry)
 
 using namespace core::string_view_literals;
@@ -2458,6 +2460,22 @@ void DrawFrame(Client& client, float ww, float wh)
                                 StringBuf dateStr;
 
                                 if (pSelectedTrace->active) {
+
+                                    // when the trace is active we want to keep asking the server for updated stats.
+                                    static core::StopWatch timer;
+
+                                    if (timer.GetMilliSeconds() >= 200)
+                                    {
+                                        timer.Start();
+
+                                        QueryTraceInfo qti;
+                                        qti.dataSize = sizeof(qti);
+                                        qti.type = PacketType::QueryTraceInfo;
+                                        qti.guid = selectGuid;
+                                        client.sendDataToServer(&qti, sizeof(qti));
+                                    }
+
+                                    // TODO: something more sexy looking.
                                     ImGui::Text("Active");
                                 }
 
