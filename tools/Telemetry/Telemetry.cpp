@@ -540,7 +540,7 @@ namespace
     }
 
     SysTimer gSysTimer;
-    tt_uint64 gTicksPerMicro;
+    tt_uint64 gTicksPerMicro = 0;
 
     TELEM_INLINE tt_uint32 getThreadID(void)
     {
@@ -3088,6 +3088,7 @@ bool TelemInit(void)
     PE::updatePDBInfo(PE::pdbInfo);
 
     // want to work out ticks per micro.
+    if(gTicksPerMicro == 0)
     {
         const auto micro_start = gSysTimer.GetMicro();
         const auto tsc_start = getTicks();
