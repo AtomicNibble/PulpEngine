@@ -3208,7 +3208,28 @@ bool handleAppList(Client& client, uint8_t* pData)
     }
 
     core::CriticalSection::ScopedLock lock(client.dataCS);
-    client.apps = std::move(apps);
+
+    if (pHdr->add) {
+
+        // add them.
+        for (auto& app : apps)
+        {
+            auto it = std::find_if(client.apps.begin(), client.apps.end(), [&app](const TraceApp& clientApp) {
+                return clientApp.appName == app.appName;
+            });
+
+            if (it == client.apps.end()) {
+                client.apps.append(app);
+            }
+            else {
+                it->traces.append(app.traces);
+            }
+        }
+    }
+    else {
+        client.apps = std::move(apps);
+    }
+
     return true;
 }
 

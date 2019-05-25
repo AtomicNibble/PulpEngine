@@ -37,6 +37,7 @@ struct ConnectionRequestViewerHdr : public PacketBase
 struct AppsListHdr : public PacketBase
 {
     tt_int32 num;
+    bool add;
 };
 
 struct AppsListData

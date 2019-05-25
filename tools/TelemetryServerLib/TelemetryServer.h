@@ -475,8 +475,11 @@ public:
 };
 
 struct QueryTraceInfo;
+
 class Server : public ITelemServer
 {
+    using ClientConnectionPtrArr = core::Array<ClientConnection*>;
+
 public:
     Server(core::MemoryArenaBase* arena);
     ~Server() X_OVERRIDE;
@@ -504,6 +507,7 @@ private:
     Settings settings_;
 
     TraceAppArr apps_;
+    ClientConnectionPtrArr clientConns_;
 };
 
 X_NAMESPACE_END

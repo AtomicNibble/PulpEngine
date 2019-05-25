@@ -52,6 +52,22 @@ namespace
 } // namespace
 
 
+void TraceInfo::assignToTraceData(AppTraceListData& tld) const
+{
+    tld.active = active;
+    tld.guid = guid;
+    tld.ticksPerMicro = ticksPerMicro;
+    tld.ticksPerMs = ticksPerMs;
+    tld.workerThreadID = workerThreadID;
+    tld.unixTimestamp = unixTimestamp;
+    strcpy_s(tld.hostName, hostName.c_str());
+    strcpy_s(tld.buildInfo, buildInfo.c_str());
+    strcpy_s(tld.cmdLine, cmdLine.c_str());
+}
+
+
+// -----------------------------
+
 void ClientConnection::flush(void)
 {
     if (pPendingJob_) {
@@ -3049,14 +3065,10 @@ int32_t TraceBuilder::handleDataPacketPDBInfo(const DataPacketPDBInfo* pData)
 
 // --------------------------------
 
-core::UniquePointer<ITelemServer> createServer(core::MemoryArenaBase* arena)
-{
-    return core::UniquePointer<ITelemServer>(core::makeUnique<Server>(arena, arena));
-}
-
 Server::Server(core::MemoryArenaBase* arena) :
     arena_(arena),
-    apps_(arena)
+    apps_(arena),
+    clientConns_(arena)
 {
     // TODO: better place?
     if (!winSockInit()) {
@@ -3149,7 +3161,6 @@ bool Server::loadAppTraces(core::string_view appName, const core::Path<>& dir)
         // dunno how slow loading all the sql dbs will be probs not that slow.
         // will see..
         sql::SqlLiteDb db;
-
         if (!db.connect(trace.dbPath.c_str(), sql::OpenFlags())) {
             X_ERROR("TelemSrv", "Failed to openDB: \"%s\"", trace.dbPath.c_str());
             continue;
@@ -3193,6 +3204,7 @@ bool Server::loadAppTraces(core::string_view appName, const core::Path<>& dir)
         X_LOG1("TelemSrv", "Trace \"%s\"", trace.dbPath.fileName());
     }
 
+    core::CriticalSection::ScopedLock lock(cs_);
     apps_.push_back(std::move(app));
     return true;
 }
@@ -3305,11 +3317,17 @@ bool Server::listen(void)
 
         X_LOG0("TelemSrv", "Client connected: %s:%s", hostname, servInfo);
 
+        // TODO: cleanup this instance up for the various failure cases below.
         ClientConnection* pClientCon = X_NEW(ClientConnection, arena_, "ClientCon")(*this, g_TelemSrvLibArena); // TEMP
         pClientCon->socket_ = clientSocket;
         memcpy(&pClientCon->clientAddr_, &addr, addrLen);
         pClientCon->host_.set(hostname);
         pClientCon->serv_.set(servInfo);
+
+        {
+            core::CriticalSection::ScopedLock lock(cs_);
+            clientConns_.push_back(pClientCon);
+        }
 
         hIOCP = CreateIoCompletionPort((HANDLE)clientSocket, hIOCP, (DWORD_PTR)pClientCon, 0);
         if (hIOCP == nullptr) {
@@ -3476,6 +3494,8 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
 // i need to send list of apps to client
 bool Server::sendAppList(ClientConnection& client)
 {
+    core::CriticalSection::ScopedLock lock(cs_);
+
     int32_t numApps = static_cast<int32_t>(apps_.size());
     int32_t numTraces = core::accumulate(apps_.begin(), apps_.end(), 0_i32, [](const TraceApp& app) {
         return static_cast<int32_t>(app.traces.size());
@@ -3489,6 +3509,7 @@ bool Server::sendAppList(ClientConnection& client)
     );
     resHdr.type = PacketType::AppList;
     resHdr.num = numApps;
+    resHdr.add = false;
 
     client.sendDataToClient(&resHdr, sizeof(resHdr));
 
@@ -3504,15 +3525,7 @@ bool Server::sendAppList(ClientConnection& client)
         for (const auto& trace : app.traces)
         {
             AppTraceListData tld;
-            tld.guid = trace.guid;
-            tld.active = trace.active;
-            tld.ticksPerMicro = trace.ticksPerMicro;
-            tld.ticksPerMs = trace.ticksPerMs;
-            tld.workerThreadID = trace.workerThreadID;
-            tld.unixTimestamp = trace.unixTimestamp;
-            strcpy_s(tld.hostName, trace.hostName.c_str());
-            strcpy_s(tld.buildInfo, trace.buildInfo.c_str());
-            strcpy_s(tld.cmdLine, trace.cmdLine.c_str());
+            trace.assignToTraceData(tld);
 
             client.sendDataToClient(&tld, sizeof(tld));
         }
@@ -3526,6 +3539,8 @@ void Server::handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo
     core::Guid::GuidStr guidStr;
     X_LOG0("TelemSrv", "Recived trace info request for: \"%s\"", pHdr->guid.toString(guidStr));
 
+    core::CriticalSection::ScopedLock lock(cs_);
+
     for (auto& app : apps_)
     {
         for (auto& trace : app.traces)
@@ -3533,24 +3548,24 @@ void Server::handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo
             if (trace.guid == pHdr->guid)
             {
                 sql::SqlLiteDb db;
-
                 if (!db.connect(trace.dbPath.c_str(), sql::OpenFlags())) {
-                    X_ERROR("TelemSrv", "Failed to openDB: \"%s\"", trace.dbPath.c_str());
+                    X_ERROR("TelemSrv", "Failed to openDB for trace info: \"%s\"", trace.dbPath.c_str());
                     continue;
                 }
 
                 TraceStats stats;
-                if (TraceDB::getStats(db, stats))
-                {
-                    QueryTraceInfoResp resp;
-                    resp.type = PacketType::QueryTraceInfoResp;
-                    resp.dataSize = sizeof(resp);
-                    resp.guid = pHdr->guid;
-                    resp.stats = stats;
-
-                    client.sendDataToClient(&resp, sizeof(resp));
+                if (!TraceDB::getStats(db, stats)) {
+                    X_ERROR("TelemSrv", "Failed to get db stats for trace info: \"%s\"", trace.dbPath.c_str());
+                    return;
                 }
 
+                QueryTraceInfoResp resp;
+                resp.type = PacketType::QueryTraceInfoResp;
+                resp.dataSize = sizeof(resp);
+                resp.guid = pHdr->guid;
+                resp.stats = stats;
+                
+                client.sendDataToClient(&resp, sizeof(resp));
                 return;
             }
         }
@@ -3559,6 +3574,11 @@ void Server::handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo
 
 void Server::closeClient(ClientConnection* pClientCon)
 {
+    {
+        core::CriticalSection::ScopedLock lock(cs_);
+        clientConns_.remove(pClientCon);
+    }
+
     X_DELETE(pClientCon, arena_);
 }
 
@@ -3582,6 +3602,34 @@ void Server::addTraceForApp(const TelemFixedStr& appName, const TraceInfo& trace
     }
 
     pApp->traces.append(trace);
+
+    // notify viewers about new trace.
+    struct Data
+    {
+        AppsListHdr hdr;
+        AppsListData ald;
+        AppTraceListData atld;
+    };
+
+    Data data;
+    data.hdr.dataSize = static_cast<tt_uint16>(sizeof(data));
+    data.hdr.type = PacketType::AppList;
+    data.hdr.num = 1;
+    data.hdr.add = true;
+
+    data.ald.numTraces = 1;
+    strcpy_s(data.ald.appName, appName.c_str());
+
+    trace.assignToTraceData(data.atld);
+    
+    for (auto& client : clientConns_)
+    {
+        if (client->type_ != ClientType::Viewer) {
+            continue;
+        }
+
+        client->sendDataToClient(&data, sizeof(data));
+    }
 }
 
 bool Server::getTraceForGuid(const core::Guid& guid, TraceInfo& traceOut)
@@ -3606,6 +3654,13 @@ bool Server::getTraceForGuid(const core::Guid& guid, TraceInfo& traceOut)
 const Settings& Server::getsettings(void) const
 {
     return settings_;
+}
+
+// -------------------
+
+core::UniquePointer<ITelemServer> createServer(core::MemoryArenaBase* arena)
+{
+    return core::UniquePointer<ITelemServer>(core::makeUnique<Server>(arena, arena));
 }
 
 X_NAMESPACE_END

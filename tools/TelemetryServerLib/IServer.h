@@ -36,6 +36,8 @@ struct TraceStats
     tt_int64 durationNano;
 };
 
+struct AppTraceListData;
+
 struct TraceInfo
 {
     TraceInfo() :
@@ -46,6 +48,9 @@ struct TraceInfo
         unixTimestamp(0),
         connFlags(0)
     {}
+
+
+    void assignToTraceData(AppTraceListData& tld) const;
 
     TELEM_INLINE int64_t ticksToNano(tt_int64 tsc) const
     {
