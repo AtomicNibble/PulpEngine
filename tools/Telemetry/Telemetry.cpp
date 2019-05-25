@@ -1246,8 +1246,11 @@ namespace
 
         auto start = getTicks();
 
+        // TODO: experiment with value 9 is fastest.
+        // maybe if we are writing to disk we want max compression?
+        const tt_int32 acceleration = 6;
         const tt_int32 cmpBytes = LZ4_compress_fast_continue(&pComp->lz4Stream, pInBegin,
-            pComp->cmpBuf, inBytes, sizeof(pComp->cmpBuf), 9);
+            pComp->cmpBuf, inBytes, sizeof(pComp->cmpBuf), acceleration);
 
         auto end = getTicks();
 
