@@ -3646,6 +3646,18 @@ void Server::onTraceEnd(const core::Guid& guid)
 
         client->sendDataToClient(&hdr, sizeof(hdr));
     }
+
+    for (auto& app : apps_)
+    {
+        for (auto& trace : app.traces)
+        {
+            if (trace.guid == guid)
+            {
+                trace.active = false;
+                break;
+            }
+        }
+    }
 }
 
 bool Server::getTraceForGuid(const core::Guid& guid, TraceInfo& traceOut)
