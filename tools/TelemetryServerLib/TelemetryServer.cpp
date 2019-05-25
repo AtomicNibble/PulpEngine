@@ -2075,7 +2075,7 @@ void ZoneTree::free_r(const Node* pNode)
 bool TraceDB::openDB(core::Path<char>& path)
 {
     // TODO: drop write when not needed
-    if (!con.connect(path.c_str(), sql::OpenFlag::WRITE)) {
+    if (!con.connect(path.c_str(), sql::OpenFlags())) {
         return false;
     }
 
