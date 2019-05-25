@@ -3621,13 +3621,13 @@ void Server::addTraceForApp(const TelemFixedStr& appName, const TraceInfo& trace
 
     trace.assignToTraceData(data.atld);
     
-    for (auto& client : clientConns_)
+    for (auto* pClient : clientConns_)
     {
-        if (client->type_ != ClientType::Viewer) {
+        if (pClient->type_ != ClientType::Viewer) {
             continue;
         }
 
-        client->sendDataToClient(&data, sizeof(data));
+        pClient->sendDataToClient(&data, sizeof(data));
     }
 }
 
@@ -3638,13 +3638,13 @@ void Server::onTraceEnd(const core::Guid& guid)
     hdr.type = PacketType::TraceEnded;
     hdr.guid = guid;
 
-    for (auto& client : clientConns_)
+    for (auto* pClient : clientConns_)
     {
-        if (client->type_ != ClientType::Viewer) {
+        if (pClient->type_ != ClientType::Viewer) {
             continue;
         }
 
-        client->sendDataToClient(&hdr, sizeof(hdr));
+        pClient->sendDataToClient(&hdr, sizeof(hdr));
     }
 
     for (auto& app : apps_)
