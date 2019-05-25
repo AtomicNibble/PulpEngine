@@ -838,13 +838,6 @@ bool ClientConnection::handleDataStream(uint8_t* pData)
     int32_t origLen = pHdr->origSize - sizeof(DataStreamHdr);
     X_UNUSED(cmpLen);
 
-#if 0 // might just be same size but compressed.
-    if (cmpLen == origLen) {
-        // uncompressed packets.
-        X_ASSERT_NOT_IMPLEMENTED();
-    }
-#endif
-
     auto* pDst = &cmpRingBuf_[cmpBufBegin_];
 
     int32_t cmpLenOut = static_cast<int32_t>(lz4DecodeStream_.decompressContinue(pHdr + 1, pDst, origLen));

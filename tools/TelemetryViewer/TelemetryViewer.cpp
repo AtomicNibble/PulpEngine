@@ -3101,11 +3101,6 @@ bool handleDataSream(Client& client, uint8_t* pData)
     int32_t origLen = pHdr->origSize - sizeof(DataStreamHdr);
     X_UNUSED(cmpLen);
 
-    if (cmpLen == origLen) {
-        // uncompressed packets. 
-        X_ASSERT_NOT_IMPLEMENTED();
-    }
-
     auto* pDst = &client.cmpRingBuf[client.cmpBufferOffset];
 
     int32_t cmpLenOut = static_cast<int32_t>(client.lz4DecodeStream.decompressContinue(pHdr + 1, pDst, origLen));
