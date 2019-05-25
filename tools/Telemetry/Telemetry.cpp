@@ -3072,9 +3072,11 @@ bool TelemInit(void)
     }
 
     // resolve callstack shizz.
-    pRtlWalkFrameChain = (RtlWalkFrameChainFunc)GetProcAddress(GetModuleHandleW(L"ntdll.dll"), "RtlWalkFrameChain");
     if (!pRtlWalkFrameChain) {
-        return false;
+        pRtlWalkFrameChain = (RtlWalkFrameChainFunc)GetProcAddress(GetModuleHandleW(L"ntdll.dll"), "RtlWalkFrameChain");
+        if (!pRtlWalkFrameChain) {
+            return false;
+        }
     }
 
     SymSetOptions(SYMOPT_LOAD_LINES);
