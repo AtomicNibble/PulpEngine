@@ -20,7 +20,9 @@ Runtime:
   Strings:
      ✔ Support printf @done (19-03-21 23:34)
      ☐ Support dynamic strings
-     ☐ Validate format strings
+       Basically need some buffer where we copy the string and return a point to it.
+       and it's position should never change.
+
 
   Misc:
     ✔ Capture and send program command line @done (19-02-15 17:05)
@@ -32,7 +34,7 @@ Runtime:
     ☐ Support plot aggregation based on paths in format string.
 
   Polish:
-    ☐ Handle TelemStartup been called multiple times better.
+    ✔ Handle TelemStartup been called multiple times better. @done (19-05-25 13:12)
     ☐ Remove the need for dbgHelp.
     ☐ Get rid of the CRT (low priority)
       * spintf
@@ -43,6 +45,11 @@ Runtime:
       ✘ Try reconnect? @cancelled (19-05-18 14:07)
         Sounds painful unless you can resume.
 
+   ☐ Support a checked build
+     ☐ Will need to solve the logging deadlock issue tho.
+       Maybe I could disable telem for that thread.
+     ☐ Validate format strings
+     ☐ Handle forgetting to call zoneEnd.
 
 Veiwer:
 
@@ -66,7 +73,7 @@ ServerLib:
   ✔ Support clients creating multiple traces per second. @done (19-04-02 22:24)
     Currently this don't work since db names clash.
 
-  ☐ Create nice api for the server exe to just run.
+  ✔ Create nice api for the server exe to just run. @done (19-05-25 17:54)
   ✔ Support multiple client connections / data streams @done (19-04-26 20:53)
 
   ✔ Process the incoming data @done (19-03-17 12:45)
@@ -89,6 +96,9 @@ ServerLib:
  ✔ Explore having a buffer for incoming socket data rather than letting it sit in the socket buffer. @done (19-05-16 20:21)
    this way we can grab more than MAX_PACKET_SIZE at a time and can make the buffer pretty big like 1MB
    see if it helps reduce stalls.
+
+ ✔ Have the server tell connected viewerers about new traces. @done (19-05-25 17:54)
+
 
 Server:
 
