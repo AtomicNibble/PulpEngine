@@ -10,6 +10,13 @@
 
 #include <psapi.h> // EnumProcessModules
 
+
+
+#define DBGHLP_DYNAMIC_LOAD 0
+#define PACKET_COMPRESSION 1
+#define RUNTIME_ZONE_WRITES 1
+#define RUNTIME_ZONE_PDB_SEND 1
+
 TELEM_DISABLE_WARNING(4091)
 #include <DbgHelp.h>
 TELEM_ENABLE_WARNING(4091)
@@ -17,13 +24,14 @@ TELEM_ENABLE_WARNING(4091)
 #include <../../3rdparty/source/lz4-1.8.3/lz4_lib.h>
 
 TELEM_LINK_LIB("engine_TelemetryCommonLib.lib");
+
+#if !DBGHLP_DYNAMIC_LOAD
 TELEM_LINK_LIB("dbghelp.lib");
+#endif
 
 TELEM_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
 
-#define PACKET_COMPRESSION 1
-#define RUNTIME_ZONE_WRITES 1
-#define RUNTIME_ZONE_PDB_SEND 1
+
 
 TELEM_INTRINSIC(_BitScanReverse)
 TELEM_INTRINSIC(_BitScanForward)
@@ -42,6 +50,74 @@ namespace
     RtlWalkFrameChainFunc pRtlWalkFrameChain = nullptr;
 
     tt_int32 gTelemInitCount = 0;
+
+    struct SymAPI
+    {
+        using SymInitializeFunc = BOOL (__stdcall *)(HANDLE hProcess, PCSTR UserSearchPath, BOOL fInvadeProcess);
+        using SymCleanupFunc = BOOL(__stdcall *)(HANDLE hProcess);
+        using SymGetModuleInfoW64Func = BOOL (__stdcall *)(HANDLE hProcess, DWORD64 qwAddr, PIMAGEHLP_MODULEW64 ModuleInfo);
+
+        SymAPI() :
+            symInit_(nullptr),
+            symCleanup_(nullptr),
+            symGetModuleInfoW_(nullptr)
+        {
+#if DBGHLP_DYNAMIC_LOAD
+            hDbgHelp_ = 0;
+#endif
+        }
+
+        bool resovle(void)
+        {
+            if (isValid()) {
+                return true;
+            }
+
+#if DBGHLP_DYNAMIC_LOAD
+            hDbgHelp_ = ::LoadLibraryW(L"dbghelp.dll");
+            if (!hDbgHelp_) {
+                return false;
+            }
+
+            symInit_ = (SymInitializeFunc)::GetProcAddress(hDbgHelp_, "SymInitialize");
+            symCleanup_ = (SymCleanupFunc)::GetProcAddress(hDbgHelp_, "SymCleanup");
+            symGetModuleInfoW_ = (SymGetModuleInfoW64Func)::GetProcAddress(hDbgHelp_, "SymGetModuleInfoW64");
+#else
+            symInit_ = ::SymInitialize;
+            symCleanup_ = ::SymCleanup;
+            symGetModuleInfoW_ = ::SymGetModuleInfoW64;
+#endif
+            return isValid();
+        }
+
+        void unload(void)
+        {
+#if DBGHLP_DYNAMIC_LOAD
+
+            if (hDbgHelp_) {
+                ::FreeLibrary(hDbgHelp_);
+                hDbgHelp_ = 0;
+            }
+            symInit_ = nullptr;
+            symCleanup_ = nullptr;
+            symGetModuleInfoW_ = nullptr;
+#endif
+        }
+
+        bool isValid(void) const {
+            return symInit_ && symCleanup_ && symGetModuleInfoW_;
+        }
+
+        SymInitializeFunc symInit_;
+        SymCleanupFunc symCleanup_;
+        SymGetModuleInfoW64Func symGetModuleInfoW_;
+    private:
+#if DBGHLP_DYNAMIC_LOAD
+        HMODULE hDbgHelp_;
+#endif
+    };
+
+    SymAPI gSymAPI;
 
     namespace Hash
     {
@@ -2628,7 +2704,7 @@ namespace
     bool PDBSender::send(void)
     {
         modInfo_.SizeOfStruct = sizeof(modInfo_);
-        if (!SymGetModuleInfoW64(::GetCurrentProcess(), modAddr_, &modInfo_)) {
+        if (!gSymAPI.symGetModuleInfoW_(::GetCurrentProcess(), modAddr_, &modInfo_)) {
             // TODO: tell server we suck.
             return false;
         }
@@ -3064,9 +3140,7 @@ bool TelemInit(void)
     // Just stop it, ok?
     _CrtSetDebugFillThreshold(0);
 
-    platform::WSADATA winsockInfo;
-
-    if (platform::WSAStartup(MAKEWORD(2, 2), &winsockInfo) != 0) {
+    if (!gSymAPI.resovle()) {
         return false;
     }
 
@@ -3082,8 +3156,15 @@ bool TelemInit(void)
         }
     }
 
-    SymSetOptions(SYMOPT_LOAD_LINES);
-    if (!SymInitialize(GetCurrentProcess(), nullptr, true)) {
+    platform::WSADATA winsockInfo;
+    if (platform::WSAStartup(MAKEWORD(2, 2), &winsockInfo) != 0) {
+        return false;
+    }
+
+    // enumerates the loaded modules for the process and calls SymLoadModule64 function for each module.
+    const bool invadeProccess = true;
+
+    if (!gSymAPI.symInit_(GetCurrentProcess(), nullptr, invadeProccess)) {
         // this will fail if called multiple times.
         return false;
     }
@@ -3126,7 +3207,7 @@ void TelemShutDown(void)
         // report error but keep going.
     }
 
-    if (!SymCleanup(GetCurrentProcess())) {
+    if (!gSymAPI.symCleanup_(GetCurrentProcess())) {
         // rip
         return;
     }
