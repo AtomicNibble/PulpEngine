@@ -3193,9 +3193,11 @@ bool handleAppList(Client& client, uint8_t* pData)
             trace.active = srcTrace.active;
             trace.guid = srcTrace.guid;
             trace.ticksPerMicro = srcTrace.ticksPerMicro;
+            trace.workerThreadID = srcTrace.workerThreadID;
             trace.unixTimestamp = srcTrace.unixTimestamp;
             trace.hostName = srcTrace.hostName;
             trace.buildInfo = srcTrace.buildInfo;
+            trace.cmdLine = srcTrace.cmdLine;
 
             app.traces.emplace_back(std::move(trace));
         }
@@ -3253,7 +3255,15 @@ bool handleOpenTraceResp(Client& client, uint8_t* pData)
     }
 
     core::CriticalSection::ScopedLock lock(client.dataCS);
-    client.views.emplace_back(pHdr->guid, pHdr->ticksPerMicro, pHdr->stats, pHdr->handle, g_arena);
+
+    // find the info
+    auto* pInfo = client.infoForGUID(pHdr->guid);
+    if (!pInfo) {
+        X_ERROR("TelemViewer", "Failed to find trace info for open trace resp");
+        return false;
+    }
+
+    client.views.emplace_back(*pInfo, pHdr->stats, pHdr->handle, g_arena);
 
     // ask for some data?
     // do i want zones and ticks seperate?
@@ -3486,6 +3496,21 @@ TraceView* Client::viewForHandle(tt_int8 handle)
     return pView;
 }
 
+
+const TraceInfo* Client::infoForGUID(const core::Guid& guid) const
+{
+    for (auto& app : apps)
+    {
+        for (auto& info : app.traces)
+        {
+            if (info.guid == guid)
+            {
+                return &info;
+            }
+        }
+    }
+    return nullptr;
+}
 
 bool connectToServer(Client& client)
 {

@@ -883,9 +883,6 @@ bool ClientConnection::handleOpenTrace(uint8_t* pData)
     otr.dataSize = sizeof(otr);
     otr.type = PacketType::OpenTraceResp;
     otr.guid = pHdr->guid;
-    otr.ticksPerMicro = 0;
-    otr.workerThreadID = 0;
-    otr.unixTimestamp = 0;
     otr.handle = -1_ui8;
 
     // TODO: check we don't have it open already.
@@ -904,9 +901,6 @@ bool ClientConnection::handleOpenTrace(uint8_t* pData)
             }
 
             otr.handle = safe_static_cast<int8_t>(i);
-            otr.ticksPerMicro = ts.traceInfo.ticksPerMicro;
-            otr.unixTimestamp = ts.traceInfo.unixTimestamp;
-            otr.workerThreadID = ts.traceInfo.workerThreadID;
             sendDataToClient(&otr, sizeof(otr));
             return true;
         }
@@ -940,7 +934,6 @@ bool ClientConnection::handleOpenTrace(uint8_t* pData)
     tracesStreams_.emplace_back(std::move(ts));
 
     otr.handle = safe_static_cast<int8_t>(id);
-    otr.ticksPerMicro = trace.ticksPerMicro;
     sendDataToClient(&otr, sizeof(otr));
     return true;
 }
@@ -3546,9 +3539,13 @@ bool Server::sendAppList(ClientConnection& client)
             AppTraceListData tld;
             tld.guid = trace.guid;
             tld.active = trace.active;
+            tld.ticksPerMicro = trace.ticksPerMicro;
+            tld.ticksPerMs = trace.ticksPerMs;
+            tld.workerThreadID = trace.workerThreadID;
             tld.unixTimestamp = trace.unixTimestamp;
             strcpy_s(tld.hostName, trace.hostName.c_str());
             strcpy_s(tld.buildInfo, trace.buildInfo.c_str());
+            strcpy_s(tld.cmdLine, trace.cmdLine.c_str());
 
             client.sendDataToClient(&tld, sizeof(tld));
         }

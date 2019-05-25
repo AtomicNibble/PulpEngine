@@ -307,9 +307,8 @@ struct TraceView
     using TraceThreadGroupDataArr = core::Array<TraceThreadGroupData>;
 
 public:
-    TraceView(core::Guid guid, uint64_t ticksPerMicro, TraceStats stats, int8_t handle, core::MemoryArenaBase* arena) :
-        guid(guid),
-        ticksPerMicro(ticksPerMicro),
+    TraceView(const TraceInfo& info, const TraceStats& stats, int8_t handle, core::MemoryArenaBase* arena) :
+        info(info),
         stats(stats),
         handle(handle),
         segments(arena),
@@ -350,6 +349,7 @@ public:
 
     X_INLINE uint64_t ticksToNano(uint64_t tsc) const
     {
+        const uint64_t ticksPerMicro = info.ticksPerMicro;
         const uint64_t whole = (tsc / ticksPerMicro) * 1000;
         const uint64_t part = (tsc % ticksPerMicro) * 1000 / ticksPerMicro;
 
@@ -362,8 +362,7 @@ public:
     bool open_;
     bool _pad[2];
 
-    core::Guid guid;
-    uint64_t ticksPerMicro;
+    TraceInfo info;
     TraceStats stats;
     int8_t handle;
 
@@ -406,7 +405,9 @@ struct Client
     void closeConnection(void);
     void sendDataToServer(const void* pData, int32_t len);
     TraceView* viewForHandle(tt_int8 handle);
+    const TraceInfo* infoForGUID(const core::Guid& guid) const;
 
+public:
     core::StackString256 addr;
     uint16_t port;
     ConnectionState conState;
