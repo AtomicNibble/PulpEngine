@@ -940,8 +940,7 @@ bool ClientConnection::handleOpenTrace(uint8_t* pData)
         return true;
     }
 
-    if (!TraceDB::getStats(ts.con, otr.stats))
-    {
+    if (!TraceDB::getStats(ts.con, otr.stats)) {
         X_ERROR("TelemSrv", "Failed to get stats for openDb request");
         return true;
     }
