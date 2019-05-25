@@ -227,6 +227,8 @@ public:
     int32_t handleDataPacketPDBInfo(const DataPacketPDBInfo* pData);
 
     core::string_view getString(int32_t strIdx) const;
+    void getStats(TraceStats& stats) const;
+    void setGuid(core::Guid& guid);
 
 private:
     bool createTables(void);
@@ -261,6 +263,8 @@ private:
     sql::SqlLiteCmd cmdInsertCallstack;
 
     core::FixedArray<uint64_t, MAX_LOCKS> lockSet;
+
+    TraceStats stats_;
 
     StringIdxMap stringMap;
     IndexStrPairArr indexMap;

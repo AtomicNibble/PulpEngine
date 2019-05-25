@@ -298,6 +298,7 @@ bool ClientConnection::handleConnectionRequest(uint8_t* pData)
     }
 
     strm.traceInfo = trace;
+    strm.setGuid(trace.guid); // bit of a hack.
 
     bool setMeta = true;
 
@@ -2554,6 +2555,8 @@ void TraceBuilder::insertLockIfMissing(uint64_t lockHandle)
 
 int32_t TraceBuilder::addString(core::string_view str)
 {
+    ++stats_.numStrings;
+
     auto it = stringMap.emplace(core::string(str.begin(), str.end()), 0);
     X_ASSERT(it.second, "Duplicate")();
     auto idx = static_cast<int32_t>(it.first.getIndex());
@@ -2577,6 +2580,16 @@ core::string_view TraceBuilder::getString(int32_t strIdx) const
     auto fmtIt = stringMap.at(fmtStrIdx);
 
     return core::string_view(fmtIt->first);
+}
+
+void TraceBuilder::getStats(TraceStats& stats) const
+{
+    stats = stats_;
+}
+
+void TraceBuilder::setGuid(core::Guid& guid)
+{
+    stats_.guid = guid;
 }
 
 int32_t TraceBuilder::indexForString(core::string_view str)
@@ -2643,6 +2656,9 @@ uint16_t TraceBuilder::getStringIndex(StringBuf& buf, const DataPacketBaseArgDat
 
 int32_t TraceBuilder::handleDataPacketTickInfo(const DataPacketTickInfo* pData)
 {
+    ++stats_.numTicks;
+    stats_.durationNano = pData->endNano; // TODO: if app don't sent ticks we fooked.
+
     auto& cmd = cmdInsertTickInfo;
     cmd.bind(1, static_cast<int32_t>(pData->threadID));
     cmd.bind(2, static_cast<int64_t>(pData->start));
@@ -2738,6 +2754,8 @@ void TraceBuilder::writeZoneTree(const ZoneTree& zoneTree, int32_t setID)
 
 int32_t TraceBuilder::handleDataPacketZone(const DataPacketZone* pData)
 {
+    ++stats_.numZones;
+
     StringBuf strBuf;
     int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxFmt);
 
@@ -2768,6 +2786,8 @@ int32_t TraceBuilder::handleDataPacketZone(const DataPacketZone* pData)
 
 int32_t TraceBuilder::handleDataPacketLockTry(const DataPacketLockTry* pData)
 {
+    ++stats_.numLockTry;
+
     insertLockIfMissing(pData->lockHandle);
 
     StringBuf strBuf;
@@ -2924,6 +2944,8 @@ int32_t TraceBuilder::handleDataPacketLockCount(const DataPacketLockCount* pData
 
 int32_t TraceBuilder::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
 {
+    ++stats_.numAlloc;
+
     StringBuf strBuf;
     int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxFmt);
 
@@ -2952,6 +2974,8 @@ int32_t TraceBuilder::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
 
 int32_t TraceBuilder::handleDataPacketMemFree(const DataPacketMemFree* pData)
 {
+    ++stats_.numFree;
+
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
     info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
@@ -2975,6 +2999,8 @@ int32_t TraceBuilder::handleDataPacketMemFree(const DataPacketMemFree* pData)
 
 int32_t TraceBuilder::handleDataPacketMessage(const DataPacketMessage* pData)
 {
+    ++stats_.numMessages;
+
     StringBuf strBuf;
     int32_t strIdx = getStringIndex(strBuf, pData, sizeof(*pData), pData->strIdxFmt);
 
