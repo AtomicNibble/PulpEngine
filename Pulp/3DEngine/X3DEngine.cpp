@@ -330,7 +330,7 @@ void X3DEngine::clearPersistent(void)
 void X3DEngine::update(core::FrameData& frame)
 {
     X_PROFILE_BEGIN("3DUpdate", core::profiler::SubSys::ENGINE3D);
-    ttZone(gEnv->ctx, "3dEngine Update");
+    ttZone(gEnv->ctx, "(3dEngine) Update");
 
     pTextureManager_->scheduleStreaming();
 
@@ -347,7 +347,7 @@ void X3DEngine::update(core::FrameData& frame)
 void X3DEngine::onFrameBegin(core::FrameData& frame)
 {
     X_PROFILE_BEGIN("3DFrameBegin", core::profiler::SubSys::ENGINE3D);
-    ttZone(gEnv->ctx, "3dEngine FrameBegin");
+    ttZone(gEnv->ctx, "(3dEngine) FrameBegin");
 
     // draw the emitters into prim context.
     for (auto* pWorld : worlds_) {
@@ -553,7 +553,7 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
 
 void X3DEngine::renderPrimContex2D(core::FrameData& frame, IPrimativeContext::Mode mode)
 {
-    ttZone(gEnv->ctx, "Render PrimContext2D");
+    ttZone(gEnv->ctx, "(3dEngine) Render PrimContext2D");
 
     PrimativeContextArr prims;
 
@@ -606,7 +606,7 @@ void X3DEngine::renderPrimContex2D(core::FrameData& frame, IPrimativeContext::Mo
 void X3DEngine::addPrimsToBucket(core::FrameData& frame, render::CommandBucket<uint32_t>& primBucket,
     IPrimativeContext::Mode mode, core::span<PrimativeContext*> prims)
 {
-    ttZone(gEnv->ctx, "addPrimsToBucket");
+    ttZone(gEnv->ctx, "(3dEngine) addPrimsToBucket");
 
     const auto is2D = mode == IPrimativeContext::Mode::Mode2D;
 

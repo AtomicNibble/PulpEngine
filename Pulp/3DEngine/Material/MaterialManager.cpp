@@ -375,6 +375,8 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 {
     X_ASSERT_NOT_NULL(pMat);
 
+    ttZone(gEnv->ctx, "(3dEngine/Material) GetTech");
+
     // we must get the techDef so we can select the tech definition.
     TechDefState* pTechDefState = pMat->getTechDefState();
 

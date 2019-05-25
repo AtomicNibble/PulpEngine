@@ -101,6 +101,8 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
         return pCompilingPerm;
     }
 
+    ttZone(gEnv->ctx, "(3dEngine/Material) CreateTechPerm");
+
     // compile the perm.
     render::IRender* pRenderSys = gEnv->pRender;
 
