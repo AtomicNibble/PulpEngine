@@ -950,10 +950,7 @@ bool ClientConnection::handleReqTraceZoneSegment(uint8_t* pData)
         X_ASSERT_UNREACHABLE();
     }
 
-    // MEOW
-    // load me the ticks!
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
+    if (isHandleValid(pHdr->handle)) {
         return false;
     }
 
@@ -1224,8 +1221,7 @@ bool ClientConnection::handleReqTraceLocks(uint8_t* pData)
         X_ASSERT_UNREACHABLE();
     }
 
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
+    if (isHandleValid(pHdr->handle)) {
         return false;
     }
 
@@ -1276,8 +1272,7 @@ bool ClientConnection::handleReqTraceStrings(uint8_t* pData)
         X_ASSERT_UNREACHABLE();
     }
 
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
+    if (isHandleValid(pHdr->handle)) {
         return false;
     }
 
@@ -1367,8 +1362,7 @@ bool ClientConnection::handleReqTraceThreadNames(uint8_t* pData)
         X_ASSERT_UNREACHABLE();
     }
 
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
+    if (isHandleValid(pHdr->handle)) {
         return false;
     }
 
@@ -1424,8 +1418,7 @@ bool ClientConnection::handleReqTraceThreadGroups(uint8_t* pData)
         X_ASSERT_UNREACHABLE();
     }
 
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
+    if (isHandleValid(pHdr->handle)) {
         return false;
     }
 
@@ -1507,8 +1500,7 @@ bool ClientConnection::handleReqTraceThreadGroupNames(uint8_t* pData)
         X_ASSERT_UNREACHABLE();
     }
 
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
+    if (isHandleValid(pHdr->handle)) {
         return false;
     }
 
@@ -1563,8 +1555,7 @@ bool ClientConnection::handleReqTraceLockNames(uint8_t* pData)
         X_ASSERT_UNREACHABLE();
     }
 
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
+    if (isHandleValid(pHdr->handle)) {
         return false;
     }
 
@@ -1621,8 +1612,7 @@ bool ClientConnection::handleReqTraceZoneTree(uint8_t* pData)
         X_ASSERT_UNREACHABLE();
     }
 
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
+    if (isHandleValid(pHdr->handle)) {
         return false;
     }
 
@@ -1680,8 +1670,7 @@ bool ClientConnection::handleReqTraceMessages(uint8_t* pData)
         X_ASSERT_UNREACHABLE();
     }
 
-    int32_t handle = pHdr->handle;
-    if (handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size())) {
+    if (isHandleValid(pHdr->handle)) {
         return false;
     }
 
@@ -1866,7 +1855,10 @@ T* ClientConnection::addToCompressionBufferT(void)
     return pPtr;
 }
 
-
+inline bool ClientConnection::isHandleValid(int32_t handle) const
+{
+    return handle < 0 || handle >= static_cast<int32_t>(tracesStreams_.size());
+}
 
 // ----------------------------------------------
 

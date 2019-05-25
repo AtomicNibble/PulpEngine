@@ -443,6 +443,8 @@ private:
     template<typename T>
     T* addToCompressionBufferT(void);
 
+    bool isHandleValid(int32_t handle) const;
+
 public:
     Server& srv_;
 
