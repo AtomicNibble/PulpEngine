@@ -2351,6 +2351,10 @@ void DrawFrame(Client& client, float ww, float wh)
                                         core::StackString256 label(trace.hostName.begin(), trace.hostName.end());
                                         label.appendFmt(" - [%s]", ageStr.c_str());
 
+                                        if (trace.active) {
+                                            label.append("[active]");
+                                        }
+
                                         if (ImGui::Selectable(label.c_str(), trace.guid == selectGuid))
                                         {
                                             selectGuid = trace.guid;
@@ -2452,6 +2456,10 @@ void DrawFrame(Client& client, float ww, float wh)
                                 core::HumanDuration::Str durStr0;
                                 HumanNumber::Str numStr;
                                 StringBuf dateStr;
+
+                                if (pSelectedTrace->active) {
+                                    ImGui::Text("Active");
+                                }
 
                                 ImGui::Text("Date: %s", unixToLocalTimeStr(dateStr, pSelectedTrace->unixTimestamp));
                                 ImGui::Text("Duration: %s", core::HumanDuration::toStringNano(durStr0, stats.durationNano));
