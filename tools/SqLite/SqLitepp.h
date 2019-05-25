@@ -132,6 +132,7 @@ public:
     SqlLiteDb& operator=(SqlLiteDb&&);
 
     static bool setThreadMode(ThreadMode::Enum threadMode);
+    static void enableSharedCache(bool enable);
 
     bool connect(const char* pDb, OpenFlags flags);
     bool disconnect(void);

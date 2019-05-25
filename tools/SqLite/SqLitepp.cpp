@@ -232,6 +232,11 @@ bool SqlLiteDb::setThreadMode(ThreadMode::Enum threadMode)
     return true;
 }
 
+void SqlLiteDb::enableSharedCache(bool enable)
+{
+    X_ASSERT(SQLITE_OK == sqlite3_enable_shared_cache(enable ? 1 : 0), "Enable shared cache failed")();
+}
+
 bool SqlLiteDb::connect(const char* pDb, OpenFlags flags)
 {
     X_ASSERT_NOT_NULL(pDb);
