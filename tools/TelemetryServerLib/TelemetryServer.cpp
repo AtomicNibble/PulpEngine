@@ -3420,24 +3420,128 @@ bool Server::ingestTraceFile(core::Path<>& path)
         return false;
     }
 
-    // okay so we think this trace file is valid.
-    // we should just have the same data we would get from a socket.
-    uint64_t bytesLeft = file.remainingBytes();
+    // read the connection request?
+    constexpr int32_t MAX_STR_LEN = MAX_CMDLINE_LEN + MAX_STRING_LEN + MAX_STRING_LEN;
 
+    struct {
+        ConnectionRequestHdr cr;
+        char stringData[MAX_STR_LEN];
+    } data;
+
+    core::zero_object(data);
+
+    if (file.readObj(data.cr) != sizeof(data.cr)) {
+        X_ERROR("TelemSrv", "Failed to read trace file meta");
+        return false;
+    }
+
+    int32_t strDataLen = data.cr.appNameLen + data.cr.buildInfoLen + data.cr.cmdLineLen;
+
+    if (file.read(data.stringData, strDataLen) != strDataLen) {
+        X_ERROR("TelemSrv", "Failed to read trace file meta strings");
+        return false;
+    }
+
+    struct platform::addrinfo hints, *servinfo = nullptr;
+    core::zero_object(hints);
+    hints.ai_family = AF_INET; // ipv4/6
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = platform::IPPROTO_TCP;
+
+    // Resolve the server address and port
+    int res = platform::getaddrinfo("localhost", DEFAULT_PORT, &hints, &servinfo);
+    if (res != 0) {
+        lastErrorWSA::Description Dsc;
+        const auto err = lastErrorWSA::Get();
+        X_ERROR("TelemServ", "Failed to getaddrinfo. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
+        return false;
+    }
+
+    platform::SOCKET connectSocket = INV_SOCKET;
+
+    for (auto pPtr = servinfo; pPtr != nullptr; pPtr = pPtr->ai_next) {
+        // Create a SOCKET for connecting to server
+        connectSocket = platform::socket(pPtr->ai_family, pPtr->ai_socktype, pPtr->ai_protocol);
+        if (connectSocket == INV_SOCKET) {
+            return false;
+        }
+
+        // Connect to server.
+        res = connect(connectSocket, pPtr->ai_addr, static_cast<int32_t>(pPtr->ai_addrlen));
+        if (res == SOCKET_ERROR) {
+            platform::closesocket(connectSocket);
+            connectSocket = INV_SOCKET;
+            continue;
+        }
+
+        break;
+    }
+
+    platform::freeaddrinfo(servinfo);
+    if (connectSocket == INV_SOCKET) {
+        X_ERROR("TelemSrv", "Failed to connect to server for ingest");
+        return false;
+    }
+
+    // lets have a big send bffer so we end up with some overlap for reading from disk / sending.
+    tt_int32 sock_opt = 1024 * 256;
+    res = platform::setsockopt(connectSocket, SOL_SOCKET, SO_SNDBUF, (char*)&sock_opt, sizeof(sock_opt));
+    if (res != 0) {
+        lastErrorWSA::Description Dsc;
+        const auto err = lastErrorWSA::Get();
+        X_ERROR("TelemSrv", "Failed to set sndbuf on socket. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
+        return false;
+    }
+
+    auto sendToServer = [&](const char* pBuffer, int32_t length) -> bool {
+        int32_t res = platform::send(connectSocket, pBuffer, length, 0);
+        if (res != SOCKET_ERROR) {
+            return true;
+        }
+
+        lastErrorWSA::Description Dsc;
+        const auto err = lastErrorWSA::Get();
+        
+        X_ERROR("TelemSrv", "Socket: send failed with Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
+        return false;
+    };
+
+    if (!sendToServer(reinterpret_cast<const char*>(&data.cr), sizeof(data.cr))) {
+        platform::closesocket(connectSocket);
+        return false;
+    }
+
+    if (!sendToServer(reinterpret_cast<const char*>(&data.stringData), strDataLen)) {
+        platform::closesocket(connectSocket);
+        return false;
+    }
+
+    uint64_t bytesLeft = file.remainingBytes();
     uint8_t buffer[1024 * 64];
 
     while (bytesLeft)
     {
-        auto toRead = core::Min(sizeof(buffer), bytesLeft);
+        auto toRead = safe_static_cast<int32_t>(core::Min(sizeof(buffer), bytesLeft));
 
         if (file.read(buffer, toRead) != toRead) {
             X_ERROR("TelemSrv", "Error reading trace file data");
+            platform::closesocket(connectSocket);
             return false;
         }
 
-        // we have som data!
+        // we have some data!
+        if (!sendToServer(reinterpret_cast<const char*>(buffer), toRead)) {
+            platform::closesocket(connectSocket);
+            return false;
+        }
 
         bytesLeft -= toRead;
+    }
+
+    platform::closesocket(connectSocket);
+
+    if (file.remainingBytes() != 0) {
+        X_ERROR("TelemSrv", "Error reading trace file, did not consume all bytes");
     }
 
     return true;
