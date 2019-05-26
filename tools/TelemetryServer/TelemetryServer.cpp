@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "EngineApp.h"
 
+#include <Platform/Console.h>
+
 #include <../TelemetryServerLib/IServer.h>
 
 #include <IConsole.h>
@@ -50,6 +52,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     X_UNUSED(hPrevInstance);
     X_UNUSED(nCmdShow);
 
+    int res = 0;
+
     {
         EngineApp app;
 
@@ -75,9 +79,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 core::Path<> path(traceFilePath.begin(), traceFilePath.end());
 
                 if (!srv->ingestTraceFile(path)) {
-                    X_ERROR("TelemSrv", "Failed to ingrest trace file: \"%s\"", path.c_str());
-                    return 1;
+                    X_ERROR("TelemSrv", "Failed to ingest trace file: \"%s\"", path.c_str());
+                    res = 1;
                 }
+
+                gEnv->pConsoleWnd->pressToContinue();
             }
             else
             {
@@ -85,14 +91,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 srv->loadApps();
 
                 if (!srv->listen()) {
-                    return 1;
+                    res = 1;
                 }
-
             }
         }
     }
 
-    return 0;
+    return res;
 }
 
 
