@@ -360,7 +360,7 @@ TEST(StringUtil, Wide)
     char OutSub[128] = {};
 
     const char* full = strUtil::Convert(pWide, Out);
-    const char* sub = strUtil::Convert(pWide, OutSub, 7);
+    const char* sub = strUtil::Convert(pWide, pWide + core::strUtil::strlen(pWide), OutSub, 7);
 
     EXPECT_TRUE(strcmp("wideee like your ass o.o", full) == 0);
     EXPECT_TRUE(strcmp("wideee", OutSub) == 0);

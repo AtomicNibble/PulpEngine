@@ -30,12 +30,12 @@ namespace invalidParameterHandler
                 char convFunction[256];
                 char convExpression[256];
 
-                memset(convExpression, 0, 0x100u);
-                memset(convFunction, 0, 0x100u);
-                memset(convFile, 0, 0x100u);
-                strUtil::Convert(expression, convExpression, 0x100u);
-                strUtil::Convert(function, convFunction, 0x100u);
-                strUtil::Convert(file, convFile, 0x100u);
+                core::zero_object(convExpression);
+                core::zero_object(convFunction);
+                core::zero_object(convFile);
+                strUtil::Convert(expression, convExpression);
+                strUtil::Convert(function, convFunction);
+                strUtil::Convert(file, convFile);
 
                 X_ERROR("InvParamHandler", "Failed expression: %s", convExpression);
                 X_ERROR("InvParamHandler", "Function: %s", function);
