@@ -45,6 +45,9 @@ typedef core::MemoryArena<
     >
     ConverterArena;
 
+using namespace core::string_view_literals;
+using namespace core::Hash::Literals;
+
 namespace
 {
     X_DECLARE_ENUM(ConvertMode)
@@ -52,12 +55,10 @@ namespace
 
     bool GetMode(ConvertMode::Enum& mode)
     {
-        using namespace core::Hash::Literals;
+        auto modeStr = gEnv->pCore->GetCommandLineArg("mode"_sv);
+        if (modeStr.isNotEmpty()) {
 
-        const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
-        if (pMode) {
-
-            core::StackString256 modeStr(pMode);
+            core::StackString256 modeStr(modeStr.begin(), modeStr.end());
             modeStr.toLower();
 
             switch (core::Hash::Fnv1aHash(modeStr.data(), modeStr.length()))
@@ -90,7 +91,7 @@ namespace
                     mode = ConvertMode::DUMP;
                     break;
                 default:
-                    X_ERROR("Converter", "Unknown mode: \"%ls\"", pMode);
+                    X_ERROR("Converter", "Unknown mode: \"%.*s\"", modeStr.length(), modeStr.data());
                     return false;
             }
         
@@ -104,13 +105,10 @@ namespace
     {
         using namespace core::Hash::Literals;
 
-        const wchar_t* pAssetType = gEnv->pCore->GetCommandLineArgForVarW(L"type");
-        if (pAssetType) {
-            core::StackString<128, char> assetTypeStr(pAssetType);
-            assetTypeStr.toLower();
-
+        auto assetTypeStr = gEnv->pCore->GetCommandLineArg("type"_sv);
+        if (assetTypeStr.isNotEmpty()) {
             if (!assetTypeFromStr(assetTypeStr.begin(), assetTypeStr.end(), assType)) {
-                X_ERROR("Converter", "Unknown asset type: \"%ls\"", pAssetType);
+                X_ERROR("Converter", "Unknown asset type: \"%.*s\"", assetTypeStr.length(), assetTypeStr.data());
                 return false;
             }
 
@@ -123,11 +121,9 @@ namespace
 
     bool GetAssetName(core::string& name, bool slient = false)
     {
-        const wchar_t* pAssetName = gEnv->pCore->GetCommandLineArgForVarW(L"name");
-        if (pAssetName) {
-            core::StackString512 assetName(pAssetName);
-
-            name = assetName.c_str();
+        auto assetNameStr = gEnv->pCore->GetCommandLineArg("name"_sv);
+        if (assetNameStr.isNotEmpty()) {
+            name.assign(assetNameStr.begin(), assetNameStr.end());
             return true;
         }
 
@@ -137,11 +133,9 @@ namespace
 
     bool GetConversionProfile(core::string& name, bool slient = false)
     {
-        const wchar_t* pProfileName = gEnv->pCore->GetCommandLineArgForVarW(L"profile");
-        if (pProfileName) {
-            core::StackString512 profileStr(pProfileName);
-
-            name.assign(profileStr.begin(), profileStr.end());
+        auto profileNameStr = gEnv->pCore->GetCommandLineArg("profile"_sv);
+        if (profileNameStr.isNotEmpty()) {
+            name.assign(profileNameStr.begin(), profileNameStr.end());
             return true;
         }
 
@@ -150,22 +144,21 @@ namespace
 
     bool ForceModeEnabled(void)
     {
-        const wchar_t* pForce = gEnv->pCore->GetCommandLineArgForVarW(L"force");
-        if (pForce) {
-            return core::strUtil::StringToBool(pForce);
+        auto forceStr = gEnv->pCore->GetCommandLineArg("force"_sv);
+        if (forceStr.isNotEmpty()) {
+            return core::strUtil::StringToBool(forceStr.begin(), forceStr.end());
         }
         return false;
     }
 
     void GetMod(core::string& name)
     {
-        const wchar_t* pModName = gEnv->pCore->GetCommandLineArgForVarW(L"mod");
-        if (!pModName) {
+        auto modNameStr = gEnv->pCore->GetCommandLineArg("mod"_sv);
+        if (modNameStr.empty()) {
             return;
         }
 
-        core::StackString512 nameNarrow(pModName);
-        name.assign(nameNarrow.begin(), nameNarrow.end());
+        name.assign(modNameStr.begin(), modNameStr.end());
     }
 
 
