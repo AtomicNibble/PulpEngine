@@ -564,12 +564,17 @@ namespace Util
     Texturefmt::Enum TexFmtFromStr(const char* pStr)
     {
         X_ASSERT_NOT_NULL(pStr);
+        return TexFmtFromStr(core::string_view(pStr));
+    }
 
+
+    Texturefmt::Enum TexFmtFromStr(core::string_view str)
+    {
         // force input to upper case.
-        core::StackString<64, char> strUpper(pStr);
+        core::StackString<64, char> strUpper(str.begin(), str.end());
         strUpper.toUpper();
 
-        // everything is 2 or mroe currently.
+        // everything is 2 or more currently.
         if (strUpper.length() < 2) {
             return Texturefmt::UNKNOWN;
         }
@@ -715,9 +720,13 @@ namespace Util
     ImgFileFormat::Enum ImgFileFmtFromStr(const char* pStr)
     {
         X_ASSERT_NOT_NULL(pStr);
+        return ImgFileFmtFromStr(core::string_view(pStr));
+    }
 
+    ImgFileFormat::Enum ImgFileFmtFromStr(core::string_view str)
+    {
         // force input to upper case.
-        core::StackString<64, char> strUpper(pStr);
+        core::StackString<64, char> strUpper(str.begin(), str.end());
         strUpper.toUpper();
 
         using namespace core::Hash::Literals;
@@ -739,7 +748,7 @@ namespace Util
                 return ImgFileFormat::TGA;
 
             default:
-                X_ERROR("Img", "Unknown img file format: \"%s\"", pStr);
+                X_ERROR("Img", "Unknown img file format: \"%.*s\"", str.length(), str.data());
                 return ImgFileFormat::UNKNOWN;
         }
     }
