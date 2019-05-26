@@ -108,8 +108,8 @@ struct ITelemServer
 {
     virtual ~ITelemServer() = default;
 
-    virtual bool loadApps() X_ABSTRACT;
-    virtual bool listen() X_ABSTRACT;
+    virtual bool loadApps(void) X_ABSTRACT;
+    virtual bool listen(void) X_ABSTRACT;
 };
 
 TELEM_SRV_EXPORT core::UniquePointer<ITelemServer> createServer(core::MemoryArenaBase* arena);
