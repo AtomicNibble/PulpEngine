@@ -503,6 +503,16 @@ bool XCore::Init(CoreInitParams& startupParams)
         return false;
     }
 
+    {
+        if (GetCommandLineArgForVarW(L"nopause")) {
+            env_.noPause_ = true;
+        }
+
+        if (GetCommandLineArgForVarW(L"noconsole")) {
+            startupParams.bConsoleLog = false;
+        }
+    }
+
     // #------------------------- Logging -----------------------
     if (!InitLogging(startupParams)) {
         return false;
@@ -908,14 +918,6 @@ bool XCore::ParseCmdArgs(CoreInitParams& initParams)
             }
             args_[args_.size() - 1].appendArg(args.getArgv(i));
         }
-    }
-
-    if (GetCommandLineArgForVarW(L"nopause")) {
-        env_.noPause_ = true;
-    }
-
-    if (GetCommandLineArgForVarW(L"noconsole")) {
-        initParams.bConsoleLog = false;
     }
 
     return true;
