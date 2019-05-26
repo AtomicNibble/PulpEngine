@@ -894,22 +894,26 @@ bool XCore::ParseCmdArgs(CoreInitParams& initParams)
         return false;
     }
 
+    // and convert to utf8
+    char buf[4096];
+    size_t bufLen;
+    core::strUtil::Convert(pArgs, buf, bufLen);
+
     // tokenize all the args
-    core::CmdArgs<4096, wchar_t> args(pArgs);
+    core::CmdArgs<4096> args(buf, bufLen);
 
     // now group them based on '+'
-    size_t i;
     size_t num = args.getArgc();
 
-    for (i = 0; i < num; i++) {
+    for (size_t i = 0; i < num; i++) {
         if (args_.size() >= MAX_CMD_ARS) {
             // logging is not enabled here, rip.
             // X_WARNING("Core", "Ignoring %" PRIuS " remaning command args, max reached: %" PRIuS, num - args_.size(), args_.capacity());
             break;
         }
 
-        const wchar_t* pArg = args.getArgv(i);
-        if ((*pArg == L'+' || *pArg == L'-') && core::strUtil::strlen(pArg) > 1) {
+        const auto* pArg = args.getArgv(i);
+        if ((*pArg == '+' || *pArg == '-') && core::strUtil::strlen(pArg) > 1) {
             args_.AddOne().appendArg(args.getArgv(i) + 1);
         }
         else {

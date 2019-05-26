@@ -119,7 +119,7 @@ class XCore : public ICore
     typedef core::Array<IAssertHandler*> ArrsetHandlersArr;
     
     typedef core::Array<core::string> HotRelodIgnoreArr;
-    typedef core::CmdArgs<1024, wchar_t> CmdArg;
+    typedef core::CmdArgs<1024> CmdArg;
     typedef core::Array<CmdArg> CmdArgs;
 
 public:

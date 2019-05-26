@@ -50,9 +50,9 @@ using namespace core::string_view_literals;
 
 namespace
 {
-    char buf[core::bitUtil::RoundUpToMultiple<size_t>(sizeof(XCore) + 64, 128)];
+    char __lineraAllocBuf[core::bitUtil::RoundUpToMultiple<size_t>(sizeof(XCore) + 64, 128)];
 
-    core::LinearAllocator linera(buf, buf + sizeof(buf));
+    core::LinearAllocator linera(__lineraAllocBuf, __lineraAllocBuf + sizeof(__lineraAllocBuf));
     core::SimpleMemoryArena<decltype(linera)> coreInstArena(&linera, "CoreAllocator");
 
 } // namespace
@@ -443,29 +443,43 @@ const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
         return nullptr;
     }
 
-    size_t i;
-    for (i = 0; i < args_.size(); i++) {
+#if 1
+    core::StackString256 name(pVarName);
+
+    static wchar_t buf[512];
+    core::zero_object(buf);
+
+    auto resView = GetCommandLineArg(name);
+
+    if (!resView.empty()) {
+        core::strUtil::Convert(resView, buf);
+        return buf;
+    }
+
+    return nullptr;
+#else
+    for (size_t i = 0; i < args_.size(); i++) {
         const CmdArg& arg = args_[i];
 
         if (arg.getArgc() >= 3) {
-            const wchar_t* pCmd = arg.getArgv(0);
-            if (core::strUtil::IsEqualCaseInsen(pCmd, L"set")) {
-                const wchar_t* pName = arg.getArgv(1);
+            const auto* pCmd = arg.getArgv(0);
+            if (core::strUtil::IsEqualCaseInsen(pCmd, "set")) {
+                const auto* pName = arg.getArgv(1);
                 if (core::strUtil::IsEqual(pName, pVarName)) {
-                    const wchar_t* pValue = arg.getArgv(2);
+                    const auto* pValue = arg.getArgv(2);
                     return pValue;
                 }
             }
         }
         else if (arg.getArgc() == 2) {
-            const wchar_t* pName = arg.getArgv(0);
+            const auto* pName = arg.getArgv(0);
             if (core::strUtil::IsEqualCaseInsen(pName, pVarName)) {
-                const wchar_t* pValue = arg.getArgv(1);
+                const auto* pValue = arg.getArgv(1);
                 return pValue;
             }
         }
         else if (arg.getArgc() == 1) {
-            const wchar_t* pName = arg.getArgv(0);
+            const auto* pName = arg.getArgv(0);
             if (core::strUtil::IsEqualCaseInsen(pName, pVarName)) {
                 return L"";
             }
@@ -473,6 +487,7 @@ const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
     }
 
     return nullptr;
+#endif
 }
 
 void XCore::OnFatalError(const char* pFormat, va_list args)
@@ -596,7 +611,7 @@ void XCore::ListProgramArgs(void)
         merged.setFmt("(%" PRIuS ") ", i);
 
         for (j = 0; j < argsNum; j++) {
-            merged.appendFmt("^2%ls^7", arg.getArgv(j));
+            merged.appendFmt("^2%s^7", arg.getArgv(j));
             if ((j + 1) < argsNum) {
                 merged.append(" -> ");
             }
