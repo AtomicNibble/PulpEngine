@@ -40,7 +40,7 @@ namespace
 
 } // namespace
 
-
+using namespace core::string_view_literals;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -64,15 +64,32 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         TelemetryServerArena arena(&allocator, "TelemetryServerArena");
 
         // create the server.
-        auto srv = telemetry::createServer(&arena);
+        {
+            auto srv = telemetry::createServer(&arena);
 
-        srv->loadApps();
+            // TODO: i tihnk core should store all args as utf-8
+            auto traceFilePath = gEnv->pCore->GetCommandLineArg("trace"_sv);
 
-        if (!srv->listen()) {
-            return 1;
+            if (!traceFilePath.empty())
+            {
+                core::Path<> path(traceFilePath.begin(), traceFilePath.end());
+
+                if (!srv->ingestTraceFile(path)) {
+                    X_ERROR("TelemSrv", "Failed to ingrest trace file: \"%s\"", path.c_str());
+                    return 1;
+                }
+            }
+            else
+            {
+
+                srv->loadApps();
+
+                if (!srv->listen()) {
+                    return 1;
+                }
+
+            }
         }
-
-        // TODO: cleanup server?
     }
 
     return 0;

@@ -484,15 +484,19 @@ class Server : public ITelemServer
 
 public:
     Server(core::MemoryArenaBase* arena);
-    ~Server() X_OVERRIDE;
+    ~Server() X_FINAL;
 
-    bool loadApps() X_FINAL;
-    bool loadAppTraces(core::string_view appName, const core::Path<>& dir);
-
+    bool loadApps(void) X_FINAL;
     bool listen(void) X_FINAL;
 
-public:
+    bool ingestTraceFile(core::Path<>& path) X_FINAL;
+
+private:
+    bool loadAppTraces(core::string_view appName, const core::Path<>& dir);
+
     void readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData);
+
+public:
     bool sendAppList(ClientConnection& client);
     void handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo* pHdr);
     void closeClient(ClientConnection* pClientCon);

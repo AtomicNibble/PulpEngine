@@ -3390,6 +3390,55 @@ bool Server::listen(void)
 }
 
 
+bool Server::ingestTraceFile(core::Path<>& path)
+{
+    // we might have a bigggggg boy.
+    // couple 100 GB etc.
+    // so need to ingrest him.
+    // but also sometimes i will want to load the whole file for benchmarking.
+
+    core::FileFlags mode = core::FileFlag::READ | core::FileFlag::SHARE;
+    
+    core::XFileScoped file;
+    if (!file.openFile(path, mode)) {
+        return false;
+    }
+
+    TelemFileHdr hdr;
+    if (file.readObj(hdr) != sizeof(hdr)) {
+        return false;
+    }
+
+    if (!hdr.isValid()) {
+        return false;
+    }
+
+    if (hdr.version != TRACE_FILE_VERSION) {
+        return false;
+    }
+
+    // okay so we think this trace file is valid.
+    // we should just have the same data we would get from a socket.
+    uint64_t bytesLeft = file.remainingBytes();
+
+    uint8_t buffer[1024 * 64];
+
+    while (bytesLeft)
+    {
+        auto toRead = core::Min(sizeof(buffer), bytesLeft);
+
+        if (file.read(buffer, toRead) != toRead) {
+            return false;
+        }
+
+        // we have som data!
+
+        bytesLeft -= toRead;
+    }
+
+    return true;
+}
+
 void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData)
 {
     X_UNUSED(jobSys, threadIdx, pJob, pJobData);
