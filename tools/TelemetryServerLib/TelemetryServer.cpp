@@ -3538,6 +3538,14 @@ bool Server::ingestTraceFile(core::Path<>& path)
         bytesLeft -= toRead;
     }
 
+    // flush
+    res = platform::shutdown(connectSocket, SD_BOTH);
+    if (res == SOCKET_ERROR) {
+        lastErrorWSA::Description Dsc;
+        const auto err = lastErrorWSA::Get();
+        X_ERROR("TelemSrv", "socket shutdown failed with Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
+    }
+
     platform::closesocket(connectSocket);
 
     if (file.remainingBytes() != 0) {
