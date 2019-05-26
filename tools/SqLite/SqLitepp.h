@@ -365,7 +365,6 @@ public:
     int columnCount(void) const;
 
     const char* columnName(int idx) const;
-    const char* columnDecltype(int idx) const;
 
     iterator begin(void);
     iterator end(void);

@@ -734,32 +734,6 @@ Result::Enum SqlLiteCmd::executeAll(void)
         return rc;
     }
 
-    char const* sql = pTail_;
-
-    while (std::strlen(sql) > 0) // sqlite3_complete() is broken.
-    {
-        sqlite3_stmt* old_stmt = pStmt_;
-
-        if ((rc = prepare_impl(sql)) != Result::OK) {
-            X_ERROR("SqlDb", "executeAll err(%i): \"%s\"", rc, db_.errorMsg());
-            return rc;
-        }
-
-        if ((rc = static_cast<Result::Enum>(sqlite3_transfer_bindings(old_stmt, pStmt_))) != Result::OK) {
-            X_ERROR("SqlDb", "executeAll err(%i): \"%s\"", rc, db_.errorMsg());
-            return rc;
-        }
-
-        finish_impl(old_stmt);
-
-        if ((rc = execute()) != Result::OK) {
-            X_ERROR("SqlDb", "executeAll err(%i): \"%s\"", rc, db_.errorMsg());
-            return rc;
-        }
-
-        sql = pTail_;
-    }
-
     return rc;
 }
 
@@ -902,11 +876,6 @@ int SqlLiteQuery::columnCount(void) const
 char const* SqlLiteQuery::columnName(int idx) const
 {
     return sqlite3_column_name(pStmt_, idx);
-}
-
-char const* SqlLiteQuery::columnDecltype(int idx) const
-{
-    return sqlite3_column_decltype(pStmt_, idx);
 }
 
 SqlLiteQuery::iterator SqlLiteQuery::begin(void)
