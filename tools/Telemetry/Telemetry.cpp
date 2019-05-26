@@ -149,30 +149,6 @@ namespace
 
     namespace Io
     {
-        #define TELEM_TAG(a, b, c, d) (tt_uint32)((d << 24) | (c << 16) | (b << 8) | a)
-
-        static const char* TRACE_FILE_EXTENSION = "trace";
-        static const tt_uint32 TRACR_FOURCC = TELEM_TAG('t', 'r', 'a', 'c');
-        static const tt_uint8 TRACE_VERSION = 1;
-
-        // write a header.
-        struct TelemFileHdr
-        {
-            TelemFileHdr() {
-                zero_this(this);
-            }
-
-            tt_uint32 fourCC;
-            tt_uint8 version;
-            tt_uint8 _pad[3];
-
-            bool isValid(void) const {
-                return fourCC == TRACR_FOURCC;
-            }
-        };
-
-        static_assert(sizeof(TelemFileHdr) == 8, "Size changed");
-
         TtFileHandle fileOpen(void* pUserData, const char* pPath)
         {
             TELEM_UNUSED(pUserData);
@@ -3524,7 +3500,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
 
         // lets be nice and only make one IO call.
         // lengths are validated above.
-        uint8_t buf[sizeof(Io::TelemFileHdr) +
+        uint8_t buf[sizeof(TelemFileHdr) +
             sizeof(cr) +
             MAX_CMDLINE_LEN +
             MAX_STRING_LEN +
@@ -3532,9 +3508,10 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
             128
         ];
 
-        Io::TelemFileHdr hdr;
-        hdr.fourCC = Io::TRACR_FOURCC;
-        hdr.version = Io::TRACE_VERSION;
+        TelemFileHdr hdr;
+        zero_object(hdr);
+        hdr.fourCC = TRACR_FILE_FOURCC;
+        hdr.version = TRACE_FILE_VERSION;
 
         tt_int32 offset = 0;
         memcpy(&buf[offset], &hdr, sizeof(hdr));

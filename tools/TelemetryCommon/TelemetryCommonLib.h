@@ -31,3 +31,4 @@
 #include "StringCompress.h"
 #include "SysTimer.h"
 #include "LastErrorWSA.h"
+#include "TraceFileTypes.h"
