@@ -3104,6 +3104,7 @@ Server::Server(core::MemoryArenaBase* arena) :
     settings_.symbolTmpDir.set("symbols/.tmp/");
 
     sql::SqlLiteDb::enableSharedCache(true);
+    sql::SqlLiteDb::setThreadMode(sql::ThreadMode::MULTI);
 }
 
 Server::~Server()
