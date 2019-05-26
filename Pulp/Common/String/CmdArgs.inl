@@ -2,9 +2,9 @@
 X_NAMESPACE_BEGIN(core)
 
 template<size_t BUF_SIZE>
-CmdArgs<BUF_SIZE>::CmdArgs(void)
+CmdArgs<BUF_SIZE>::CmdArgs(void) :
+    CmdArgs<BUF_SIZE>(nullptr, 0)
 {
-    clear();
 }
 
 template<size_t BUF_SIZE>
@@ -16,6 +16,10 @@ CmdArgs<BUF_SIZE>::CmdArgs(const TChar* pText) :
 template<size_t BUF_SIZE>
 CmdArgs<BUF_SIZE>::CmdArgs(const TChar* pText, size_t length)
 {
+    argc_ = 0;
+    core::zero_object(argv_);
+    core::zero_object(tokenized_);
+
     tokenize(pText, length);
 }
 
