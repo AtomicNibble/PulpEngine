@@ -150,8 +150,6 @@ struct TraceBuilder : public TraceStream
         };
     };
 
-    static constexpr size_t MAX_LOCKS = 256;
-
     using StringIdxMap = core::FixedHashTable<core::string, int32_t>;
 
     struct IndexStr
