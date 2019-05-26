@@ -53,6 +53,7 @@ public:
     constexpr size_type size() const;
     constexpr size_type length() const;
     constexpr bool empty() const;
+    constexpr bool isNotEmpty() const;
     constexpr const_pointer data() const;
 
     constexpr const_iterator begin() const;
@@ -158,6 +159,11 @@ constexpr string_view::size_type string_view::length() const
 constexpr bool string_view::empty() const
 {
     return size_ == 0;
+}
+
+constexpr bool string_view::isNotEmpty() const
+{
+    return !empty();
 }
 
 constexpr typename string_view::const_pointer string_view::data() const
