@@ -173,7 +173,7 @@ namespace strUtil
     template<size_t N>
     inline const char* Convert(const wchar_t* startInclusive, const wchar_t* endExclusive, char(&output)[N])
     {
-        return Convert(startInclusive, endExclusive, output, N * sizeof(wchar_t));
+        return Convert(startInclusive, endExclusive, output, N);
     }
 
     // ----
