@@ -3406,14 +3406,17 @@ bool Server::ingestTraceFile(core::Path<>& path)
 
     TelemFileHdr hdr;
     if (file.readObj(hdr) != sizeof(hdr)) {
+        X_ERROR("TelemSrv", "Failed to read trace file header");
         return false;
     }
 
     if (!hdr.isValid()) {
+        X_ERROR("TelemSrv", "Trace file header is invalid");
         return false;
     }
 
     if (hdr.version != TRACE_FILE_VERSION) {
+        X_ERROR("TelemSrv", "Trace file version mismatch");
         return false;
     }
 
@@ -3428,6 +3431,7 @@ bool Server::ingestTraceFile(core::Path<>& path)
         auto toRead = core::Min(sizeof(buffer), bytesLeft);
 
         if (file.read(buffer, toRead) != toRead) {
+            X_ERROR("TelemSrv", "Error reading trace file data");
             return false;
         }
 
