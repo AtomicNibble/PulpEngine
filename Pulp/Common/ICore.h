@@ -7,7 +7,6 @@
 #include "Traits\FunctionTraits.h"
 
 #include "Math\XVector.h"
-
 #include "Random\XorShift.h"
 
 // defaults.
@@ -45,6 +44,8 @@ X_NAMESPACE_DECLARE(core,
                     class MallocFreeAllocator;
                     class MemoryArenaBase;
                     class AssetLoader;
+
+                    class string_view;
 
                     namespace V2 {
 	                    class JobSystem;
@@ -416,6 +417,7 @@ struct ICore
 
     // cmd-line util
     virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_ABSTRACT;
+    virtual core::string_view GetCommandLineArg(core::string_view name) const X_ABSTRACT;
 
     virtual bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_ABSTRACT;
     virtual bool IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName,

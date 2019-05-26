@@ -490,6 +490,43 @@ const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
 #endif
 }
 
+core::string_view XCore::GetCommandLineArg(core::string_view name) const
+{
+    if (args_.isEmpty()) {
+        return {};
+    }
+
+    for (size_t i = 0; i < args_.size(); i++) {
+        const CmdArg& arg = args_[i];
+
+        if (arg.getArgc() >= 3) {
+            const auto* pCmd = arg.getArgv(0);
+            if (core::strUtil::IsEqualCaseInsen(pCmd, "set")) {
+                const auto* pName = arg.getArgv(1);
+                if (core::strUtil::IsEqual(core::string_view(pName), name)) {
+                    const auto* pValue = arg.getArgv(2);
+                    return core::string_view(pValue);
+                }
+            }
+        }
+        else if (arg.getArgc() == 2) {
+            const auto* pName = arg.getArgv(0);
+            if (core::strUtil::IsEqualCaseInsen(core::string_view(pName), name)) {
+                const auto* pValue = arg.getArgv(1);
+                return core::string_view(pValue);
+            }
+        }
+        else if (arg.getArgc() == 1) {
+            const auto* pName = arg.getArgv(0);
+            if (core::strUtil::IsEqualCaseInsen(core::string_view(pName), name)) {
+                return {};
+            }
+        }
+    }
+
+    return {};
+}
+
 void XCore::OnFatalError(const char* pFormat, va_list args)
 {
     core::CallStack::Description Dsc;

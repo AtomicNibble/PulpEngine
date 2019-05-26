@@ -135,6 +135,7 @@ public:
 
     bool RunGameLoop(void) X_FINAL;
     const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_FINAL;
+    core::string_view GetCommandLineArg(core::string_view name) const X_FINAL;
     bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_FINAL;
     bool IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName,
         IConverterModule** pConvertModuleOut = nullptr, IConverter** pConverterInstance = nullptr) X_FINAL;
