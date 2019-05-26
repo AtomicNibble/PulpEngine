@@ -2096,6 +2096,7 @@ bool TraceDB::setPragmas(void)
 bool TraceDB::getStats(sql::SqlLiteDb& db, TraceStats& stats)
 {
     // These need to be fast even when there is 10 million rows etc..
+    sql::SqlLiteTransaction trans(db, true);
 
     {
         sql::SqlLiteQuery qry(db, "SELECT MAX(_rowid_) FROM strings LIMIT 1");
