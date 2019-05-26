@@ -2,6 +2,9 @@
 #include "TelemetryServer.h"
 
 #include <Util/Guid.h>
+#include <Time/StopWatch.h>
+#include <String/HumanDuration.h>
+#include <String/HumanSize.h>
 
 #include <IFileSys.h>
 
@@ -3516,7 +3519,10 @@ bool Server::ingestTraceFile(core::Path<>& path)
         return false;
     }
 
-    uint64_t bytesLeft = file.remainingBytes();
+    core::StopWatch timer;
+
+    const uint64_t totalBytes = file.remainingBytes();
+    uint64_t bytesLeft = totalBytes;
     uint8_t buffer[1024 * 64];
 
     while (bytesLeft)
@@ -3545,6 +3551,17 @@ bool Server::ingestTraceFile(core::Path<>& path)
         const auto err = lastErrorWSA::Get();
         X_ERROR("TelemSrv", "socket shutdown failed with Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
     }
+
+    auto ellapsedMs = timer.GetMilliSeconds();
+    auto ellapsedSec = ellapsedMs / 1000;
+
+    float MBs = static_cast<float>(totalBytes / 1024 / 1024);
+    float MBPerSec = MBs / ellapsedSec;
+
+    core::HumanDuration::Str durStr;
+    core::HumanSize::Str sizeStr;
+
+    X_LOG0("TelemSrv", "Ingested ^6%s^7 in ^6%s^7 speed ^6%.2fMB/s", core::HumanSize::toString(sizeStr, totalBytes), core::HumanDuration::toString(durStr, ellapsedMs), MBPerSec);
 
     platform::closesocket(connectSocket);
 
