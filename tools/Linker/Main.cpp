@@ -44,6 +44,8 @@ typedef core::MemoryArena<
     >
     LinkerArena;
 
+using namespace core::string_view_literals;
+
 namespace
 {
     X_DECLARE_ENUM(LinkMode)
@@ -68,16 +70,16 @@ namespace
 
     bool GetMode(LinkMode::Enum& mode)
     {
-        const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
-        if (pMode) {
-            if (core::strUtil::IsEqualCaseInsen(pMode, L"build")) {
+        auto modeStr = gEnv->pCore->GetCommandLineArg("mode"_sv);
+        if (modeStr.isNotEmpty()) {
+            if (core::strUtil::IsEqualCaseInsen(modeStr, "build"_sv)) {
                 mode = LinkMode::BUILD;
             }
-            else if (core::strUtil::IsEqualCaseInsen(pMode, L"meta")) {
+            else if (core::strUtil::IsEqualCaseInsen(modeStr, "meta"_sv)) {
                 mode = LinkMode::META;
             }
             else {
-                X_ERROR("Linker", "Unknown mode: \"%ls\"", pMode);
+                X_ERROR("Linker", "Unknown mode: \"%.*s\"", modeStr.length(), modeStr.data());
                 return false;
             }
 
@@ -100,27 +102,25 @@ namespace
 
     bool LoadBuildOptions(linker::BuildOptions& options)
     {
-        if (!gEnv->pCore->GetCommandLineArgForVarW(L"nocompress")) {
+        if (!gEnv->pCore->GetCommandLineArg("nocompress"_sv).isNotEmpty()) {
             options.flags.Set(AssetPak::PakBuilderFlag::COMPRESSION);
         } 
 
-        if (gEnv->pCore->GetCommandLineArgForVarW(L"sharedict")) {
+        if (gEnv->pCore->GetCommandLineArg("sharedict"_sv).isNotEmpty()) {
             options.flags.Set(AssetPak::PakBuilderFlag::SHARED_DICT);
         }
 
-        if (gEnv->pCore->GetCommandLineArgForVarW(L"memory")) {
+        if (gEnv->pCore->GetCommandLineArg("memory"_sv).isNotEmpty()) {
             options.flags.Set(AssetPak::PakBuilderFlag::HINT_MEMORY);
         }
 
-        if (gEnv->pCore->GetCommandLineArgForVarW(L"timestamp")) {
+        if (gEnv->pCore->GetCommandLineArg("timestamp"_sv).isNotEmpty()) {
             options.flags.Set(AssetPak::PakBuilderFlag::TIMESTAMP);
         }
 
-        char buf[core::Path<char>::BUF_SIZE];
-
-        const wchar_t* pAssetList = gEnv->pCore->GetCommandLineArgForVarW(L"al");
-        if (pAssetList) {
-            options.assetList.set(core::strUtil::Convert(pAssetList, buf));
+        auto assetListStr = gEnv->pCore->GetCommandLineArg("al"_sv);
+        if (assetListStr.isNotEmpty()) {
+            options.assetList.set(assetListStr.begin(), assetListStr.end());
 
             core::Path<char> temp(options.assetList);
             temp.removeExtension();
@@ -128,20 +128,20 @@ namespace
             options.outFile = temp.fileName();
         }
 
-        const wchar_t* pLevelName = gEnv->pCore->GetCommandLineArgForVarW(L"lvl");
-        if (pLevelName) {
-            options.level = core::strUtil::Convert(pLevelName, buf);
+        auto levelName = gEnv->pCore->GetCommandLineArg("lvl"_sv);
+        if (levelName.isNotEmpty()) {
+            options.level.assign(levelName.data(), levelName.length());
             options.outFile.set(options.level.begin(), options.level.end());
         }
 
-        const wchar_t* pModName = gEnv->pCore->GetCommandLineArgForVarW(L"mod");
-        if (pModName) {
-            options.mod = core::strUtil::Convert(pModName, buf);
+        auto modName = gEnv->pCore->GetCommandLineArg("mod"_sv);
+        if (modName.isNotEmpty()) {
+            options.mod.assign(modName.data(), modName.length());
         }
 
-        const wchar_t* pOutFileName = gEnv->pCore->GetCommandLineArgForVarW(L"of");
-        if (pOutFileName) {
-            options.outFile.set(core::strUtil::Convert(pOutFileName, buf));
+        auto outFileName = gEnv->pCore->GetCommandLineArg("of"_sv);
+        if (outFileName.isNotEmpty()) {
+            options.outFile.set(outFileName.begin(), outFileName.end());
         }
 
         if (options.outFile.isEmpty()) {

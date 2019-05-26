@@ -93,6 +93,8 @@ namespace
 
 X_NAMESPACE_BEGIN(texture)
 
+using namespace core::string_view_literals;
+
 namespace
 {
 
@@ -124,38 +126,32 @@ namespace
                 outFile.set(pOutFile);
             }
 
-            const wchar_t* pDim = gEnv->pCore->GetCommandLineArgForVarW(L"dim");
-            if (pDim) {
+            auto dimStr = gEnv->pCore->GetCommandLineArg("dim"_sv);
+            if (!dimStr.empty()) {
          
                 // wXh
-                if (::swscanf_s(pDim, L"%" PRIu16 L"x%" PRIu16, &dim.x, &dim.y) != 2) {
-                    X_ERROR("ImgTool", "Failed to parse dim: %ls", pDim);
+                core::StackString256 buf(dimStr.begin(), dimStr.end());
+                if (::sscanf_s(buf.c_str(), "%" PRIu16 "x%" PRIu16, &dim.x, &dim.y) != 2) {
+                    X_ERROR("ImgTool", "Failed to parse dim: %s", buf.c_str());
                     return false;
                 }
 
                 resize = true;
             }
 
-            const wchar_t* pOutFmt = gEnv->pCore->GetCommandLineArgForVarW(L"fmt");
-            if (pOutFmt) {
+            auto outFmtStr = gEnv->pCore->GetCommandLineArg("fmt"_sv);
+            if (!outFmtStr.empty()) {
 
-                char buf[64];
-                outputFileFmt = texture::Util::ImgFileFmtFromStr(core::strUtil::Convert(pOutFmt, buf));
+                outputFileFmt = texture::Util::ImgFileFmtFromStr(outFmtStr);
                 if (outputFileFmt == ImgFileFormat::UNKNOWN) {
-                    X_LOG0("ImgTool", "Unknown extension: \"%ls\"", pOutFmt);
+                    X_LOG0("ImgTool", "Unknown extension: \"%.*s\"", outFmtStr.length(), outFmtStr.data());
                     return false;
                 }
             }
 
-            const wchar_t* pForce = gEnv->pCore->GetCommandLineArgForVarW(L"force");
-            if (pForce) {
-                // TOOD: hack - make it work like a flag.
-                if (core::strUtil::strlen(pForce) == 0) {
-                    force = true;
-                }
-                else {
-                    force = core::strUtil::StringToBool(pForce);
-                }
+            auto forceStr = gEnv->pCore->GetCommandLineArg("force"_sv);
+            if (!forceStr.empty()) {
+                force = core::strUtil::StringToBool(forceStr.begin(), forceStr.end());
             }
         }
 
