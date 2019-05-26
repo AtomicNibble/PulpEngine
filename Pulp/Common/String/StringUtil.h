@@ -83,10 +83,16 @@ namespace strUtil
     inline const char* Convert(const wchar_t* input, char (&output)[N]);
 
     template<size_t N>
+    inline const char* Convert(const wchar_t* input, char(&output)[N], size_t& lengthOut);
+
+    template<size_t N>
     inline const char* Convert(const wchar_t* startInclusive, const wchar_t* endExclusive, char(&output)[N]);
 
     template<size_t N>
     inline const wchar_t* Convert(const char* input, wchar_t (&output)[N]);
+
+    template<size_t N>
+    inline const wchar_t* Convert(const char* input, wchar_t(&output)[N], size_t& lengthOut);
 
     template<size_t N>
     inline const wchar_t* Convert(const char* startInclusive, const char* endExclusive, wchar_t(&output)[N]);

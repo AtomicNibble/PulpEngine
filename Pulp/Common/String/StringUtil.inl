@@ -165,15 +165,29 @@ namespace strUtil
     }
 
     template<size_t N>
+    inline const char* Convert(const wchar_t* input, char(&output)[N], size_t& lengthOut)
+    {
+        return Convert(input, input + strlen(input), output, N, lengthOut);
+    }
+
+    template<size_t N>
     inline const char* Convert(const wchar_t* startInclusive, const wchar_t* endExclusive, char(&output)[N])
     {
         return Convert(startInclusive, endExclusive, output, N * sizeof(wchar_t));
     }
 
+    // ----
+
     template<size_t N>
     inline const wchar_t* Convert(const char* input, wchar_t (&output)[N])
     {
         return Convert(input, input + strlen(input), output, N * sizeof(wchar_t));
+    }
+
+    template<size_t N>
+    inline const wchar_t* Convert(const char* input, wchar_t(&output)[N], size_t& lengthOut)
+    {
+        return Convert(input, input + strlen(input), output, N * sizeof(wchar_t), lengthOut);
     }
 
     template<size_t N>
@@ -187,6 +201,8 @@ namespace strUtil
     {
         return Convert(input.begin(), input.end(), output, N * sizeof(wchar_t));
     }
+
+    // ----
 
     inline const char* Convert(const wchar_t* startInclusive, const wchar_t* endExclusive, char* output, size_t outputBytes)
     {
