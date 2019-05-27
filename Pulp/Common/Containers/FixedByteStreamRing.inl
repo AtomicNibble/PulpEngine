@@ -28,7 +28,7 @@ inline FixedByteStreamRingOwningPolicy::~FixedByteStreamRingOwningPolicy()
 
 template<size_t N>
 inline FixedByteStreamRingStackPolicy<N>::FixedByteStreamRingStackPolicy() :
-    FixedByteStreamBase(buf_, core::ByteUtil::bytesToBytes(N))
+    FixedByteStreamRingBase(buf_, core::ByteUtil::bytesToBytes(N))
 {
 }
 
