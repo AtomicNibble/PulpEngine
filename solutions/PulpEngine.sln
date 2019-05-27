@@ -346,6 +346,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TelemetrySymbols", "..\tool
 		{07328CCB-F9CC-4967-861E-272BCA0CAB04} = {07328CCB-F9CC-4967-861E-272BCA0CAB04}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TelemetryTraceImport", "..\tools\TelemetryTraceImport\TelemetryTraceImport.vcxproj", "{035685D3-12DC-4231-A216-3D48D04FA105}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C9F0BB81-77FE-4CCA-AAA0-18FA2F772561} = {C9F0BB81-77FE-4CCA-AAA0-18FA2F772561}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Dynamic|Win32 = Debug Dynamic|Win32
@@ -1482,6 +1487,30 @@ Global
 		{E1795F20-048A-40FE-AE45-D39E459F1609}.Super|Win32.Build.0 = Super|Win32
 		{E1795F20-048A-40FE-AE45-D39E459F1609}.Super|x64.ActiveCfg = Super|x64
 		{E1795F20-048A-40FE-AE45-D39E459F1609}.Super|x64.Build.0 = Super|x64
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Debug|Win32.ActiveCfg = Debug|Win32
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Debug|Win32.Build.0 = Debug|Win32
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Debug|x64.ActiveCfg = Debug|x64
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Debug|x64.Build.0 = Debug|x64
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Release Dynamic|Win32.ActiveCfg = Release Dynamic|Win32
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Release Dynamic|Win32.Build.0 = Release Dynamic|Win32
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Release Dynamic|x64.ActiveCfg = Release Dynamic|x64
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Release Dynamic|x64.Build.0 = Release Dynamic|x64
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Release|Win32.ActiveCfg = Release|Win32
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Release|Win32.Build.0 = Release|Win32
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Release|x64.ActiveCfg = Release|x64
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Release|x64.Build.0 = Release|x64
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Super Dynamic|Win32.ActiveCfg = Super Dynamic|Win32
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Super Dynamic|Win32.Build.0 = Super Dynamic|Win32
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Super Dynamic|x64.ActiveCfg = Super Dynamic|x64
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Super Dynamic|x64.Build.0 = Super Dynamic|x64
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Super|Win32.ActiveCfg = Super|Win32
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Super|Win32.Build.0 = Super|Win32
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Super|x64.ActiveCfg = Super|x64
+		{035685D3-12DC-4231-A216-3D48D04FA105}.Super|x64.Build.0 = Super|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1536,6 +1565,7 @@ Global
 		{C9F0BB81-77FE-4CCA-AAA0-18FA2F772561} = {BDE1E09F-D58A-444E-88B9-F28C2D8B5E1B}
 		{01C8805E-1ED0-4A6C-8D52-98EC23277CB3} = {BDE1E09F-D58A-444E-88B9-F28C2D8B5E1B}
 		{E1795F20-048A-40FE-AE45-D39E459F1609} = {BDE1E09F-D58A-444E-88B9-F28C2D8B5E1B}
+		{035685D3-12DC-4231-A216-3D48D04FA105} = {BDE1E09F-D58A-444E-88B9-F28C2D8B5E1B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C210B0E9-1C7C-4621-93AE-D9FE065678CB}

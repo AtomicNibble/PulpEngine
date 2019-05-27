@@ -37,7 +37,7 @@ namespace
         core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
     >
-        TelemetryServerArena;
+        TelemetryTraceImportArena;
 
 
 } // namespace
@@ -61,20 +61,32 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             return 1;
         }
 
-        core::ICVar* pLogVerbosity = gEnv->pConsole->getCVar(core::string_view("log_verbosity"));
-        pLogVerbosity->Set(0);
-
-        TelemetryServerArena::AllocationPolicy allocator;
-        TelemetryServerArena arena(&allocator, "TelemetryServerArena");
+        TelemetryTraceImportArena::AllocationPolicy allocator;
+        TelemetryTraceImportArena arena(&allocator, "TTelemetryTraceImportArena");
 
         {
             auto srv = telemetry::createServer(&arena);
 
-            srv->loadApps();
+            // TODO: i tihnk core should store all args as utf-8
+            auto traceFilePath = gEnv->pCore->GetCommandLineArg("trace"_sv);
 
-            if (!srv->listen()) {
+            if (!traceFilePath.empty())
+            {
+                X_ERROR("TelemSrv", "Missing trace arg");
                 res = 1;
             }
+            else
+            {
+                core::Path<> path(traceFilePath.begin(), traceFilePath.end());
+
+                if (!srv->ingestTraceFile(path)) {
+                    X_ERROR("TelemSrv", "Failed to ingest trace file: \"%s\"", path.c_str());
+                    res = 1;
+                }
+
+                gEnv->pConsoleWnd->pressToContinue();
+            }
+           
         }
     }
 
