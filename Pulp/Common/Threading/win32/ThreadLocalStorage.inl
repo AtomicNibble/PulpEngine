@@ -38,16 +38,16 @@ inline void ThreadLocalStorage::setValueInt(intptr_t value)
 template<typename T>
 inline T* ThreadLocalStorage::getValue(void) const
 {
-    void* data = TlsGetValue(index_);
+    void* pData = TlsGetValue(index_);
 
     // see remarks at http://msdn.microsoft.com/en-us/library/windows/desktop/ms686812%28v=vs.85%29.aspx
-    if (lastError::Get() != ERROR_SUCCESS) {
+    if (pData == 0 && lastError::Get() != ERROR_SUCCESS) {
         lastError::Description Dsc;
         X_ERROR("LocalStorage", "Failed to get thread local storage idx(%d). Error: %s",
             index_, lastError::ToString(Dsc));
     }
 
-    return static_cast<T*>(data);
+    return static_cast<T*>(pData);
 }
 
 inline intptr_t ThreadLocalStorage::getValueInt(void) const
