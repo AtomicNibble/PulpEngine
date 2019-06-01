@@ -824,6 +824,7 @@ struct IFileSys
 
     // Open Files
     virtual XFile* openFileOS(const PathWT& osPath, FileFlags mode) X_ABSTRACT;
+    virtual XFile* openFileOS(const PathT& osPath, FileFlags mode) X_ABSTRACT;
     virtual XFile* openFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir = VirtualDirectory::BASE) X_ABSTRACT;
     virtual void closeFile(XFile* file) X_ABSTRACT;
 
@@ -856,6 +857,7 @@ struct IFileSys
     virtual bool fileExists(const PathT& relPath) const X_ABSTRACT;
     virtual bool fileExists(const PathT& relPath, VirtualDirectory::Enum dir) const X_ABSTRACT;
     virtual bool fileExistsOS(const PathWT& osPath) const X_ABSTRACT;
+    virtual bool fileExistsOS(const PathT& osPath) const X_ABSTRACT;
     virtual bool directoryExists(const PathT& relPath) const X_ABSTRACT;
     virtual bool directoryExists(const PathT& relPath, VirtualDirectory::Enum dir) const X_ABSTRACT;
     virtual bool directoryExistsOS(const PathWT& osPath) const X_ABSTRACT;
@@ -1095,6 +1097,12 @@ public:
     {
         X_ASSERT(pFile_ == nullptr, "File already open")();
         pFile_ = pFileSys_->openFile(path, mode, dir);
+        return pFile_ != nullptr;
+    }
+    inline bool openFileOS(const IFileSys::PathT& path, IFileSys::FileFlags mode)
+    {
+        X_ASSERT(pFile_ == nullptr, "File already open")();
+        pFile_ = pFileSys_->openFileOS(path, mode);
         return pFile_ != nullptr;
     }
     inline bool openFileOS(const IFileSys::PathWT& path, IFileSys::FileFlags mode)

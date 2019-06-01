@@ -254,6 +254,7 @@ public:
 
     // Open / Close
     XFile* openFileOS(const PathWT& osPath, FileFlags mode) X_FINAL;
+    XFile* openFileOS(const PathT& osPath, FileFlags mode) X_FINAL;
     XFile* openFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum writeDir) X_FINAL;
     void closeFile(XFile* file) X_FINAL;
 
@@ -291,6 +292,7 @@ public:
     bool fileExists(const PathT& relPath) const X_FINAL;
     bool fileExists(const PathT& relPath, VirtualDirectory::Enum dir) const X_FINAL;
     bool fileExistsOS(const PathWT& osPath) const X_FINAL;
+    bool fileExistsOS(const PathT& osPath) const X_FINAL;
     bool directoryExists(const PathT& relPath) const X_FINAL;
     bool directoryExists(const PathT& relPath, VirtualDirectory::Enum dir) const X_FINAL;
     bool directoryExistsOS(const PathWT& osPath) const X_FINAL;

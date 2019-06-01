@@ -360,6 +360,24 @@ XFile* xFileSys::openFileOS(const PathWT& osPath, FileFlags mode)
     return nullptr;
 }
 
+XFile* xFileSys::openFileOS(const PathT& osPath, FileFlags mode)
+{
+    if (isDebug()) {
+        X_LOG0("FileSys", "openFileOS: \"%s\"", osPath.c_str());
+    }
+
+    PathWT pathWide(osPath);
+
+    XDiskFile* pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(pathWide, mode);
+    if (pFile->valid()) {
+        return pFile;
+    }
+
+    closeFile(pFile);
+    return nullptr;
+}
+
+
 
 XFile* xFileSys::openFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum writeDir)
 {
@@ -909,6 +927,12 @@ bool xFileSys::fileExists(const PathT& relPath, VirtualDirectory::Enum dir) cons
 bool xFileSys::fileExistsOS(const PathWT& osPath) const
 {
     return PathUtil::FileExist(osPath, false);
+}
+
+bool xFileSys::fileExistsOS(const PathT& osPath) const
+{
+    PathWT path(osPath.begin(), osPath.end());
+    return PathUtil::FileExist(path, false);
 }
 
 bool xFileSys::directoryExists(const PathT& relPath) const
