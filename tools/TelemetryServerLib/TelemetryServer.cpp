@@ -77,6 +77,7 @@ void ClientConnection::flush(void)
         gEnv->pJobSys->Wait(pPendingJob_);
     }
 
+    // this is not longer correct?
     if (type_ == ClientType::TraceStream) {
         traceBuilder_.flushZoneTree();
         traceBuilder_.createIndexes();
@@ -90,21 +91,108 @@ void ClientConnection::flush(void)
 
 void ClientConnection::disconnect(void)
 {
+    // in this case we just want to clean up the client now cus there was a error processing the data.
     flush();
-    srv_.closeClient(this);
+    srv_.closeClient(this, false);
 }
 
 void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData)
 {
     X_UNUSED(jobSys, threadIdx, pJob, pJobData);
 
-    auto& curBuf = io_.buffer;
-    
-    auto* pData = reinterpret_cast<uint8_t*>(curBuf.buffer.data());
-    auto bytesLeft = curBuf.bytesTrans;
+    uint8_t packetData[MAX_PACKET_SIZE];
+    int32_t packetSize = 0;
+
+    // So the new logic will just keep reading and fill up the buffer.
+    // but it will stop reading when buffer is full.
+    // we need tostart reading again once we have room.
+    // and room is created here.
+    // i also need to know if a read has already been dispatched.
 
     while (1)
     {
+        // read a packet from ring.
+        {
+            core::CriticalSection::ScopedLock lock(io_.cs);
+
+            auto ringSize = io_.ring.size();
+            if (ringSize < sizeof(PacketBase)) {
+                io_.pJob_ = nullptr;
+
+                if (io_.closed) {
+                    X_LOG0("TelemSrv", "Processed all data disconnecting");
+                    disconnect();
+                }
+                return;
+            }
+
+            PacketBase hdr;
+            io_.ring.peek(0, &hdr, 1);
+
+            if (hdr.dataSize == 0) {
+                X_ERROR("TelemSrv", "Client sent packet with length zero...");
+                disconnect();
+                return;
+            }
+
+            if (hdr.dataSize > MAX_PACKET_SIZE) {
+                X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<int32_t>(hdr.dataSize));
+                disconnect();
+                return;
+            }
+
+            if (hdr.dataSize > ringSize) {
+                // we don't have enougth data to process yet.
+                io_.pJob_ = nullptr;
+
+                if (io_.closed) {
+                    X_LOG0("TelemSrv", "Processed all data disconnecting");
+                    disconnect();
+                }
+                return;
+            }
+
+            packetSize = static_cast<int32_t>(hdr.dataSize);
+            io_.ring.read(packetData, packetSize);
+
+            // dispatch a read?
+            auto freeSpace = io_.ring.freeSpace();
+
+            X_LOG0("TelemSrv", "CONSUME Ring size: %" PRIuS " freeSpace: %" PRIuS, io_.ring.size(), freeSpace);
+
+            if (freeSpace > MAX_PACKET_SIZE)
+            {
+                // How do i know if we pending or not?
+                // need a flag.
+                if (io_.recvStalled && !io_.closed)
+                {
+                    io_.recvStalled = false;
+
+                    auto& socketBuf = io_.socketBuffer;
+                    socketBuf.resizeBuffer(freeSpace);
+
+                    X_LOG1("TelemSrv", "Requesting recv with buffer size %" PRIu32 " (stalled)", socketBuf.buf.len);
+
+                    DWORD bytesTransferred = 0;
+                    DWORD flags = 0;
+
+                    // if we get data back the IOCP gets called anyway.
+                    auto res = platform::WSARecv(socket_, &socketBuf.buf, 1, &bytesTransferred, &flags, &io_.overlapped, nullptr);
+                    if (res == SOCKET_ERROR) {
+                        auto err = lastErrorWSA::Get();
+                        if (err != ERROR_IO_PENDING) {
+                            lastErrorWSA::Description errDsc;
+                            X_ERROR("TelemSrv", "failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
+                            disconnect();
+                        }
+                    }
+                }
+            }
+        }
+
+        auto* pData = packetData;
+        auto bytesLeft = packetSize;
+
         auto* pPacketHdr = reinterpret_cast<const PacketBase*>(pData);
 
         bool res = false;
@@ -117,7 +205,7 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
             case PacketType::ConnectionRequestViewer:
                 res = handleConnectionRequestViewer(pData);
                 break;
-            case PacketType::DataStream:
+            case PacketType::DataStream: 
                 res = handleDataStream(pData);
                 break;
                 // From viewer clients.
@@ -169,50 +257,7 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
         bytesLeft -= pPacketHdr->dataSize;
         pData += pPacketHdr->dataSize;
 
-        // got another packet?
-        if (bytesLeft > sizeof(PacketBase))
-        {
-            pPacketHdr = reinterpret_cast<const PacketBase*>(pData);
-
-            if (bytesLeft >= pPacketHdr->dataSize)
-            {
-                // process the next packet
-                continue;
-            }
-        }
-
-        break;
-    }
-
-    // we need to read more data.
-    // first shift the data down.
-    auto trailingBytes = bytesLeft;
-
-    if (trailingBytes > 0) {
-        auto offset = std::distance(reinterpret_cast<uint8_t*>(curBuf.buffer.data()), pData);
-        std::memcpy(curBuf.buffer.data(), &curBuf.buffer[offset], trailingBytes);
-    }
-
-    curBuf.bytesTrans = trailingBytes;
-    curBuf.setBufferLength();
-
-    // post a recv.
-    X_LOG1("TelemSrv", "Requesting recv with buffer size %" PRIu32, curBuf.buf.len);
-
-    DWORD bytesTransferred = 0;
-    DWORD flags = 0;
-
-    // if we get data back the IOCP gets called anyway.
-    auto res = platform::WSARecv(socket_, &curBuf.buf, 1, &bytesTransferred, &flags, &io_.overlapped, nullptr);
-    if (res == SOCKET_ERROR) {
-        auto err = lastErrorWSA::Get();
-        if (err != ERROR_IO_PENDING) {
-            lastErrorWSA::Description errDsc;
-            X_ERROR("TelemSrv", "failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
-
-            // is this safe?
-            disconnect();
-        }
+        X_ASSERT(bytesLeft == 0, "Did not consume packet")();
     }
 }
 
@@ -855,6 +900,11 @@ bool ClientConnection::handleDataStream(uint8_t* pData)
         cmpBufBegin_ = 0;
     }
 
+#if 1
+    // I can't dispatch a job for this currently it breaks with new buffer logic?
+    processDataStream(pDst, origLen);
+#else
+
     // create a job to process the data.
     // if there is one already running wait.
     // i need processing to be in order currently.
@@ -873,6 +923,7 @@ bool ClientConnection::handleDataStream(uint8_t* pData)
         jd
         JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL)
     );
+#endif
     return true;
 }
 
@@ -3371,7 +3422,7 @@ bool Server::listen(void)
         auto& io = pClientCon->io_;
         io.op = IOOperation::Recv;
 
-        auto& buf = io.buffer;
+        auto& buf = io.socketBuffer;
 
         // wait for some data.
         DWORD flags = 0;
@@ -3447,7 +3498,7 @@ bool Server::ingestTraceFile(core::Path<>& path)
 
     struct platform::addrinfo hints, *servinfo = nullptr;
     core::zero_object(hints);
-    hints.ai_family = AF_INET; // ipv4/6
+    hints.ai_family = AF_INET; // ipv4
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = platform::IPPROTO_TCP;
 
@@ -3604,7 +3655,7 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
             if (pIOContext) {
                 X_ERROR("TelemSrv", "Failed completion packet. Error: %s", core::lastError::ToString(Dsc));
                 X_ASSERT_NOT_NULL(pClientCon);
-                closeClient(pClientCon);
+                closeClient(pClientCon, true);
                 continue;
             }
 
@@ -3615,7 +3666,7 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
         if (bytesTransferred == 0) {
             X_ERROR("TelemSrv", "GetQueuedCompletionStatus returned zero bytes");
             if (pClientCon) {
-                closeClient(pClientCon);
+                closeClient(pClientCon, true);
             }
             continue;
         }
@@ -3626,63 +3677,99 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
         }
 
         auto& ioCtx = *pIOContext;
-        auto& curBuf = ioCtx.buffer;
+        auto& socketBuffer = ioCtx.socketBuffer;
+        socketBuffer.buffer.resize(bytesTransferred);
 
-        curBuf.bytesTrans += bytesTransferred;
-
-        X_LOG1("TelemSrv", "Recv %" PRIu32 " buffer has %" PRIu32, bytesTransferred, curBuf.bytesTrans);
+        X_LOG1("TelemSrv", "Recv %" PRIu32 " bytes", bytesTransferred);
 
         if (ioCtx.op == IOOperation::Recv)
         {
-            if (curBuf.bytesTrans >= sizeof(PacketBase))
+            // so.. we place data into a ring buffer.
+            // a thread needs to process it.
+            // ideally it's a job so that N threads can handle X clients.
+            // maybe we just make a job if not one already?
+            // how to prvent a race tho.
+
+            size_t freeSpace = 0;
+
             {
-                // we always check for header from start of buffer.
-                auto* pHdr = reinterpret_cast<const PacketBase*>(curBuf.buffer.data());
-                if (pHdr->dataSize == 0) {
-                    X_ERROR("TelemSrv", "Client sent packet with length zero...");
-                    closeClient(pClientCon);
-                    continue;
+                core::CriticalSection::ScopedLock lock(ioCtx.cs);
+
+                X_ASSERT(ioCtx.recvStalled == false, "Stalled should not be set")(ioCtx.recvStalled);
+
+                freeSpace = ioCtx.ring.freeSpace();
+                if (freeSpace < socketBuffer.buffer.size()) {
+                    // we read more data from socket than we have space for.
+                    X_ASSERT_UNREACHABLE();
                 }
 
-                if (pHdr->dataSize > MAX_PACKET_SIZE) {
-                    X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<int32_t>(pHdr->dataSize));
-                    closeClient(pClientCon);
-                    continue;
-                }
+                ioCtx.ring.write(socketBuffer.buffer.data(), socketBuffer.buffer.size());
+                freeSpace = ioCtx.ring.freeSpace();
 
-                // we don't bother starting a job untill we have atleast one packet.
-                if (curBuf.bytesTrans >= pHdr->dataSize) {
-                    const auto trailingBytes = curBuf.bytesTrans - pHdr->dataSize;
+                X_LOG0("TelemSrv", "Ring size: %" PRIuS " freeSpace: %" PRIuS, ioCtx.ring.size(), freeSpace);
 
-                    X_LOG1("TelemSrv", "Got packet size: %" PRIu16 " trailingbytes: %" PRIu32, pHdr->dataSize, trailingBytes);
+                if (!ioCtx.pJob_) {
+                    const auto spaceUsed = ioCtx.ring.size();
 
-                    pJob = pJobSys->CreateMemberJobAndRun<ClientConnection>(
-                        pClientCon,
-                        &ClientConnection::processNetPacketJob,
-                        nullptr
-                        JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL)
-                    );
+                    if (spaceUsed >= sizeof(PacketBase))
+                    {
+                        PacketBase hdr;
+                        ioCtx.ring.peek(0, &hdr, 1);
 
-                    continue;
-                }
-                else {
-                    X_LOG1("TelemSrv", "Waiting for more data need: %" PRIu16 " have: %" PRIu32, pHdr->dataSize, curBuf.bytesTrans);
+                        if (hdr.dataSize == 0) {
+                            X_ERROR("TelemSrv", "Client sent packet with length zero...");
+                            closeClient(pClientCon, true);
+                            continue;
+                        }
+
+                        if (hdr.dataSize > MAX_PACKET_SIZE) {
+                            X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<int32_t>(hdr.dataSize));
+                            closeClient(pClientCon, true);
+                            continue;
+                        }
+
+                        if (spaceUsed >= hdr.dataSize) {
+                            X_LOG1("TelemSrv", "Creating new job for packet processing");
+
+                            ioCtx.pJob_ = pJobSys->CreateMemberJobAndRun<ClientConnection>(
+                                pClientCon,
+                                &ClientConnection::processNetPacketJob,
+                                nullptr
+                                JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL)
+                            );
+
+                        }
+                    }
+
                 }
             }
 
-            curBuf.setBufferLength();
+            socketBuffer.resetBuffer();
+            
+            if (freeSpace > MAX_PACKET_SIZE) {
 
-            X_LOG1("TelemSrv", "Requesting recv with buffer size %" PRIu32, curBuf.buf.len);
-
-            auto res = platform::WSARecv(pClientCon->socket_, &curBuf.buf, 1, &bytesTransferred, &flags, &ioCtx.overlapped, nullptr);
-            if (res == SOCKET_ERROR) {
-                auto err = lastErrorWSA::Get();
-                if (err != ERROR_IO_PENDING) {
-                    lastErrorWSA::Description errDsc;
-                    X_ERROR("TelemSrv", "Failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
-
-                    closeClient(pClientCon);
+                // see if we need to use smaller buffer.
+                if (freeSpace < SocketBuffer::BUFF_SIZE) {
+                    socketBuffer.resizeBuffer(freeSpace);
                 }
+
+                X_LOG1("TelemSrv", "Requesting recv with buffer size %" PRIu32, socketBuffer.buf.len);
+
+                auto res = platform::WSARecv(pClientCon->socket_, &socketBuffer.buf, 1, &bytesTransferred, &flags, &ioCtx.overlapped, nullptr);
+                if (res == SOCKET_ERROR) {
+                    auto err = lastErrorWSA::Get();
+                    if (err != ERROR_IO_PENDING) {
+                        lastErrorWSA::Description errDsc;
+                        X_ERROR("TelemSrv", "Failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
+                        closeClient(pClientCon, true);
+                        continue;
+                    }
+                }     
+            }
+            else {
+                X_WARNING("TelemSrv", "Clients ring buffer is full not dispatching socket read");
+                core::CriticalSection::ScopedLock lock(ioCtx.cs);
+                ioCtx.recvStalled = true;
             }
 
         }
@@ -3807,8 +3894,15 @@ void Server::handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo
     }
 }
 
-void Server::closeClient(ClientConnection* pClientCon)
+void Server::closeClient(ClientConnection* pClientCon, bool wait)
 {
+    // sometimes we need to wait for background.
+    if (wait) {
+        core::CriticalSection::ScopedLock lock(pClientCon->io_.cs);
+        pClientCon->io_.closed = true;
+        return;
+    }
+
     {
         core::CriticalSection::ScopedLock lock(cs_);
         clientConns_.remove(pClientCon);

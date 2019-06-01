@@ -6,6 +6,7 @@
 
 #include <Containers/FixedHashTable.h>
 #include <Containers/ByteStream.h>
+#include <Containers/FixedByteStreamRing.h>
 
 #include <Memory/AllocationPolicies/LinearAllocator.h>
 #include <Memory/SimpleMemoryArena.h>
@@ -291,28 +292,40 @@ struct SocketBuffer
     static_assert(BUFF_SIZE >= MAX_PACKET_SIZE, "Buffer size is too small");
 
     SocketBuffer(core::MemoryArenaBase* arena) :
-        bytesTrans(0),
         buffer(arena, BUFF_SIZE)
     {
         buf.buf = buffer.data();
         buf.len = static_cast<int32_t>(buffer.size());
     }
 
-    void setBufferLength(void) {
-        buf.buf = buffer.data() + bytesTrans;
-        buf.len = static_cast<int32_t>(buffer.size() - bytesTrans);
+    void resetBuffer(void) {
+        resizeBuffer(BUFF_SIZE);
+    }
+
+    void resizeBuffer(size_t freeSace) {
+        auto size = core::Min(freeSace, BUFF_SIZE);
+
+        buffer.resize(size);
+        buf.buf = buffer.data();
+        buf.len = static_cast<int32_t>(buffer.size());
         X_ASSERT(buf.len > 0 && buf.len <= buffer.size(), "Length is invalid")(buffer.size());
     }
 
-    uint32_t bytesTrans;
     ByteArr buffer;
     platform::WSABUF buf;
 };
 
 struct PerClientIoData
 {
+    static constexpr size_t RING_BUF_SIZE = 1024 * 1024 * 128;
+
     PerClientIoData(core::MemoryArenaBase* arena) :
-        buffer(arena)
+        socketBuffer(arena),
+        cs(10),
+        ring(arena, RING_BUF_SIZE),
+        pJob_(nullptr),
+        recvStalled(false),
+        closed(false)
     {
         core::zero_object(overlapped);
         op = IOOperation::Invalid;
@@ -321,7 +334,14 @@ struct PerClientIoData
 public:
     OVERLAPPED overlapped;
     IOOperation::Enum op;
-    SocketBuffer buffer;
+    SocketBuffer socketBuffer;
+
+    core::CriticalSection cs;
+    core::FixedByteStreamRingOwning ring;
+
+    core::V2::Job* pJob_;
+    bool recvStalled;
+    bool closed;
 };
 
 static_assert(X_OFFSETOF(PerClientIoData, overlapped) == 0, "Overlapped must be at start");
@@ -499,7 +519,7 @@ private:
 public:
     bool sendAppList(ClientConnection& client);
     void handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo* pHdr);
-    void closeClient(ClientConnection* pClientCon);
+    void closeClient(ClientConnection* pClientCon, bool wait);
 
     void addTraceForApp(const TelemFixedStr& appName, const TraceInfo& trace);
     void onTraceEnd(const core::Guid& guid);
