@@ -3535,7 +3535,7 @@ bool readPacket(Client& client, char* pBuffer, int& bufLengthInOut)
 
 Client::Client(core::MemoryArenaBase* arena) :
     addr("127.0.0.1"),
-    port(8001),
+    port(telem::DEFAULT_PORT),
     conState(ConnectionState::Offline),
     connectSignal(true),
     socket(INV_SOCKET),

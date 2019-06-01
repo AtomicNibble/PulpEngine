@@ -18,9 +18,6 @@ X_NAMESPACE_BEGIN(telemetry)
 
 namespace
 {
-
-    const char* DEFAULT_PORT = "8001";
-
     bool winSockInit(void)
     {
         platform::WSADATA winsockInfo;
@@ -3313,7 +3310,7 @@ bool Server::listen(void)
     hints.ai_flags = AI_PASSIVE;
 
     // Resolve the server address and port
-    int res = platform::getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
+    int res = platform::getaddrinfo(NULL, telem::DEFAULT_PORT_STR, &hints, &result);
     if (res != 0) {
         return false;
     }
@@ -3368,7 +3365,7 @@ bool Server::listen(void)
 
     while (true)
     {
-        X_LOG0("TelemSrv", "Waiting for client on port: %s", DEFAULT_PORT);
+        X_LOG0("TelemSrv", "Waiting for client on port: %s", telem::DEFAULT_PORT_STR);
 
         struct platform::sockaddr addr;
         int32_t addrLen = sizeof(addr);

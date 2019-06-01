@@ -402,7 +402,7 @@ bool XCore::Init(CoreInitParams& startupParams)
             X_BUILD_STRING " Version: " X_ENGINE_VERSION_STR " Rev: " X_ENGINE_BUILD_REF_STR,
             "127.0.0.1",
             telem::ConnectionType::Tcp,
-            8001,
+            telem::DEFAULT_PORT,
             1000,
             TtConnectionFlag::None
         );

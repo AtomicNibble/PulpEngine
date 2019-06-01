@@ -31,7 +31,6 @@
 
 #endif // _MSC_VER
 
-
 struct TtLogType
 {
     enum Enum : tt_uint8
@@ -254,6 +253,9 @@ extern "C"
 
 namespace telem
 {
+    static const tt_int32 DEFAULT_PORT = 8001;
+    static const char* DEFAULT_PORT_STR = "8001";
+
     using ContexHandle = TraceContexHandle;
     using ConnectionType = TtConnectionType;
     using LockResult = TtLockResult;
