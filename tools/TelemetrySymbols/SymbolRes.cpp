@@ -312,28 +312,26 @@ bool SymResolver::loadPDB(uintptr_t baseAddr, uint32_t virtualSize, const core::
     addSymSrvFolderNameForPDB(symbolPath, guid, age);
     symbolPath.append(tmp.fileName());
 
-    core::Path<wchar_t> fullPathW;
+    core::Path<> fullPath;
     for (auto& searchPath : searchPaths_)
     {
         if (searchPath.type == SymPathType::Path || searchPath.type == SymPathType::Cache)
         {
-            core::Path<> fullPath(searchPath.path);
+            fullPath = searchPath.path;
             fullPath /= symbolPath;
 
-            fullPathW = core::Path<wchar_t>(fullPath);
-
-            if (gEnv->pFileSys->fileExistsOS(fullPathW))
+            if (gEnv->pFileSys->fileExistsOS(fullPath))
             {
                 break;
             }
             else
             {
-                fullPathW.clear();
+                fullPath.clear();
             }
         }
     }
 
-    if (fullPathW.isEmpty()) {
+    if (fullPath.isEmpty()) {
         // Failed to find it.
         return false;
     }
@@ -351,6 +349,8 @@ bool SymResolver::loadPDB(uintptr_t baseAddr, uint32_t virtualSize, const core::
         X_ERROR("TelemSym", "Failed to create DIA data source. Error: 0x%" PRIu32, hr);
         return false;
     }
+
+    core::Path<wchar_t> fullPathW(fullPath);
 
     hr = mod.pSource_->loadDataFromPdb(fullPathW.c_str());
     if (FAILED(hr)) {
