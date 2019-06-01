@@ -45,7 +45,6 @@ namespace msgbox
     const Buttons DEFAULT_BUTTONS = Buttons::OK;
 
     Selection show(core::string_view msg, core::string_view title, StyleFlags style, Buttons buttons);
-    Selection show(const wchar_t* pMessage, const wchar_t* pTitle, StyleFlags style, Buttons buttons);
 
     inline Selection show(core::string_view msg, core::string_view title, StyleFlags style)
     {
