@@ -509,8 +509,6 @@ public:
     bool loadApps(void) X_FINAL;
     bool listen(void) X_FINAL;
 
-    bool ingestTraceFile(core::Path<>& path) X_FINAL;
-
 private:
     bool loadAppTraces(core::string_view appName, const core::Path<>& dir);
 

@@ -110,7 +110,6 @@ struct ITelemServer
 
     virtual bool loadApps(void) X_ABSTRACT;
     virtual bool listen(void) X_ABSTRACT;
-    virtual bool ingestTraceFile(core::Path<>& path) X_ABSTRACT;
 };
 
 TELEM_SRV_EXPORT core::UniquePointer<ITelemServer> createServer(core::MemoryArenaBase* arena);

@@ -3,7 +3,7 @@
 
 #include <Platform/Console.h>
 
-#include <../TelemetryServerLib/IServer.h>
+#include <../TelemetryServerLib/TelemetryServerLib.h>
 
 #include <IConsole.h>
 
@@ -65,8 +65,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         TelemetryTraceImportArena arena(&allocator, "TelemetryTraceImportArena");
 
         {
-            auto srv = telemetry::createServer(&arena);
-
             auto traceFilePath = gEnv->pCore->GetCommandLineArg("trace"_sv);
 
             if (!traceFilePath.empty())
@@ -78,7 +76,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             {
                 core::Path<> path(traceFilePath.begin(), traceFilePath.end());
 
-                if (!srv->ingestTraceFile(path)) {
+                telemetry::TraceImport ti;
+
+                if (!ti.ingestTraceFile(path)) {
                     X_ERROR("TraceImport", "Failed to ingest trace file: \"%s\"", path.c_str());
                     res = 1;
                 }
