@@ -39,7 +39,7 @@ bool Linker::Init(void)
     return true;
 }
 
-bool Linker::dumpMetaOS(core::Path<wchar_t>& osPath)
+bool Linker::dumpMetaOS(core::Path<>& osPath)
 {
     return builder_.dumpMetaOS(osPath);
 }

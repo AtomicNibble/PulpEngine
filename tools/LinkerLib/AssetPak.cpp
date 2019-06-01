@@ -703,7 +703,7 @@ bool AssetPakBuilder::hasAsset(AssetId id) const
 }
 
 
-bool AssetPakBuilder::dumpMetaOS(core::Path<wchar_t>& osPath)
+bool AssetPakBuilder::dumpMetaOS(core::Path<>& osPath)
 {
     core::XFileScoped file;
     core::FileFlags mode;
@@ -766,7 +766,7 @@ bool AssetPakBuilder::dumpMetaOS(core::Path<wchar_t>& osPath)
     APakFlags::Description flagStr;
     X_LOG0("AssetPak", "^9PakMeta");
     X_LOG_BULLET;
-    X_LOG0("AssetPak", "Pak: \"%ls\" version: ^6%" PRIu8, osPath.fileName(), hdr.version);
+    X_LOG0("AssetPak", "Pak: \"%s\" version: ^6%" PRIu8, osPath.fileName(), hdr.version);
     X_LOG0("AssetPak", "flags: \"%s\"", hdr.flags.ToString(flagStr));
     X_LOG0("AssetPak", "Size: ^6%s (%" PRIu64 ") ^7RawAssetSize: ^6%s (%" PRIu64 ") ^6%%%.2f",
         core::HumanSize::toString(sizeStr, hdr.size), hdr.size,

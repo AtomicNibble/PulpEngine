@@ -89,7 +89,7 @@ namespace
         return false;
     }
 
-    bool GetInputfile(core::Path<wchar_t>& name)
+    bool GetInputfile(core::Path<>& name)
     {
         auto fileNameArg = gEnv->pCore->GetCommandLineArg("if"_sv);
         if (!fileNameArg) {
@@ -190,13 +190,13 @@ namespace
         }
         else if (mode == LinkMode::META) 
         {
-            core::Path<wchar_t> inputFile;
+            core::Path<> inputFile;
 
             if (!GetInputfile(inputFile)) {
 
                 int32_t numArgs = __argc;
                 if (numArgs == 2) {
-                    inputFile.set(__wargv[1]);
+                    inputFile.set(__wargv[1], __wargv[1] + core::strUtil::strlen(__wargv[1]));
                 }
                 
                 if (inputFile.isEmpty()) {

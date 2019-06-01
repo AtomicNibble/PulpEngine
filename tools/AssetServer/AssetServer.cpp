@@ -444,15 +444,14 @@ void AssetServer::ConverterInfo(const ProtoBuf::AssetDB::ConverterInfoReqest& mo
     ProtoBuf::AssetDB::ConverterInfoResponse response;
 
     // TODO: utf-8 encode this?
-    core::Path<wchar_t> workingDir;
+    core::Path<> workingDir;
     if (!gEnv->pFileSys->getWorkingDirectory(workingDir)) {
-        // TODO:
+        X_FATAL("AssetServer", "Failed to get working dir for converter info");
     }
-    core::Path<char> narrowPath(workingDir);
 
     response.set_result(ProtoBuf::AssetDB::Result::OK);
     response.set_error("");
-    response.set_workingdir(narrowPath.c_str());
+    response.set_workingdir(workingDir.c_str());
 
     if (!WriteDelimitedTo(response, outputBuffer)) {
         writeError(response, outputBuffer, "Failed to create response msg");
