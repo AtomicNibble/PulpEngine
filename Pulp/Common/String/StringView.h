@@ -50,6 +50,8 @@ public:
     constexpr const_reference operator[](const size_type idx) const;
     constexpr const_reference at(const size_type idx) const;
 
+    constexpr operator bool() const;
+
     constexpr size_type size() const;
     constexpr size_type length() const;
     constexpr bool empty() const;
@@ -144,6 +146,11 @@ constexpr typename string_view::const_reference string_view::operator[](const si
 constexpr typename string_view::const_reference string_view::at(const size_type idx) const
 {
     return *(pBegin_ + idx);
+}
+
+constexpr string_view::operator bool() const
+{
+    return !empty();
 }
 
 constexpr string_view::size_type string_view::size() const
