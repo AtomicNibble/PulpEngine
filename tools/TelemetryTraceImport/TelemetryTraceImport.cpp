@@ -67,7 +67,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         {
             auto srv = telemetry::createServer(&arena);
 
-            // TODO: i tihnk core should store all args as utf-8
             auto traceFilePath = gEnv->pCore->GetCommandLineArg("trace"_sv);
 
             if (!traceFilePath.empty())
