@@ -62,7 +62,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
 
         TelemetryTraceImportArena::AllocationPolicy allocator;
-        TelemetryTraceImportArena arena(&allocator, "TTelemetryTraceImportArena");
+        TelemetryTraceImportArena arena(&allocator, "TelemetryTraceImportArena");
 
         {
             auto srv = telemetry::createServer(&arena);
@@ -72,7 +72,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
             if (!traceFilePath.empty())
             {
-                X_ERROR("TelemSrv", "Missing trace arg");
+                X_ERROR("TraceImport", "Missing trace arg");
                 res = 1;
             }
             else
@@ -80,7 +80,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 core::Path<> path(traceFilePath.begin(), traceFilePath.end());
 
                 if (!srv->ingestTraceFile(path)) {
-                    X_ERROR("TelemSrv", "Failed to ingest trace file: \"%s\"", path.c_str());
+                    X_ERROR("TraceImport", "Failed to ingest trace file: \"%s\"", path.c_str());
                     res = 1;
                 }
 
