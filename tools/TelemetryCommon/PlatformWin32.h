@@ -116,4 +116,6 @@ namespace platform
 
 TELEM_LINK_LIB("Ws2_32.lib");
 
+const SOCKET INV_SOCKET = (SOCKET)(~0);
+
 } // namespace platform

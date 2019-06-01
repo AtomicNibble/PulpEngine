@@ -3318,12 +3318,12 @@ bool Server::listen(void)
         return false;
     }
 
-    platform::SOCKET listenSocket = INV_SOCKET;
-    platform::SOCKET clientSocket = INV_SOCKET;
+    platform::SOCKET listenSocket = platform::INV_SOCKET;
+    platform::SOCKET clientSocket = platform::INV_SOCKET;
 
     // Create a SOCKET for connecting to server
     listenSocket = platform::WSASocketW(result->ai_family, result->ai_socktype, result->ai_protocol, nullptr, 0, WSA_FLAG_OVERLAPPED);
-    if (listenSocket == INV_SOCKET) {
+    if (listenSocket == platform::INV_SOCKET) {
         platform::freeaddrinfo(result);
         return false;
     }

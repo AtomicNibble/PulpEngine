@@ -48,6 +48,8 @@ X_LINK_LIB("Ws2_32.lib");
 
 #endif // X_PLATFORM_WIN32
 
+const SOCKET INV_SOCKET = (SOCKET)(~0);
+
 } // namespace platform
 
 typedef platform::SOCKET SocketHandle;
