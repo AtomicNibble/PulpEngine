@@ -168,12 +168,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             auto& console = *gEnv->pConsoleWnd;
             console.redirectSTD();
 
-            const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
+            auto modeStr = gEnv->pCore->GetCommandLineArg("mode"_sv);
 
             Mode::Enum mode = Mode::UnitTests;
 
-            if (pMode) {
-                core::StackString<96, char> strLower(pMode);
+            if (modeStr) {
+                core::StackString<96, char> strLower(modeStr);
                 strLower.toLower();
 
                 switch (core::Hash::Fnv1aHash(strLower.data(), strLower.length())) {

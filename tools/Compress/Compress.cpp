@@ -28,6 +28,8 @@ X_LINK_ENGINE_LIB("Core")
 
 #endif // !X_LIB
 
+using namespace core::string_view_literals;
+
 namespace
 {
     typedef core::MemoryArena<
@@ -51,11 +53,11 @@ namespace
     using core::Compression::ICompressor;
     using core::Compression::Compressor;
 
-    bool ReadFileToBuf(const core::Path<wchar_t>& filePath, core::Array<uint8_t>& bufOut)
+    bool ReadFileToBuf(const core::Path<>& filePath, core::Array<uint8_t>& bufOut)
     {
         core::XFileScoped file;
         if (!file.openFileOS(filePath, core::FileFlag::READ | core::FileFlag::SHARE)) {
-            X_ERROR("Compress", "Failed to open input file: \"%ls\"", filePath.c_str());
+            X_ERROR("Compress", "Failed to open input file: \"%s\"", filePath.c_str());
             return false;
         }
 
@@ -69,11 +71,11 @@ namespace
         return true;
     }
 
-    bool WriteFileFromBuf(const core::Path<wchar_t>& filePath, const core::Array<uint8_t>& buf)
+    bool WriteFileFromBuf(const core::Path<>& filePath, const core::Array<uint8_t>& buf)
     {
         core::XFileScoped file;
         if (!file.openFileOS(filePath, core::FileFlag::WRITE | core::FileFlag::RECREATE)) {
-            X_ERROR("Compress", "Failed to open input file: \"%ls\"", filePath.c_str());
+            X_ERROR("Compress", "Failed to open input file: \"%s\"", filePath.c_str());
             return false;
         }
 
@@ -103,7 +105,7 @@ namespace
 
     int DoCompression(CompressorArena& arena)
     {
-        core::Path<wchar_t> inFile, outFile;
+        core::Path<> inFile, outFile;
 
         Algo::Enum algo = Algo::LZ4;
         bool defalte = true;
@@ -111,13 +113,14 @@ namespace
 
         // args
         {
-            const wchar_t* pInFile = gEnv->pCore->GetCommandLineArgForVarW(L"if");
-            if (!pInFile) {
+            auto inFileArg = gEnv->pCore->GetCommandLineArg("if"_sv);
+            if (!inFileArg) {
                 int32_t numArgs = __argc;
                 if (numArgs == 2) {
-                    pInFile = __wargv[1];
-                    outFile = pInFile;
-                    outFile += L".out";
+                    inFile = core::Path<>(__wargv[1], __wargv[1] + core::strUtil::strlen(__wargv[1]));
+
+                    outFile.set(inFile.begin(), inFile.end());
+                    outFile += ".out";
                     defalte = false;
                 }
                 else {
@@ -125,24 +128,26 @@ namespace
                     return 1;
                 }
             }
+            else {
+                inFile.set(inFileArg.begin(), inFileArg.end());
+            }
 
-            inFile = pInFile;
 
-            const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
-            if (pMode) {
-                if (core::strUtil::IsEqualCaseInsen(pMode, L"inflate")) {
+            auto modeStr = gEnv->pCore->GetCommandLineArg("mode"_sv);
+            if (modeStr) {
+                if (core::strUtil::IsEqualCaseInsen(modeStr, "inflate"_sv)) {
                     defalte = false;
                 }
             }
 
-            const wchar_t* pOutFile = gEnv->pCore->GetCommandLineArgForVarW(L"of");
-            if (pOutFile) {
-                outFile = pOutFile;
+            auto outFileArg = gEnv->pCore->GetCommandLineArg("of"_sv);
+            if (outFileArg) {
+                outFile.set(outFileArg.begin(), outFileArg.end());
             }
 
-            const wchar_t* pAlgo = gEnv->pCore->GetCommandLineArgForVarW(L"a");
-            if (pAlgo) {
-                int32_t iAlgo = core::strUtil::StringToInt<int32_t>(pAlgo);
+            auto algoStr = gEnv->pCore->GetCommandLineArg("a"_sv);
+            if (algoStr) {
+                int32_t iAlgo = core::strUtil::StringToInt<int32_t>(algoStr.begin(), algoStr.end());
                 iAlgo = constrain<int32_t>(iAlgo, 1, Algo::ENUM_COUNT);
 
                 static_assert(core::Compression::Algo::ENUM_COUNT == 7, "Added additional compression algos? this code needs updating.");
@@ -174,9 +179,9 @@ namespace
                 }
             }
 
-            const wchar_t* pLvl = gEnv->pCore->GetCommandLineArgForVarW(L"lvl");
-            if (pLvl) {
-                int32_t lvlArg = core::strUtil::StringToInt<int32_t>(pLvl);
+            auto lvlStr = gEnv->pCore->GetCommandLineArg("lvl"_sv);
+            if (lvlStr) {
+                int32_t lvlArg = core::strUtil::StringToInt<int32_t>(lvlStr.begin(), lvlStr.end());
                 lvlArg = constrain<int32_t>(lvlArg, 1, CompressLevel::ENUM_COUNT) - 1;
 
                 lvl = static_cast<CompressLevel::Enum>(lvlArg);
@@ -220,25 +225,25 @@ namespace
         if (defalte && outFile.isEmpty()) {
             switch (algo) {
                 case Algo::LZ4:
-                    outFile = inFile + L".lz4";
+                    outFile = inFile + ".lz4";
                     break;
                 case Algo::LZ4HC:
-                    outFile = inFile + L".lz4";
+                    outFile = inFile + ".lz4";
                     break;
                 case Algo::LZ5:
-                    outFile = inFile + L".lz5";
+                    outFile = inFile + ".lz5";
                     break;
                 case Algo::LZ5HC:
-                    outFile = inFile + L".lz5";
+                    outFile = inFile + ".lz5";
                     break;
                 case Algo::LZMA:
-                    outFile = inFile + L".lzma";
+                    outFile = inFile + ".lzma";
                     break;
                 case Algo::ZLIB:
-                    outFile = inFile + L".zlib";
+                    outFile = inFile + ".zlib";
                     break;
                 case Algo::STORE:
-                    outFile = inFile + L".store";
+                    outFile = inFile + ".store";
                     break;
                 default:
                     X_ERROR("Compress", "unknown compression algo: %i", algo);
@@ -282,21 +287,21 @@ namespace
 
     int DoTrain(CompressorArena& arena)
     {
-        core::Path<wchar_t> srcDir, outFile;
+        core::Path<> srcDir, outFile;
         size_t maxDictSize = std::numeric_limits<uint16_t>::max();
 
-        const wchar_t* pSrcDir = gEnv->pCore->GetCommandLineArgForVarW(L"train-src");
-        if (pSrcDir) {
-            srcDir = pSrcDir;
+        auto srcDirArg = gEnv->pCore->GetCommandLineArg("train-src"_sv);
+        if (srcDirArg) {
+            srcDir.set(srcDirArg.begin(), srcDirArg.end());
             srcDir.ensureSlash();
         }
-        const wchar_t* pOutFile = gEnv->pCore->GetCommandLineArgForVarW(L"train-of");
-        if (pOutFile) {
-            outFile = pOutFile;
+        auto outFileArg = gEnv->pCore->GetCommandLineArg("train-of"_sv);
+        if (outFileArg) {
+            outFile.set(outFileArg.begin(), outFileArg.end());
         }
-        const wchar_t* pMaxDictSize = gEnv->pCore->GetCommandLineArgForVarW(L"train-md");
-        if (pMaxDictSize) {
-            maxDictSize = core::strUtil::StringToInt<size_t>(pMaxDictSize);
+        auto maxDictSizeArg = gEnv->pCore->GetCommandLineArg("train-md"_sv);
+        if (maxDictSizeArg) {
+            maxDictSize = core::strUtil::StringToInt<size_t>(maxDictSizeArg.begin(), maxDictSizeArg.end());
         }
 
         if (srcDir.isEmpty()) {
@@ -322,11 +327,10 @@ namespace
 
         // process the files.
         {
-            core::Array<core::Path<wchar_t>> fileNames(&arena);
+            core::Array<core::Path<>> fileNames(&arena);
             fileNames.setGranularity(256);
 
-            core::Path<wchar_t> pathW(pSrcDir);
-            core::Path<char> path(pathW);
+            core::Path<> path(srcDir);
             path.ensureSlash();
             path.append("*");
 
@@ -368,17 +372,17 @@ namespace
 
             // load all the files.
             for (size_t i = 0; i < fileNames.size(); i++) {
-                core::Path<wchar_t> filePath(srcDir);
-                filePath.appendFmt(L"%s", fileNames[i].c_str());
+                core::Path<> filePath(srcDir);
+                filePath.appendFmt("%s", fileNames[i].c_str());
 
                 core::XFileScoped file;
                 if (!file.openFileOS(filePath, core::FileFlag::READ | core::FileFlag::SHARE)) {
-                    X_ERROR("Train", "Failed to open input file: \"%ls\"", filePath.c_str());
+                    X_ERROR("Train", "Failed to open input file: \"%s\"", filePath.c_str());
                     return false;
                 }
 
                 if (file.read(&sampleData[currentOffset], sampleSizes[i]) != sampleSizes[i]) {
-                    X_ERROR("Train", "Failed to read input file: \"%ls\"", filePath.c_str());
+                    X_ERROR("Train", "Failed to read input file: \"%s\"", filePath.c_str());
                     return false;
                 }
                 currentOffset += sampleSizes[i];
@@ -407,7 +411,7 @@ namespace
 
         core::XFileScoped file;
         if (!file.openFileOS(outFile, core::FileFlag::WRITE | core::FileFlag::RECREATE)) {
-            X_ERROR("Train", "Failed to open output file: \"%ls\"", outFile.c_str());
+            X_ERROR("Train", "Failed to open output file: \"%s\"", outFile.c_str());
             return 1;
         }
 
@@ -461,8 +465,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         PrintArgs();
 
-        const wchar_t* pTrain = gEnv->pCore->GetCommandLineArgForVarW(L"train");
-        if (pTrain && core::strUtil::StringToBool(pTrain)) {
+        auto trainStr = gEnv->pCore->GetCommandLineArg("train"_sv);
+        if (trainStr && core::strUtil::StringToBool(trainStr.begin(), trainStr.end())) {
             res = DoTrain(arena);
         }
         else {

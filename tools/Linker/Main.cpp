@@ -91,12 +91,12 @@ namespace
 
     bool GetInputfile(core::Path<wchar_t>& name)
     {
-        const wchar_t* pFileName = gEnv->pCore->GetCommandLineArgForVarW(L"if");
-        if (!pFileName) {
+        auto fileNameArg = gEnv->pCore->GetCommandLineArg("if"_sv);
+        if (!fileNameArg) {
             return false;
         }
          
-        name.set(pFileName);
+        name.set(fileNameArg.begin(), fileNameArg.end());
         return true;
     }
 

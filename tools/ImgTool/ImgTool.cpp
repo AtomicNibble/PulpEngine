@@ -46,11 +46,11 @@ namespace
         ImgToolArena;
 
 
-    bool ReadFileToBuf(const core::Path<wchar_t>& filePath, core::Array<uint8_t>& bufOut)
+    bool ReadFileToBuf(const core::Path<>& filePath, core::Array<uint8_t>& bufOut)
     {
         core::XFileScoped file;
         if (!file.openFileOS(filePath, core::FileFlag::READ | core::FileFlag::SHARE)) {
-            X_ERROR("ImgTool", "Failed to open input file: \"%ls\"", filePath.c_str());
+            X_ERROR("ImgTool", "Failed to open input file: \"%s\"", filePath.c_str());
             return false;
         }
 
@@ -64,11 +64,11 @@ namespace
         return true;
     }
 
-    bool WriteFileFromBuf(const core::Path<wchar_t>& filePath, const core::Array<uint8_t>& buf)
+    bool WriteFileFromBuf(const core::Path<>& filePath, const core::Array<uint8_t>& buf)
     {
         core::XFileScoped file;
         if (!file.openFileOS(filePath, core::FileFlag::WRITE | core::FileFlag::RECREATE)) {
-            X_ERROR("ImgTool", "Failed to open input file: \"%ls\"", filePath.c_str());
+            X_ERROR("ImgTool", "Failed to open input file: \"%s\"", filePath.c_str());
             return false;
         }
 
@@ -103,7 +103,7 @@ namespace
         // currently i want a tool that will take N input images and resize and save as tga.
         // so need input file, output shit, desired size and format.
 
-        core::Path<wchar_t> inFile, outFile;
+        core::Path<> inFile, outFile;
         Vec2<uint16_t> dim;
 
         bool resize = false;
@@ -113,17 +113,17 @@ namespace
 
         // args
         {
-            const wchar_t* pInFile = gEnv->pCore->GetCommandLineArgForVarW(L"if");
-            if (!pInFile) {
+            auto inFileArg = gEnv->pCore->GetCommandLineArg("if"_sv);
+            if (!inFileArg) {
                 X_ERROR("ImgTool", "Missing required arg -if");
                 return false;
             }
 
-            inFile.set(pInFile);
+            inFile.set(inFileArg.begin(), inFileArg.end());
 
-            const wchar_t* pOutFile = gEnv->pCore->GetCommandLineArgForVarW(L"of");
-            if (pOutFile) {
-                outFile.set(pOutFile);
+            auto outFileArg = gEnv->pCore->GetCommandLineArg("of"_sv);
+            if (outFileArg) {
+                outFile.set(outFileArg.begin(), outFileArg.end());
             }
 
             auto dimStr = gEnv->pCore->GetCommandLineArg("dim"_sv);
@@ -158,10 +158,9 @@ namespace
         if (outFile.isEmpty())
         {
             const char* pExt = texture::Util::getExtension(outputFileFmt);
-            wchar_t buf[0x100] = {};
 
             outFile = inFile;
-            outFile.setExtension(core::strUtil::Convert(pExt, buf));
+            outFile.setExtension(pExt);
         }
 
         // output exists?
@@ -175,7 +174,7 @@ namespace
             }
         }
 
-        X_LOG0("ImgTool", "Loading: \"%ls\"", inFile.c_str());
+        X_LOG0("ImgTool", "Loading: \"%*.s\"", inFile.c_str());
 
         core::Array<uint8_t> srcImgData(&arena);
         if (!ReadFileToBuf(inFile, srcImgData)) {
@@ -234,7 +233,7 @@ namespace
 
         Converter::CompileFlags flags;
 
-        X_LOG0("ImgTool", "Saving: \"%ls\"", outFile.c_str());
+        X_LOG0("ImgTool", "Saving: \"%s\"", outFile.c_str());
 
         core::FileFlags mode;
         mode.Set(core::FileFlag::WRITE);

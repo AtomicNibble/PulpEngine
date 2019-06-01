@@ -18,6 +18,8 @@ X_LINK_ENGINE_LIB("Core")
 
 #endif // !X_LIB
 
+using namespace core::string_view_literals;
+
 namespace
 {
     typedef core::MemoryArena<
@@ -43,19 +45,19 @@ namespace
 
     bool GetMode(ScriptMode::Enum& mode)
     {
-        const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
-        if (pMode) {
-            if (core::strUtil::IsEqualCaseInsen(pMode, L"check")) {
+        auto modeStr = gEnv->pCore->GetCommandLineArg("mode"_sv);
+        if (modeStr) {
+            if (core::strUtil::IsEqualCaseInsen(modeStr, "check"_sv)) {
                 mode = ScriptMode::CHECK;
             }
-            else if (core::strUtil::IsEqualCaseInsen(pMode, L"run")) {
+            else if (core::strUtil::IsEqualCaseInsen(modeStr, "run"_sv)) {
                 mode = ScriptMode::RUN;
             }
-            else if (core::strUtil::IsEqualCaseInsen(pMode, L"bake")) {
+            else if (core::strUtil::IsEqualCaseInsen(modeStr, "bake"_sv)) {
                 mode = ScriptMode::BAKE;
             }
             else {
-                X_ERROR("Converter", "Unknown mode: \"%ls\"", pMode);
+                X_ERROR("Converter", "Unknown mode: \"%*.s\"", modeStr.length(), modeStr.data());
                 return false;
             }
 
@@ -67,11 +69,9 @@ namespace
 
     bool GetInputFile(core::Path<char>& inputFile)
     {
-        const wchar_t* pInputFile = gEnv->pCore->GetCommandLineArgForVarW(L"if");
-        if (pInputFile) {
-            core::StackString512 narrowName(pInputFile);
-
-            inputFile.set(narrowName.begin(), narrowName.end());
+        auto inputFileStr = gEnv->pCore->GetCommandLineArg("if"_sv);
+        if (inputFileStr) {
+            inputFile.set(inputFileStr.begin(), inputFileStr.end());
             return true;
         }
 

@@ -504,11 +504,11 @@ bool XCore::Init(CoreInitParams& startupParams)
     }
 
     {
-        if (GetCommandLineArgForVarW(L"nopause")) {
+        if (GetCommandLineArg("nopause"_sv).isNotEmpty()) {
             env_.noPause_ = true;
         }
 
-        if (GetCommandLineArgForVarW(L"noconsole")) {
+        if (GetCommandLineArg("noconsole"_sv).isNotEmpty()) {
             startupParams.bConsoleLog = false;
         }
     }

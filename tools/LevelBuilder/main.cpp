@@ -14,6 +14,8 @@
 
 #include <../AssetDB/AssetDB.h>
 
+using namespace core::string_view_literals;
+
 X_NAMESPACE_BEGIN(level)
 
 core::MemoryArenaBase* g_arena = nullptr;
@@ -71,25 +73,23 @@ namespace
 
     bool GetInputfile(core::Path<char>& name)
     {
-        const wchar_t* pFileName = gEnv->pCore->GetCommandLineArgForVarW(L"if");
-        if (!pFileName) {
+        auto fileName = gEnv->pCore->GetCommandLineArg("if"_sv);
+        if (!fileName) {
             return false;
         }
 
-        core::StackString512 nameNarrow(pFileName);
-        name = core::Path<char>(nameNarrow.begin(), nameNarrow.end());
+        name.set(fileName.begin(), fileName.end());
         return true;
     }
 
     void GetMod(core::string& name)
     {
-        const wchar_t* pModName = gEnv->pCore->GetCommandLineArgForVarW(L"mod");
-        if (!pModName) {
+        auto modName = gEnv->pCore->GetCommandLineArg("mod"_sv);
+        if (!modName) {
             return;
         }
 
-        core::StackString512 nameNarrow(pModName);
-        name.assign(nameNarrow.begin(), nameNarrow.end());
+        name.assign(modName.begin(), modName.end());
     }
 
 

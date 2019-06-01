@@ -25,6 +25,8 @@ X_FORCE_LINK_FACTORY("XConverterLib_Shader");
 
 #endif // !X_LIB
 
+using namespace core::string_view_literals;
+
 namespace
 {
     typedef core::MemoryArena<
@@ -47,19 +49,19 @@ namespace
 
     bool GetMode(CompileMode::Enum& mode)
     {
-        const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
-        if (pMode) {
-            if (core::strUtil::IsEqualCaseInsen(pMode, L"single")) {
+        auto modeStr = gEnv->pCore->GetCommandLineArg("mode"_sv);
+        if (modeStr) {
+            if (core::strUtil::IsEqualCaseInsen(modeStr, "single"_sv)) {
                 mode = CompileMode::SINGLE;
             }
-            else if (core::strUtil::IsEqualCaseInsen(pMode, L"all")) {
+            else if (core::strUtil::IsEqualCaseInsen(modeStr, "all"_sv)) {
                 mode = CompileMode::ALL;
             }
-            else if (core::strUtil::IsEqualCaseInsen(pMode, L"clean")) {
+            else if (core::strUtil::IsEqualCaseInsen(modeStr, "clean"_sv)) {
                 mode = CompileMode::CLEAN;
             }
             else {
-                X_ERROR("Converter", "Unknown mode: \"%ls\"", pMode);
+                X_ERROR("Converter", "Unknown mode: \"%.*s\"", modeStr.length(), modeStr.data());
                 return false;
             }
 
@@ -71,13 +73,11 @@ namespace
 
     bool GetMaterialCat(engine::MaterialCat::Enum& matCat, bool slient = false)
     {
-        const wchar_t* pAssetType = gEnv->pCore->GetCommandLineArgForVarW(L"type");
-        if (pAssetType) {
-            core::StackString256 typeStr(pAssetType);
-
-            matCat = engine::Util::MatCatFromStr(typeStr.c_str());
+        auto typeStr = gEnv->pCore->GetCommandLineArg("type"_sv);
+        if (typeStr) {
+            matCat = engine::Util::MatCatFromStr(typeStr.begin(), typeStr.end());
             if (matCat == engine::MaterialCat::UNKNOWN) {
-                X_ERROR("Converter", "Unknown material cat: \"%ls\"", pAssetType);
+                X_ERROR("Converter", "Unknown material cat: \"%*.s\"", typeStr.length(), typeStr.data());
                 return false;
             }
 
@@ -90,11 +90,9 @@ namespace
 
     bool GetTechName(core::string& name, bool slient = false)
     {
-        const wchar_t* pTechName = gEnv->pCore->GetCommandLineArgForVarW(L"name");
-        if (pTechName) {
-            core::StackString512 techNameStr(pTechName);
-
-            name = techNameStr.c_str();
+        auto techNameStr = gEnv->pCore->GetCommandLineArg("name"_sv);
+        if (techNameStr) {
+            name.assign(techNameStr.begin(), techNameStr.end());
             return true;
         }
 
@@ -104,18 +102,18 @@ namespace
 
     bool ForceModeEnabled(void)
     {
-        const wchar_t* pForce = gEnv->pCore->GetCommandLineArgForVarW(L"force");
-        if (pForce) {
-            return core::strUtil::StringToBool(pForce);
+        auto forceStr = gEnv->pCore->GetCommandLineArg("force"_sv);
+        if (forceStr) {
+            return core::strUtil::StringToBool(forceStr.begin(), forceStr.end());
         }
         return false;
     }
 
     bool DebugCompile(void)
     {
-        const wchar_t* pDebug = gEnv->pCore->GetCommandLineArgForVarW(L"debug");
-        if (pDebug) {
-            return core::strUtil::StringToBool(pDebug);
+        auto debugStr = gEnv->pCore->GetCommandLineArg("debug"_sv);
+        if (debugStr) {
+            return core::strUtil::StringToBool(debugStr.begin(), debugStr.end());
         }
         return false;
     }

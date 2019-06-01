@@ -25,6 +25,8 @@
 
 #include "Pak.h"
 
+using namespace core::string_view_literals;
+
 X_NAMESPACE_BEGIN(core)
 
 namespace
@@ -277,13 +279,12 @@ bool xFileSys::initDirectorys(bool working)
     else 
     {
         
-        const wchar_t* pBasePath = gEnv->pCore->GetCommandLineArgForVarW(L"fs_basepath");
-        if (pBasePath) {
-            basePath_ = pBasePath;
+        auto basePathArg = gEnv->pCore->GetCommandLineArg("fs_basepath"_sv);
+        if (basePathArg) {
+            basePath_ = PathWT(basePathArg.begin(), basePathArg.end());
         }
 
-        const wchar_t* pSaveDir = gEnv->pCore->GetCommandLineArgForVarW(L"fs_savepath");
-      
+        auto saveDirArg = gEnv->pCore->GetCommandLineArg("fs_savepath"_sv);
 
         PathWT base(basePath_);
         PathUtil::replaceSeprators(base);
@@ -295,8 +296,8 @@ bool xFileSys::initDirectorys(bool working)
 #if 1
         PathWT saveDir(core);
 
-        if (pSaveDir) {
-            saveDir = pSaveDir;
+        if (saveDirArg) {
+            saveDir = PathWT(saveDirArg.begin(), saveDirArg.end());;
             PathUtil::replaceSeprators(saveDir);
             PathUtil::ensureSlash(saveDir);
         }

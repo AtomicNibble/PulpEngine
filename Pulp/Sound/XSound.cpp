@@ -26,7 +26,6 @@ X_DISABLE_WARNING(4505)
 // Comms
 #include <AK/Comm/AkCommunication.h>
 
-
 X_ENABLE_WARNING(4505)
 
 #if X_DEBUG
@@ -159,6 +158,8 @@ X_LINK_LIB_WWISE("CommunicationCentral");
 #endif // X_ENABLE_SOUND_COMS
 
 using namespace AK;
+
+using namespace core::string_view_literals;
 
 X_NAMESPACE_BEGIN(sound)
 
@@ -344,28 +345,27 @@ bool XSound::init(void)
     
     l_platInitSetings.eAudioAPI = AkAudioAPI::AkAPI_Default;
     {
-        const wchar_t* pOutputDevice = gEnv->pCore->GetCommandLineArgForVarW(L"snd_output_device");
-        if (pOutputDevice) {
-            if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"xaudio2")) {
+        auto outputDevice = gEnv->pCore->GetCommandLineArg("snd_output_device"_sv);
+        if (outputDevice) {
+            if (core::strUtil::IsEqualCaseInsen(outputDevice, "xaudio2"_sv)) {
                 l_platInitSetings.eAudioAPI = AkAudioAPI::AkAPI_XAudio2;
                 X_LOG1("SoundSys", "using output device: XAudio2");
             }
-            else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"directsound")) {
+            else if (core::strUtil::IsEqualCaseInsen(outputDevice, "directsound"_sv)) {
                 l_platInitSetings.eAudioAPI = AkAudioAPI::AkAPI_DirectSound;
                 X_LOG1("SoundSys", "using output device: directsound (DirectX Sound)");
             }
-            else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"wasapi")) {
+            else if (core::strUtil::IsEqualCaseInsen(outputDevice, "wasapi"_sv)) {
                 l_platInitSetings.eAudioAPI = AkAudioAPI::AkAPI_Wasapi;
                 X_LOG1("SoundSys", "using output device: Wasapi (Windows Audio Session)");
             }
-            else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"none")) {
+            else if (core::strUtil::IsEqualCaseInsen(outputDevice, "none"_sv)) {
                 l_platInitSetings.eAudioAPI = AkAudioAPI::AkAPI_Default;
                 X_LOG1("SoundSys", "using output device: none (no sound)");
             }
             else {
-                X_ERROR("SoundSys", "Unknown output device \"%ls\" using default instead. valid options: "
-                    "xaudio2, directsound, wasapi, none",
-                    pOutputDevice);
+                X_ERROR("SoundSys", "Unknown output device \"%.*s\" using default instead. valid options: "
+                    "xaudio2, directsound, wasapi, none", outputDevice.length(), outputDevice.data());
             }
         }
     }

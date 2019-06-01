@@ -435,61 +435,6 @@ bool XCore::OnFileChange(core::IDirectoryWatcher::Action::Enum action,
     return true;
 }
 
-const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
-{
-    X_ASSERT_NOT_NULL(pVarName);
-
-    if (args_.isEmpty()) {
-        return nullptr;
-    }
-
-#if 1
-    core::StackString256 name(pVarName);
-
-    static wchar_t buf[512];
-    core::zero_object(buf);
-
-    auto resView = GetCommandLineArg(name);
-
-    if (!resView.empty()) {
-        core::strUtil::Convert(resView, buf);
-        return buf;
-    }
-
-    return nullptr;
-#else
-    for (size_t i = 0; i < args_.size(); i++) {
-        const CmdArg& arg = args_[i];
-
-        if (arg.getArgc() >= 3) {
-            const auto* pCmd = arg.getArgv(0);
-            if (core::strUtil::IsEqualCaseInsen(pCmd, "set")) {
-                const auto* pName = arg.getArgv(1);
-                if (core::strUtil::IsEqual(pName, pVarName)) {
-                    const auto* pValue = arg.getArgv(2);
-                    return pValue;
-                }
-            }
-        }
-        else if (arg.getArgc() == 2) {
-            const auto* pName = arg.getArgv(0);
-            if (core::strUtil::IsEqualCaseInsen(pName, pVarName)) {
-                const auto* pValue = arg.getArgv(1);
-                return pValue;
-            }
-        }
-        else if (arg.getArgc() == 1) {
-            const auto* pName = arg.getArgv(0);
-            if (core::strUtil::IsEqualCaseInsen(pName, pVarName)) {
-                return L"";
-            }
-        }
-    }
-
-    return nullptr;
-#endif
-}
-
 core::string_view XCore::GetCommandLineArg(core::string_view name) const
 {
     if (args_.isEmpty()) {
