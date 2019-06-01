@@ -121,7 +121,7 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
 
                 if (io_.closed) {
                     X_LOG0("TelemSrv", "Processed all data disconnecting");
-                    disconnect();
+                    break;
                 }
                 return;
             }
@@ -131,14 +131,12 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
 
             if (hdr.dataSize == 0) {
                 X_ERROR("TelemSrv", "Client sent packet with length zero...");
-                disconnect();
-                return;
+                break;
             }
 
             if (hdr.dataSize > MAX_PACKET_SIZE) {
                 X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<int32_t>(hdr.dataSize));
-                disconnect();
-                return;
+                break;
             }
 
             if (hdr.dataSize > ringSize) {
@@ -147,7 +145,7 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
 
                 if (io_.closed) {
                     X_LOG0("TelemSrv", "Processed all data disconnecting");
-                    disconnect();
+                    break;
                 }
                 return;
             }
@@ -183,7 +181,7 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
                         if (err != ERROR_IO_PENDING) {
                             lastErrorWSA::Description errDsc;
                             X_ERROR("TelemSrv", "failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
-                            disconnect();
+                            break;
                         }
                     }
                 }
@@ -249,8 +247,7 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
 
         if (!res) {
             X_ERROR("TelemSrv", "Error processing packet");
-            disconnect();
-            return;
+            break;
         }
 
         // process next packet.
@@ -259,6 +256,9 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
 
         X_ASSERT(bytesLeft == 0, "Did not consume packet")();
     }
+
+    // all failures drop down here so we are not holding the lock.
+    disconnect();
 }
 
 
