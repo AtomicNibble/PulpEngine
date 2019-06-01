@@ -93,7 +93,7 @@ void ClientConnection::disconnect(void)
 {
     // in this case we just want to clean up the client now cus there was a error processing the data.
     flush();
-    srv_.closeClient(this, false);
+    srv_.closeClientAndRelease(this, false);
 }
 
 void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData)
@@ -3655,7 +3655,7 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
             if (pIOContext) {
                 X_ERROR("TelemSrv", "Failed completion packet. Error: %s", core::lastError::ToString(Dsc));
                 X_ASSERT_NOT_NULL(pClientCon);
-                closeClient(pClientCon, true);
+                closeClientAndRelease(pClientCon, true);
                 continue;
             }
 
@@ -3666,7 +3666,7 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
         if (bytesTransferred == 0) {
             X_ERROR("TelemSrv", "GetQueuedCompletionStatus returned zero bytes");
             if (pClientCon) {
-                closeClient(pClientCon, true);
+                closeClientAndRelease(pClientCon, true);
             }
             continue;
         }
@@ -3718,13 +3718,13 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
 
                         if (hdr.dataSize == 0) {
                             X_ERROR("TelemSrv", "Client sent packet with length zero...");
-                            closeClient(pClientCon, true);
+                            closeClientAndRelease(pClientCon, true);
                             continue;
                         }
 
                         if (hdr.dataSize > MAX_PACKET_SIZE) {
                             X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<int32_t>(hdr.dataSize));
-                            closeClient(pClientCon, true);
+                            closeClientAndRelease(pClientCon, true);
                             continue;
                         }
 
@@ -3761,7 +3761,7 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
                     if (err != ERROR_IO_PENDING) {
                         lastErrorWSA::Description errDsc;
                         X_ERROR("TelemSrv", "Failed to recv for client. Error: %s", lastErrorWSA::ToString(err, errDsc));
-                        closeClient(pClientCon, true);
+                        closeClientAndRelease(pClientCon, true);
                         continue;
                     }
                 }     
@@ -3894,7 +3894,7 @@ void Server::handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo
     }
 }
 
-void Server::closeClient(ClientConnection* pClientCon, bool wait)
+void Server::closeClientAndRelease(ClientConnection* pClientCon, bool wait)
 {
     // sometimes we need to wait for background.
     if (wait) {

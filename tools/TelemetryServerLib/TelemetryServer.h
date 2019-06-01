@@ -519,7 +519,7 @@ private:
 public:
     bool sendAppList(ClientConnection& client);
     void handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo* pHdr);
-    void closeClient(ClientConnection* pClientCon, bool wait);
+    void closeClientAndRelease(ClientConnection* pClientCon, bool wait);
 
     void addTraceForApp(const TelemFixedStr& appName, const TraceInfo& trace);
     void onTraceEnd(const core::Guid& guid);
