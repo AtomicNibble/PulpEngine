@@ -9,82 +9,68 @@ XFontNull XFontSysNull::nullFont_;
 
 // -------------------------------------------------------------
 
-void XFontNull::Release(void)
-{
-}
-// release the object
 void XFontNull::Free(void)
 {
 }
-// free internal memory
-void XFontNull::FreeBuffers(void)
-{
-}
-// free texture buffers
+
 void XFontNull::FreeTexture(void)
 {
 }
 
-bool XFontNull::loadFont(void)
+void XFontNull::DrawTestText(engine::IPrimativeContext* pPrimCon, const core::FrameTimeData& time)
 {
-    return true;
+    X_UNUSED(pPrimCon, time);
 }
 
-texture::TexID XFontNull::getTextureId(void) const
+// these draw the text into the primative context.
+void XFontNull::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+    const TextDrawContext& contex, const char* pBegin, const char* pEnd)
 {
-    return -1;
+    X_UNUSED(pPrimCon, pos, ang, contex, pBegin, pEnd);
 }
 
-void XFontNull::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
-    const XTextDrawConect& contex, const char* pBegin, const char* pEnd)
+void XFontNull::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+    const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd)
 {
-    X_UNUSED(pPrimCon);
-    X_UNUSED(stateHandle);
-    X_UNUSED(pos);
-    X_UNUSED(contex);
-    X_UNUSED(pBegin);
-    X_UNUSED(pEnd);
+    X_UNUSED(pPrimCon, pos, ang, contex, pBegin, pEnd);
 }
 
-void XFontNull::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
-    const XTextDrawConect& contex, const wchar_t* pBegin, const wchar_t* pEnd)
+void XFontNull::DrawString(engine::IPrimativeContext* pPrimCon,
+    const Vec3f& pos, const TextDrawContext& contex, const char* pBegin, const char* pEnd)
 {
-    X_UNUSED(pPrimCon);
-    X_UNUSED(stateHandle);
-    X_UNUSED(pos);
-    X_UNUSED(contex);
-    X_UNUSED(pBegin);
-    X_UNUSED(pEnd);
+    X_UNUSED(pPrimCon, pos, contex, pBegin, pEnd);
+
 }
 
-size_t XFontNull::GetTextLength(const char* pStr, const bool asciiMultiLine) const
+void XFontNull::DrawString(engine::IPrimativeContext* pPrimCon,
+    const Vec3f& pos, const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd)
 {
-    X_UNUSED(pStr);
-    X_UNUSED(asciiMultiLine);
-    return 0;
+    X_UNUSED(pPrimCon, pos, contex, pBegin, pEnd);
+
 }
 
-size_t XFontNull::GetTextLength(const wchar_t* pStr, const bool asciiMultiLine) const
+size_t XFontNull::GetTextLength(const char* pBegin, const char* pEnd, const bool asciiMultiLine) const
 {
-    X_UNUSED(pStr);
-    X_UNUSED(asciiMultiLine);
+    X_UNUSED(pBegin, pEnd, asciiMultiLine);
+
     return 0;
 }
 
 // calculate the size.
-Vec2f XFontNull::GetTextSize(const char* pStr, const XTextDrawConect& contex)
+Vec2f XFontNull::GetTextSize(const char* pBegin, const char* pEnd, const TextDrawContext& contex)
 {
-    X_UNUSED(pStr);
-    X_UNUSED(contex);
+    X_UNUSED(pBegin, pEnd, contex);
     return Vec2f::zero();
 }
 
-Vec2f XFontNull::GetTextSize(const wchar_t* pStr, const XTextDrawConect& contex)
+// size of N chars, for none monospace fonts it just uses space.
+float32_t XFontNull::GetCharWidth(char cChar, size_t num, const TextDrawContext& contex)
 {
-    X_UNUSED(pStr);
-    X_UNUSED(contex);
-    return Vec2f::zero();
+    X_UNUSED(cChar, num, contex);
+    return 0.f;
 }
+
+
 
 int32_t XFontNull::GetEffectId(const char* pEffectName) const
 {
@@ -94,39 +80,73 @@ int32_t XFontNull::GetEffectId(const char* pEffectName) const
 
 // -------------------------------------------------------------
 
-bool XFontSysNull::Init(void)
+void XFontSysNull::registerVars(void)
+{
+
+}
+
+void XFontSysNull::registerCmds(void)
+{
+
+}
+
+bool XFontSysNull::init(void)
 {
     return true;
 }
 
-void XFontSysNull::ShutDown(void)
+void XFontSysNull::shutDown(void)
 {
+
 }
 
 void XFontSysNull::release(void)
 {
-    X_DELETE(this, g_fontArena);
+
 }
 
-void XFontSysNull::updateDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const
+bool XFontSysNull::asyncInitFinalize(void)
+{
+    return true;
+}
+
+void XFontSysNull::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const
 {
     X_UNUSED(bucket);
 }
 
-IFont* XFontSysNull::NewFont(const char* pFontName)
+IFont* XFontSysNull::loadFont(core::string_view name)
 {
-    X_UNUSED(pFontName);
-    return &nullFont_;
+    X_UNUSED(name);
+    return nullptr;
 }
 
-IFont* XFontSysNull::GetFont(const char* pFontName) const
+IFont* XFontSysNull::findFont(core::string_view name) const
 {
-    X_UNUSED(pFontName);
-    return &nullFont_;
+    X_UNUSED(name);
+    return nullptr;
 }
 
-void XFontSysNull::ListFontNames(void) const
+IFont* XFontSysNull::getDefault(void) const
 {
+    return nullptr;
+}
+
+void XFontSysNull::releaseFont(IFont* pFont)
+{
+    X_UNUSED(pFont);
+}
+
+bool XFontSysNull::waitForLoad(IFont* pFont)
+{
+    X_UNUSED(pFont);
+    return true;
+}
+
+// this should really take a sink no?
+void XFontSysNull::listFonts(core::string_view searchPattern) const
+{
+    X_UNUSED(searchPattern);
 }
 
 #else

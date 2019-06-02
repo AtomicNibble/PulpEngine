@@ -10,47 +10,61 @@ X_NAMESPACE_BEGIN(font)
 class XFontNull : public IFont
 {
 public:
-    ~XFontNull() X_OVERRIDE = default;
+    ~XFontNull() X_FINAL = default;
 
-    void Release(void) X_OVERRIDE;     // release the object
-    void Free(void) X_OVERRIDE;        // free internal memory
-    void FreeBuffers(void) X_OVERRIDE; // free texture buffers
-    void FreeTexture(void) X_OVERRIDE;
+    virtual void Free(void) X_FINAL;        // free internal memory
+    virtual void FreeTexture(void) X_FINAL;
 
-    texture::TexID getTextureId(void) const X_OVERRIDE;
+    // draw a load of test text.
+    virtual void DrawTestText(engine::IPrimativeContext* pPrimCon, const core::FrameTimeData& time) X_FINAL;
 
-    bool loadFont(void) X_OVERRIDE;
+    // these draw the text into the primative context.
+    virtual void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+        const TextDrawContext& contex, const char* pBegin, const char* pEnd) X_FINAL;
+    virtual void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+        const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_FINAL;
+    virtual void DrawString(engine::IPrimativeContext* pPrimCon,
+        const Vec3f& pos, const TextDrawContext& contex, const char* pBegin, const char* pEnd) X_FINAL;
+    virtual void DrawString(engine::IPrimativeContext* pPrimCon,
+        const Vec3f& pos, const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_FINAL;
 
-    void DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
-        const XTextDrawConect& contex, const char* pBegin, const char* pEnd) X_OVERRIDE;
-    void DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
-        const XTextDrawConect& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_OVERRIDE;
-
-    size_t GetTextLength(const char* pStr, const bool asciiMultiLine) const X_OVERRIDE;
-    size_t GetTextLength(const wchar_t* pStr, const bool asciiMultiLine) const X_OVERRIDE;
+    virtual size_t GetTextLength(const char* pBegin, const char* pEnd, const bool asciiMultiLine) const X_FINAL;
 
     // calculate the size.
-    Vec2f GetTextSize(const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
-    Vec2f GetTextSize(const wchar_t* pStr, const XTextDrawConect& contex) X_OVERRIDE;
+    virtual Vec2f GetTextSize(const char* pBegin, const char* pEnd, const TextDrawContext& contex) X_FINAL;
 
-    int32_t GetEffectId(const char* pEffectName) const X_OVERRIDE;
+    // size of N chars, for none monospace fonts it just uses space.
+    virtual float32_t GetCharWidth(char cChar, size_t num, const TextDrawContext& contex) X_FINAL;
+
+    virtual int32_t GetEffectId(const char* pEffectName) const X_FINAL;
 };
 
 class XFontSysNull : public IFontSys
 {
 public:
-    ~XFontSysNull() X_OVERRIDE = default;
+    ~XFontSysNull() X_FINAL = default;
 
-    virtual bool Init(void) X_OVERRIDE;
-    virtual void ShutDown(void) X_OVERRIDE;
-    virtual void release(void) X_OVERRIDE;
+    virtual void registerVars(void) X_FINAL;
+    virtual void registerCmds(void) X_FINAL;
 
-    virtual void updateDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_OVERRIDE;
+    virtual bool init(void) X_FINAL;
+    virtual void shutDown(void) X_FINAL;
+    virtual void release(void) X_FINAL;
 
-    virtual IFont* NewFont(const char* pFontName) X_OVERRIDE;
-    virtual IFont* GetFont(const char* pFontName) const X_OVERRIDE;
+    virtual bool asyncInitFinalize(void) X_FINAL;
 
-    virtual void ListFontNames(void) const X_OVERRIDE;
+    virtual void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_FINAL;
+
+    virtual IFont* loadFont(core::string_view name) X_FINAL;
+    virtual IFont* findFont(core::string_view name) const X_FINAL;
+    virtual IFont* getDefault(void) const X_FINAL;
+
+    virtual void releaseFont(IFont* pFont) X_FINAL;
+
+    virtual bool waitForLoad(IFont* pFont) X_FINAL;
+
+    // this should really take a sink no?
+    virtual void listFonts(core::string_view searchPattern) const X_FINAL;
 
 private:
     static XFontNull nullFont_;
