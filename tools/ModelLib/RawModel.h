@@ -40,7 +40,7 @@ namespace RawModel
         bool LoadRawModel(const core::Path<char>& path);
         bool LoadRawModel(const core::Array<uint8_t>& data);
 
-        bool SaveRawModelOS(const core::Path<wchar_t>& osPath);
+        bool SaveRawModelOS(const core::Path<char>& osPath);
         bool SaveRawModel(const core::Path<char>& path);
         bool SaveRawModel(core::XFile* pFile);
         // save to a buffer

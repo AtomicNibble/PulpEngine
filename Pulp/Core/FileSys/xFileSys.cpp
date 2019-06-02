@@ -879,6 +879,18 @@ bool xFileSys::createDirectoryTreeOS(const PathWT& osPath) const
     return PathUtil::CreateDirectoryTree(path);
 }
 
+bool xFileSys::createDirectoryTreeOS(const PathT& osPath) const
+{
+    PathWT path(osPath);
+    path.removeFileName();
+
+    if (isDebug()) {
+        X_LOG0("FileSys", "CreateDirectoryTree: \"%ls\"", path.c_str());
+    }
+
+    return PathUtil::CreateDirectoryTree(path);
+}
+
 // --------------------- exsists ---------------------
 
 bool xFileSys::fileExists(const PathT& relPath) const

@@ -129,7 +129,7 @@ void Window::RegisterVars(void)
 
 /// --------------------------------------------------------------------------------------------------------
 
-bool Window::Create(const wchar_t* const pTitle, Rect r, Mode::Enum mode)
+bool Window::Create(core::string_view title, Rect r, Mode::Enum mode)
 {
     lastError::Description Dsc;
 
@@ -155,10 +155,12 @@ bool Window::Create(const wchar_t* const pTitle, Rect r, Mode::Enum mode)
     r.x2 = r.x1 + (rect.right - rect.left);
     r.y2 = r.y1 + (rect.bottom - rect.top);
 
+    core::StackStringW256 titleWide(title.begin(), title.end());
+
     window_ = ::CreateWindowExW(
         0,
         g_ClassName,
-        pTitle,
+        titleWide.c_str(),
         mode,
         r.x1, r.y1, 
         r.getWidth(), r.getHeight(),
@@ -174,7 +176,7 @@ bool Window::Create(const wchar_t* const pTitle, Rect r, Mode::Enum mode)
     SendMessage(window_, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 #endif
 
-    X_ERROR_IF(window_ == NULL, "Window", "Failed to create window. Title: '%ls'. Error: %s", pTitle, lastError::ToString(Dsc));
+    X_ERROR_IF(window_ == NULL, "Window", "Failed to create window. Title: '%ls'. Error: %s", titleWide.c_str(), lastError::ToString(Dsc));
 
     return window_ != NULL;
 }

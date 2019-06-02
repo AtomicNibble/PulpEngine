@@ -271,7 +271,7 @@ public:
     bool getDependencies(core::Array<AssetDep>& dependencies) const;
 
     bool saveModel(const core::Path<char>& path);
-    bool saveModelOS(const core::Path<wchar_t>& osPath);
+    bool saveModelOS(const core::Path<char>& osPath);
     bool saveModel(core::XFile* pFile);
 private:
 

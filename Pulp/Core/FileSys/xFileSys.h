@@ -287,6 +287,7 @@ public:
     bool createDirectoryOS(const PathWT& osPath) const X_FINAL;
     bool createDirectoryTree(const PathT& relPath, VirtualDirectory::Enum dir) const X_FINAL;
     bool createDirectoryTreeOS(const PathWT& osPath) const X_FINAL;
+    bool createDirectoryTreeOS(const PathT& osPath) const X_FINAL;
 
     // exsists.
     bool fileExists(const PathT& relPath) const X_FINAL;

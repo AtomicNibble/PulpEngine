@@ -625,10 +625,10 @@ namespace RawModel
         return true;
     }
 
-    bool Model::SaveRawModelOS(const core::Path<wchar_t>& osPath)
+    bool Model::SaveRawModelOS(const core::Path<char>& osPath)
     {
-        core::Path<wchar_t> filePath(osPath);
-        filePath.setExtension(model::MODEL_RAW_FILE_EXTENSION_W);
+        core::Path<char> filePath(osPath);
+        filePath.setExtension(model::MODEL_RAW_FILE_EXTENSION);
 
         core::XFileScoped file;
         core::FileFlags mode;

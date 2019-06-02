@@ -85,7 +85,7 @@ namespace profiler
     private:
         Vec2f RenderStartupData(engine::IPrimativeContext* pPrim, Vec2f pos);
         Vec2f RenderArenaTree(engine::IPrimativeContext* pPrim, Vec2f pos, core::MemoryArenaBase* arena);
-        Vec2f RenderStr(engine::IPrimativeContext* pPrim, Vec2f pos, const wchar_t* pTitle, const core::StackString512& str);
+        Vec2f RenderStr(engine::IPrimativeContext* pPrim, Vec2f pos, core::string_view title, const core::StackString512& str);
 
         static size_t countChildren_r(core::MemoryArenaBase* arena);
 

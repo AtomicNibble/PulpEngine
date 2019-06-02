@@ -463,12 +463,12 @@ namespace profiler
             core::MemoryAllocatorStatistics::Str str;
             strAllocStats.toString(str);
 
-            area = RenderStr(pPrim, pos, L"String Mem", str);
+            area = RenderStr(pPrim, pos, "String Mem"_sv, str);
             pos.x += area.x + padding;
 
             allocStats.toString(str);
 
-            area = RenderStr(pPrim, pos, L"Combined Mem", str);
+            area = RenderStr(pPrim, pos, "Combined Mem"_sv, str);
             pos.x += area.x + padding;
         }
 
@@ -483,13 +483,13 @@ namespace profiler
             core::IOQueueStats::Str str3;
             pFileSys->getIOQueueStats().toString(str3);
 
-            area = RenderStr(pPrim, pos, L"IO Stats", str1);
+            area = RenderStr(pPrim, pos, "IO Stats"_sv, str1);
             pos.x += area.x + padding;
 
-            area = RenderStr(pPrim, pos, L"IO Stats (Async)", str2);
+            area = RenderStr(pPrim, pos, "IO Stats (Async)"_sv, str2);
             pos.x += area.x + padding;
 
-            area = RenderStr(pPrim, pos, L"IO Qeue Stats", str3);
+            area = RenderStr(pPrim, pos, "IO Qeue Stats"_sv, str3);
             pos.x += area.x + padding;
         }
 #endif // !X_ENABLE_FILE_STATS
@@ -504,7 +504,7 @@ namespace profiler
 
             stats.toString(str);
 
-            area = RenderStr(pPrim, pos, L"Render Stats", str);
+            area = RenderStr(pPrim, pos, "Render Stats"_sv, str);
             pos.x += area.x + padding;
         }
 
@@ -721,7 +721,7 @@ namespace profiler
         return Vec2f(width, height);
     }
 
-    Vec2f XProfileSys::RenderStr(engine::IPrimativeContext* pPrim, Vec2f pos, const wchar_t* pTitle, const core::StackString512& str)
+    Vec2f XProfileSys::RenderStr(engine::IPrimativeContext* pPrim, Vec2f pos, core::string_view title, const core::StackString512& str)
     {
         font::TextDrawContext ctx;
         ctx.pFont = pFont_;
@@ -759,7 +759,7 @@ namespace profiler
 
         ctx.SetColor(Col_Mintcream);
         ctx.flags.Set(font::DrawTextFlag::CENTER);
-        pPrim->drawText(pos.x + (width / 2), titleStartY, ctx, pTitle);
+        pPrim->drawText(pos.x + (width / 2), titleStartY, ctx, title);
 
         ctx.SetColor(Col_Dimgray);
         ctx.flags.Remove(font::DrawTextFlag::CENTER);

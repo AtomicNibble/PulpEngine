@@ -716,12 +716,11 @@ bool XCore::Init(CoreInitParams& startupParams)
         // create a window
         pWindow_ = X_NEW(core::Window, &coreArena_, "GameWindow");
 
-        wchar_t titleW[128];
-        const char* pTitle = X_ENGINE_NAME " Engine " X_CPUSTRING
+        auto title = core::string_view(X_ENGINE_NAME " Engine " X_CPUSTRING
 #if X_SUPER == 0
                                            " (fps:0, 0ms) Time: 0(x1)"
 #endif
-            ;
+            );
 
         auto mode = core::Window::Mode::APPLICATION;
         Recti r;
@@ -754,7 +753,7 @@ bool XCore::Init(CoreInitParams& startupParams)
             r.y2 = r.y1 + vars_.getWinHeight();
         }
 
-        if (!pWindow_->Create(core::strUtil::Convert(pTitle, titleW), r, mode)) {
+        if (!pWindow_->Create(title, r, mode)) {
             return false;
         }
 
@@ -889,7 +888,6 @@ bool XCore::ParseCmdArgs(CoreInitParams& initParams)
 {
     // should never be null
     const wchar_t* pArgs = initParams.pCmdLine;
-
     if (!pArgs) {
         return false;
     }

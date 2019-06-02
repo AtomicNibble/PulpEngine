@@ -32,7 +32,6 @@ namespace techset
         typedef core::HashMap<core::string, TechSetDef*> TechSetDefMap;
 
         static const char* INCLUDE_DIR;
-        static const wchar_t* INCLUDE_DIR_W;
 
     public:
         typedef core::Array<core::string> CatTypeArr;

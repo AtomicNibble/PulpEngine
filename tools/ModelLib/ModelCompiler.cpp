@@ -924,10 +924,10 @@ bool ModelCompiler::saveModel(const core::Path<char>& path)
     return saveModel(file.GetFile());
 }
 
-bool ModelCompiler::saveModelOS(const core::Path<wchar_t>& osPath)
+bool ModelCompiler::saveModelOS(const core::Path<char>& osPath)
 {
-    core::Path<wchar_t> path(osPath);
-    path.setExtension(model::MODEL_FILE_EXTENSION_W);
+    core::Path<char> path(osPath);
+    path.setExtension(model::MODEL_FILE_EXTENSION);
 
     core::XFileScoped file;
     if (!gEnv->pFileSys->createDirectoryTreeOS(path)) {

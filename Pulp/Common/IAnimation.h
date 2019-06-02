@@ -77,7 +77,6 @@ static const uint32_t ANIM_MAX_LOADED = 1 << 10;
 // This also allows other tools to export anims since the inter format is text based.
 static const uint32_t ANIM_INTER_VERSION = 2;
 static const char* ANIM_INTER_FILE_EXTENSION = "anim_inter";
-static const wchar_t* ANIM_INTER_FILE_EXTENSION_W = L"anim_inter";
 
 #ifdef RELATIVE
 #undef RELATIVE

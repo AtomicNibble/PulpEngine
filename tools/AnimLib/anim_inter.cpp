@@ -29,13 +29,13 @@ namespace Inter
     {
     }
 
-    bool Anim::loadOS(const core::Path<wchar_t>& osPath)
+    bool Anim::loadOS(const core::Path<>& osPath)
     {
         X_ASSERT_NOT_NULL(gEnv);
         X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-        core::Path<wchar_t> filePath(osPath);
-        filePath.setExtension(ANIM_INTER_FILE_EXTENSION_W);
+        core::Path<> filePath(osPath);
+        filePath.setExtension(ANIM_INTER_FILE_EXTENSION);
 
         core::FileFlags mode;
         mode.Set(core::FileFlag::READ);
@@ -81,13 +81,13 @@ namespace Inter
         return ParseData(lex);
     }
 
-    bool Anim::saveOS(const core::Path<wchar_t>& osPath) const
+    bool Anim::saveOS(const core::Path<>& osPath) const
     {
         X_ASSERT_NOT_NULL(gEnv);
         X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-        core::Path<wchar_t> filePath(osPath);
-        filePath.setExtension(ANIM_INTER_FILE_EXTENSION_W);
+        core::Path<> filePath(osPath);
+        filePath.setExtension(ANIM_INTER_FILE_EXTENSION);
 
         {
             core::XFileScoped file;

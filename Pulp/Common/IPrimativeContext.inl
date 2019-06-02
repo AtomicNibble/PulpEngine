@@ -206,6 +206,11 @@ X_INLINE void IPrimativeContext::drawText(float x, float y, const font::TextDraw
     drawText(Vec3f(x, y, 1), con, pText, pText + core::strUtil::strlen(pText));
 }
 
+X_INLINE void IPrimativeContext::drawText(float x, float y, const font::TextDrawContext& con, core::string_view text)
+{
+    drawText(Vec3f(x, y, 1), con, text.begin(), text.end());
+}
+
 X_INLINE void IPrimativeContext::drawText(float x, float y, const font::TextDrawContext& con, const char* pText, const char* pEnd)
 {
     drawText(Vec3f(x, y, 1), con, pText, pEnd);

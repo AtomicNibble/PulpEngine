@@ -25,7 +25,6 @@ namespace techset
     } // namespace
 
     const char* TechSetDefs::INCLUDE_DIR = "include";
-    const wchar_t* TechSetDefs::INCLUDE_DIR_W = L"include";
 
     TechSetDefs::TechSetDefs(core::MemoryArenaBase* arena) :
         arena_(arena),

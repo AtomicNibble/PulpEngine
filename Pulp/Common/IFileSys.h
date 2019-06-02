@@ -852,6 +852,7 @@ struct IFileSys
     virtual bool createDirectoryOS(const PathWT& osPath) const X_ABSTRACT;
     virtual bool createDirectoryTree(const PathT& relPath, VirtualDirectory::Enum dir) const X_ABSTRACT;
     virtual bool createDirectoryTreeOS(const PathWT& osPath) const X_ABSTRACT;
+    virtual bool createDirectoryTreeOS(const PathT& osPath) const X_ABSTRACT;
 
     // exsists.
     virtual bool fileExists(const PathT& relPath) const X_ABSTRACT;

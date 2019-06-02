@@ -1961,8 +1961,8 @@ void XConsole::drawBuffer(void)
     }
 
     {
-        const wchar_t* pTxt = X_WIDEN(X_ENGINE_NAME " Engine " X_BUILD_STRING ">");
-        const wchar_t* pTxtEnd = pTxt + (sizeof(X_ENGINE_NAME " Engine " X_BUILD_STRING ">") - 1);
+        const char* pTxt = X_ENGINE_NAME " Engine " X_BUILD_STRING ">";
+        const char* pTxtEnd = pTxt + (sizeof(X_ENGINE_NAME " Engine " X_BUILD_STRING ">") - 1);
 
         Vec2f pos(10, 5);
         Vec2f txtwidth = pFont_->GetTextSize(pTxt, pTxtEnd, ctx);
