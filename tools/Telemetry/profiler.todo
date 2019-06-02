@@ -96,6 +96,11 @@ ServerLib:
  ✔ Explore having a buffer for incoming socket data rather than letting it sit in the socket buffer. @done (19-05-16 20:21)
    this way we can grab more than MAX_PACKET_SIZE at a time and can make the buffer pretty big like 1MB
    see if it helps reduce stalls.
+   ✔ Make it so we can have a buffer bigger than socket. @done (19-06-01 18:21)
+     Currently I only use the buffer for reading from socket so can only ever read socket buffer size.
+     When ideally I want to be able to say have a 64MB buffer that we drain the socket into.
+     That way we can handle massive spikes etc.
+
 
  ✔ Have the server tell connected viewerers about new traces. @done (19-05-25 17:54)
 
