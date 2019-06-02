@@ -156,12 +156,7 @@ X_DECLARE_FLAGS8(FontFlag)
 
 typedef Flags8<FontFlag> FontFlags;
 
-//
-//	We support both ascii and wide char.
-//	since it's not much work to support wide char
-//  and saves me hassel later if I wanna support strange languages
-//  most engines now a day support wide char like Blizzard
-//  binary can still be multi-byte also.
+
 struct IFont
 {
     virtual ~IFont() = default;
