@@ -2,6 +2,7 @@
 #include "SymbolRes.h"
 
 #include <Containers/FixedArray.h>
+#include <Containers/FixedByteStream.h>
 
 #include <IFileSys.h>
 
@@ -445,6 +446,157 @@ void SymResolver::addSymSrvFolderNameForPDB(core::Path<>& path, const core::Guid
     path.ensureSlash();
 }
 
+bool SymResolver::getSymInfoFromPDB(core::Path<>& path, SymInfo& info)
+{
+    std::array<uint8_t, 0x20> PDB7_SIG = {
+        0x4D, 0x69, 0x63, 0x72, 0x6F, 0x73, 0x6F, 0x66, 0x74, 0x20, 0x43, 0x2F, 0x43, 0x2B, 0x2B, 0x20,
+        0x4D, 0x53, 0x46, 0x20, 0x37, 0x2E, 0x30, 0x30, 0x0D, 0x0A, 0x1A, 0x44, 0x53, 0x00, 0x00, 0x00
+    };
+
+    struct PDB_SIGNATURE
+    {
+        std::array<uint8_t, 0x20> sig;
+    };
+
+#if 0
+    struct PDB_HEADER2
+    {
+        PDB_SIGNATURE m_signature;
+        uint32_t pageSize;
+        uint32_t startPage;
+        uint32_t filePages;
+        uint32_t rootStreamSize;
+        uint32_t reserved;
+        uint32_t rootPageIndex;
+    };
+#endif
+
+    struct PDB_HEADER7
+    {
+        inline size_t pageCount(size_t size) const {
+            return (size + pageSize - 1) / pageSize;
+        }
+        inline size_t offsetforPageIdx(size_t idx) const {
+            return idx * pageSize;
+        }
+        inline size_t rootPageCount(void) const {
+            return pageCount(rootStreamSize);
+        }
+        inline size_t rootPageOffset(void) const {
+            return offsetforPageIdx(rootPageIndex);
+        }
+
+        PDB_SIGNATURE signature;
+        uint32_t pageSize;
+        uint32_t AllocTablePointer;
+        uint32_t filePages;
+        uint32_t rootStreamSize;
+        uint32_t reserved;
+        uint32_t rootPageIndex;
+    };
+
+    core::XFileScoped file;
+    if (!file.openFileOS(path, core::FileFlag::READ | core::FileFlag::SHARE | core::FileFlag::RANDOM_ACCESS)) {
+        return false;
+    }
+
+    PDB_HEADER7 hdr;
+    if (file.readObj(hdr) != sizeof(hdr)) {
+        X_ERROR("TelemSym", "Failed to read PDB header");
+        return false;
+    }
+
+    if (hdr.signature.sig != PDB7_SIG) {
+        X_ERROR("TelemSym", "PDB sig mismatch");
+        return false;
+    }
+
+    auto rootPageCount = hdr.rootPageCount();
+    core::Array<uint32_t> rootPages(g_TelemSymLibArena, rootPageCount);
+
+    auto rootRageOffset = hdr.rootPageOffset();
+    file.seek(rootRageOffset, core::SeekMode::SET);
+
+    if (file.readObjs(rootPages.data(), rootPageCount) != rootPageCount) {
+        X_ERROR("TelemSym", "Failed to read root page indexes");
+        return false;
+    }
+
+    // we want to read info from root streams, for now just read it all.
+    core::Array<uint8_t> buff(g_TelemSymLibArena, hdr.rootStreamSize);
+
+    // read the data.
+    {
+        for (int32_t i = 0; i < static_cast<int32_t>(rootPages.size()); i++)
+        {
+            uint32_t offset = i * hdr.pageSize;
+            uint32_t bytesLeft = hdr.rootStreamSize - offset;
+
+            uint32_t pageIdx = rootPages[i];
+            uint32_t readSize = core::Min(hdr.pageSize, bytesLeft);
+            auto pageOffset = hdr.offsetforPageIdx(pageIdx);
+
+            file.seek(pageOffset, core::SeekMode::SET);
+
+            if (file.read(buff.data() + offset, readSize) != readSize) {
+                X_ERROR("TelemSym", "Failed to read root page data");
+                return false;
+            }
+        }
+    }
+
+    core::FixedByteStreamNoneOwning bs(buff.begin(), buff.end(), true);
+
+    auto numStreams = bs.read<uint32_t>();
+    if (numStreams < 2) {
+        X_ERROR("TelemSym", "PDB is missing stream1");
+        return false;
+    }
+
+    auto stream0Size = bs.read<uint32_t>();
+    auto stream0Pages = hdr.pageCount(stream0Size);
+
+    auto stream1Size = bs.read<uint32_t>();
+    auto stream1Pages = hdr.pageCount(stream1Size);
+    X_UNUSED(stream1Pages);
+
+    bs.skip(sizeof(uint32_t) * (numStreams - 2));
+
+    // skip steam0 pages
+    bs.skip(sizeof(uint32_t) * stream0Pages);
+
+    struct PDBVersionInfo
+    {
+        uint32_t version;
+        uint32_t timeStamp;
+        uint32_t age;
+        core::Guid guid;
+        uint32_t stringDataLength;
+    };
+
+    // Make this bit more simple and only care about first page
+    // think it's very unlikley page size ever be less than 32bytes.
+    // be suprised if it was ever not 4096.
+    if (sizeof(PDBVersionInfo) > hdr.pageSize) {
+        X_ERROR("TelemSym", "Unsupported PDB pagesize");
+        return false;
+    }
+
+    auto pageIdx = bs.read<uint32_t>();
+    auto pageOffset = hdr.offsetforPageIdx(pageIdx);
+
+    file.seek(pageOffset, core::SeekMode::SET);
+
+    PDBVersionInfo pdbInfo;
+    if (file.readObj(pdbInfo) != sizeof(pdbInfo)) {
+        X_ERROR("TelemSym", "Failed to read PDB version info");
+        return false;
+    }
+
+    info.age = pdbInfo.age;
+    info.guid = pdbInfo.guid;
+    return true;
+}
 
 bool SymResolver::haveModuleWithBase(uintptr_t baseAddr)
 {

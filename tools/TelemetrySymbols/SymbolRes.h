@@ -15,6 +15,15 @@ X_DECLARE_ENUM(SymPathType)(
     Server
 );
 
+struct SymInfo
+{
+    SymInfo() {
+        core::zero_this(this);
+    }
+
+    core::Guid guid;
+    uint32_t age;
+};
 
 struct SymPath
 {
@@ -73,6 +82,7 @@ public:
     TELEMETRY_SYMLIB_EXPORT bool resolveForAddr(uintptr_t addr);
 
     TELEMETRY_SYMLIB_EXPORT static void addSymSrvFolderNameForPDB(core::Path<>& path, const core::Guid& guid, uint32_t age);
+    TELEMETRY_SYMLIB_EXPORT static bool getSymInfoFromPDB(core::Path<>& path, SymInfo& info);
 
 private:
     bool haveModuleWithBase(uintptr_t baseAddr);
