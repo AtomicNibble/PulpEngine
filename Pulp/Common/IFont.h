@@ -20,7 +20,7 @@ X_NAMESPACE_BEGIN(font)
 static const char* FONT_DESC_FILE_EXTENSION = "font";
 static const char* FONT_BAKED_FILE_EXTENSION = "fnt";
 
-static const wchar_t FONT_PRECACHE_STR[] = L" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]"
+static const char FONT_PRECACHE_STR[] = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]"
                                            "^_`abcdefghijklmnopqrstuvwxyz{|}~¢£¤¥¦§¨©ª«¬­\n\t";
 
 static const uint32_t FONT_MAX_LOADED = 8;
@@ -182,14 +182,12 @@ struct IFont
         const Vec3f& pos, const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_ABSTRACT;
 
     virtual size_t GetTextLength(const char* pBegin, const char* pEnd, const bool asciiMultiLine) const X_ABSTRACT;
-    virtual size_t GetTextLength(const wchar_t* pBegin, const wchar_t* pEnd, const bool asciiMultiLine) const X_ABSTRACT;
 
     // calculate the size.
     virtual Vec2f GetTextSize(const char* pBegin, const char* pEnd, const TextDrawContext& contex) X_ABSTRACT;
-    virtual Vec2f GetTextSize(const wchar_t* pBegin, const wchar_t* pEnd, const TextDrawContext& contex) X_ABSTRACT;
 
     // size of N chars, for none monospace fonts it just uses space.
-    virtual float32_t GetCharWidth(wchar_t cChar, size_t num, const TextDrawContext& contex) X_ABSTRACT;
+    virtual float32_t GetCharWidth(char cChar, size_t num, const TextDrawContext& contex) X_ABSTRACT;
 
     virtual int32_t GetEffectId(const char* pEffectName) const X_ABSTRACT;
 

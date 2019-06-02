@@ -181,16 +181,8 @@ public:
     X_INLINE void drawText(float x, float y, const font::TextDrawContext& con, core::string_view text);
     X_INLINE void drawText(float x, float y, const font::TextDrawContext& con, const char* pText, const char* pEnd);
 
-    X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const wchar_t* pFormat, va_list args);
-    X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const wchar_t* pText);
-    X_INLINE void drawText(const Vec3f& pos, const Matrix33f& ang, const font::TextDrawContext& con, const wchar_t* pText);
-    X_INLINE void drawText(float x, float y, const font::TextDrawContext& con, const wchar_t* pText);
-    X_INLINE void drawText(float x, float y, const font::TextDrawContext& con, const wchar_t* pText, const wchar_t* pEnd);
-
     virtual void drawText(const Vec3f& poss, const Matrix33f& ang, const font::TextDrawContext& con, const char* pText, const char* pEnd) X_ABSTRACT;
-    virtual void drawText(const Vec3f& poss, const Matrix33f& ang, const font::TextDrawContext& con, const wchar_t* pText, const wchar_t* pEnd) X_ABSTRACT;
     virtual void drawText(const Vec3f& poss, const font::TextDrawContext& con, const char* pText, const char* pEnd) X_ABSTRACT;
-    virtual void drawText(const Vec3f& poss, const font::TextDrawContext& con, const wchar_t* pText, const wchar_t* pEnd) X_ABSTRACT;
 
 private:
     X_INLINE void drawImage(float xpos, float ypos, float z, float w, float h,

@@ -100,7 +100,7 @@ public:
 
     // returns 1 if texture updated, returns 2 if texture not updated, returns 0 on error
     // pUpdated is the number of slots updated
-    CacheResult::Enum PreCacheString(const wchar_t* pBegin, const wchar_t* pEnd, int32_t* pUpdatedOut = nullptr);
+    CacheResult::Enum PreCacheString(const char* pBegin, const char* pEnd, int32_t* pUpdatedOut = nullptr);
 
     void GetTextureCoord(const XTextureSlot* pSlot, XCharCords& cords) const;
 

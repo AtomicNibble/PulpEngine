@@ -54,14 +54,12 @@ public:
         const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_FINAL;
 
     size_t GetTextLength(const char* pBegin, const char* pEnd, const bool asciiMultiLine) const X_FINAL;
-    size_t GetTextLength(const wchar_t* pBegin, const wchar_t* pEnd, const bool asciiMultiLine) const X_FINAL;
 
     // calculate the size.
     Vec2f GetTextSize(const char* pBegin, const char* pEnd, const TextDrawContext& contex) X_FINAL;
-    Vec2f GetTextSize(const wchar_t* pBegin, const wchar_t* pEnd, const TextDrawContext& contex) X_FINAL;
 
     // size of N chars, for none monospace fonts it just uses space.
-    float32_t GetCharWidth(wchar_t cChar, size_t num, const TextDrawContext& contex) X_FINAL;
+    float32_t GetCharWidth(char cChar, size_t num, const TextDrawContext& contex) X_FINAL;
 
     int32_t GetEffectId(const char* pEffectName) const X_FINAL;
 
@@ -77,13 +75,13 @@ public:
 
 private:
     void DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
-        const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd, const Matrix33f* pRotation);
+        const TextDrawContext& contex, const char* pBegin, const char* pEnd, const Matrix33f* pRotation);
 
 private:
-    Vec2f GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, const TextDrawContext& contex);
+    Vec2f GetTextSizeInternal(const char* pBegin, const char* pEnd, const TextDrawContext& contex);
 
     bool CreateDeviceTexture(void);
-    void Prepare(const wchar_t* pBegin, const wchar_t* pEnd);
+    void Prepare(const char* pBegin, const char* pEnd);
 
 private:
     static size_t ByteToWide(const char* pBegin, const char* pEnd, wchar_t* pOut, const size_t buflen);

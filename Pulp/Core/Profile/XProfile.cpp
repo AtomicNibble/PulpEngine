@@ -522,13 +522,13 @@ namespace profiler
         auto& allocStats = arenaStats.allocatorStatistics_;
 
         core::StackString<64, char> name;
-        core::StackStringW256 str;
+        core::StackString256 str;
         core::HumanSize::Str strBuf, strBuf2;
 
         name.append(' ', treeIndent * 2);
         name.append(arenaStats.arenaName_);
 
-        str.appendFmt(L"%-25" PRns "^6%6" PRIuS "%11" PRIuS "%11" PRns "%11" PRns,
+        str.appendFmt("%-25" PRns "^6%6" PRIuS "%11" PRIuS "%11" PRns "%11" PRns,
             name.c_str(),
             allocStats.allocationCount_,
             allocStats.totalAllocations_,
@@ -603,8 +603,8 @@ namespace profiler
             Color(0.01f, 0.01f, 0.01f, 0.8f));
 
         // titles.
-        core::StackStringW256 str;
-        str.appendFmt(L"%-25" PRns "%6" PRns "%11" PRns "%11" PRns "%11" PRns,
+        core::StackString256 str;
+        str.appendFmt("%-25" PRns "%6" PRns "%11" PRns "%11" PRns "%11" PRns,
             "Memory Arena Name", "Num", "Total", "Phys(U)", "Phys");
 
         font::TextDrawContext ctx;
@@ -631,8 +631,8 @@ namespace profiler
         // pad it
         maxNickNameWidth = core::Max(maxNickNameWidth + 2_sz, 5_sz);
 
-        core::StackStringW512 text;
-        text.setFmt(L"#%*s\t%5s\t%12s\t%8s", maxNickNameWidth, L"Name", L"Calls", L"Time(cs)", L"Time(ms)");
+        core::StackString512 text;
+        text.setFmt("#%*s\t%5s\t%12s\t%8s", maxNickNameWidth, "Name", "Calls", "Time(cs)", "Time(ms)");
 
         font::TextDrawContext ctx;
         ctx.pFont = pFont_;
@@ -696,7 +696,7 @@ namespace profiler
         ctx.SetColor(Col_Mintcream);
         ctx.flags.Set(font::DrawTextFlag::CENTER);
 
-        pPrim->drawText(pos.x + (width / 2), titleStartY, ctx, L"Startup Timmings");
+        pPrim->drawText(pos.x + (width / 2), titleStartY, ctx, "Startup Timmings"_sv);
 
         ctx.SetColor(Col_Dimgray);
         ctx.flags.Remove(font::DrawTextFlag::CENTER);
@@ -708,7 +708,7 @@ namespace profiler
         for (size_t i = 0; i < profilerData_.size(); ++i) {
             const auto* pData = profilerData_[i];
 
-            text.setFmt(L"%*" PRns "\t%5" PRIi32 "\t%12" PRIu64 "\t%8.2f",
+            text.setFmt("%*" PRns "\t%5" PRIi32 "\t%12" PRIu64 "\t%8.2f",
                 maxNickNameWidth + 1,
                 pData->pNickName_,
                 pData->callCount_,
@@ -919,13 +919,13 @@ namespace profiler
                 }
             }
 
-            core::StackStringW512 txt;
-            txt.appendFmt(L"JobsRun: %" PRIi32 " JobsStolen: %" PRIi32 " JobsAssited: %" PRIi32,
+            core::StackString512 txt;
+            txt.appendFmt("JobsRun: %" PRIi32 " JobsStolen: %" PRIi32 " JobsAssited: %" PRIi32,
                 int32_t(frameStats.jobsRun), int32_t(frameStats.jobsStolen), int32_t(frameStats.jobsAssited));
 
             ctx.SetColor(Col_Mintcream);
             ctx.flags.Set(font::DrawTextFlag::CENTER);
-            pPrim->drawText(xStart + (width / 2), pos.y + padding, ctx, L"Profiler");
+            pPrim->drawText(xStart + (width / 2), pos.y + padding, ctx, "Profiler"_sv);
 
             ctx.flags.Remove(font::DrawTextFlag::CENTER);
             pPrim->drawText(xStart + padding, pos.y + padding, ctx, txt.begin(), txt.end());

@@ -258,55 +258,36 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon, const core::FrameT
 void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
     const TextDrawContext& ctx, const char* pBegin, const char* pEnd)
 {
-    wchar_t strW[MAX_TXT_SIZE];
-
-    size_t txtLen = pEnd - pBegin;
-    const wchar_t* pWideBegin = core::strUtil::Convert(pBegin, strW);
-    const wchar_t* pWideEnd = pWideBegin + txtLen;
-
     DrawStringInternal(
         pPrimCon,
         pos,
         ctx,
-        pWideBegin,
-        pWideEnd,
+        pBegin,
+        pEnd,
         &ang);
 }
 
 void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
     const TextDrawContext& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
 {
+    char narrow[MAX_TXT_SIZE];
+
+    size_t txtLen = pEnd - pBegin;
+    const char* pNarrowBegin = core::strUtil::Convert(pBegin, narrow);
+    const char* pNarrowEnd = pNarrowBegin + txtLen;
+
     DrawStringInternal(
         pPrimCon,
         pos,
         ctx,
-        pBegin,
-        pEnd,
+        pNarrowBegin,
+        pNarrowEnd,
         &ang);
 }
 
 void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
     const TextDrawContext& ctx, const char* pBegin, const char* pEnd)
 {
-    // to wide char
-    wchar_t strW[MAX_TXT_SIZE];
-
-    size_t txtLen = pEnd - pBegin;
-    const wchar_t* pWideBegin = core::strUtil::Convert(pBegin, strW);
-    const wchar_t* pWideEnd = pWideBegin + txtLen;
-
-    DrawStringInternal(
-        pPrimCon,
-        pos,
-        ctx,
-        pWideBegin,
-        pWideEnd,
-        nullptr);
-}
-
-void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
-    const TextDrawContext& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
-{
     DrawStringInternal(
         pPrimCon,
         pos,
@@ -316,8 +297,26 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
         nullptr);
 }
 
+void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
+    const TextDrawContext& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
+{
+    char narrow[MAX_TXT_SIZE];
+
+    size_t txtLen = pEnd - pBegin;
+    const char* pNarrowBegin = core::strUtil::Convert(pBegin, narrow);
+    const char* pNarrowEnd = pNarrowBegin + txtLen;
+
+    DrawStringInternal(
+        pPrimCon,
+        pos,
+        ctx,
+        pNarrowBegin,
+        pNarrowEnd,
+        nullptr);
+}
+
 void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
-    const TextDrawContext& ctx, const wchar_t* pBegin, const wchar_t* pEnd, const Matrix33f* pRotation)
+    const TextDrawContext& ctx, const char* pBegin, const char* pEnd, const Matrix33f* pRotation)
 {
     const size_t textLen = (pEnd - pBegin);
     if (!textLen) {
@@ -372,7 +371,7 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
     }
 
     if (shiftedPosition) {
-        textSize = GetTextSizeWInternal(pBegin, pEnd, ctx);
+        textSize = GetTextSizeInternal(pBegin, pEnd, ctx);
 
         if (ctx.flags.IsSet(DrawTextFlag::RIGHT)) {
             baseXY.x -= textSize.x;
@@ -406,7 +405,7 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
 
         if (drawFrame && passIdx == 0) {
             if (!shiftedPosition) {
-                textSize = GetTextSizeWInternal(pBegin, pEnd, ctx);
+                textSize = GetTextSizeInternal(pBegin, pEnd, ctx);
             }
 
             Vec2f baseOffset;
@@ -480,13 +479,13 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
             pVerts[5].st = pVerts[0].st;
         }
 
-        const wchar_t* pChar = pBegin;
-        while (wchar_t ch = *pChar++) {
+        const char* pChar = pBegin;
+        while (char ch = *pChar++) {
             // check for special chars that alter how we render.
             switch (ch) {
-                case L'\t':
-                case L' ': {
-                    const int32_t numSpaces = ch == L' ' ? 1 : FONT_TAB_CHAR_NUM;
+                case '\t':
+                case ' ': {
+                    const int32_t numSpaces = ch == ' ' ? 1 : FONT_TAB_CHAR_NUM;
 
                     if (isProportional) {
                         auto* pSlot = pFontTexture_->GetCharSlot(' ');
@@ -500,16 +499,16 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
                     continue;
                 }
 
-                case L'^': {
-                    if (*pChar == L'^') {
+                case '^': {
+                    if (*pChar == '^') {
                         ++pChar;
                     }
-                    else if (*pChar == L'~') { // resets to contex col
+                    else if (*pChar == '~') { // resets to contex col
                         col = ctx.col;
                         ++pChar;
                     }
                     else if (core::strUtil::IsDigit(*pChar)) {
-                        const int32_t colorIndex = (*pChar) - L'0';
+                        const int32_t colorIndex = (*pChar) - '0';
                         X_ASSERT(colorIndex >= 0 && colorIndex < X_ARRAY_SIZE(g_ColorTable), "ColorIndex out of range")(colorIndex);
                         Color8u newColor = g_ColorTable[colorIndex];
                         col.r = newColor.r;
@@ -520,13 +519,13 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
                     continue;
                 }
 
-                case L'\n': {
+                case '\n': {
                     charX = baseXY.x;
                     charY += verAdvance;
                     continue;
                 }
 
-                case L'\r': {
+                case '\r': {
                     charX = baseXY.x;
                     continue;
                 }
@@ -682,7 +681,7 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
     // as all the batching goes to shit.
     if (debugRect) {
         if (!shiftedPosition) {
-            textSize = GetTextSizeWInternal(pBegin, pEnd, ctx);
+            textSize = GetTextSizeInternal(pBegin, pEnd, ctx);
         }
 
         Vec3f tl(baseXY.x, baseXY.y, pos.z);
@@ -709,13 +708,13 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
         float charX = baseXY.x + pass.offset.x;
         float charY = baseXY.y + pass.offset.y;
 
-        const wchar_t* pChar = pBegin;
-        while (wchar_t ch = *pChar++) {
+        const char* pChar = pBegin;
+        while (char ch = *pChar++) {
             // check for special chars that alter how we render.
             switch (ch) {
-                case L'\t':
-                case L' ': {
-                    const int32_t numSpaces = ch == L' ' ? 1 : FONT_TAB_CHAR_NUM;
+                case '\t':
+                case ' ': {
+                    const int32_t numSpaces = ch == ' ' ? 1 : FONT_TAB_CHAR_NUM;
 
                     if (isProportional) {
                         auto* pSlot = pFontTexture_->GetCharSlot(' ');
@@ -729,8 +728,8 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
                     continue;
                 }
 
-                case L'^': {
-                    if (*pChar == L'^') {
+                case '^': {
+                    if (*pChar == '^') {
                         ++pChar;
                     }
                     else if (core::strUtil::IsDigit(*pChar)) {
@@ -739,13 +738,13 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
                     continue;
                 }
 
-                case L'\n': {
+                case '\n': {
                     charX = baseXY.x;
                     charY += verAdvance;
                     continue;
                 }
 
-                case L'\r': {
+                case '\r': {
                     charX = baseXY.x;
                     continue;
                 }
@@ -781,7 +780,7 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
     }
 }
 
-Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, const TextDrawContext& ctx)
+Vec2f XFont::GetTextSizeInternal(const char* pBegin, const char* pEnd, const TextDrawContext& ctx)
 {
     X_PROFILE_BEGIN("FontTextSize", core::profiler::SubSys::FONT);
     ttZone(gEnv->ctx, "(Font) text size");
@@ -801,18 +800,18 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, co
     // we reset width, so need to keep track of max.
     float maxW = 0;
 
-    const wchar_t* pCur = pBegin;
+    const char* pCur = pBegin;
     while (pCur < pEnd) {
         const wchar_t ch = *pCur++;
         switch (ch) {
-            case L'\\': {
-                if (*pCur != L'n') {
+            case '\\': {
+                if (*pCur != 'n') {
                     break;
                 }
 
                 ++pCur;
             }
-            case L'\n': {
+            case '\n': {
                 maxW = core::Max(maxW, charX);
 
                 charX = 0;
@@ -820,15 +819,15 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, co
                 charY += core::Min(verAdvance, ctx.size.y);
                 continue;
             }
-            case L'\r': {
+            case '\r': {
                 maxW = core::Max(maxW, charX);
 
                 charX = 0;
                 continue;
             }
-            case L'\t':
-            case L' ': {
-                const int32_t numSpaces = ch == L' ' ? 1 : FONT_TAB_CHAR_NUM;
+            case '\t':
+            case ' ': {
+                const int32_t numSpaces = ch == ' ' ? 1 : FONT_TAB_CHAR_NUM;
 
                 if (isProportional) {
                     auto* pSlot = pFontTexture_->GetCharSlot(' ');
@@ -841,8 +840,8 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, co
                 }
                 continue;
             }
-            case L'^': {
-                if (*pCur == L'^') {
+            case '^': {
+                if (*pCur == '^') {
                     ++pCur;
                 }
                 else if (*pCur) {
@@ -910,64 +909,17 @@ size_t XFont::GetTextLength(const char* pBegin, const char* pEnd, const bool asc
     return size;
 }
 
-size_t XFont::GetTextLength(const wchar_t* pBegin, const wchar_t* pEnd, const bool asciiMultiLine) const
-{
-    size_t size = 0;
-
-    // parse the string, ignoring control characters
-    const wchar_t* pCur = pBegin;
-    while (pCur < pEnd) {
-        switch (*pCur++) {
-            case L'\\': {
-                if (*pCur != L'n' || !asciiMultiLine) {
-                    break;
-                }
-                ++pCur;
-            }
-            case L'\n':
-            case L'\r':
-            case L'\t': {
-                continue;
-            } break;
-            case L'$': {
-                if (*pCur == L'$') {
-                    ++pCur;
-                }
-                else if (*pCur) {
-                    ++pCur;
-                    continue;
-                }
-            } break;
-            default:
-                break;
-        }
-
-        ++size;
-    }
-
-    return size;
-}
-
 // ---------------------------------------------------------
 
 // calculate the size.
 Vec2f XFont::GetTextSize(const char* pBegin, const char* pEnd, const TextDrawContext& contex)
 {
-    // to wide char
-    wchar_t strW[MAX_TXT_SIZE];
-    const size_t len = ByteToWide(pBegin, pEnd, strW, MAX_TXT_SIZE);
-
-    return GetTextSizeWInternal(strW, strW + len, contex);
+    return GetTextSizeInternal(pBegin, pEnd, contex);
 }
 
-Vec2f XFont::GetTextSize(const wchar_t* pBegin, const wchar_t* pEnd, const TextDrawContext& contex)
+float32_t XFont::GetCharWidth(char cChar, size_t num, const TextDrawContext& contex)
 {
-    return GetTextSizeWInternal(pBegin, pEnd, contex);
-}
-
-float32_t XFont::GetCharWidth(wchar_t cChar, size_t num, const TextDrawContext& contex)
-{
-    Vec2f size = GetTextSizeWInternal(&cChar, &cChar + 1, contex);
+    Vec2f size = GetTextSizeInternal(&cChar, &cChar + 1, contex);
 
     return size.x * num;
 }
@@ -1036,7 +988,7 @@ void XFont::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
 
 // ---------------------------------------------------------
 
-void XFont::Prepare(const wchar_t* pBegin, const wchar_t* pEnd)
+void XFont::Prepare(const char* pBegin, const char* pEnd)
 {
     X_PROFILE_BEGIN("FontPrepare", core::profiler::SubSys::FONT);
     ttZone(gEnv->ctx, "(Font) prepare texture");

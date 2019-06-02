@@ -124,7 +124,7 @@ void XFontTexture::PreWarmCache(void)
     PreCacheString(FONT_PRECACHE_STR, FONT_PRECACHE_STR + len);
 }
 
-CacheResult::Enum XFontTexture::PreCacheString(const wchar_t* pBegin, const wchar_t* pEnd, int32_t* pUpdatedOut)
+CacheResult::Enum XFontTexture::PreCacheString(const char* pBegin, const char* pEnd, int32_t* pUpdatedOut)
 {
     uint16 slotUsage = slotUsage_++;
     size_t length = union_cast<size_t>(pEnd - pBegin);
@@ -133,7 +133,8 @@ CacheResult::Enum XFontTexture::PreCacheString(const wchar_t* pBegin, const wcha
     X_ASSERT(pEnd >= pBegin, "Invalid begin end pair")(pBegin, pEnd);
 
     for (size_t i = 0; i < length; i++) {
-        const wchar_t cChar = pBegin[i];
+        // TODO: handle utf8
+        const char cChar = pBegin[i];
 
         XTextureSlot* pSlot = GetCharSlot(cChar);
         if (!pSlot) {
