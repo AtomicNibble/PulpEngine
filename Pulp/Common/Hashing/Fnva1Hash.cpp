@@ -19,7 +19,7 @@ namespace Hash
         Fnv1aVal hash = seed;
         auto* s = reinterpret_cast<const uint8_t*>(key);
 
-        for (uint32_t i = 0; i < length; ++i) {
+        for (size_t i = 0; i < length; ++i) {
             hash ^= (uint32_t)*s++;
             hash *= FNV_32_PRIME;
         }
@@ -31,7 +31,7 @@ namespace Hash
     {
         Fnv1aVal hash = FNV1_32_INIT;
 
-        for (uint32_t i = 0; i < length; ++i) {
+        for (size_t i = 0; i < length; ++i) {
             hash ^= (uint32_t)core::strUtil::ToLower(*key++);
             hash *= FNV_32_PRIME;
         }
@@ -50,7 +50,7 @@ namespace Hash
         Fnv1Val hash = seed;
         auto* s = reinterpret_cast<const uint8_t*>(key);
 
-        for (uint32_t i = 0; i < length; ++i) {
+        for (size_t i = 0; i < length; ++i) {
             hash *= FNV_32_PRIME;
             hash ^= (uint32_t)*s++;
         }
@@ -62,7 +62,7 @@ namespace Hash
     {
         Fnv1Val hash = FNV1_32_INIT;
 
-        for (uint32_t i = 0; i < length; ++i) {
+        for (size_t i = 0; i < length; ++i) {
             hash *= FNV_32_PRIME;
             hash ^= (uint32_t)core::strUtil::ToLower(*key++);
         }
@@ -80,11 +80,10 @@ namespace Hash
 
     Fnv1a64Val Fnv1a64Hash(const void* key, size_t length, Fnv1a64Val seed)
     {
-        size_t i;
         Fnv1a64Val hash = seed;
         auto* s = reinterpret_cast<const uint8_t*>(key);
 
-        for (i = 0; i < length; ++i) {
+        for (size_t i = 0; i < length; ++i) {
             hash ^= (uint64_t)*s++;
             hash *= FNV_64_PRIME;
         }
@@ -99,11 +98,10 @@ namespace Hash
 
     Fnv164Val Fnv164Hash(const void* key, size_t length, Fnv164Val seed)
     {
-        size_t i;
         Fnv164Val hash = seed;
         auto* s = reinterpret_cast<const uint8_t*>(key);
 
-        for (i = 0; i < length; ++i) {
+        for (size_t i = 0; i < length; ++i) {
             hash *= FNV_64_PRIME;
             hash ^= (uint64_t)*s++;
         }
