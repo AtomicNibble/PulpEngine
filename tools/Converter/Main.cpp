@@ -103,8 +103,6 @@ namespace
 
     bool GetAssetType(converter::AssetType::Enum& assType, bool slient = false)
     {
-        using namespace core::Hash::Literals;
-
         auto assetTypeStr = gEnv->pCore->GetCommandLineArg("type"_sv);
         if (assetTypeStr.isNotEmpty()) {
             if (!assetTypeFromStr(assetTypeStr.begin(), assetTypeStr.end(), assType)) {
