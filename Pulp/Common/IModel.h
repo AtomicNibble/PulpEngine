@@ -169,7 +169,6 @@ static const uint32_t MODEL_MAX_LODS = 4;
 // legnth checks are done without extension, to make it include extension, simple reduce it by the length of ext.
 static const uint32_t MODEL_MAX_NAME_LENGTH = 60;
 static const char* MODEL_FILE_EXTENSION = "model";
-static const wchar_t* MODEL_FILE_EXTENSION_W = L"model";
 static const char* MODEL_DEFAULT_NAME = "default/default";
 
 static const uint32_t MODEL_STREAM_ALIGN = 16; // streams are aligned to this relative to start of file.
@@ -181,7 +180,6 @@ static const uint32_t MODEL_STREAM_ALIGN = 16; // streams are aligned to this re
 // Also text based allowing for other tools to create it with ease.
 static const uint32_t MODEL_RAW_VERSION = 2;
 static const char* MODEL_RAW_FILE_EXTENSION = "model_raw";
-static const wchar_t* MODEL_RAW_FILE_EXTENSION_W = L"model_raw";
 
 // col mesh info
 static const char MODEL_MESH_COL_BOX_PREFIX[] = "PBX_";
