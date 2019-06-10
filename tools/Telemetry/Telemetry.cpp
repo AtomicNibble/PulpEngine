@@ -771,8 +771,6 @@ namespace
 
         tt_int32 numPDBSync;
 
-        X86_PAD(8)
-
         // -- Cace lane boundry --
         // This lane is very hot and should have no writes expect tickerBuf flip.
 
@@ -813,7 +811,7 @@ namespace
 
         tt_uint8 _lanePad2[32];
 
-        X86_PAD(24)
+        X86_PAD(8)
 
         // -- Cace lane boundry --
 
@@ -1875,7 +1873,11 @@ namespace
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockState>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockCount>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataMemAlloc>());
+#if X_64
     static_assert(56 == sizeof(QueueDataMemFree));
+#else
+    static_assert(40 == sizeof(QueueDataMemFree));
+#endif
     static_assert(64 == GetSizeWithoutArgData<QueueDataMessage>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataPlot>());
     static_assert(48 == sizeof(QueueDataPDBInfo));
