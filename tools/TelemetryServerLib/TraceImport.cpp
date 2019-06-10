@@ -62,7 +62,7 @@ bool TraceImport::ingestTraceFile(core::Path<>& path)
         return false;
     }
 
-    int32_t strDataLen = data.cr.appNameLen + data.cr.buildInfoLen + data.cr.cmdLineLen;
+    size_t strDataLen = data.cr.appNameLen + data.cr.buildInfoLen + data.cr.cmdLineLen;
 
     if (file.read(data.stringData, strDataLen) != strDataLen) {
         X_ERROR("TelemSrv", "Failed to read trace file meta strings");
@@ -138,7 +138,7 @@ bool TraceImport::ingestTraceFile(core::Path<>& path)
         return false;
     }
 
-    if (!sendToServer(reinterpret_cast<const char*>(&data.stringData), strDataLen)) {
+    if (!sendToServer(reinterpret_cast<const char*>(&data.stringData), static_cast<int32_t>(strDataLen))) {
         platform::closesocket(connectSocket);
         return false;
     }
@@ -151,7 +151,7 @@ bool TraceImport::ingestTraceFile(core::Path<>& path)
 
     while (bytesLeft)
     {
-        auto toRead = safe_static_cast<int32_t>(core::Min(sizeof(buffer), bytesLeft));
+        auto toRead = safe_static_cast<size_t>(core::Min<uint64_t>(sizeof(buffer), bytesLeft));
 
         if (file.read(buffer, toRead) != toRead) {
             X_ERROR("TelemSrv", "Error reading trace file data");
@@ -160,7 +160,7 @@ bool TraceImport::ingestTraceFile(core::Path<>& path)
         }
 
         // we have some data!
-        if (!sendToServer(reinterpret_cast<const char*>(buffer), toRead)) {
+        if (!sendToServer(reinterpret_cast<const char*>(buffer), static_cast<int32_t>(toRead))) {
             platform::closesocket(connectSocket);
             return false;
         }
