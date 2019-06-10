@@ -153,7 +153,7 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
             // dispatch a read?
             auto freeSpace = io_.ring.freeSpace();
 
-            X_LOG0("TelemSrv", "CONSUME Ring size: %" PRIuS " freeSpace: %" PRIuS, io_.ring.size(), freeSpace);
+            X_LOG1("TelemSrv", "CONSUME Ring size: %" PRIuS " freeSpace: %" PRIuS, io_.ring.size(), freeSpace);
 
             if (freeSpace > MAX_PACKET_SIZE)
             {
@@ -3523,7 +3523,7 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
                 ioCtx.ring.write(socketBuffer.buffer.data(), socketBuffer.buffer.size());
                 freeSpace = ioCtx.ring.freeSpace();
 
-                X_LOG0("TelemSrv", "Ring size: %" PRIuS " freeSpace: %" PRIuS, ioCtx.ring.size(), freeSpace);
+                X_LOG1("TelemSrv", "Ring size: %" PRIuS " freeSpace: %" PRIuS, ioCtx.ring.size(), freeSpace);
 
                 if (!ioCtx.pJob_) {
                     const auto spaceUsed = ioCtx.ring.size();
