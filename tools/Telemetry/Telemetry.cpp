@@ -3794,6 +3794,7 @@ void TelemSetThreadGroupDefaultSort(TraceContexHandle ctx, tt_int32 groupID, tt_
 
 tt_int32 TelemGetCallStack(TraceContexHandle ctx, TtCallStack& stackOut)
 {
+    // TODO: why?
     static_assert((sizeof(TtCallStack) % 64) == 0, "Should be multiple of 64");
 
     auto* pCtx = handleToContext(ctx);
