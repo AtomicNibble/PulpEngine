@@ -221,25 +221,25 @@ void PotatoAnimExporter::setFileName(const MString& path)
     // we don't replace seperators on the name as asset names
     // have a fixed slash, regardless of native slash of the platform.
     // so we replace slashes only when building file paths.
-    fileName_.set(path.asWChar());
+    fileName_.set(path.asUTF8());
     fileName_.trim();
 
     name_ = core::string(path.asChar(), path.length());
     name_.trim();
 
-    fileName_.setExtension(anim::ANIM_FILE_EXTENSION_W);
+    fileName_.setExtension(anim::ANIM_FILE_EXTENSION);
 }
 
 void PotatoAnimExporter::setOutdir(const MString& path)
 {
-    outDir_.set(path.asWChar());
+    outDir_.set(path.asUTF8());
     outDir_.trim();
     outDir_.replaceSeprators();
 }
 
-core::Path<wchar_t> PotatoAnimExporter::getFilePath(void) const
+core::Path<> PotatoAnimExporter::getFilePath(void) const
 {
-    core::Path<wchar_t> path(outDir_);
+    core::Path<> path(outDir_);
     path /= fileName_;
     path.replaceSeprators();
     return path;

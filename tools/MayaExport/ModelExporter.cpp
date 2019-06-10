@@ -211,7 +211,7 @@ MStatus ModelExporter::convert(const MArgList& args)
         if (exportMode_ == ExpoMode::RAW) {
             PROFILE_MAYA_NAME("Save Raw");
 
-            core::Path<wchar_t> outPath = getFilePath();
+            core::Path<> outPath = getFilePath();
             {
                 MayaUtil::MayaPrintMsg("Exporting to: '%s'", outPath.c_str());
                 MayaUtil::MayaPrintMsg(""); // new line
@@ -348,27 +348,27 @@ void ModelExporter::printStats(void) const
 
 void ModelExporter::setFileName(const MString& path)
 {
-    core::Path<wchar_t> temp(path.asWChar());
+    core::Path<> temp(path.asUTF8());
     temp.trim();
     
     name_ = MString(temp.data(), safe_static_cast<int32_t>(temp.length()));
     
     fileName_ = temp;
-    fileName_.setExtension(model::MODEL_FILE_EXTENSION_W);
+    fileName_.setExtension(model::MODEL_FILE_EXTENSION);
 }
 
 void ModelExporter::setOutdir(const MString& path)
 {
-    core::StackStringW512 temp(path.asWChar());
+    core::StackString512 temp(path.asUTF8());
     temp.trim();
 
-    outDir_.set(temp.c_str());
+    outDir_.set(temp.begin(), temp.end());
     outDir_.replaceSeprators();
 }
 
-core::Path<wchar_t> ModelExporter::getFilePath(void) const
+core::Path<> ModelExporter::getFilePath(void) const
 {
-    core::Path<wchar_t> path(outDir_);
+    core::Path<> path(outDir_);
     path /= fileName_;
     path.replaceSeprators();
     return path;

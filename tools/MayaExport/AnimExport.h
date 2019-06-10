@@ -30,7 +30,7 @@ private:
     void setFileName(const MString& path);
     void setOutdir(const MString& path);
 
-    core::Path<wchar_t> getFilePath(void) const;
+    core::Path<> getFilePath(void) const;
     const core::string& getName(void) const;
 
     MStatus getInputObjects(void);
@@ -57,8 +57,8 @@ private:
     MString noteTrack_;
 
     core::string name_;
-    core::Path<wchar_t> fileName_; // name + extension.
-    core::Path<wchar_t> outDir_;
+    core::Path<> fileName_; // name + extension.
+    core::Path<> outDir_;
 
     ExpoMode::Enum exportMode_;
     MDistance::Unit unitOfMeasurement_;

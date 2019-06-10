@@ -75,7 +75,7 @@ private:
     void setFileName(const MString& path);
     void setOutdir(const MString& path);
 
-    core::Path<wchar_t> getFilePath(void) const;
+    core::Path<> getFilePath(void) const;
     const MString& getName(void) const;
 
     MStatus parseArgs(const MArgList& args);
@@ -104,8 +104,8 @@ private:
 private:
     float scale_;
     MString name_; // without extension.
-    core::Path<wchar_t> fileName_;
-    core::Path<wchar_t> outDir_;
+    core::Path<> fileName_;
+    core::Path<> outDir_;
     ExpoMode::Enum exportMode_;
     MeshExpoMode::Enum meshExportMode_;
     MDistance::Unit unitOfMeasurement_;
