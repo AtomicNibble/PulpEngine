@@ -11,6 +11,7 @@
 #include <Platform\Console.h>
 
 #include <Time/StopWatch.h>
+#include <Threading/SharedLock.h>
 
 #include <../Telemetry/TelemetryLib.h>
 
