@@ -101,8 +101,29 @@ using tt_size = unsigned int;
 
 static_assert(sizeof(tt_uintptr) == sizeof(void*), "Size missmatch");
 
-using TtFileHandle = tt_uintptr;
+struct TtConnectionType
+{
+    enum Enum
+    {
+        Tcp,
+        File
+    };
+};
 
+struct TtError
+{
+    enum Enum
+    {
+        Ok,
+        Error,
+        InvalidParam,
+        InvalidContex,
+        ArenaTooSmall,
+        NetNotInit,
+
+        HandeshakeFail
+    };
+};
 
 struct TtLogType
 {
@@ -193,37 +214,22 @@ struct TtPlotType
 };
 
 
+inline tt_int32 TELEM_INTERNAL_THREAD_GROUP_ID = -1;
+
+using TraceContexHandle = tt_uintptr;
+inline TraceContexHandle INVALID_TRACE_CONTEX = 0;
+
+
 // IO callbacks.
+using TtFileHandle = tt_uintptr;
+inline TtFileHandle TELEM_INVALID_HANDLE = 0;
+
 using FileOpenFunc = TtFileHandle(*)(void* pUserData, const char*);
 using FileCloseFunc = void(*)(void* pUserData, TtFileHandle);
 using FileWriteFunc = tt_int32(*)(void* pUserData, TtFileHandle, const void*, tt_int32);
 
-inline TtFileHandle TELEM_INVALID_HANDLE = 0;
-inline tt_int32 TELEM_INTERNAL_THREAD_GROUP_ID = -1;
-
-
 using LogFunction = void(*)(void* pUserData, TtLogType::Enum type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm);
-using TraceContexHandle = tt_uintptr;
 
-inline TraceContexHandle INVALID_TRACE_CONTEX = 0;
-
-enum TtConnectionType
-{
-    Tcp,
-    File
-};
-
-enum TtError
-{
-    Ok,
-    Error,
-    InvalidParam,
-    InvalidContex,
-    ArenaTooSmall,
-    NetNotInit,
-
-    HandeshakeFail
-};
 
 struct TtCallStack
 {
@@ -288,7 +294,7 @@ extern "C"
 #define __TELEM_API_F32(name, ...) __TELEMETRYLIB_EXPORT float name(__VA_ARGS__); \
         __TELEM_API_BLANK(inline float __blank##name(__VA_ARGS__) { return 0.f; })
 
-#define __TELEM_API_ERR(name, ...) __TELEMETRYLIB_EXPORT TtError name(__VA_ARGS__); \
+#define __TELEM_API_ERR(name, ...) __TELEMETRYLIB_EXPORT TtError::Enum name(__VA_ARGS__); \
         __TELEM_API_BLANK(inline TtError __blank##name(__VA_ARGS__) { return TtError::Ok; })
 
 #pragma warning( push )
@@ -305,7 +311,7 @@ extern "C"
     __TELEM_API_VOID(TelemSetIoFuncs, TraceContexHandle ctx, FileOpenFunc open, FileCloseFunc close, FileWriteFunc write, void* pUserData);
 
     __TELEM_API_ERR(TelemOpen, TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
-        TtConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS, TtConnectionFlags flags);
+        TtConnectionType::Enum conType, tt_uint16 serverPort, tt_int32 timeoutMS, TtConnectionFlags flags);
 
     __TELEM_API_BOOL(TelemClose, TraceContexHandle ctx);
 

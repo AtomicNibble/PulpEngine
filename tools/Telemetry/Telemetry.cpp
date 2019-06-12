@@ -3192,7 +3192,7 @@ void TelemShutDown(void)
     }
 }
 
-TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size bufLen)
+TtError::Enum TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size bufLen)
 {
     out = INVALID_TRACE_CONTEX;
 
@@ -3354,8 +3354,8 @@ void TelemSetIoFuncs(TraceContexHandle ctx, FileOpenFunc open, FileCloseFunc clo
     pCtx->pFileWrite = write;
 }
 
-TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pPath,
-    TtConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS, TtConnectionFlags flags)
+TtError::Enum TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pPath,
+    TtConnectionType::Enum conType, tt_uint16 serverPort, tt_int32 timeoutMS, TtConnectionFlags flags)
 {
     if (!isValidContext(ctx)) {
         return TtError::InvalidContex;
