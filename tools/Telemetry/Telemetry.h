@@ -264,7 +264,7 @@ struct TtSourceInfo
 
 __TELEM_PACK_POP;
 
-#define TT_SOURCE_INFO TtSourceInfo(__FILE__, __FUNCTION__, __LINE__)
+#define _TELEM_SOURCE_INFO TtSourceInfo(__FILE__, __FUNCTION__, __LINE__)
 
 #ifdef __cplusplus
 extern "C" 
@@ -640,8 +640,8 @@ namespace telem
 #define ttLoadLibary() telem::gTelemApi.loadModule()
 #endif // TTELEMETRY_LINK
 
-#define ttZone(ctx, pFmtString, ...) telem::ScopedZone __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, TT_SOURCE_INFO, pFmtString, __VA_ARGS__)
-#define ttZoneFilterd(ctx, minMicroSec, pFmtString, ...) telem::ScopedZoneFilterd __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, TT_SOURCE_INFO, minMicroSec, pFmtString, __VA_ARGS__)
+#define ttZone(ctx, pFmtString, ...) telem::ScopedZone __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, _TELEM_SOURCE_INFO, pFmtString, __VA_ARGS__)
+#define ttZoneFilterd(ctx, minMicroSec, pFmtString, ...) telem::ScopedZoneFilterd __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, _TELEM_SOURCE_INFO, minMicroSec, pFmtString, __VA_ARGS__)
 
 #define ttZoneFunction(ctx) ttZone(ctx, __FUNCTION__)
 #define ttZoneFunctionFilterd(ctx, minMicroSec) ttZoneFilterd(ctx, minMicroSec, __FUNCTION__)
@@ -687,24 +687,24 @@ namespace telem
 #define ttSendCallStackSkip(ctx, pStack, numToSkip) __TELEM_FUNC_NAME(TelemSendCallStackSkip)(ctx, pStack, numToSkip)
 
 // Zones
-#define ttEnter(ctx, pFmtString, ...) __TELEM_FUNC_NAME(TelemEnter)(ctx, TT_SOURCE_INFO, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttEnterEx(ctx, matchIdOut, minMicroSec, pFmtString, ...) __TELEM_FUNC_NAME(TelemEnterEx)(ctx, TT_SOURCE_INFO, matchIdOut, minMicroSec, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttEnter(ctx, pFmtString, ...) __TELEM_FUNC_NAME(TelemEnter)(ctx, _TELEM_SOURCE_INFO, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttEnterEx(ctx, matchIdOut, minMicroSec, pFmtString, ...) __TELEM_FUNC_NAME(TelemEnterEx)(ctx, _TELEM_SOURCE_INFO, matchIdOut, minMicroSec, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ttLeave(ctx) __TELEM_FUNC_NAME(TelemLeave)(ctx)
 #define ttLeaveEx(ctx, matchId) __TELEM_FUNC_NAME(TelemLeaveEx)(ctx, matchId)
 
 
 // Lock util
 #define ttSetLockName(ctx, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetLockName)(ctx, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttTryLock(ctx, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemTryLock)(ctx, TT_SOURCE_INFO, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttTryLockEx(ctx, matchIdOut, minMicroSec, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemTryLock)(ctx, TT_SOURCE_INFO, matchIdOut, minMicroSec, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttTryLock(ctx, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemTryLock)(ctx, _TELEM_SOURCE_INFO, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttTryLockEx(ctx, matchIdOut, minMicroSec, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemTryLock)(ctx, _TELEM_SOURCE_INFO, matchIdOut, minMicroSec, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ttEndTryLock(ctx, pPtr, result) __TELEM_FUNC_NAME(TelemEndTryLock)(ctx, pPtr, result)
 #define ttEndTryLockEx(ctx, matchIdOut, pPtr, result) __TELEM_FUNC_NAME(TelemEndTryLockEx)(ctx, matchIdOut, pPtr, result)
-#define ttSetLockState(ctx, pPtr, state) __TELEM_FUNC_NAME(TelemSetLockState)(ctx, TT_SOURCE_INFO, pPtr, state)
-#define ttSignalLockCount(ctx, pPtr, count) __TELEM_FUNC_NAME(TelemSignalLockCount)(ctx, TT_SOURCE_INFO, pPtr, count)
+#define ttSetLockState(ctx, pPtr, state) __TELEM_FUNC_NAME(TelemSetLockState)(ctx, _TELEM_SOURCE_INFO, pPtr, state)
+#define ttSignalLockCount(ctx, pPtr, count) __TELEM_FUNC_NAME(TelemSignalLockCount)(ctx, _TELEM_SOURCE_INFO, pPtr, count)
 
 // Some allocation tracking.
-#define ttAlloc(ctx, pPtr, size, pFmtString, ...) __TELEM_FUNC_NAME(TelemAlloc)(ctx, TT_SOURCE_INFO, pPtr, size, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttFree(ctx, pPtr) __TELEM_FUNC_NAME(TelemFree)(ctx, TT_SOURCE_INFO, pPtr)
+#define ttAlloc(ctx, pPtr, size, pFmtString, ...) __TELEM_FUNC_NAME(TelemAlloc)(ctx, _TELEM_SOURCE_INFO, pPtr, size, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttFree(ctx, pPtr) __TELEM_FUNC_NAME(TelemFree)(ctx, _TELEM_SOURCE_INFO, pPtr)
 
 #define ttPlot(ctx, type, value, pFmtString, ...)    ttPlotF32(ctx, type, value, pFmtString, __VA_ARGS__);
 #define ttPlotF32(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotF32)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
