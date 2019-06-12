@@ -1734,7 +1734,7 @@ namespace
         tt_int32 sortVal;
     };
 
-    TELEM_ALIGNED_SYMBOL(struct QueueDataCallStack, 64) : public QueueDataBase
+    struct QueueDataCallStack : public QueueDataBase
     {
         TtCallStack callstack;
     };
@@ -1868,15 +1868,16 @@ namespace
     static_assert(40 == sizeof(QueueDataTickInfo));
     static_assert(64 == GetSizeWithoutArgData<QueueDataZone>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockSetName>());
-    static_assert((sizeof(QueueDataCallStack) % 64) == 0);
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockTry>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockState>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockCount>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataMemAlloc>());
 #if X_64
     static_assert(56 == sizeof(QueueDataMemFree));
+    static_assert(136 == sizeof(QueueDataCallStack));
 #else
     static_assert(40 == sizeof(QueueDataMemFree));
+    static_assert(72 == sizeof(QueueDataCallStack));
 #endif
     static_assert(64 == GetSizeWithoutArgData<QueueDataMessage>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataPlot>());
@@ -2077,7 +2078,7 @@ namespace
 
     TELEM_INLINE void queueCallStack(TraceContext* pCtx, const TtCallStack& stack)
     {
-        QueueDataCallStack data; // this is full size so we don't read past end of stack..
+        QueueDataCallStack data; // this is full size so we don't write past end of stack..
         data.type = QueueDataType::CallStack;
         data.argDataSize = 0;
         data.callstack.num = stack.num;
@@ -3794,9 +3795,6 @@ void TelemSetThreadGroupDefaultSort(TraceContexHandle ctx, tt_int32 groupID, tt_
 
 tt_int32 TelemGetCallStack(TraceContexHandle ctx, TtCallStack& stackOut)
 {
-    // TODO: why?
-    static_assert((sizeof(TtCallStack) % 64) == 0, "Should be multiple of 64");
-
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
         return -1;

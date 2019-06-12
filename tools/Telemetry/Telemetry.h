@@ -3,12 +3,6 @@
 #include "../TelemetryCommon/Types.h"
 #include "../TelemetryCommon/Compiler.h" // for export defs
 
-#if X_64 // TODO: ..
-#define TELEM_64 1
-#else
-#define TELEM_64 0
-#endif
-
 #ifndef TTELEMETRY_ENABLED
 #define TTELEMETRY_ENABLED 1
 #endif // TTELEMETRY_ENABLED
@@ -113,7 +107,7 @@ enum TtError
 
 struct TtCallStack
 {
-    static const tt_uint32 MAX_FRAMES = 14;
+    static const tt_uint32 MAX_FRAMES = 15;
 
     TtCallStack() {
         id = -1;
@@ -123,11 +117,6 @@ struct TtCallStack
     tt_int32 id;
     tt_int32 num;
     void* frames[MAX_FRAMES];
-
-#if TELEM_64
-private:
-    tt_uint64 _pad;
-#endif
 };
 
 TELEM_PACK_PUSH(4)
