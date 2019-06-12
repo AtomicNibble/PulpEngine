@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../TelemetryCommon/Types.h"
-
 #ifndef TTELEMETRY_ENABLED
 #define TTELEMETRY_ENABLED 1
 #endif // TTELEMETRY_ENABLED
