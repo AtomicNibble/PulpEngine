@@ -28,6 +28,10 @@
 #define __TELEM_PRAGMA(pragma)      __pragma(pragma)
 #define __TELEM_PACK_PUSH(val)      __TELEM_PRAGMA(pack(push, val))
 #define __TELEM_PACK_POP            __TELEM_PRAGMA(pack(pop))
+
+#define __TELEM_WIDEN_HELPER(str)   L##str
+#define __TELEM_WIDEN(str)          __TELEM_WIDEN_HELPER(str)
+
 #else 
 
 #define __TELEM_GET_ARG_COUNT_PRIVATE(_0, _1_, _2_, _3_, _4_, _5_, _6_, _7_, _8_, _9_, _10_, _11_, _12_, _13_, _14_, _15_, _16_, _17_, _18_, _19_, _20_, _21_, _22_, _23_, _24_, _25_, _26_, _27_, _28_, _29_, _30_, _31_, _32_, _33_, _34_, _35_, _36, _37, _38, _39, _40, _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, _51, _52, _53, _54, _55, _56, _57, _58, _59, _60, _61, _62, _63, _64, _65, _66, _67, _68, _69, _70, count, ...) count
@@ -36,13 +40,11 @@
 #endif // _MSC_VER
 
 
-
 #if defined(WIN32) && !defined(X_DLL)
 #ifndef TELEM_LIB
 #define TELEM_LIB
 #endif
 #endif
-
 
 #ifndef __TELEMETRYLIB_EXPORT
 
@@ -57,6 +59,50 @@
 #endif // TELEM_LIB
 
 #endif // !__TELEMETRYLIB_EXPORT
+
+#if defined(_WIN32) || defined(_WIN64)
+#if _WIN64
+#define __TELEM_64 1
+#else
+#define __TELEM_64 0
+#endif
+#endif
+
+#define TELEM_DLL_NAME "engine_TelemetryLib.dll"
+#define TELEM_DLL_NAME_WIDE __TELEM_WIDEN("engine_TelemetryLib.dll")
+
+#define __TELEM_TYPES
+
+using tt_int8 = char;
+using tt_int16 = short;
+using tt_int32 = int;
+using tt_int64 = long long;
+
+using tt_uint8 = unsigned char;
+using tt_uint16 = unsigned short;
+using tt_uint32 = unsigned int;
+using tt_uint64 = unsigned long long;
+
+#if __TELEM_64
+
+using tt_intptr = __int64;
+using tt_uintptr = unsigned __int64;
+using tt_ptrdiff = __int64;
+using tt_size = unsigned __int64;
+
+#else
+
+using tt_intptr = int;
+using tt_uintptr = unsigned int;
+using tt_ptrdiff = int;
+using tt_size = unsigned int;
+
+#endif // __TELEM_64
+
+static_assert(sizeof(tt_uintptr) == sizeof(void*), "Size missmatch");
+
+using TtFileHandle = tt_uintptr;
+
 
 struct TtLogType
 {
@@ -96,6 +142,53 @@ struct TtStat
     enum Enum : tt_uint8
     {
         NumStalls,
+    };
+};
+
+struct TtLockResult
+{
+    enum Enum : tt_uint8
+    {
+        Acquired,
+        Fail
+    };
+};
+
+struct TtLockState
+{
+    enum Enum : tt_uint8
+    {
+        Locked,
+        Released,
+    };
+
+    static inline const char* ToString(Enum ls)
+    {
+        switch (ls)
+        {
+            case Locked:
+                return "Locked";
+            case Released:
+                return "Released";
+            default:
+                return "<ukn>";
+        }
+    }
+};
+
+// Plots
+struct TtPlotType
+{
+    enum Enum : tt_uint8
+    {
+        Time,
+        Time_us,
+        Time_clocks,
+        Time_cycles,
+        Integer,
+        Percentage_computed,
+        Percentage_direct,
+        Untyped
     };
 };
 
@@ -310,7 +403,7 @@ namespace telem
 
         bool loadModule()
         {
-            hLib_ = ::LoadLibraryW(L"engine_TelemetryLib.dll");
+            hLib_ = ::LoadLibraryW(TELEM_DLL_NAME_WIDE);
             if (!hLib_) {
                 return false;
             }

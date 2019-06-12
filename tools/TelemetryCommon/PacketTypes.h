@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Types.h"
+#include <../Telemetry/Telemetry.h>
 #include "Compiler.h"
 #include "StringTable.h"
 
