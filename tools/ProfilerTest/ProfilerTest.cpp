@@ -13,7 +13,7 @@
 #include <Time/StopWatch.h>
 #include <Threading/SharedLock.h>
 
-#include <../Telemetry/TelemetryLib.h>
+#include <../Telemetry/Telemetry.h>
 
 #if TTELEMETRY_LINK
 X_LINK_ENGINE_LIB("TelemetryLib")

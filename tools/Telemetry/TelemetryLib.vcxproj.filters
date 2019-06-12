@@ -11,9 +11,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TelemetryLib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Telemetry.h">
       <Filter>Header Files</Filter>
     </ClInclude>

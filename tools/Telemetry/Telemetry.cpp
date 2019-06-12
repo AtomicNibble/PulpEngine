@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "TelemetryLib.h"
+#include "Telemetry.h"
 
 // TODO: get rid of
 #include <memory>

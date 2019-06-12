@@ -18,7 +18,7 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 
 // Telem
 #define TTELEMETRY_ENABLED 1
-#include <TelemetryLib.h>
+#include <Telemetry.h>
 
 
 // Util

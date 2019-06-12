@@ -462,7 +462,6 @@
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="PlatformWin32.h" />
     <ClInclude Include="Telemetry.h" />
-    <ClInclude Include="TelemetryLib.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Threading.h" />
     <ClInclude Include="Util.h" />
