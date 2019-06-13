@@ -6,7 +6,7 @@
 
 #ifndef TTELEMETRY_LINK 
 #define TTELEMETRY_LINK 1
-#endif // TTELEMETRY_LINK 
+#endif // TTELEMETRY_LINK
 
 #define __TELEMETRY_UNIQUE_NAME_HELPER_0(_0, _1)  _0##_1
 #define __TELEMETRY_UNIQUE_NAME_HELPER(_0, _1) __TELEMETRY_UNIQUE_NAME_HELPER_0(_0, _1)
@@ -195,7 +195,6 @@ struct TtLockState
     }
 };
 
-// Plots
 struct TtPlotType
 {
     enum Enum : tt_uint8
@@ -569,16 +568,15 @@ namespace telem
     };
 
     // if you have multiple dll's this will be diffrent.
-    // so you would have to call it in each dll init.
+    // so you would have to call init in each dll.
     // but also means you can conditionally enable telemetry for various modules.
-    // it's not safe to resole functions during a zone for the same module.
+    // it's not safe to resolve functions during a zone for the same module.
     extern TelemetryAPI gTelemApi;
 
 #endif // TTELEMETRY_LINK
 
     struct ScopedZone
     {
-        // Is having this overload helpful for compile time?
         inline ScopedZone(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pFormat) :
             ctx_(ctx)
         {
@@ -603,7 +601,6 @@ namespace telem
 
     struct ScopedZoneFilterd
     {
-        // Is having this overload helpful for compile time?
         inline ScopedZoneFilterd(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64 minMicroSec, const char* pFormat) :
             ctx_(ctx)
         {
@@ -682,6 +679,7 @@ namespace telem
 #define ttSetThreadGroupName(ctx, groupID, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetThreadGroupName)(ctx, groupID, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ttSetThreadGroupDefaultSort(ctx, groupID, idx) __TELEM_FUNC_NAME(TelemSetThreadGroupDefaultSort)(ctx, groupID, idx)
 
+// Callstack
 #define ttGetCallStack(ctx, stackOut) __TELEM_FUNC_NAME(TelemGetCallStack)(ctx, stackOut)
 #define ttSendCallStack(ctx, pStack) __TELEM_FUNC_NAME(TelemSendCallStack)(ctx, pStack)
 #define ttSendCallStackSkip(ctx, pStack, numToSkip) __TELEM_FUNC_NAME(TelemSendCallStackSkip)(ctx, pStack, numToSkip)
@@ -706,6 +704,7 @@ namespace telem
 #define ttAlloc(ctx, pPtr, size, pFmtString, ...) __TELEM_FUNC_NAME(TelemAlloc)(ctx, _TELEM_SOURCE_INFO, pPtr, size, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ttFree(ctx, pPtr) __TELEM_FUNC_NAME(TelemFree)(ctx, _TELEM_SOURCE_INFO, pPtr)
 
+// Plots
 #define ttPlot(ctx, type, value, pFmtString, ...)    ttPlotF32(ctx, type, value, pFmtString, __VA_ARGS__);
 #define ttPlotF32(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotF32)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ttPlotF64(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotF64)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
@@ -714,6 +713,7 @@ namespace telem
 #define ttPlotI64(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotI64)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ttPlotU64(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotU64)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 
+// Messages
 #define ttMessage(ctx, type, pFmtString, ...)  __TELEM_FUNC_NAME(TelemMessage)(ctx, type, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ttLog(ctx, pFmtString, ...) ttMessage(ctx, TtMsgType::Msg, pFmtString, __VA_ARGS__)
 #define ttWarning(ctx, pFmtString, ...) ttMessage(ctx, TtMsgType::Warning, pFmtString, __VA_ARGS__)
