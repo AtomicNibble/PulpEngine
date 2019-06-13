@@ -33,3 +33,6 @@ extern TelemSrvLibArena* g_TelemSrvLibArena;
 #endif // X_LIB
 
 #include "sprintf.h"
+
+
+X_LINK_LIB("engine_TelemetryCommonLib");

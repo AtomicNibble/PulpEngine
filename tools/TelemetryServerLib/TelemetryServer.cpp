@@ -12,8 +12,6 @@
 
 #include "PacketTypesViewer.h"
 
-X_LINK_LIB("engine_TelemetryCommonLib.lib");
-
 X_NAMESPACE_BEGIN(telemetry)
 
 namespace
