@@ -1000,9 +1000,6 @@
     <ClInclude Include="Time\win32\TimeStamp.h">
       <Filter>Headers\Time\win32</Filter>
     </ClInclude>
-    <ClInclude Include="Platform\win32\CustomFrame.h">
-      <Filter>Headers\Platform\win32</Filter>
-    </ClInclude>
     <ClInclude Include="Platform\win32\Types.h">
       <Filter>Headers\Platform\win32</Filter>
     </ClInclude>
@@ -1818,9 +1815,6 @@
       <Filter>SourceFiles\Memory</Filter>
     </ClCompile>
     <ClCompile Include="Platform\win32\Console.cpp">
-      <Filter>SourceFiles\Platform\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="Platform\win32\CustomFrame.cpp">
       <Filter>SourceFiles\Platform\win32</Filter>
     </ClCompile>
     <ClCompile Include="Platform\win32\Window.cpp">

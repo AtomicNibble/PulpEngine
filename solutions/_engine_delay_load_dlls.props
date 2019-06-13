@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
 	<Link>
-          <DelayLoadDLLs>GDI32.dll;MSIMG32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+          <DelayLoadDLLs>%(DelayLoadDLLs)</DelayLoadDLLs>
 	</Link>
   </ItemDefinitionGroup>
 </Project>

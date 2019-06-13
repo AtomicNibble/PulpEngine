@@ -515,15 +515,6 @@ void XCore::WindowSizeVarChange(core::ICVar* pVar)
 
 }
 
-void XCore::WindowCustomFrameVarChange(core::ICVar* pVar)
-{
-    bool enabled = (pVar->GetInteger() == 1);
-
-    if (pWindow_) {
-        pWindow_->CustomFrame(enabled);
-    }
-}
-
 void XCore::Cmd_ListProgramArgs(core::IConsoleCmdArgs* pCmd)
 {
     X_UNUSED(pCmd);

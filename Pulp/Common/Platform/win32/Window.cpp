@@ -1,7 +1,6 @@
 #include "EngineCommon.h"
 
 #include "Window.h"
-#include "CustomFrame.h"
 
 #include "Util\LastError.h"
 
@@ -104,8 +103,7 @@ Window::Window() :
     sizingFixedAspectRatio_(true),
     hasFocus_(false),
     maximized_(false),
-    close_(false),
-    pFrame_(nullptr)
+    close_(false)
 {
     RegisterClass();
 }
@@ -113,7 +111,6 @@ Window::Window() :
 Window::~Window(void)
 {
     Destroy();
-    X_DELETE(pFrame_, gEnv->pArena);
 }
 
 /// --------------------------------------------------------------------------------------------------------
@@ -188,30 +185,6 @@ void Window::Destroy(void)
 
     mode_ = Mode::NONE;
     hasFocus_ = false;
-}
-
-void Window::CustomFrame(bool enable)
-{
-    if (enable) {
-        if (pFrame_ == nullptr) {
-            pFrame_ = X_NEW(xFrame, gEnv->pArena, "Win32CustomFrame");
-
-            ::RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
-            ::RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_NOCHILDREN | RDW_VALIDATE);
-        }
-        else {
-            ::RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
-            ::RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_NOCHILDREN | RDW_VALIDATE);
-        }
-    }
-    else {
-        if (pFrame_ != nullptr) {
-            X_DELETE_AND_NULL(pFrame_, gEnv->pArena);
-
-            ::RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
-            ::RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_NOCHILDREN | RDW_VALIDATE);
-        }
-    }
 }
 
 Window::Notification::Enum Window::PumpMessages(void)
@@ -501,10 +474,6 @@ LRESULT Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(ed);
             break;
         }
-    }
-
-    if (pFrame_) {
-        return pFrame_->DrawFrame(hWnd, msg, wParam, lParam);
     }
 
     return DefWindowProc(hWnd, msg, wParam, lParam);

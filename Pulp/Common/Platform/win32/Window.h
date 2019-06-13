@@ -13,8 +13,6 @@
 
 X_NAMESPACE_BEGIN(core)
 
-class xFrame;
-
 // this should be a nice little wrapper for windows that allows resizing and all that shit.
 // Styles etc :D
 
@@ -56,7 +54,6 @@ public:
 
     bool Create(core::string_view title, Rect r, Mode::Enum mode);
     void Destroy(void);
-    void CustomFrame(bool enable);
 
     Notification::Enum PumpMessages(void);
 
@@ -130,8 +127,6 @@ protected:
     bool hasFocus_;
     bool maximized_;
     bool close_;
-
-    xFrame* pFrame_;
 
     static int32_t s_var_windowDebug;
 };

@@ -1315,8 +1315,6 @@ void XCore::registerVars(const CoreInitParams& initParams)
         vars_.getVarWinWidth()->SetOnChangeCallback(del);
         vars_.getVarWinHeight()->SetOnChangeCallback(del);
 
-        del.Bind<XCore, &XCore::WindowCustomFrameVarChange>(this);
-        vars_.getVarWinCustomFrame()->SetOnChangeCallback(del);
     }
 }
 

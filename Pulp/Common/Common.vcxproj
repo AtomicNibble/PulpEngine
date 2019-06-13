@@ -292,7 +292,6 @@
     <ClInclude Include="Platform\Types.h" />
     <ClInclude Include="Platform\win32\ClipBoard.h" />
     <ClInclude Include="Platform\win32\Console.h" />
-    <ClInclude Include="Platform\win32\CustomFrame.h" />
     <ClInclude Include="Platform\win32\DirectoryWatcher.h" />
     <ClInclude Include="Platform\win32\Module.h" />
     <ClInclude Include="Platform\win32\Pipe.h" />
@@ -1111,13 +1110,6 @@
     </ClCompile>
     <ClCompile Include="Platform\win32\ClipBoard.cpp" />
     <ClCompile Include="Platform\win32\Console.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Platform\win32\CustomFrame.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>

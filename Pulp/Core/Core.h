@@ -234,7 +234,6 @@ private:
     // var callbacks.
     void WindowPosVarChange(core::ICVar* pVar);
     void WindowSizeVarChange(core::ICVar* pVar);
-    void WindowCustomFrameVarChange(core::ICVar* pVar);
 
 private:
     static CoreGlobals env_;
