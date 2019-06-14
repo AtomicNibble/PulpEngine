@@ -75,7 +75,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
 
     pICore_->RegisterAssertHandler(this);
 
-    LinkModule(pICore_, "TelemetryServer");
+    LinkModule(pICore_, "TelemetryViewer");
 
     if (!pICore_->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "TelemetryServerLib", "Engine_TelemetryServerLib")) {
         return false;

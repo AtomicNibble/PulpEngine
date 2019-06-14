@@ -15,7 +15,10 @@
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 
 X_LINK_ENGINE_LIB("Core")
+X_LINK_ENGINE_LIB("TelemetrySymbols")
+
 X_FORCE_LINK_FACTORY("XTelemSrvLib");
+X_FORCE_LINK_FACTORY("XTelemSymLib");
 
 #endif // !X_LIB
 
