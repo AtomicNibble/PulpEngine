@@ -211,15 +211,15 @@ struct TtPlotType
 };
 
 
-inline tt_int32 TELEM_INTERNAL_THREAD_GROUP_ID = -1;
+const tt_int32 TELEM_INTERNAL_THREAD_GROUP_ID = -1;
 
 using TraceContexHandle = tt_uintptr;
-inline TraceContexHandle INVALID_TRACE_CONTEX = 0;
+const TraceContexHandle INVALID_TRACE_CONTEX = 0;
 
 
 // IO callbacks.
 using TtFileHandle = tt_uintptr;
-inline TtFileHandle TELEM_INVALID_HANDLE = 0;
+const TtFileHandle TELEM_INVALID_HANDLE = 0;
 
 using FileOpenFunc = TtFileHandle(*)(void* pUserData, const char*);
 using FileCloseFunc = void(*)(void* pUserData, TtFileHandle);
