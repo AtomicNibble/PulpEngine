@@ -294,8 +294,8 @@ extern "C"
 #define __TELEM_API_ERR(name, ...) __TELEMETRYLIB_EXPORT TtError::Enum name(__VA_ARGS__); \
         __TELEM_API_BLANK(inline TtError __blank##name(__VA_ARGS__) { return TtError::Ok; })
 
-#pragma warning( push )
-#pragma warning(disable: 4100) // unused param (caused by the blank functions).
+__TELEM_PRAGMA(warning( push ))
+__TELEM_PRAGMA(warning(disable: 4100)) // unused param (caused by the blank functions).
 
     __TELEM_API_BOOL(TelemInit);
     __TELEM_API_VOID(TelemShutDown);
@@ -366,7 +366,7 @@ extern "C"
 
     __TELEM_API_VOID(TelemMessage, TraceContexHandle ctx, TtMsgType::Enum type, const char* pFmtString, tt_int32 numArgs, ...);
 
-#pragma warning( pop )
+__TELEM_PRAGMA(warning( pop ))
 
 #ifdef __cplusplus
 } // extern "C"
