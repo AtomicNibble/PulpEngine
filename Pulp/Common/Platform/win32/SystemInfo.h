@@ -13,7 +13,7 @@ X_NAMESPACE_BEGIN(core)
 
 namespace SysInfo
 {
-    typedef wchar_t UserNameStr[128];
+    typedef wchar_t UserNameStr[256];
     typedef wchar_t LanguageStr[128];
 
     struct MemInfo
