@@ -66,8 +66,8 @@
 #endif
 #endif
 
-#define TELEM_DLL_NAME "engine_TelemetryLib.dll"
-#define TELEM_DLL_NAME_WIDE __TELEM_WIDEN("engine_TelemetryLib.dll")
+#define TELEM_LIB_NAME "engine_TelemetryLib"
+#define TELEM_LIB_NAME_WIDE __TELEM_WIDEN("engine_TelemetryLib")
 
 #define __TELEM_TYPES
 
@@ -406,7 +406,7 @@ namespace telem
 
         bool loadModule()
         {
-            hLib_ = ::LoadLibraryW(TELEM_DLL_NAME_WIDE);
+            hLib_ = ::LoadLibraryW(TELEM_LIB_NAME_WIDE);
             if (!hLib_) {
                 return false;
             }
