@@ -694,7 +694,7 @@ namespace telem
 // Lock util
 #define ttSetLockName(ctx, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetLockName)(ctx, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ttTryLock(ctx, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemTryLock)(ctx, _TELEM_SOURCE_INFO, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttTryLockEx(ctx, matchIdOut, minMicroSec, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemTryLock)(ctx, _TELEM_SOURCE_INFO, matchIdOut, minMicroSec, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttTryLockEx(ctx, matchIdOut, minMicroSec, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemTryLockEx)(ctx, _TELEM_SOURCE_INFO, matchIdOut, minMicroSec, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ttEndTryLock(ctx, pPtr, result) __TELEM_FUNC_NAME(TelemEndTryLock)(ctx, pPtr, result)
 #define ttEndTryLockEx(ctx, matchIdOut, pPtr, result) __TELEM_FUNC_NAME(TelemEndTryLockEx)(ctx, matchIdOut, pPtr, result)
 #define ttSetLockState(ctx, pPtr, state) __TELEM_FUNC_NAME(TelemSetLockState)(ctx, _TELEM_SOURCE_INFO, pPtr, state)
