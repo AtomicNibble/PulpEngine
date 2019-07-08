@@ -340,14 +340,14 @@ __TELEM_PRAGMA(warning(disable: 4100)) // unused param (caused by the blank func
 
     // Zones
     __TELEM_API_VOID(TelemEnter, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemEnterEx, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemEnterEx, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minNanoSec, const char* pFmtString, tt_int32 numArgs, ...);
     __TELEM_API_VOID(TelemLeave, TraceContexHandle ctx);
     __TELEM_API_VOID(TelemLeaveEx, TraceContexHandle ctx, tt_uint64 matchId);
 
     // Lock util
     __TELEM_API_VOID(TelemSetLockName, TraceContexHandle ctx, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...);
     __TELEM_API_VOID(TelemTryLock, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemTryLockEx, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemTryLockEx, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minNanoSec, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...);
     __TELEM_API_VOID(TelemEndTryLock, TraceContexHandle ctx, const void* pPtr, TtLockResult::Enum result);
     __TELEM_API_VOID(TelemEndTryLockEx, TraceContexHandle ctx, tt_uint64 matchId, const void* pPtr, TtLockResult::Enum result);
     __TELEM_API_VOID(TelemSetLockState, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState::Enum state);
@@ -601,18 +601,18 @@ namespace telem
 
     struct ScopedZoneFilterd
     {
-        inline ScopedZoneFilterd(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64 minMicroSec, const char* pFormat) :
+        inline ScopedZoneFilterd(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64 minNanoSec, const char* pFormat) :
             ctx_(ctx)
         {
-            __TELEM_FUNC_NAME(TelemEnterEx)(ctx, sourceInfo, matchId_, minMicroSec, pFormat, 0);
+            __TELEM_FUNC_NAME(TelemEnterEx)(ctx, sourceInfo, matchId_, minNanoSec, pFormat, 0);
         }
 
         template<typename ... Args>
-        inline ScopedZoneFilterd(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64 minMicroSec, const char* pFormat, Args&& ... args) :
+        inline ScopedZoneFilterd(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64 minNanoSec, const char* pFormat, Args&& ... args) :
             ctx_(ctx)
         {
             const std::size_t num = sizeof...(Args);
-            __TELEM_FUNC_NAME(TelemEnterEx)(ctx, sourceInfo, matchId_, minMicroSec, pFormat, num, std::forward<Args>(args) ...);
+            __TELEM_FUNC_NAME(TelemEnterEx)(ctx, sourceInfo, matchId_, minNanoSec, pFormat, num, std::forward<Args>(args) ...);
         }
 
         inline ~ScopedZoneFilterd() {
@@ -638,10 +638,10 @@ namespace telem
 #endif // TTELEMETRY_LINK
 
 #define ttZone(ctx, pFmtString, ...) telem::ScopedZone __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, _TELEM_SOURCE_INFO, pFmtString, __VA_ARGS__)
-#define ttZoneFilterd(ctx, minMicroSec, pFmtString, ...) telem::ScopedZoneFilterd __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, _TELEM_SOURCE_INFO, minMicroSec, pFmtString, __VA_ARGS__)
+#define ttZoneFilterd(ctx, minNanoSec, pFmtString, ...) telem::ScopedZoneFilterd __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, _TELEM_SOURCE_INFO, minNanoSec, pFmtString, __VA_ARGS__)
 
 #define ttZoneFunction(ctx) ttZone(ctx, __FUNCTION__)
-#define ttZoneFunctionFilterd(ctx, minMicroSec) ttZoneFilterd(ctx, minMicroSec, __FUNCTION__)
+#define ttZoneFunctionFilterd(ctx, minNanoSec) ttZoneFilterd(ctx, minNanoSec, __FUNCTION__)
 
 #define ttInit() __TELEM_FUNC_NAME(TelemInit)()
 #define ttShutDown() __TELEM_FUNC_NAME(TelemShutDown)()
@@ -686,7 +686,7 @@ namespace telem
 
 // Zones
 #define ttEnter(ctx, pFmtString, ...) __TELEM_FUNC_NAME(TelemEnter)(ctx, _TELEM_SOURCE_INFO, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttEnterEx(ctx, matchIdOut, minMicroSec, pFmtString, ...) __TELEM_FUNC_NAME(TelemEnterEx)(ctx, _TELEM_SOURCE_INFO, matchIdOut, minMicroSec, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttEnterEx(ctx, matchIdOut, minNanoSec, pFmtString, ...) __TELEM_FUNC_NAME(TelemEnterEx)(ctx, _TELEM_SOURCE_INFO, matchIdOut, minNanoSec, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ttLeave(ctx) __TELEM_FUNC_NAME(TelemLeave)(ctx)
 #define ttLeaveEx(ctx, matchId) __TELEM_FUNC_NAME(TelemLeaveEx)(ctx, matchId)
 
@@ -694,7 +694,7 @@ namespace telem
 // Lock util
 #define ttSetLockName(ctx, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetLockName)(ctx, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ttTryLock(ctx, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemTryLock)(ctx, _TELEM_SOURCE_INFO, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttTryLockEx(ctx, matchIdOut, minMicroSec, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemTryLockEx)(ctx, _TELEM_SOURCE_INFO, matchIdOut, minMicroSec, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttTryLockEx(ctx, matchIdOut, minNanoSec, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemTryLockEx)(ctx, _TELEM_SOURCE_INFO, matchIdOut, minNanoSec, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
 #define ttEndTryLock(ctx, pPtr, result) __TELEM_FUNC_NAME(TelemEndTryLock)(ctx, pPtr, result)
 #define ttEndTryLockEx(ctx, matchIdOut, pPtr, result) __TELEM_FUNC_NAME(TelemEndTryLockEx)(ctx, matchIdOut, pPtr, result)
 #define ttSetLockState(ctx, pPtr, state) __TELEM_FUNC_NAME(TelemSetLockState)(ctx, _TELEM_SOURCE_INFO, pPtr, state)

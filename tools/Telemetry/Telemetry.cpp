@@ -3890,7 +3890,7 @@ void TelemLeave(TraceContexHandle ctx)
     queueZone(pCtx, pThreadData, depth);
 }
 
-void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minNanoSec, const char* pFmtString, tt_int32 numArgs, ...)
 {
     // This is a copy of TelemEnter since can't pick up the va_args later unless we always pass them.
     auto* pCtx = handleToContext(ctx);
@@ -3901,7 +3901,7 @@ void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint
     }
 
     // only do the copy when enabled?
-    matchIdOut = minMicroSec;
+    matchIdOut = minNanoSec;
 
     auto depth = pThreadData->stackDepth;
     ++pThreadData->stackDepth;
@@ -3943,11 +3943,11 @@ void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId)
     scopeData.zone.end = ticks;
 
     // work out if we send it.
-    auto minMicroSec = matchId;
+    auto minNanoSec = matchId;
     auto elpased = scopeData.zone.end - scopeData.zone.start;
     auto elapsedNano = ticksToNano(pCtx, elpased);
 
-    if (elapsedNano > minMicroSec * 1000) {
+    if (elapsedNano > minNanoSec) {
         return;
     }
 
@@ -4028,7 +4028,7 @@ void TelemTryLock(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const v
     }
 }
 
-void TelemTryLockEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, 
+void TelemTryLockEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minNanoSec,
     const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto ticks = getTicks();
@@ -4047,7 +4047,7 @@ void TelemTryLockEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_ui
         return;
     }
 
-    matchIdOut = minMicroSec;
+    matchIdOut = minNanoSec;
 
     auto& lock = pLock->lock;
     lock.start = ticks;
@@ -4113,11 +4113,11 @@ void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPt
     lock.depth = static_cast<decltype(lock.depth)>(pThreadData->stackDepth);
 
     // work out if we send it.
-    auto minMicroSec = matchId;
+    auto minNanoSec = matchId;
     auto elpased = lock.end - lock.start;
     auto elapsedNano = ticksToNano(pCtx, elpased);
 
-    if (elapsedNano > minMicroSec * 1000) {
+    if (elapsedNano > minNanoSec) {
         return;
     }
     
