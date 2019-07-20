@@ -33,7 +33,16 @@
 #else 
 
 #define __TELEM_GET_ARG_COUNT_PRIVATE(_0, _1_, _2_, _3_, _4_, _5_, _6_, _7_, _8_, _9_, _10_, _11_, _12_, _13_, _14_, _15_, _16_, _17_, _18_, _19_, _20_, _21_, _22_, _23_, _24_, _25_, _26_, _27_, _28_, _29_, _30_, _31_, _32_, _33_, _34_, _35_, _36, _37, _38, _39, _40, _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, _51, _52, _53, _54, _55, _56, _57, _58, _59, _60, _61, _62, _63, _64, _65, _66, _67, _68, _69, _70, count, ...) count
-#define __TELEM_ARG_COUNT(...) __TELEM_GET_ARG_COUNT_PRIVATE(0, ## __VA_ARGS__, 70, 69, 68, 67, 66, 65, 64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+#define __TELEM_ARG_COUNT(...) __TELEM_GET_ARG_COUNT_PRIVATE(0, __VA_ARGS__, 70, 69, 68, 67, 66, 65, 64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+
+#define __TELEM_IMPORT
+#define __TELEM_EXPORT
+#define __TELEM_PRAGMA(pragma)      _Pragma(#pragma)
+#define __TELEM_PACK_PUSH(val)      __TELEM_PRAGMA(pack(push, val))
+#define __TELEM_PACK_POP            __TELEM_PRAGMA(pack(pop))
+
+#define __TELEM_WIDEN_HELPER(str)   L##str
+#define __TELEM_WIDEN(str)          __TELEM_WIDEN_HELPER(str)
 
 #endif // _MSC_VER
 
@@ -64,6 +73,18 @@
 #else
 #define __TELEM_64 0
 #endif
+
+#define __TELEM_WIN32 1
+#else
+#define __TELEM_WIN32 0
+#endif
+
+#if __GNUC__
+#if __x86_64__ || __ppc64__
+#define __TELEM_64 1
+#else
+#define __TELEM_64 0
+#endif
 #endif
 
 #define TELEM_LIB_NAME "engine_TelemetryLib"
@@ -83,10 +104,10 @@ using tt_uint64 = unsigned long long;
 
 #if __TELEM_64
 
-using tt_intptr = __int64;
-using tt_uintptr = unsigned __int64;
-using tt_ptrdiff = __int64;
-using tt_size = unsigned __int64;
+using tt_intptr = tt_int64;
+using tt_uintptr = tt_uint64;
+using tt_ptrdiff = tt_intptr;
+using tt_size = tt_uint64;
 
 #else
 
@@ -294,8 +315,12 @@ extern "C"
 #define __TELEM_API_ERR(name, ...) __TELEMETRYLIB_EXPORT TtError::Enum name(__VA_ARGS__); \
         __TELEM_API_BLANK(inline TtError __blank##name(__VA_ARGS__) { return TtError::Ok; })
 
+#if __TELEM_WIN32
+
 __TELEM_PRAGMA(warning( push ))
 __TELEM_PRAGMA(warning(disable: 4100)) // unused param (caused by the blank functions).
+
+#endif
 
     __TELEM_API_BOOL(TelemInit);
     __TELEM_API_VOID(TelemShutDown);
@@ -366,7 +391,12 @@ __TELEM_PRAGMA(warning(disable: 4100)) // unused param (caused by the blank func
 
     __TELEM_API_VOID(TelemMessage, TraceContexHandle ctx, TtMsgType::Enum type, const char* pFmtString, tt_int32 numArgs, ...);
 
+
+#if __TELEM_WIN32
+
 __TELEM_PRAGMA(warning( pop ))
+
+#endif
 
 #ifdef __cplusplus
 } // extern "C"
@@ -637,8 +667,8 @@ namespace telem
 #define ttLoadLibary() telem::gTelemApi.loadModule()
 #endif // TTELEMETRY_LINK
 
-#define ttZone(ctx, pFmtString, ...) telem::ScopedZone __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, _TELEM_SOURCE_INFO, pFmtString, __VA_ARGS__)
-#define ttZoneFilterd(ctx, minNanoSec, pFmtString, ...) telem::ScopedZoneFilterd __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, _TELEM_SOURCE_INFO, minNanoSec, pFmtString, __VA_ARGS__)
+#define ttZone(ctx, pFmtString, ...) telem::ScopedZone __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, _TELEM_SOURCE_INFO, pFmtString, ## __VA_ARGS__)
+#define ttZoneFilterd(ctx, minNanoSec, pFmtString, ...) telem::ScopedZoneFilterd __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, _TELEM_SOURCE_INFO, minNanoSec, pFmtString, ## __VA_ARGS__)
 
 #define ttZoneFunction(ctx) ttZone(ctx, __FUNCTION__)
 #define ttZoneFunctionFilterd(ctx, minNanoSec) ttZoneFilterd(ctx, minNanoSec, __FUNCTION__)
@@ -674,9 +704,9 @@ namespace telem
 #define ttFastTimeToMs(ctx, time) __TELEM_FUNC_NAME(TelemFastTimeToMs)(ctx, time)
 
 // Thread
-#define ttSetThreadName(ctx, threadID, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetThreadName)(ctx, threadID, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttSetThreadName(ctx, threadID, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetThreadName)(ctx, threadID, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
 #define ttSetThreadGroup(ctx, threadID, groupID) __TELEM_FUNC_NAME(TelemSetThreadGroup)(ctx, threadID, groupID)
-#define ttSetThreadGroupName(ctx, groupID, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetThreadGroupName)(ctx, groupID, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttSetThreadGroupName(ctx, groupID, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetThreadGroupName)(ctx, groupID, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
 #define ttSetThreadGroupDefaultSort(ctx, groupID, idx) __TELEM_FUNC_NAME(TelemSetThreadGroupDefaultSort)(ctx, groupID, idx)
 
 // Callstack
@@ -685,39 +715,39 @@ namespace telem
 #define ttSendCallStackSkip(ctx, pStack, numToSkip) __TELEM_FUNC_NAME(TelemSendCallStackSkip)(ctx, pStack, numToSkip)
 
 // Zones
-#define ttEnter(ctx, pFmtString, ...) __TELEM_FUNC_NAME(TelemEnter)(ctx, _TELEM_SOURCE_INFO, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttEnterEx(ctx, matchIdOut, minNanoSec, pFmtString, ...) __TELEM_FUNC_NAME(TelemEnterEx)(ctx, _TELEM_SOURCE_INFO, matchIdOut, minNanoSec, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttEnter(ctx, pFmtString, ...) __TELEM_FUNC_NAME(TelemEnter)(ctx, _TELEM_SOURCE_INFO, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
+#define ttEnterEx(ctx, matchIdOut, minNanoSec, pFmtString, ...) __TELEM_FUNC_NAME(TelemEnterEx)(ctx, _TELEM_SOURCE_INFO, matchIdOut, minNanoSec, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
 #define ttLeave(ctx) __TELEM_FUNC_NAME(TelemLeave)(ctx)
 #define ttLeaveEx(ctx, matchId) __TELEM_FUNC_NAME(TelemLeaveEx)(ctx, matchId)
 
 
 // Lock util
-#define ttSetLockName(ctx, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetLockName)(ctx, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttTryLock(ctx, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemTryLock)(ctx, _TELEM_SOURCE_INFO, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttTryLockEx(ctx, matchIdOut, minNanoSec, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemTryLockEx)(ctx, _TELEM_SOURCE_INFO, matchIdOut, minNanoSec, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttSetLockName(ctx, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemSetLockName)(ctx, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
+#define ttTryLock(ctx, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemTryLock)(ctx, _TELEM_SOURCE_INFO, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
+#define ttTryLockEx(ctx, matchIdOut, minNanoSec, pPtr, pFmtString, ...) __TELEM_FUNC_NAME(TelemTryLockEx)(ctx, _TELEM_SOURCE_INFO, matchIdOut, minNanoSec, pPtr, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
 #define ttEndTryLock(ctx, pPtr, result) __TELEM_FUNC_NAME(TelemEndTryLock)(ctx, pPtr, result)
 #define ttEndTryLockEx(ctx, matchIdOut, pPtr, result) __TELEM_FUNC_NAME(TelemEndTryLockEx)(ctx, matchIdOut, pPtr, result)
 #define ttSetLockState(ctx, pPtr, state) __TELEM_FUNC_NAME(TelemSetLockState)(ctx, _TELEM_SOURCE_INFO, pPtr, state)
 #define ttSignalLockCount(ctx, pPtr, count) __TELEM_FUNC_NAME(TelemSignalLockCount)(ctx, _TELEM_SOURCE_INFO, pPtr, count)
 
 // Some allocation tracking.
-#define ttAlloc(ctx, pPtr, size, pFmtString, ...) __TELEM_FUNC_NAME(TelemAlloc)(ctx, _TELEM_SOURCE_INFO, pPtr, size, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttAlloc(ctx, pPtr, size, pFmtString, ...) __TELEM_FUNC_NAME(TelemAlloc)(ctx, _TELEM_SOURCE_INFO, pPtr, size, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
 #define ttFree(ctx, pPtr) __TELEM_FUNC_NAME(TelemFree)(ctx, _TELEM_SOURCE_INFO, pPtr)
 
 // Plots
-#define ttPlot(ctx, type, value, pFmtString, ...)    ttPlotF32(ctx, type, value, pFmtString, __VA_ARGS__);
-#define ttPlotF32(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotF32)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttPlotF64(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotF64)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttPlotI32(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotI32)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttPlotU32(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotU32)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttPlotI64(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotI64)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttPlotU64(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotU64)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
+#define ttPlot(ctx, type, value, pFmtString, ...)    ttPlotF32(ctx, type, value, pFmtString, ## __VA_ARGS__);
+#define ttPlotF32(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotF32)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
+#define ttPlotF64(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotF64)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
+#define ttPlotI32(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotI32)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
+#define ttPlotU32(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotU32)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
+#define ttPlotI64(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotI64)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
+#define ttPlotU64(ctx, type, value, pFmtString, ...)  __TELEM_FUNC_NAME(TelemPlotU64)(ctx, type, value, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
 
 // Messages
-#define ttMessage(ctx, type, pFmtString, ...)  __TELEM_FUNC_NAME(TelemMessage)(ctx, type, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#define ttLog(ctx, pFmtString, ...) ttMessage(ctx, TtMsgType::Msg, pFmtString, __VA_ARGS__)
-#define ttWarning(ctx, pFmtString, ...) ttMessage(ctx, TtMsgType::Warning, pFmtString, __VA_ARGS__)
-#define ttError(ctx, pFmtString, ...) ttMessage(ctx, TtMsgType::Error, pFmtString,  __VA_ARGS__)
+#define ttMessage(ctx, type, pFmtString, ...)  __TELEM_FUNC_NAME(TelemMessage)(ctx, type, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
+#define ttLog(ctx, pFmtString, ...) ttMessage(ctx, TtMsgType::Msg, pFmtString, ## __VA_ARGS__)
+#define ttWarning(ctx, pFmtString, ...) ttMessage(ctx, TtMsgType::Warning, pFmtString, ## __VA_ARGS__)
+#define ttError(ctx, pFmtString, ...) ttMessage(ctx, TtMsgType::Error, pFmtString, ## __VA_ARGS__)
 
 
 #else // TTELEMETRY_ENABLED
