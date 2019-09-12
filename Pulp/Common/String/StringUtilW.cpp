@@ -108,8 +108,12 @@ namespace strUtil
 
     bool IsEqual(const wchar_t* str1, const wchar_t* str2)
     {
-        while (*str1 && (*str1 == *str2))
+        X_ASSERT_NOT_NULL(str1);
+        X_ASSERT_NOT_NULL(str2);
+
+        while (*str1 && (*str1 == *str2)) {
             str1++, str2++;
+        }
 
         // are they both null ?
         return (*(const uint8_t*)str1 - *(const uint8_t*)str2) == 0;
