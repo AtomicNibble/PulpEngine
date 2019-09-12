@@ -136,7 +136,7 @@ size_t OsFile::write(const void* pBuffer, size_t length)
 
     if (!mode_.IsSet(FileFlag::WRITE)) {
         IFileSys::FileFlags::Description Dsc;
-        X_ERROR("File", "can't write to file. Flags: %s", mode_.ToString(Dsc));
+        X_ERROR("File", "Can't write to file. Flags: %s", mode_.ToString(Dsc));
         return 0;
     }
 
