@@ -217,6 +217,13 @@ XOsFileAsyncOperationCompiltion OsFileAsync::writeAsync(void* pBuffer, size_t le
     ttZone(gEnv->ctx, "(Core/FileSys/AsyncFile) OSWrite");
 
     XOsFileAsyncOperationCompiltion op(overlappedArena_, hFile_, position, callBack);
+    auto* pOverlapped = op.getOverlapped();
+
+    LARGE_INTEGER large;
+    large.QuadPart = position;
+
+    pOverlapped->Offset = large.LowPart;
+    pOverlapped->OffsetHigh = large.HighPart;
 
     if (length > std::numeric_limits<uint32_t>::max()) {
         core::HumanSize::Str humanStr;
@@ -226,7 +233,7 @@ XOsFileAsyncOperationCompiltion OsFileAsync::writeAsync(void* pBuffer, size_t le
 
     uint32_t length32 = safe_static_cast<uint32_t>(length);
 
-    if (!::WriteFileEx(hFile_, pBuffer, length32, op.getOverlapped(), s_CompiletionRoutineWrite)) {
+    if (!::WriteFileEx(hFile_, pBuffer, length32, pOverlapped, s_CompiletionRoutineWrite)) {
         auto err = lastError::Get();
         if (err != ERROR_IO_PENDING) {
             lastError::Description dsc;
