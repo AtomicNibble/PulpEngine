@@ -126,7 +126,7 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint6
         return op;
     }
 
-    uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
+    uint32_t length32 = safe_static_cast<uint32_t>(length);
 
     if (!::ReadFile(hFile_, pBuffer, length32, nullptr, op.getOverlapped())) {
         auto err = lastError::Get();
@@ -157,7 +157,7 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length
         return op;
     }
 
-    uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
+    uint32_t length32 = safe_static_cast<uint32_t>(length);
 
     if (!::WriteFile(hFile_, pBuffer, length32, nullptr, op.getOverlapped())) {
         auto err = lastError::Get();
@@ -198,7 +198,7 @@ XOsFileAsyncOperationCompiltion OsFileAsync::readAsync(void* pBuffer, size_t len
         return op;
     }
 
-    uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
+    uint32_t length32 = safe_static_cast<uint32_t>(length);
 
     if (!::ReadFileEx(hFile_, pBuffer, length32, pOverlapped, s_CompiletionRoutineRead)) {
         auto err = lastError::Get();
@@ -224,7 +224,7 @@ XOsFileAsyncOperationCompiltion OsFileAsync::writeAsync(void* pBuffer, size_t le
         return op;
     }
 
-    uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
+    uint32_t length32 = safe_static_cast<uint32_t>(length);
 
     if (!::WriteFileEx(hFile_, pBuffer, length32, op.getOverlapped(), s_CompiletionRoutineWrite)) {
         auto err = lastError::Get();
