@@ -153,13 +153,6 @@ inline constexpr Flags<T>& Flags<T>::operator=(Enum e)
 }
 
 template<class T>
-inline constexpr Flags<T>& Flags<T>::operator=(const Flags& oth)
-{
-    flags_ = oth.flags_;
-    return *this;
-}
-
-template<class T>
 inline constexpr Flags<T> Flags<T>::operator~(void) const
 {
     // do we want to ensure bits outside setable range are not set?
@@ -346,13 +339,6 @@ template<class T>
 inline constexpr Flags8<T>& Flags8<T>::operator=(Enum e)
 {
     flags_ = e;
-    return *this;
-}
-
-template<class T>
-inline constexpr Flags8<T>& Flags8<T>::operator=(const Flags8& oth)
-{
-    flags_ = oth.flags_;
     return *this;
 }
 

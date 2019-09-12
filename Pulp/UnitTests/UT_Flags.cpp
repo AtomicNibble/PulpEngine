@@ -19,6 +19,8 @@ TEST(FlagTest, Genral)
 {
     Flags<TestF> flag;
 
+    static_assert(std::is_trivially_copyable_v<Flags<TestF>>, "Should be trivially copyable");
+
     EXPECT_FALSE(flag.IsAnySet());
     EXPECT_FALSE(flag.AreAllSet());
 

@@ -49,7 +49,7 @@ public:
     inline constexpr Flags& operator^=(Enum e);
 
     inline constexpr Flags& operator=(Enum e);
-    inline constexpr Flags& operator=(const Flags& oth);
+    inline constexpr Flags& operator=(const Flags& oth) = default;
 
     inline constexpr Flags operator~(void) const;
 
@@ -114,7 +114,7 @@ public:
     inline constexpr Flags8& operator^=(Enum e);
 
     inline constexpr Flags8& operator=(Enum e);
-    inline constexpr Flags8& operator=(const Flags8& oth);
+    inline constexpr Flags8& operator=(const Flags8& oth) = default;
 
     inline constexpr uint8_t ToInt(void) const;
 
