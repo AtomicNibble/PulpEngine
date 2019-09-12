@@ -910,13 +910,13 @@ SqlLiteTransaction::~SqlLiteTransaction()
 Result::Enum SqlLiteTransaction::commit(void)
 {
     auto db = pDb_;
+    pDb_ = nullptr; // prevent execute on decon
 
     auto rc = db->executeRes("COMMIT");
     if (rc != Result::OK) {
-        X_ERROR("SqlDb", "transaction commit err(%i): \"%s\"", rc, pDb_->errorMsg());
+        X_ERROR("SqlDb", "transaction commit err(%i): \"%s\"", rc, db->errorMsg());
     }
 
-    pDb_ = nullptr; // prevent execute on decon
     return rc;
 }
 
@@ -927,7 +927,7 @@ Result::Enum SqlLiteTransaction::rollback(void)
 
     auto rc = db->executeRes("ROLLBACK");
     if (rc != Result::OK) {
-        X_ERROR("SqlDb", "transaction rollback err(%i): \"%s\"", rc, pDb_->errorMsg());
+        X_ERROR("SqlDb", "transaction rollback err(%i): \"%s\"", rc, db->errorMsg());
     }
     return rc;
 }
