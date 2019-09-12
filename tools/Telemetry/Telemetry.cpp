@@ -615,6 +615,18 @@ namespace
         return (x & (x - 1)) == 0;
     }
 
+    template<typename T>
+    TELEM_INLINE bool IsAligned(T value, unsigned int alignment, unsigned int offset)
+    {
+        return ((value + offset) % alignment) == 0;
+    }
+
+    template<typename T>
+    TELEM_INLINE bool IsAligned(T* value, unsigned int alignment, unsigned int offset)
+    {
+        return ((reinterpret_cast<uintptr_t>(value) + offset) % alignment) == 0;
+    }
+
     const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
 
     struct ArgData
@@ -2920,6 +2932,15 @@ namespace
 
         ttSetThreadName(contextToHandle(pCtx), getThreadID(), "Telem - Worker");
         ttSetThreadGroup(contextToHandle(pCtx), getThreadID(), TELEM_INTERNAL_THREAD_GROUP_ID);
+
+        if (!IsAligned(pCtx, 64, 0)) {
+            ::DebugBreak();
+            return 1;
+        }
+        if (!IsAligned(&pCtx->shutDownFlag, 32, 0)) {
+            ::DebugBreak();
+            return 1;
+        }
 
         tt_uint8 stringTableBuf[STRING_TABLE_BUF_SIZE];
         tt_uint8 callstackCacheBuf[CALLSTACK_CACHE_BUF_SIZE];
