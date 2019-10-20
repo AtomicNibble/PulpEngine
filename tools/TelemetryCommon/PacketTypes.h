@@ -232,8 +232,7 @@ struct DataPacketZone : public DataPacketBaseArgData
     tt_uint64 end;
 
     // 8
-    tt_uint16 lineNo;
-    tt_uint16 strIdxFunction;
+    tt_uint32 lineNo;
     tt_uint16 strIdxFile;
     tt_uint16 strIdxFmt;
 
@@ -321,13 +320,12 @@ struct DataPacketLockTry : public DataPacketBaseArgData
     tt_uint64 lockHandle;
 
     // 8
-    tt_uint16 lineNo;
-    tt_uint16 strIdxFunction;
+    tt_uint32 lineNo;
     tt_uint16 strIdxFile;
     tt_uint16 strIdxFmt;
 
     // 2
-    TtLockResult::Enum result;
+    tt_uint8 result;
     tt_uint8 depth;
 };
 
@@ -335,7 +333,7 @@ struct DataPacketLockTry : public DataPacketBaseArgData
 struct DataPacketLockState : public DataPacketBaseArgData
 {
     // 1
-    TtLockState::Enum state;
+    tt_uint8 state;
 
     // 4
     TtthreadId threadID;
@@ -347,8 +345,7 @@ struct DataPacketLockState : public DataPacketBaseArgData
     tt_uint64 lockHandle;
 
     // 8
-    tt_uint16 lineNo;
-    tt_uint16 strIdxFunction;
+    tt_uint32 lineNo;
     tt_uint16 strIdxFile;
     tt_uint16 strIdxFmt;
 };
@@ -368,8 +365,7 @@ struct DataPacketLockCount : public DataPacketBase
     tt_uint16 count;
 
     // 6
-    tt_uint16 lineNo;
-    tt_uint16 strIdxFunction;
+    tt_uint32 lineNo;
     tt_uint16 strIdxFile;
 };
 
@@ -388,8 +384,7 @@ struct DataPacketMemAlloc : public DataPacketBaseArgData
     tt_uint64 ptr;
 
     // 8
-    tt_uint16 lineNo;
-    tt_uint16 strIdxFunction;
+    tt_uint32 lineNo;
     tt_uint16 strIdxFile;
     tt_uint16 strIdxFmt;
 };
@@ -406,8 +401,7 @@ struct DataPacketMemFree : public DataPacketBase
     tt_uint64 ptr;
 
     // 8
-    tt_uint16 lineNo;
-    tt_uint16 strIdxFunction;
+    tt_uint32 lineNo;
     tt_uint16 strIdxFile;
 };
 
@@ -418,7 +412,7 @@ struct DataPacketMessage : public DataPacketBaseArgData
 
     // 4
     tt_uint16 strIdxFmt;
-    tt_uint8 logType;
+    tt_uint8 flags;
 };
 
 struct TtPlotValueType
@@ -436,7 +430,7 @@ struct TtPlotValueType
 
 struct TtPlotValue
 {
-    TtPlotType::Enum plotType;
+    tt_uint8 plotType;
     TtPlotValueType::Enum valueType;
 
     union {

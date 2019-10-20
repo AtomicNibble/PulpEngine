@@ -103,7 +103,7 @@ namespace
             ttGetCallStack(ctx, stack);
             auto stackID = ttSendCallStack(ctx, &stack);
 
-            ttMessage(ctx, TtLogType::Msg, "Message with callstack: %t", stackID);
+            ttMessage(ctx, TtMsgFlagsSeverityMsg, "Message with callstack: %t", stackID);
 
          //   core::ScopedLockShared locks0(sharedLock);
 
@@ -115,7 +115,7 @@ namespace
                 ttFree(ctx, (void*)0x12345678);
             }
 
-            ttPlot(ctx, TtPlotType::Time, timer.GetMilliSeconds(), "A Plot!");
+            ttPlot(ctx, TtPlotTypeTime, timer.GetMilliSeconds(), "A Plot!");
 
             for (int x = 0; x < 10; x++)
             {
@@ -161,10 +161,10 @@ namespace
     }
 
 
-    void LogFunc(void* pUserData, TtLogType::Enum type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm)
+    void LogFunc(void* pUserData, TtMsgFlags flags, const char* pMsgNullTerm, tt_int32 lenWithoutTerm)
     {
         X_UNUSED(pUserData);
-        X_UNUSED(type);
+        X_UNUSED(flags);
         X_UNUSED(pMsgNullTerm);
         X_UNUSED(lenWithoutTerm);
 
@@ -172,15 +172,16 @@ namespace
         if (!gEnv->pLog) {
             return;
         }
-        switch (type)
+
+        switch (flags & TtMsgFlagsSeverityMask)
         {
-            case TtLogType::Msg:
+            case TtMsgFlagsSeverityMsg:
                 X_LOG0("Telemetry", pMsgNullTerm);
                 break;
-            case TtLogType::Warning:
+            case TtMsgFlagsSeverityWarning:
                 X_WARNING("Telemetry", pMsgNullTerm);
                 break;
-            case TtLogType::Error:
+            case TtMsgFlagsSeverityError:
                 X_ERROR("Telemetry", pMsgNullTerm);
                 break;
        }
@@ -225,13 +226,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             ttError(ctx, "Goat has no boat %" PRIi32 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %f %f %s",
                 124_i32, 5226262_i64, 16_i64, 32_i64, 64_i64, 0.353f, 515125.0203503557575, "meow meow");
 
-            ttPlot(ctx, TtPlotType::Integer, 1, "meow?");
-            ttPlotF32(ctx, TtPlotType::Integer, 1, "cow?");
-            ttPlotF64(ctx, TtPlotType::Integer, 1, "pickle?");
-            ttPlotI32(ctx, TtPlotType::Integer, 1, "nickle?");
-            ttPlotI64(ctx, TtPlotType::Integer, 1, "pizza?");
-            ttPlotU32(ctx, TtPlotType::Integer, 1, "noodles?");
-            ttPlotU64(ctx, TtPlotType::Integer, 1, "bananan?");
+            ttPlot(ctx, TtPlotTypeInteger, 1, "meow?");
+            ttPlotF32(ctx, TtPlotTypeInteger, 1, "cow?");
+            ttPlotF64(ctx, TtPlotTypeInteger, 1, "pickle?");
+            ttPlotI32(ctx, TtPlotTypeInteger, 1, "nickle?");
+            ttPlotI64(ctx, TtPlotTypeInteger, 1, "pizza?");
+            ttPlotU32(ctx, TtPlotTypeInteger, 1, "noodles?");
+            ttPlotU64(ctx, TtPlotTypeInteger, 1, "bananan?");
 
             core::StackString256 name;
             for (int32_t i = 0; i < numThreads; i++) {
@@ -278,7 +279,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             }
 
             // how many stalls?
-            auto numStalls = ttGetStati(ctx, TtStat::NumStalls);
+            auto numStalls = ttGetStati(ctx, TtStatNumStalls);
 
             X_LOG0("Main", "TelemStalled: %" PRIi32, numStalls);
 

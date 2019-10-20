@@ -279,7 +279,7 @@ struct ReqTraceMessagesResp : public DataPacketBaseViewer
 
 struct TraceMessagesData
 {
-    TtLogType::Enum type;
+    TtMsgFlags flags;
     tt_int64  timeTicks;
     tt_uint32 strIdx;
 };

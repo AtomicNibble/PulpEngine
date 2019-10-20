@@ -648,17 +648,16 @@ void LockTryTooltip(TraceView& view, const LockTry& lock)
     StringBuf strBuf;
 
     auto strDesc = view.strings.getString(lock.strIdxDescrption);
-    auto strFunc = view.strings.getString(lock.strIdxFunction);
     auto strFile = view.strings.getString(lock.strIdxFile);
     auto strLockName = view.strings.getLockName(lock.lockHandle);
     auto strThread = view.strings.getThreadName(lock.threadID);
 
     ImGui::BeginTooltip();
 
-        if (lock.result == TtLockResult::Acquired) {
+        if (lock.result == TtLockResultAcquired) {
             ImGui::Text("Waiting for lock \"%s\" (Acquired)", strLockName.begin());
         }
-        else if (lock.result == TtLockResult::Fail) {
+        else if (lock.result == TtLockResultFail) {
             ImGui::Text("Waiting for lock \"%s\" (Fail)", strLockName.begin());
         }
         else {
@@ -668,7 +667,6 @@ void LockTryTooltip(TraceView& view, const LockTry& lock)
         ImGui::TextUnformatted(strDesc.begin(), strDesc.end());
         TextFocusedFmt("Handle", "0x%" PRIX64, lock.lockHandle);
         ImGui::Separator();
-        ImGui::TextUnformatted(strFunc.begin(), strFunc.end());
         ImGui::Text("%s:%i", strFile.data(), lock.lineNo);
         TextFocused("Thread:", strThread.begin(), strThread.end());
         ImGui::SameLine();
@@ -694,12 +692,11 @@ void LockStateTooltip(TraceView& view, uint64_t lockId, const LockState& lockSta
 
     auto strLock = view.strings.getLockName(lockId);
     auto strThread = view.strings.getThreadName(lockState.threadID);
-    auto strFunc = view.strings.getString(lockState.strIdxFunction);
     auto strFile = view.strings.getString(lockState.strIdxFile);
 
     StringBuf strBuf;
     core::StackString256 str;
-    str.appendFmt("%s -> %s", TtLockState::ToString(lockState.state), TtLockState::ToString(lockStateNext.state));
+    str.appendFmt("%s -> %s", TtLockStateToString(lockState.state), TtLockStateToString(lockStateNext.state));
 
     ImGui::BeginTooltip();
 
@@ -707,7 +704,6 @@ void LockStateTooltip(TraceView& view, uint64_t lockId, const LockState& lockSta
         ImGui::Separator();
         ImGui::TextUnformatted(str.begin(), str.end());
         ImGui::Separator();
-        ImGui::TextUnformatted(strFunc.begin(), strFunc.end());
         ImGui::Text("%s:%i", strFile.data(), lockState.lineNo);
         ImGui::Separator();
         TextFocused("Execution time:", TimeToString(strBuf, time));
@@ -732,7 +728,6 @@ void ZoneTooltip(TraceView& view, ZoneSegmentThread& thread, const ZoneData& zon
     StringBuf strBuf;
 
     auto strZone = view.strings.getString(zone.strIdxZone);
-    auto strFunc = view.strings.getString(zone.strIdxFunction);
     auto strFile = view.strings.getString(zone.strIdxFile);
     auto strThread = view.strings.getThreadName(thread.id);
 
@@ -740,7 +735,6 @@ void ZoneTooltip(TraceView& view, ZoneSegmentThread& thread, const ZoneData& zon
   
         ImGui::TextUnformatted(strZone.begin(), strZone.end());
         ImGui::Separator();
-        ImGui::TextUnformatted(strFunc.begin(), strFunc.end());
         ImGui::Text("%s:%i", strFile.data(), zone.lineNo);
         TextFocused("Thread:", strThread.begin(), strThread.end());
         ImGui::SameLine();
@@ -1207,9 +1201,9 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
                     auto vbeginOrig = vbegin;
                     auto vendOrig = vend;
 
-                    if (vbegin->state != TtLockState::Locked) {
+                    if (vbegin->state != TtLockStateLocked) {
                         // find the first lock state?
-                        while (vbegin < vend && vbegin->state != TtLockState::Locked) {
+                        while (vbegin < vend && vbegin->state != TtLockStateLocked) {
                             ++vbegin;
                         }
                     }
@@ -1219,21 +1213,21 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
                     {
                         auto threadID = vbegin->threadID;
 
-                        while (vbegin > ls.begin() && vbegin[-1].state == TtLockState::Locked && vbegin[-1].threadID == threadID) {
+                        while (vbegin > ls.begin() && vbegin[-1].state == TtLockStateLocked && vbegin[-1].threadID == threadID) {
                             --vbegin;
                         }
                     }
 
                     // make sure end is released.
                     {
-                        while (vend < ls.end() && vend->state != TtLockState::Released) {
+                        while (vend < ls.end() && vend->state != TtLockStateReleased) {
                             ++vend;
                         }
                     }
 
 
                     if (vbegin < vend) {
-                        X_ASSERT((*vbegin).state == TtLockState::Locked, "Incorrect state")();
+                        X_ASSERT((*vbegin).state == TtLockStateLocked, "Incorrect state")();
                     }
 
                     X_UNUSED(vbeginOrig, vendOrig);
@@ -1242,7 +1236,7 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
 
                     while (vbegin < vend) 
                     {
-                        X_ASSERT(vbegin->state == TtLockState::Locked, "Incorrect states")();
+                        X_ASSERT(vbegin->state == TtLockStateLocked, "Incorrect states")();
 
                         ++processed;
                         int32_t depth = 1;
@@ -1254,7 +1248,7 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
                             ++lockRelease;
 
                             // look for recursion.
-                            while (lockRelease < vend && lockRelease->state == TtLockState::Locked && lockRelease->threadID == threadID) {
+                            while (lockRelease < vend && lockRelease->state == TtLockStateLocked && lockRelease->threadID == threadID) {
                                 ++depth;
                                 ++lockRelease;
                             }
@@ -1262,7 +1256,7 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
                             // now we find where this thread released.
                             // need to do it for depth.
                             while (lockRelease < vend) {
-                                if (lockRelease->state == TtLockState::Released && lockRelease->threadID == threadID) {
+                                if (lockRelease->state == TtLockStateReleased && lockRelease->threadID == threadID) {
                                     --depth;
                                     if (depth == 0) {
                                         break;
@@ -1282,7 +1276,7 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
                         auto& lockStateRelease = *(lockRelease);
 
 
-                        X_ASSERT(lockState.state == TtLockState::Locked && lockStateRelease.state == TtLockState::Released, "Incorrect states")();
+                        X_ASSERT(lockState.state == TtLockStateLocked && lockStateRelease.state == TtLockStateReleased, "Incorrect states")();
                         const auto locksz = std::max((lockStateRelease.timeNano - lockState.timeNano) * pxns, pxns * 0.5);
 
                         if (locksz < MinVisSize)
@@ -1356,7 +1350,7 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
                             vbegin += num;
 
                             if (vbegin < vend) {
-                                X_ASSERT(vbegin->state == TtLockState::Locked, "Incorrect states")();
+                                X_ASSERT(vbegin->state == TtLockStateLocked, "Incorrect states")();
                             }
                         }
                         else {
@@ -1370,7 +1364,7 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
                                 ++vbegin;
                             }
 
-                            X_ASSERT(vbegin->state == TtLockState::Locked, "Begin should be a lock state")();
+                            X_ASSERT(vbegin->state == TtLockStateLocked, "Begin should be a lock state")();
                         }
                     }
                 }
@@ -2355,6 +2349,13 @@ void DrawFrame(Client& client, float ww, float wh)
 
                                         if (trace.active) {
                                             label.append("[active]");
+
+#if 0
+                                            ImVec2 p_min = ImGui::GetCursorScreenPos();
+                                            p_min.y -= ImGui::GetStyle().FramePadding.y;
+                                            ImVec2 p_max = ImVec2(p_min.x + ImGui::GetContentRegionAvailWidth(), p_min.y + ImGui::GetFrameHeight());
+                                            ImGui::GetWindowDrawList()->AddRectFilled(p_min, p_max, IM_COL32(0, 80, 0, 200));
+#endif
                                         }
 
                                         if (ImGui::Selectable(label.c_str(), trace.guid == selectGuid))
@@ -2696,7 +2697,6 @@ bool handleTraceZoneSegmentZones(Client& client, const DataPacketBaseViewer* pBa
         zd.startNano = view.ticksToNano(zone.start);
         zd.endNano = view.ticksToNano(zone.end);
         zd.lineNo = zone.lineNo;
-        zd.strIdxFunction = zone.strIdxFunction;
         zd.strIdxFile = zone.strIdxFile;
         zd.strIdxZone = zone.strIdxFmt;
         zd.stackDepth = zone.stackDepth;
@@ -2776,11 +2776,10 @@ bool handleTraceZoneSegmentLockStates(Client& client, const DataPacketBaseViewer
         LockState ls;
         ls.time = state.time;
         ls.timeNano = view.ticksToNano(state.time);
-        ls.state = state.state;
+        ls.state = static_cast<TtLockState>(state.state);
         ls.threadIdx = safe_static_cast<uint16_t>(t);
         ls.threadID = state.threadID;
         ls.lineNo = state.lineNo;
-        ls.strIdxFunction = state.strIdxFunction;
         ls.strIdxFile = state.strIdxFile;
 
         it->second.lockStates.push_back(ls);
@@ -2844,9 +2843,8 @@ bool handleTraceZoneSegmentLockTry(Client& client, const DataPacketBaseViewer* p
         lt.endNano = view.ticksToNano(lockTry.end);
         lt.threadID = lockTry.threadID;
         lt.threadIdx = safe_static_cast<uint16_t>(t);
-        lt.result = lockTry.result;
+        lt.result = static_cast<TtLockResult>(lockTry.result);
         lt.lineNo = lockTry.lineNo;
-        lt.strIdxFunction = lockTry.strIdxFunction;
         lt.strIdxFile = lockTry.strIdxFile;
         lt.strIdxDescrption = lockTry.strIdxFmt;
 
@@ -3402,7 +3400,7 @@ bool handleOpenTraceResp(Client& client, uint8_t* pData)
 
 
     auto startNano = 0;
-    auto endNano = 1000_ui64 * 1000_ui64 * 1000_ui64 * 5_ui64;
+    auto endNano = 1000_ui64 * 1000_ui64 * 1000_ui64 * 500_ui64;
 
     ReqTraceZoneMessages rzm;
     rzm.type = PacketType::ReqTraceMessages;

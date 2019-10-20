@@ -141,8 +141,7 @@ struct TraceBuilder : public TraceStream
         {
             struct Packed
             {
-                uint16_t lineNo;
-                uint16_t idxFunction;
+                uint32_t lineNo;
                 uint16_t idxFile;
                 uint16_t depth;
             } raw;

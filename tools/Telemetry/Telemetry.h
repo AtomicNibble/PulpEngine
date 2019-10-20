@@ -92,202 +92,159 @@
 
 #define __TELEM_TYPES
 
-using tt_int8 = char;
-using tt_int16 = short;
-using tt_int32 = int;
-using tt_int64 = long long;
+typedef char tt_int8;
+typedef short tt_int16;
+typedef int tt_int32;
+typedef long long tt_int64;
 
-using tt_uint8 = unsigned char;
-using tt_uint16 = unsigned short;
-using tt_uint32 = unsigned int;
-using tt_uint64 = unsigned long long;
+typedef unsigned char tt_uint8;
+typedef unsigned short tt_uint16;
+typedef unsigned int tt_uint32;
+typedef unsigned long long tt_uint64;
+
+typedef int tt_bool;
 
 #if __TELEM_64
 
-using tt_intptr = tt_int64;
-using tt_uintptr = tt_uint64;
-using tt_ptrdiff = tt_intptr;
-using tt_size = tt_uint64;
+typedef tt_int64 tt_intptr;
+typedef tt_uint64 tt_uintptr;
+typedef tt_intptr tt_ptrdiff;
+typedef tt_uint64 tt_size;
 
 #else
 
-using tt_intptr = int;
-using tt_uintptr = unsigned int;
-using tt_ptrdiff = int;
-using tt_size = unsigned int;
+typedef tt_int64 int;
+typedef tt_uint64 unsigned int;
+typedef tt_intptr int;
+typedef tt_uint64 unsigned int;
 
 #endif // __TELEM_64
 
 static_assert(sizeof(tt_uintptr) == sizeof(void*), "Size missmatch");
 
-struct TtConnectionType
+typedef enum TtConnectionType
 {
-    enum Enum
-    {
-        Tcp,
-        File
-    };
-};
+    TtConnectionTypeTcp,
+    TtConnectionTypeFile
+} TtConnectionType;
 
-struct TtError
+typedef enum TtError
 {
-    enum Enum
-    {
-        Ok,
-        Error,
-        InvalidParam,
-        InvalidContex,
-        ArenaTooSmall,
-        NetNotInit,
+    TtErrorOk,
+    TtErrorError,
+    TtErrorInvalidParam,
+    TtErrorInvalidContex,
+    TtErrorArenaTooSmall,
+    TtErrorNetNotInit,
 
-        HandeshakeFail
-    };
-};
+    TtErrorHandeshakeFail
+} TtError;
 
-struct TtLogType
+typedef enum TtMsgFlag
 {
-    enum Enum : tt_uint8
-    {
-        Msg,
-        Warning,
-        Error
-    };
-};
+    TtMsgFlagsSeverityMsg = 1,
+    TtMsgFlagsSeverityWarning = 2,
+    TtMsgFlagsSeverityError = 4,
+    TtMsgFlagsSeverityMask = 0x7,
+} TtMsgFlag;
 
-typedef TtLogType TtMsgType;
+typedef tt_uint32 TtMsgFlags;
 
-struct TtFlag
+typedef enum TtFlag
 {
-    enum Enum : tt_uint8
-    {
-        DropData = 1, // Used for profiling overhead, data is not sent to server.
-    };
-};
+    TtFlagDropData = 1, // Used for profiling overhead, data is not sent to server.
+} TtFlag;
 
-struct TtConnectionFlag
+typedef enum TtConnectionFlag
 {
-    enum Enum : tt_uint8
-    {
-        // Runtime will stream missing PDB to server on demand.
-        // not needed if you copy PDB to symbol server.
-        None = 0,
-        StreamPDB = 1,
-    };
-};
+    // Runtime will stream missing PDB to server on demand.
+    // not needed if you copy PDB to symbol server.
+    TtConnectionFlagNone = 0,
+    TtConnectionFlagStreamPDB = 1,
+} TtConnectionFlag;
 
-using TtConnectionFlags = tt_uint32;
+typedef tt_uint32 TtConnectionFlags;
 
-struct TtStat
+typedef enum TtStat
 {
-    enum Enum : tt_uint8
-    {
-        NumStalls,
-    };
-};
+    TtStatNumStalls,
+} TtStat;
 
-struct TtLockResult
+typedef enum TtLockResult
 {
-    enum Enum : tt_uint8
-    {
-        Acquired,
-        Fail
-    };
-};
+    TtLockResultAcquired,
+    TtLockResultFail
+} TtLockResult;
 
-struct TtLockState
+typedef enum TtLockState
 {
-    enum Enum : tt_uint8
-    {
-        Locked,
-        Released,
-    };
+    TtLockStateLocked,
+    TtLockStateReleased,
+} TtLockState;
 
-    static inline const char* ToString(Enum ls)
-    {
-        switch (ls)
-        {
-            case Locked:
-                return "Locked";
-            case Released:
-                return "Released";
-            default:
-                return "<ukn>";
-        }
+static inline const char* TtLockStateToString(enum TtLockState ls)
+{
+    switch (ls) {
+        case TtLockStateLocked:
+            return "Locked";
+        case TtLockStateReleased:
+            return "Released";
+        default:
+            return "<ukn>";
     }
-};
+}
 
-struct TtPlotType
+typedef enum TtPlotType
 {
-    enum Enum : tt_uint8
-    {
-        Time,
-        Time_us,
-        Time_clocks,
-        Time_cycles,
-        Integer,
-        Percentage_computed,
-        Percentage_direct,
-        Untyped
-    };
-};
+    TtPlotTypeTime,
+    TtPlotTypeTime_us,
+    TtPlotTypeTime_clocks,
+    TtPlotTypeTime_cycles,
+    TtPlotTypeInteger,
+    TtPlotTypePercentage_computed,
+    TtPlotTypePercentage_direct,
+    TtPlotTypeUntyped
+} TtPlotType;
 
 
 const tt_int32 TELEM_INTERNAL_THREAD_GROUP_ID = -1;
 
-using TraceContexHandle = tt_uintptr;
+typedef tt_uintptr TraceContexHandle;
 const TraceContexHandle INVALID_TRACE_CONTEX = 0;
 
 
 // IO callbacks.
-using TtFileHandle = tt_uintptr;
+typedef tt_uintptr TtFileHandle;
 const TtFileHandle TELEM_INVALID_HANDLE = 0;
 
-using FileOpenFunc = TtFileHandle(*)(void* pUserData, const char*);
-using FileCloseFunc = void(*)(void* pUserData, TtFileHandle);
-using FileWriteFunc = tt_int32(*)(void* pUserData, TtFileHandle, const void*, tt_int32);
+typedef TtFileHandle(*FileOpenFunc)(void* pUserData, const char*);
+typedef void(*FileCloseFunc)(void* pUserData, TtFileHandle);
+typedef tt_int32(*FileWriteFunc)(void* pUserData, TtFileHandle, const void*, tt_int32);
 
-using LogFunction = void(*)(void* pUserData, TtLogType::Enum type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm);
+typedef void(*LogFunction)(void* pUserData, TtMsgFlags type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm);
 
 
-struct TtCallStack
+#define __TELEM_CALLSTACK_MAX_FRAMES 15
+
+typedef struct TtCallStack
 {
-    static const tt_uint32 MAX_FRAMES = 15;
-
+#ifdef __cplusplus
     TtCallStack() {
         id = -1;
         num = 0;
     }
+#endif
 
     tt_int32 id;
     tt_int32 num;
-    void* frames[MAX_FRAMES];
-};
+    void* frames[__TELEM_CALLSTACK_MAX_FRAMES];
+} TtCallStack;
 
-__TELEM_PACK_PUSH(4)
 
-struct TtSourceInfo
-{
-    TtSourceInfo() = default;
-    TtSourceInfo(const TtSourceInfo& oth) = default;
-    inline TtSourceInfo(const char* const pFile, const char* const pFunction, int line) :
-        pFile_(pFile),
-        pFunction_(pFunction),
-        line_(line)
-    {}
-
-    TtSourceInfo& operator =(const TtSourceInfo& oth) = default;
-
-    const char* pFile_;
-    const char* pFunction_;
-    int line_;
-};
-
-__TELEM_PACK_POP;
-
-#define _TELEM_SOURCE_INFO TtSourceInfo(__FILE__, __FUNCTION__, __LINE__)
+#define _TELEM_SOURCE_INFO __FILE__, __LINE__
 
 #ifdef __cplusplus
-extern "C" 
+extern "C"
 {
 #endif
 
@@ -300,8 +257,8 @@ extern "C"
 #define __TELEM_API_VOID(name, ...) __TELEMETRYLIB_EXPORT void name(__VA_ARGS__); \
         __TELEM_API_BLANK(inline void __blank##name(__VA_ARGS__) {})
 
-#define __TELEM_API_BOOL(name, ...) __TELEMETRYLIB_EXPORT bool name(__VA_ARGS__); \
-        __TELEM_API_BLANK(inline bool __blank##name(__VA_ARGS__) { return true; })
+#define __TELEM_API_BOOL(name, ...) __TELEMETRYLIB_EXPORT tt_bool name(__VA_ARGS__); \
+        __TELEM_API_BLANK(inline tt_bool __blank##name(__VA_ARGS__) { return true; })
 
 #define __TELEM_API_INT(name, ...) __TELEMETRYLIB_EXPORT tt_int32 name(__VA_ARGS__); \
         __TELEM_API_BLANK(inline tt_int32 __blank##name(__VA_ARGS__) { return -1; })
@@ -312,13 +269,13 @@ extern "C"
 #define __TELEM_API_F32(name, ...) __TELEMETRYLIB_EXPORT float name(__VA_ARGS__); \
         __TELEM_API_BLANK(inline float __blank##name(__VA_ARGS__) { return 0.f; })
 
-#define __TELEM_API_ERR(name, ...) __TELEMETRYLIB_EXPORT TtError::Enum name(__VA_ARGS__); \
-        __TELEM_API_BLANK(inline TtError __blank##name(__VA_ARGS__) { return TtError::Ok; })
+#define __TELEM_API_ERR(name, ...) __TELEMETRYLIB_EXPORT TtError name(__VA_ARGS__); \
+        __TELEM_API_BLANK(inline TtError __blank##name(__VA_ARGS__) { return Ok; })
 
 #if __TELEM_WIN32
 
-__TELEM_PRAGMA(warning( push ))
-__TELEM_PRAGMA(warning(disable: 4100)) // unused param (caused by the blank functions).
+    __TELEM_PRAGMA(warning(push))
+        __TELEM_PRAGMA(warning(disable: 4100)) // unused param (caused by the blank functions).
 
 #endif
 
@@ -326,14 +283,14 @@ __TELEM_PRAGMA(warning(disable: 4100)) // unused param (caused by the blank func
     __TELEM_API_VOID(TelemShutDown);
 
     // Context
-    __TELEM_API_ERR(TelemInitializeContext, TraceContexHandle& ctx, void* pArena, tt_size bufLen);
+    __TELEM_API_ERR(TelemInitializeContext, TraceContexHandle* ctx, void* pArena, tt_size bufLen);
     __TELEM_API_VOID(TelemShutdownContext, TraceContexHandle ctx);
 
     __TELEM_API_VOID(TelemSetContextLogFunc, TraceContexHandle ctx, LogFunction func, void* pUserData);
     __TELEM_API_VOID(TelemSetIoFuncs, TraceContexHandle ctx, FileOpenFunc open, FileCloseFunc close, FileWriteFunc write, void* pUserData);
 
     __TELEM_API_ERR(TelemOpen, TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
-        TtConnectionType::Enum conType, tt_uint16 serverPort, tt_int32 timeoutMS, TtConnectionFlags flags);
+        TtConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS, TtConnectionFlags flags);
 
     __TELEM_API_BOOL(TelemClose, TraceContexHandle ctx);
 
@@ -342,12 +299,12 @@ __TELEM_PRAGMA(warning(disable: 4100)) // unused param (caused by the blank func
     __TELEM_API_VOID(TelemUpdateSymbolData, TraceContexHandle ctx);
     __TELEM_API_VOID(TelemSyncSymbols, TraceContexHandle ctx);
 
-    __TELEM_API_VOID(TelemPause, TraceContexHandle ctx, bool pause);
+    __TELEM_API_VOID(TelemPause, TraceContexHandle ctx, tt_bool pause);
     __TELEM_API_BOOL(TelemIsPaused, TraceContexHandle ctx);
 
-    __TELEM_API_VOID(TelemSetFlag, TraceContexHandle ctx, TtFlag::Enum flag, bool set);
+    __TELEM_API_VOID(TelemSetFlag, TraceContexHandle ctx, TtFlag flag, tt_bool set);
 
-    __TELEM_API_INT(TelemGetStatI, TraceContexHandle ctx, TtStat::Enum stat);
+    __TELEM_API_INT(TelemGetStatI, TraceContexHandle ctx, TtStat stat);
 
     __TELEM_API_UINT64(TelemFastTime);
     __TELEM_API_F32(TelemFastTimeToMs, TraceContexHandle ctx, tt_uint64 time);
@@ -359,48 +316,237 @@ __TELEM_PRAGMA(warning(disable: 4100)) // unused param (caused by the blank func
     __TELEM_API_VOID(TelemSetThreadGroupDefaultSort, TraceContexHandle ctx, tt_int32 groupID, tt_int32 sortVal);
 
     // Callstack
-    __TELEM_API_INT(TelemGetCallStack, TraceContexHandle ctx, TtCallStack& stackOut);
+    __TELEM_API_INT(TelemGetCallStack, TraceContexHandle ctx, TtCallStack* stackOut);
     __TELEM_API_INT(TelemSendCallStack, TraceContexHandle ctx, const TtCallStack* pStack);
     __TELEM_API_INT(TelemSendCallStackSkip, TraceContexHandle ctx, const TtCallStack* pStack, tt_int32 numToSkip);
 
     // Zones
-    __TELEM_API_VOID(TelemEnter, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemEnterEx, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minNanoSec, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemEnter, TraceContexHandle ctx, const char* pFile, tt_int32 line, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemEnterEx, TraceContexHandle ctx, const char* pFile, tt_int32 line, tt_uint64* matchIdOut, tt_uint64 minNanoSec, const char* pFmtString, tt_int32 numArgs, ...);
     __TELEM_API_VOID(TelemLeave, TraceContexHandle ctx);
     __TELEM_API_VOID(TelemLeaveEx, TraceContexHandle ctx, tt_uint64 matchId);
 
     // Lock util
     __TELEM_API_VOID(TelemSetLockName, TraceContexHandle ctx, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemTryLock, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemTryLockEx, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minNanoSec, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemEndTryLock, TraceContexHandle ctx, const void* pPtr, TtLockResult::Enum result);
-    __TELEM_API_VOID(TelemEndTryLockEx, TraceContexHandle ctx, tt_uint64 matchId, const void* pPtr, TtLockResult::Enum result);
-    __TELEM_API_VOID(TelemSetLockState, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState::Enum state);
-    __TELEM_API_VOID(TelemSignalLockCount, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, tt_int32 count);
+    __TELEM_API_VOID(TelemTryLock, TraceContexHandle ctx, const char* pFile, tt_int32 line, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemTryLockEx, TraceContexHandle ctx, const char* pFile, tt_int32 line, tt_uint64* matchIdOut, tt_uint64 minNanoSec, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemEndTryLock, TraceContexHandle ctx, const void* pPtr, TtLockResult result);
+    __TELEM_API_VOID(TelemEndTryLockEx, TraceContexHandle ctx, tt_uint64 matchId, const void* pPtr, TtLockResult result);
+    __TELEM_API_VOID(TelemSetLockState, TraceContexHandle ctx, const char* pFile, tt_int32 line, const void* pPtr, TtLockState state);
+    __TELEM_API_VOID(TelemSignalLockCount, TraceContexHandle ctx, const char* pFile, tt_int32 line, const void* pPtr, tt_int32 count);
 
     // Some allocation tracking.
-    __TELEM_API_VOID(TelemAlloc, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr, tt_size allocSize, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemFree, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr);
+    __TELEM_API_VOID(TelemAlloc, TraceContexHandle ctx, const char* pFile, tt_int32 line, void* pPtr, tt_size allocSize, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemFree, TraceContexHandle ctx, const char* pFile, tt_int32 line, void* pPtr);
 
-    __TELEM_API_VOID(TelemPlotF32, TraceContexHandle ctx, TtPlotType::Enum type, float value, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemPlotF64, TraceContexHandle ctx, TtPlotType::Enum type, double value, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemPlotI32, TraceContexHandle ctx, TtPlotType::Enum type, tt_int32 value, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemPlotI64, TraceContexHandle ctx, TtPlotType::Enum type, tt_int64 value, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemPlotU32, TraceContexHandle ctx, TtPlotType::Enum type, tt_uint32 value, const char* pFmtString, tt_int32 numArgs, ...);
-    __TELEM_API_VOID(TelemPlotU64, TraceContexHandle ctx, TtPlotType::Enum type, tt_uint64 value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotF32, TraceContexHandle ctx, TtPlotType type, float value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotF64, TraceContexHandle ctx, TtPlotType type, double value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotI32, TraceContexHandle ctx, TtPlotType type, tt_int32 value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotI64, TraceContexHandle ctx, TtPlotType type, tt_int64 value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotU32, TraceContexHandle ctx, TtPlotType type, tt_uint32 value, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemPlotU64, TraceContexHandle ctx, TtPlotType type, tt_uint64 value, const char* pFmtString, tt_int32 numArgs, ...);
 
-    __TELEM_API_VOID(TelemMessage, TraceContexHandle ctx, TtMsgType::Enum type, const char* pFmtString, tt_int32 numArgs, ...);
+    __TELEM_API_VOID(TelemMessage, TraceContexHandle ctx, TtMsgFlags flags, const char* pFmtString, tt_int32 numArgs, ...);
 
 
 #if __TELEM_WIN32
 
-__TELEM_PRAGMA(warning( pop ))
+    __TELEM_PRAGMA(warning(pop))
 
 #endif
 
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
+
+#if TTELEMETRY_LINK
+#define __TELEM_FUNC_NAME(name) name
+#define TELEM_DYNAMIC_POINTERS 
+#else
+#define __TELEM_FUNC_NAME(name) __gTelemApi.p##name
+#define TELEM_DYNAMIC_POINTERS TelemetryAPI __gTelemApi;
+
+struct TelemetryAPI
+{
+#define __TELEM_RESOLVE(name) p##name= (decltype(name)*)::GetProcAddress(hLib_, # name); if(!p##name) { return false; }
+#define __TELEM_SET_BLANK(name) p##name= __blank##name;
+#define __TELEM_FUNC_PTR(name) decltype(name)* p##name;
+
+    TelemetryAPI() {
+        memset(this, 0, sizeof(*this));
+        setBlank();
+    }
+
+    tt_bool loadModule()
+    {
+        hLib_ = ::LoadLibraryW(TELEM_LIB_NAME_WIDE);
+        if (!hLib_) {
+            return false;
+        }
+
+        __TELEM_RESOLVE(TelemInit);
+        __TELEM_RESOLVE(TelemShutDown);
+        __TELEM_RESOLVE(TelemInitializeContext);
+        __TELEM_RESOLVE(TelemShutdownContext);
+        __TELEM_RESOLVE(TelemSetContextLogFunc);
+        __TELEM_RESOLVE(TelemSetIoFuncs);
+        __TELEM_RESOLVE(TelemOpen);
+        __TELEM_RESOLVE(TelemClose);
+        __TELEM_RESOLVE(TelemTick);
+        __TELEM_RESOLVE(TelemFlush);
+        __TELEM_RESOLVE(TelemUpdateSymbolData);
+        __TELEM_RESOLVE(TelemSyncSymbols);
+        __TELEM_RESOLVE(TelemPause);
+        __TELEM_RESOLVE(TelemIsPaused);
+        __TELEM_RESOLVE(TelemSetFlag);
+        __TELEM_RESOLVE(TelemGetStatI);
+        __TELEM_RESOLVE(TelemFastTime);
+        __TELEM_RESOLVE(TelemFastTimeToMs);
+        __TELEM_RESOLVE(TelemSetThreadName);
+        __TELEM_RESOLVE(TelemSetThreadGroup);
+        __TELEM_RESOLVE(TelemSetThreadGroupName);
+        __TELEM_RESOLVE(TelemSetThreadGroupDefaultSort);
+        __TELEM_RESOLVE(TelemGetCallStack);
+        __TELEM_RESOLVE(TelemSendCallStack);
+        __TELEM_RESOLVE(TelemSendCallStackSkip);
+        __TELEM_RESOLVE(TelemEnter);
+        __TELEM_RESOLVE(TelemEnterEx);
+        __TELEM_RESOLVE(TelemLeave);
+        __TELEM_RESOLVE(TelemLeaveEx);
+        __TELEM_RESOLVE(TelemSetLockName);
+        __TELEM_RESOLVE(TelemTryLock);
+        __TELEM_RESOLVE(TelemTryLockEx);
+        __TELEM_RESOLVE(TelemEndTryLock);
+        __TELEM_RESOLVE(TelemEndTryLockEx);
+        __TELEM_RESOLVE(TelemSetLockState);
+        __TELEM_RESOLVE(TelemSignalLockCount);
+        __TELEM_RESOLVE(TelemAlloc);
+        __TELEM_RESOLVE(TelemFree);
+        __TELEM_RESOLVE(TelemPlotF32);
+        __TELEM_RESOLVE(TelemPlotF64);
+        __TELEM_RESOLVE(TelemPlotI32);
+        __TELEM_RESOLVE(TelemPlotI64);
+        __TELEM_RESOLVE(TelemPlotU32);
+        __TELEM_RESOLVE(TelemPlotU64);
+        __TELEM_RESOLVE(TelemMessage);
+        return true;
+    }
+
+    void setBlank()
+    {
+        __TELEM_SET_BLANK(TelemInit);
+        __TELEM_SET_BLANK(TelemShutDown);
+        __TELEM_SET_BLANK(TelemInitializeContext);
+        __TELEM_SET_BLANK(TelemShutdownContext);
+        __TELEM_SET_BLANK(TelemSetContextLogFunc);
+        __TELEM_SET_BLANK(TelemSetIoFuncs);
+        __TELEM_SET_BLANK(TelemOpen);
+        __TELEM_SET_BLANK(TelemClose);
+        __TELEM_SET_BLANK(TelemTick);
+        __TELEM_SET_BLANK(TelemFlush);
+        __TELEM_SET_BLANK(TelemUpdateSymbolData);
+        __TELEM_SET_BLANK(TelemSyncSymbols);
+        __TELEM_SET_BLANK(TelemPause);
+        __TELEM_SET_BLANK(TelemIsPaused);
+        __TELEM_SET_BLANK(TelemSetFlag);
+        __TELEM_SET_BLANK(TelemGetStatI);
+        __TELEM_SET_BLANK(TelemFastTime);
+        __TELEM_SET_BLANK(TelemFastTimeToMs);
+        __TELEM_SET_BLANK(TelemSetThreadName);
+        __TELEM_SET_BLANK(TelemSetThreadGroup);
+        __TELEM_SET_BLANK(TelemSetThreadGroupName);
+        __TELEM_SET_BLANK(TelemSetThreadGroupDefaultSort);
+        __TELEM_SET_BLANK(TelemGetCallStack);
+        __TELEM_SET_BLANK(TelemSendCallStack);
+        __TELEM_SET_BLANK(TelemSendCallStackSkip);
+        __TELEM_SET_BLANK(TelemEnter);
+        __TELEM_SET_BLANK(TelemEnterEx);
+        __TELEM_SET_BLANK(TelemLeave);
+        __TELEM_SET_BLANK(TelemLeaveEx);
+        __TELEM_SET_BLANK(TelemSetLockName);
+        __TELEM_SET_BLANK(TelemTryLock);
+        __TELEM_SET_BLANK(TelemTryLockEx);
+        __TELEM_SET_BLANK(TelemEndTryLock);
+        __TELEM_SET_BLANK(TelemEndTryLockEx);
+        __TELEM_SET_BLANK(TelemSetLockState);
+        __TELEM_SET_BLANK(TelemSignalLockCount);
+        __TELEM_SET_BLANK(TelemAlloc);
+        __TELEM_SET_BLANK(TelemFree);
+        __TELEM_SET_BLANK(TelemPlotF32);
+        __TELEM_SET_BLANK(TelemPlotF64);
+        __TELEM_SET_BLANK(TelemPlotI32);
+        __TELEM_SET_BLANK(TelemPlotI64);
+        __TELEM_SET_BLANK(TelemPlotU32);
+        __TELEM_SET_BLANK(TelemPlotU64);
+        __TELEM_SET_BLANK(TelemMessage);
+    }
+
+    void unLoad()
+    {
+        if (hLib_) {
+            ::FreeLibrary(hLib_);
+        }
+
+        memset(this, 0, sizeof(*this));
+    }
+
+    __TELEM_FUNC_PTR(TelemInit);
+    __TELEM_FUNC_PTR(TelemShutDown);
+    __TELEM_FUNC_PTR(TelemInitializeContext);
+    __TELEM_FUNC_PTR(TelemShutdownContext);
+    __TELEM_FUNC_PTR(TelemSetContextLogFunc);
+    __TELEM_FUNC_PTR(TelemSetIoFuncs);
+    __TELEM_FUNC_PTR(TelemOpen);
+    __TELEM_FUNC_PTR(TelemClose);
+    __TELEM_FUNC_PTR(TelemTick);
+    __TELEM_FUNC_PTR(TelemFlush);
+    __TELEM_FUNC_PTR(TelemUpdateSymbolData);
+    __TELEM_FUNC_PTR(TelemSyncSymbols);
+    __TELEM_FUNC_PTR(TelemPause);
+    __TELEM_FUNC_PTR(TelemIsPaused);
+    __TELEM_FUNC_PTR(TelemSetFlag);
+    __TELEM_FUNC_PTR(TelemGetStatI);
+    __TELEM_FUNC_PTR(TelemFastTime);
+    __TELEM_FUNC_PTR(TelemFastTimeToMs);
+    __TELEM_FUNC_PTR(TelemSetThreadName);
+    __TELEM_FUNC_PTR(TelemSetThreadGroup);
+    __TELEM_FUNC_PTR(TelemSetThreadGroupName);
+    __TELEM_FUNC_PTR(TelemSetThreadGroupDefaultSort);
+    __TELEM_FUNC_PTR(TelemGetCallStack);
+    __TELEM_FUNC_PTR(TelemSendCallStack);
+    __TELEM_FUNC_PTR(TelemSendCallStackSkip);
+    __TELEM_FUNC_PTR(TelemEnter);
+    __TELEM_FUNC_PTR(TelemEnterEx);
+    __TELEM_FUNC_PTR(TelemLeave);
+    __TELEM_FUNC_PTR(TelemLeaveEx);
+    __TELEM_FUNC_PTR(TelemSetLockName);
+    __TELEM_FUNC_PTR(TelemTryLock);
+    __TELEM_FUNC_PTR(TelemTryLockEx);
+    __TELEM_FUNC_PTR(TelemEndTryLock);
+    __TELEM_FUNC_PTR(TelemEndTryLockEx);
+    __TELEM_FUNC_PTR(TelemSetLockState);
+    __TELEM_FUNC_PTR(TelemSignalLockCount);
+    __TELEM_FUNC_PTR(TelemAlloc);
+    __TELEM_FUNC_PTR(TelemFree);
+    __TELEM_FUNC_PTR(TelemPlotF32);
+    __TELEM_FUNC_PTR(TelemPlotF64);
+    __TELEM_FUNC_PTR(TelemPlotI32);
+    __TELEM_FUNC_PTR(TelemPlotI64);
+    __TELEM_FUNC_PTR(TelemPlotU32);
+    __TELEM_FUNC_PTR(TelemPlotU64);
+    __TELEM_FUNC_PTR(TelemMessage);
+
+private:
+    HMODULE hLib_;
+};
+
+// if you have multiple dll's this will be diffrent.
+// so you would have to call init in each dll.
+// but also means you can conditionally enable telemetry for various modules.
+// it's not safe to resolve functions during a zone for the same module.
+extern TelemetryAPI __gTelemApi;
+
+#endif // TTELEMETRY_LINK
 
 #ifdef __cplusplus
 
@@ -416,209 +562,20 @@ namespace telem
     using PlotType = TtPlotType;
     using Error = TtError;
 
-#if TTELEMETRY_LINK
-#define __TELEM_FUNC_NAME(name) name
-#define TELEM_DYNAMIC_POINTERS 
-#else
-#define __TELEM_FUNC_NAME(name) telem::gTelemApi.p##name
-#define TELEM_DYNAMIC_POINTERS telem::TelemetryAPI telem::gTelemApi;
-
-    struct TelemetryAPI
-    {
-        #define __TELEM_RESOLVE(name) p##name= (decltype(name)*)::GetProcAddress(hLib_, # name); if(!p##name) { return false; }
-        #define __TELEM_SET_BLANK(name) p##name= __blank##name;
-        #define __TELEM_FUNC_PTR(name) decltype(name)* p##name;
-
-        TelemetryAPI() {
-            memset(this, 0, sizeof(*this));
-            setBlank();
-        }
-
-        bool loadModule()
-        {
-            hLib_ = ::LoadLibraryW(TELEM_LIB_NAME_WIDE);
-            if (!hLib_) {
-                return false;
-            }
-
-            __TELEM_RESOLVE(TelemInit);
-            __TELEM_RESOLVE(TelemShutDown);
-            __TELEM_RESOLVE(TelemInitializeContext);
-            __TELEM_RESOLVE(TelemShutdownContext);
-            __TELEM_RESOLVE(TelemSetContextLogFunc);
-            __TELEM_RESOLVE(TelemSetIoFuncs);
-            __TELEM_RESOLVE(TelemOpen);
-            __TELEM_RESOLVE(TelemClose);
-            __TELEM_RESOLVE(TelemTick);
-            __TELEM_RESOLVE(TelemFlush);
-            __TELEM_RESOLVE(TelemUpdateSymbolData);
-            __TELEM_RESOLVE(TelemSyncSymbols);
-            __TELEM_RESOLVE(TelemPause);
-            __TELEM_RESOLVE(TelemIsPaused);
-            __TELEM_RESOLVE(TelemSetFlag);
-            __TELEM_RESOLVE(TelemGetStatI);
-            __TELEM_RESOLVE(TelemFastTime);
-            __TELEM_RESOLVE(TelemFastTimeToMs);
-            __TELEM_RESOLVE(TelemSetThreadName);
-            __TELEM_RESOLVE(TelemSetThreadGroup);
-            __TELEM_RESOLVE(TelemSetThreadGroupName);
-            __TELEM_RESOLVE(TelemSetThreadGroupDefaultSort);
-            __TELEM_RESOLVE(TelemGetCallStack);
-            __TELEM_RESOLVE(TelemSendCallStack);
-            __TELEM_RESOLVE(TelemSendCallStackSkip);
-            __TELEM_RESOLVE(TelemEnter);
-            __TELEM_RESOLVE(TelemEnterEx);
-            __TELEM_RESOLVE(TelemLeave);
-            __TELEM_RESOLVE(TelemLeaveEx);
-            __TELEM_RESOLVE(TelemSetLockName);
-            __TELEM_RESOLVE(TelemTryLock);
-            __TELEM_RESOLVE(TelemTryLockEx);
-            __TELEM_RESOLVE(TelemEndTryLock);
-            __TELEM_RESOLVE(TelemEndTryLockEx);
-            __TELEM_RESOLVE(TelemSetLockState);
-            __TELEM_RESOLVE(TelemSignalLockCount);
-            __TELEM_RESOLVE(TelemAlloc);
-            __TELEM_RESOLVE(TelemFree);
-            __TELEM_RESOLVE(TelemPlotF32);
-            __TELEM_RESOLVE(TelemPlotF64);
-            __TELEM_RESOLVE(TelemPlotI32);
-            __TELEM_RESOLVE(TelemPlotI64);
-            __TELEM_RESOLVE(TelemPlotU32);
-            __TELEM_RESOLVE(TelemPlotU64);
-            __TELEM_RESOLVE(TelemMessage);
-            return true;
-        }
-
-        void setBlank()
-        {
-            __TELEM_SET_BLANK(TelemInit);
-            __TELEM_SET_BLANK(TelemShutDown);
-            __TELEM_SET_BLANK(TelemInitializeContext);
-            __TELEM_SET_BLANK(TelemShutdownContext);
-            __TELEM_SET_BLANK(TelemSetContextLogFunc);
-            __TELEM_SET_BLANK(TelemSetIoFuncs);
-            __TELEM_SET_BLANK(TelemOpen);
-            __TELEM_SET_BLANK(TelemClose);
-            __TELEM_SET_BLANK(TelemTick);
-            __TELEM_SET_BLANK(TelemFlush);
-            __TELEM_SET_BLANK(TelemUpdateSymbolData);
-            __TELEM_SET_BLANK(TelemSyncSymbols);
-            __TELEM_SET_BLANK(TelemPause);
-            __TELEM_SET_BLANK(TelemIsPaused);
-            __TELEM_SET_BLANK(TelemSetFlag);
-            __TELEM_SET_BLANK(TelemGetStatI);
-            __TELEM_SET_BLANK(TelemFastTime);
-            __TELEM_SET_BLANK(TelemFastTimeToMs);
-            __TELEM_SET_BLANK(TelemSetThreadName);
-            __TELEM_SET_BLANK(TelemSetThreadGroup);
-            __TELEM_SET_BLANK(TelemSetThreadGroupName);
-            __TELEM_SET_BLANK(TelemSetThreadGroupDefaultSort);
-            __TELEM_SET_BLANK(TelemGetCallStack);
-            __TELEM_SET_BLANK(TelemSendCallStack);
-            __TELEM_SET_BLANK(TelemSendCallStackSkip);
-            __TELEM_SET_BLANK(TelemEnter);
-            __TELEM_SET_BLANK(TelemEnterEx);
-            __TELEM_SET_BLANK(TelemLeave);
-            __TELEM_SET_BLANK(TelemLeaveEx);
-            __TELEM_SET_BLANK(TelemSetLockName);
-            __TELEM_SET_BLANK(TelemTryLock);
-            __TELEM_SET_BLANK(TelemTryLockEx);
-            __TELEM_SET_BLANK(TelemEndTryLock);
-            __TELEM_SET_BLANK(TelemEndTryLockEx);
-            __TELEM_SET_BLANK(TelemSetLockState);
-            __TELEM_SET_BLANK(TelemSignalLockCount);
-            __TELEM_SET_BLANK(TelemAlloc);
-            __TELEM_SET_BLANK(TelemFree);
-            __TELEM_SET_BLANK(TelemPlotF32);
-            __TELEM_SET_BLANK(TelemPlotF64);
-            __TELEM_SET_BLANK(TelemPlotI32);
-            __TELEM_SET_BLANK(TelemPlotI64);
-            __TELEM_SET_BLANK(TelemPlotU32);
-            __TELEM_SET_BLANK(TelemPlotU64);
-            __TELEM_SET_BLANK(TelemMessage);
-        }
-
-        void unLoad()
-        {
-            if (hLib_) {
-                ::FreeLibrary(hLib_);
-            }
-
-            memset(this, 0, sizeof(*this));
-        }
-
-        __TELEM_FUNC_PTR(TelemInit);
-        __TELEM_FUNC_PTR(TelemShutDown);
-        __TELEM_FUNC_PTR(TelemInitializeContext);
-        __TELEM_FUNC_PTR(TelemShutdownContext);
-        __TELEM_FUNC_PTR(TelemSetContextLogFunc);
-        __TELEM_FUNC_PTR(TelemSetIoFuncs);
-        __TELEM_FUNC_PTR(TelemOpen);
-        __TELEM_FUNC_PTR(TelemClose);
-        __TELEM_FUNC_PTR(TelemTick);
-        __TELEM_FUNC_PTR(TelemFlush);
-        __TELEM_FUNC_PTR(TelemUpdateSymbolData);
-        __TELEM_FUNC_PTR(TelemSyncSymbols);
-        __TELEM_FUNC_PTR(TelemPause);
-        __TELEM_FUNC_PTR(TelemIsPaused);
-        __TELEM_FUNC_PTR(TelemSetFlag);
-        __TELEM_FUNC_PTR(TelemGetStatI);
-        __TELEM_FUNC_PTR(TelemFastTime);
-        __TELEM_FUNC_PTR(TelemFastTimeToMs);
-        __TELEM_FUNC_PTR(TelemSetThreadName);
-        __TELEM_FUNC_PTR(TelemSetThreadGroup);
-        __TELEM_FUNC_PTR(TelemSetThreadGroupName);
-        __TELEM_FUNC_PTR(TelemSetThreadGroupDefaultSort);
-        __TELEM_FUNC_PTR(TelemGetCallStack);
-        __TELEM_FUNC_PTR(TelemSendCallStack);
-        __TELEM_FUNC_PTR(TelemSendCallStackSkip);
-        __TELEM_FUNC_PTR(TelemEnter);
-        __TELEM_FUNC_PTR(TelemEnterEx);
-        __TELEM_FUNC_PTR(TelemLeave);
-        __TELEM_FUNC_PTR(TelemLeaveEx);
-        __TELEM_FUNC_PTR(TelemSetLockName);
-        __TELEM_FUNC_PTR(TelemTryLock);
-        __TELEM_FUNC_PTR(TelemTryLockEx);
-        __TELEM_FUNC_PTR(TelemEndTryLock);
-        __TELEM_FUNC_PTR(TelemEndTryLockEx);
-        __TELEM_FUNC_PTR(TelemSetLockState);
-        __TELEM_FUNC_PTR(TelemSignalLockCount);
-        __TELEM_FUNC_PTR(TelemAlloc);
-        __TELEM_FUNC_PTR(TelemFree);
-        __TELEM_FUNC_PTR(TelemPlotF32);
-        __TELEM_FUNC_PTR(TelemPlotF64);
-        __TELEM_FUNC_PTR(TelemPlotI32);
-        __TELEM_FUNC_PTR(TelemPlotI64);
-        __TELEM_FUNC_PTR(TelemPlotU32);
-        __TELEM_FUNC_PTR(TelemPlotU64);
-        __TELEM_FUNC_PTR(TelemMessage);
-
-    private:
-        HMODULE hLib_;
-    };
-
-    // if you have multiple dll's this will be diffrent.
-    // so you would have to call init in each dll.
-    // but also means you can conditionally enable telemetry for various modules.
-    // it's not safe to resolve functions during a zone for the same module.
-    extern TelemetryAPI gTelemApi;
-
-#endif // TTELEMETRY_LINK
-
     struct ScopedZone
     {
-        inline ScopedZone(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pFormat) :
+        inline ScopedZone(TraceContexHandle ctx, const char* pFile, tt_int32 line, const char* pFormat) :
             ctx_(ctx)
         {
-            __TELEM_FUNC_NAME(TelemEnter)(ctx, sourceInfo, pFormat, 0);
+            __TELEM_FUNC_NAME(TelemEnter)(ctx, pFile, line, pFormat, 0);
         }
 
         template<typename ... Args>
-        inline ScopedZone(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pFormat, Args&& ... args) :
+        inline ScopedZone(TraceContexHandle ctx, const char* pFile, tt_int32 line, const char* pFormat, Args&& ... args) :
             ctx_(ctx)
         {
             const std::size_t num = sizeof...(Args);
-            __TELEM_FUNC_NAME(TelemEnter)(ctx, sourceInfo, pFormat, num, std::forward<Args>(args) ...);
+            __TELEM_FUNC_NAME(TelemEnter)(ctx, pFile, line, pFormat, num, std::forward<Args>(args) ...);
         }
 
         inline ~ScopedZone() {
@@ -631,18 +588,18 @@ namespace telem
 
     struct ScopedZoneFilterd
     {
-        inline ScopedZoneFilterd(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64 minNanoSec, const char* pFormat) :
+        inline ScopedZoneFilterd(TraceContexHandle ctx, const char* pFile, tt_int32 line, tt_uint64 minNanoSec, const char* pFormat) :
             ctx_(ctx)
         {
-            __TELEM_FUNC_NAME(TelemEnterEx)(ctx, sourceInfo, matchId_, minNanoSec, pFormat, 0);
+            __TELEM_FUNC_NAME(TelemEnterEx)(ctx, pFile, line, &matchId_, minNanoSec, pFormat, 0);
         }
 
         template<typename ... Args>
-        inline ScopedZoneFilterd(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64 minNanoSec, const char* pFormat, Args&& ... args) :
+        inline ScopedZoneFilterd(TraceContexHandle ctx, const char* pFile, tt_int32 line, tt_uint64 minNanoSec, const char* pFormat, Args&& ... args) :
             ctx_(ctx)
         {
             const std::size_t num = sizeof...(Args);
-            __TELEM_FUNC_NAME(TelemEnterEx)(ctx, sourceInfo, matchId_, minNanoSec, pFormat, num, std::forward<Args>(args) ...);
+            __TELEM_FUNC_NAME(TelemEnterEx)(ctx, pFile, line, matchId_, minNanoSec, pFormat, num, std::forward<Args>(args) ...);
         }
 
         inline ~ScopedZoneFilterd() {
@@ -664,11 +621,13 @@ namespace telem
 #if TTELEMETRY_LINK
 #define ttLoadLibary() true
 #else
-#define ttLoadLibary() telem::gTelemApi.loadModule()
+#define ttLoadLibary() __gTelemApi.loadModule()
 #endif // TTELEMETRY_LINK
 
+#ifdef __cplusplus
 #define ttZone(ctx, pFmtString, ...) telem::ScopedZone __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, _TELEM_SOURCE_INFO, pFmtString, ## __VA_ARGS__)
 #define ttZoneFilterd(ctx, minNanoSec, pFmtString, ...) telem::ScopedZoneFilterd __TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, _TELEM_SOURCE_INFO, minNanoSec, pFmtString, ## __VA_ARGS__)
+#endif // __cplusplus
 
 #define ttZoneFunction(ctx) ttZone(ctx, __FUNCTION__)
 #define ttZoneFunctionFilterd(ctx, minNanoSec) ttZoneFilterd(ctx, minNanoSec, __FUNCTION__)
@@ -710,13 +669,13 @@ namespace telem
 #define ttSetThreadGroupDefaultSort(ctx, groupID, idx) __TELEM_FUNC_NAME(TelemSetThreadGroupDefaultSort)(ctx, groupID, idx)
 
 // Callstack
-#define ttGetCallStack(ctx, stackOut) __TELEM_FUNC_NAME(TelemGetCallStack)(ctx, stackOut)
+#define ttGetCallStack(ctx, stackOut) __TELEM_FUNC_NAME(TelemGetCallStack)(ctx, &stackOut)
 #define ttSendCallStack(ctx, pStack) __TELEM_FUNC_NAME(TelemSendCallStack)(ctx, pStack)
 #define ttSendCallStackSkip(ctx, pStack, numToSkip) __TELEM_FUNC_NAME(TelemSendCallStackSkip)(ctx, pStack, numToSkip)
 
 // Zones
 #define ttEnter(ctx, pFmtString, ...) __TELEM_FUNC_NAME(TelemEnter)(ctx, _TELEM_SOURCE_INFO, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
-#define ttEnterEx(ctx, matchIdOut, minNanoSec, pFmtString, ...) __TELEM_FUNC_NAME(TelemEnterEx)(ctx, _TELEM_SOURCE_INFO, matchIdOut, minNanoSec, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
+#define ttEnterEx(ctx, matchIdOut, minNanoSec, pFmtString, ...) __TELEM_FUNC_NAME(TelemEnterEx)(ctx, _TELEM_SOURCE_INFO, &matchIdOut, minNanoSec, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
 #define ttLeave(ctx) __TELEM_FUNC_NAME(TelemLeave)(ctx)
 #define ttLeaveEx(ctx, matchId) __TELEM_FUNC_NAME(TelemLeaveEx)(ctx, matchId)
 
@@ -745,9 +704,9 @@ namespace telem
 
 // Messages
 #define ttMessage(ctx, type, pFmtString, ...)  __TELEM_FUNC_NAME(TelemMessage)(ctx, type, pFmtString, __TELEM_ARG_COUNT(__VA_ARGS__), ## __VA_ARGS__)
-#define ttLog(ctx, pFmtString, ...) ttMessage(ctx, TtMsgType::Msg, pFmtString, ## __VA_ARGS__)
-#define ttWarning(ctx, pFmtString, ...) ttMessage(ctx, TtMsgType::Warning, pFmtString, ## __VA_ARGS__)
-#define ttError(ctx, pFmtString, ...) ttMessage(ctx, TtMsgType::Error, pFmtString, ## __VA_ARGS__)
+#define ttLog(ctx, pFmtString, ...) ttMessage(ctx, TtMsgFlagsSeverityMsg, pFmtString, ## __VA_ARGS__)
+#define ttWarning(ctx, pFmtString, ...) ttMessage(ctx, TtMsgFlagsSeverityWarning, pFmtString, ## __VA_ARGS__)
+#define ttError(ctx, pFmtString, ...) ttMessage(ctx, TtMsgFlagsSeverityError, pFmtString, ## __VA_ARGS__)
 
 
 #else // TTELEMETRY_ENABLED

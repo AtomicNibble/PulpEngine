@@ -373,7 +373,7 @@ bool XCore::Init(CoreInitParams& startupParams)
         const size_t telemBufSize = 1024 * 1024 * 4;
         static uint8_t telemBuf[telemBufSize];
 
-        ttInitializeContext(gEnv->ctx, telemBuf, sizeof(telemBuf));
+        ttInitializeContext(&gEnv->ctx, telemBuf, sizeof(telemBuf));
     }
 
     if (startupParams.bTelem)
@@ -401,15 +401,15 @@ bool XCore::Init(CoreInitParams& startupParams)
             startupParams.pTelemAppName,
             X_BUILD_STRING " Version: " X_ENGINE_VERSION_STR " Rev: " X_ENGINE_BUILD_REF_STR,
             "127.0.0.1",
-            telem::ConnectionType::Tcp,
+            TtConnectionTypeTcp,
             telem::DEFAULT_PORT,
             1000,
-            TtConnectionFlag::None
+            TtConnectionFlagNone
         );
 #endif
 
         // should we try do stuff like auto start a local server?
-        if (res != telem::Error::Ok) {
+        if (res != TtErrorOk) {
             // rip
             return false;
         }

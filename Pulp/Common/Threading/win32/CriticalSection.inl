@@ -11,8 +11,8 @@ inline void CriticalSection::Enter(void)
 
     EnterCriticalSection(&cs_);
 
-    ttEndTryLock(gEnv->ctx, &cs_, TtLockResult::Acquired);
-    ttSetLockState(gEnv->ctx, &cs_, TtLockState::Locked);
+    ttEndTryLock(gEnv->ctx, &cs_, TtLockResultAcquired);
+    ttSetLockState(gEnv->ctx, &cs_, TtLockStateLocked);
 }
 
 inline bool CriticalSection::TryEnter(void)
@@ -21,9 +21,9 @@ inline bool CriticalSection::TryEnter(void)
 
     bool res = TryEnterCriticalSection(&cs_) != 0;
 
-    ttEndTryLock(gEnv->ctx, &cs_, res ? TtLockResult::Acquired : TtLockResult::Fail);
+    ttEndTryLock(gEnv->ctx, &cs_, res ? TtLockResultAcquired : TtLockResultFail);
     if (res) {
-        ttSetLockState(gEnv->ctx, &cs_, TtLockState::Locked);
+        ttSetLockState(gEnv->ctx, &cs_, TtLockStateLocked);
     }
 
     return res;
@@ -33,5 +33,5 @@ inline void CriticalSection::Leave(void)
 {
     LeaveCriticalSection(&cs_);
 
-    ttSetLockState(gEnv->ctx, &cs_, TtLockState::Released);
+    ttSetLockState(gEnv->ctx, &cs_, TtLockStateReleased);
 }

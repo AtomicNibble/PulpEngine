@@ -13,7 +13,7 @@ public:
             X_ASSERT(ttLoadLibary(), "Failed to resolve telem")();
             X_ASSERT(ttInit(), "Failed to init telem")();
 
-            ttInitializeContext(ctx, telemBuf, sizeof(telemBuf));
+            ttInitializeContext(&ctx, telemBuf, sizeof(telemBuf));
             ttTick(ctx);
         }
     }
@@ -88,20 +88,20 @@ BENCHMARK_DEFINE_F(TelemFixture, lock_try)(benchmark::State& state) {
     int bogusHandle;
     for (auto _ : state) {
         ttTryLock(ctx, &bogusHandle, "AcquireSlot");
-        ttEndTryLock(ctx, &bogusHandle, TtLockResult::Acquired);
+        ttEndTryLock(ctx, &bogusHandle, TtLockResultAcquired);
     }
 }
 
 BENCHMARK_DEFINE_F(TelemFixture, lock_setstate)(benchmark::State& state) {
     int bogusHandle;
     for (auto _ : state) {
-        ttSetLockState(ctx, &bogusHandle, TtLockState::Locked);
+        ttSetLockState(ctx, &bogusHandle, TtLockStateLocked);
     }
 }
 
 BENCHMARK_DEFINE_F(TelemFixture, plot)(benchmark::State& state) {  
     for (auto _ : state) {
-        ttPlotI32(ctx, TtPlotType::Integer, 1249, "my plot");
+        ttPlotI32(ctx, TtPlotTypeInteger, 1249, "my plot");
     }
 }
 
@@ -119,13 +119,13 @@ BENCHMARK_DEFINE_F(TelemFixture, free)(benchmark::State& state) {
 
 BENCHMARK_DEFINE_F(TelemFixture, msg)(benchmark::State& state) {
     for (auto _ : state) {
-        ttMessage(ctx, TtMsgType::Msg, "this is a msg for you!");
+        ttMessage(ctx, TtMsgFlagsSeverityMsg, "this is a msg for you!");
     }
 }
 
 BENCHMARK_DEFINE_F(TelemFixture, msg_printf)(benchmark::State& state) {
     for (auto _ : state) {
-        ttMessage(ctx, TtMsgType::Msg, "this is a string %" PRIi32 ", %" PRIi64 " in the middle", 25251_i32, 123456_i64);
+        ttMessage(ctx, TtMsgFlagsSeverityMsg, "this is a string %" PRIi32 ", %" PRIi64 " in the middle", 25251_i32, 123456_i64);
     }
 }
 

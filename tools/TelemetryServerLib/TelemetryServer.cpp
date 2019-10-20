@@ -482,7 +482,7 @@ void ClientConnection::processDataStream(uint8_t* pData, int32_t len)
                 auto* pCallsTack = reinterpret_cast<const DataPacketCallStack*>(&pData[i]);
                 i += strm.handleDataPacketCallStack(pCallsTack);
 
-                if (core::bitUtil::IsBitFlagSet(strm.traceInfo.connFlags, TtConnectionFlag::StreamPDB)) {
+                if (core::bitUtil::IsBitFlagSet(strm.traceInfo.connFlags, TtConnectionFlagStreamPDB)) {
                     requestMissingPDB(pCallsTack);
                 }
                 break;
@@ -563,7 +563,7 @@ void ClientConnection::processDataStream(uint8_t* pData, int32_t len)
 
 void ClientConnection::registerPDB(const DataPacketPDBInfo* pInfo)
 {
-    if (!core::bitUtil::IsBitFlagSet(traceBuilder_.traceInfo.connFlags, TtConnectionFlag::StreamPDB)) {
+    if (!core::bitUtil::IsBitFlagSet(traceBuilder_.traceInfo.connFlags, TtConnectionFlagStreamPDB)) {
         return;
     }
 
@@ -656,7 +656,7 @@ void ClientConnection::requestMissingPDB(const DataPacketCallStack* pData)
 
 int32_t ClientConnection::handleDataPacketPDB(const DataPacketPDB* pData)
 {
-    if (!core::bitUtil::IsBitFlagSet(traceBuilder_.traceInfo.connFlags, TtConnectionFlag::StreamPDB)) {
+    if (!core::bitUtil::IsBitFlagSet(traceBuilder_.traceInfo.connFlags, TtConnectionFlagStreamPDB)) {
         X_ERROR("TelemSrv", "Recived PDB data while PDB streaming is not active");
     }
 
@@ -704,7 +704,7 @@ int32_t ClientConnection::handleDataPacketPDB(const DataPacketPDB* pData)
 
 int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pData)
 {
-    if (!core::bitUtil::IsBitFlagSet(traceBuilder_.traceInfo.connFlags, TtConnectionFlag::StreamPDB)) {
+    if (!core::bitUtil::IsBitFlagSet(traceBuilder_.traceInfo.connFlags, TtConnectionFlagStreamPDB)) {
         X_ERROR("TelemSrv", "Recived PDB block while PDB streaming is not active");
     }
 
@@ -819,7 +819,7 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
 
 int32_t ClientConnection::handleDataPacketPDBError(const DataPacketPDBError* pData)
 {
-    if (!core::bitUtil::IsBitFlagSet(traceBuilder_.traceInfo.connFlags, TtConnectionFlag::StreamPDB)) {
+    if (!core::bitUtil::IsBitFlagSet(traceBuilder_.traceInfo.connFlags, TtConnectionFlagStreamPDB)) {
         X_ERROR("TelemSrv", "Recived PDB error while PDB streaming is not active");
     }
 
@@ -1123,7 +1123,6 @@ bool ClientConnection::handleReqTraceZoneSegment(uint8_t* pData)
             info.packed = static_cast<uint64_t>(row.get<int64_t>(3));
 
             zone.lineNo = info.raw.lineNo;
-            zone.strIdxFunction = info.raw.idxFunction;
             zone.strIdxFile = info.raw.idxFile;
             zone.stackDepth = static_cast<uint8_t>(info.raw.depth & 0xFF);
 
@@ -1177,13 +1176,12 @@ bool ClientConnection::handleReqTraceZoneSegment(uint8_t* pData)
             lockTry.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
             lockTry.start = static_cast<uint64_t>(row.get<int64_t>(2));
             lockTry.end = static_cast<uint64_t>(row.get<int64_t>(3));
-            lockTry.result = static_cast<TtLockResult::Enum>(row.get<int32_t>(4));
+            lockTry.result = static_cast<uint8_t>(row.get<int32_t>(4));
 
             TraceBuilder::PackedSourceInfo info;
             info.packed = static_cast<uint64_t>(row.get<int64_t>(5));
 
             lockTry.lineNo = info.raw.lineNo;
-            lockTry.strIdxFunction = info.raw.idxFunction;
             lockTry.strIdxFile = info.raw.idxFile;
             lockTry.depth = static_cast<uint8_t>(info.raw.depth & 0xFF);
 
@@ -1237,13 +1235,12 @@ bool ClientConnection::handleReqTraceZoneSegment(uint8_t* pData)
             lockState.lockHandle = static_cast<uint64_t>(row.get<int64_t>(0));
             lockState.threadID = static_cast<uint32_t>(row.get<int32_t>(1));
             lockState.time = static_cast<uint64_t>(row.get<int64_t>(2));
-            lockState.state = static_cast<TtLockState::Enum>(row.get<int32_t>(3));
+            lockState.state = static_cast<uint8_t>(row.get<int32_t>(3));
 
             TraceBuilder::PackedSourceInfo info;
             info.packed = static_cast<uint64_t>(row.get<int64_t>(4));
 
             lockState.lineNo = info.raw.lineNo;
-            lockState.strIdxFunction = info.raw.idxFunction;
             lockState.strIdxFile = info.raw.idxFile;
 
             if (getCompressionBufferSpace() < sizeof(lockState))
@@ -1759,7 +1756,7 @@ bool ClientConnection::handleReqTraceMessages(uint8_t* pData)
         auto row = *it;
 
         TraceMessagesData ztd;
-        ztd.type = static_cast<TtLogType::Enum>(row.get<int32_t>(0));
+        ztd.flags = static_cast<TtMsgFlags>(row.get<int32_t>(0));
         ztd.timeTicks = row.get<int64_t>(1);
         ztd.strIdx = safe_static_cast<uint32_t>(row.get<int32_t>(2));
 
@@ -2810,7 +2807,6 @@ int32_t TraceBuilder::handleDataPacketZone(const DataPacketZone* pData)
 
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
-    info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
     info.raw.depth = pData->stackDepth;
 
@@ -2844,7 +2840,6 @@ int32_t TraceBuilder::handleDataPacketLockTry(const DataPacketLockTry* pData)
 
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
-    info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
     info.raw.depth = pData->depth;
 
@@ -2875,7 +2870,6 @@ int32_t TraceBuilder::handleDataPacketLockState(const DataPacketLockState* pData
 
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
-    info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
     info.raw.depth = 0;
 
@@ -3000,7 +2994,6 @@ int32_t TraceBuilder::handleDataPacketMemAlloc(const DataPacketMemAlloc* pData)
 
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
-    info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
     info.raw.depth = 0;
 
@@ -3027,7 +3020,6 @@ int32_t TraceBuilder::handleDataPacketMemFree(const DataPacketMemFree* pData)
 
     PackedSourceInfo info;
     info.raw.lineNo = pData->lineNo;
-    info.raw.idxFunction = getStringIndex(pData->strIdxFunction);
     info.raw.idxFile = getStringIndex(pData->strIdxFile);
     info.raw.depth = 0;
 
@@ -3055,7 +3047,7 @@ int32_t TraceBuilder::handleDataPacketMessage(const DataPacketMessage* pData)
 
     auto& cmd = cmdInsertMessage;
     cmd.bind(1, static_cast<int64_t>(pData->time));
-    cmd.bind(2, static_cast<int32_t>(pData->logType));
+    cmd.bind(2, static_cast<int32_t>(pData->flags));
     cmd.bind(3, strIdx);
 
     auto res = cmd.execute();

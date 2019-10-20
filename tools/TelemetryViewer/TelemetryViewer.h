@@ -34,8 +34,7 @@ struct ZoneData
     int64_t endTicks;
 
     // 8
-    uint16_t lineNo;
-    uint16_t strIdxFunction;
+    tt_uint32 lineNo;
     uint16_t strIdxFile;
     uint16_t strIdxZone;
 
@@ -57,14 +56,13 @@ struct LockState
     int64_t time;
     int64_t timeNano;
 
-    TtLockState::Enum state;
+    TtLockState state;
     uint16_t threadIdx; // used for colors.
 
     uint32_t threadID; // TODO: can just use threadIdx?
 
     // 8
-    uint16_t lineNo;
-    uint16_t strIdxFunction;
+    tt_uint32 lineNo;
     uint16_t strIdxFile;
 };
 
@@ -81,11 +79,10 @@ struct LockTry
     uint32_t threadID; // TODO: can just use threadIdx?
 
     uint16_t threadIdx; // used for colors.
-    TtLockResult::Enum result;
+    TtLockResult result;
 
     // 8
-    uint16_t lineNo;
-    uint16_t strIdxFunction;
+    tt_uint32 lineNo;
     uint16_t strIdxFile;
     uint16_t strIdxDescrption;
 };

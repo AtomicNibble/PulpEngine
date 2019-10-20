@@ -534,6 +534,17 @@ namespace
 
     } // namespace StrUtil
 
+    __TELEM_PACK_PUSH(4)
+
+    struct TtSourceInfo
+    {
+        const char* pFile;
+        int line;
+    };
+
+    __TELEM_PACK_POP;
+
+
     template<class T>
     TELEM_INLINE constexpr const T& Max(const T& x, const T& y)
     {
@@ -645,7 +656,7 @@ namespace
         tt_uint64 end;
 
         const char* pFmtStr;
-        TtLockResult::Enum result;
+        TtLockResult result;
         tt_uint16 depth;
         TtSourceInfo sourceInfo;
 
@@ -718,11 +729,11 @@ namespace
 #endif // X_64
 
 
-    void defaultLogFunction(void* pUserData, TtLogType::Enum type, const char* pMsgNullTerm, tt_int32 lenWithoutTerm)
+    void defaultLogFunction(void* pUserData, TtMsgFlags flags, const char* pMsgNullTerm, tt_int32 lenWithoutTerm)
     {
         TELEM_UNUSED(pUserData);
         TELEM_UNUSED(lenWithoutTerm);
-        TELEM_UNUSED(type);
+        TELEM_UNUSED(flags);
 
         ::OutputDebugStringA(pMsgNullTerm);
         ::OutputDebugStringA("\n");
@@ -1017,7 +1028,7 @@ namespace
         return pThreadData;
     }
 
-    void writeLog(TraceContext* pCtx, TtLogType::Enum type, const char* pFmt, ...)
+    void writeLog(TraceContext* pCtx, TtMsgFlags flags, const char* pFmt, ...)
     {
         char buf[MAX_STRING_LEN] = {};
 
@@ -1026,7 +1037,7 @@ namespace
         tt_int32 len = vsprintf(buf, pFmt, args); // TODO: replace
         va_end(args);
 
-        pCtx->logFunc(pCtx->pUserData, type, buf, len);
+        pCtx->logFunc(pCtx->pUserData, flags, buf, len);
     }
 
     bool readPacket(TraceContext* pCtx, char* pBuffer, int& bufLengthInOut)
@@ -1040,30 +1051,30 @@ namespace
             int res = platform::recv(pCtx->socket, &pBuffer[bytesRead], maxReadSize, 0);
 
             if (res == 0) {
-                writeLog(pCtx, TtLogType::Error, "Connection closing...");
+                writeLog(pCtx, TtMsgFlagsSeverityError, "Connection closing...");
                 return false;
             }
             else if (res < 0) {
                 lastErrorWSA::Description Dsc;
                 const auto err = lastErrorWSA::Get();
-                writeLog(pCtx, TtLogType::Error, "recv failed with Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
+                writeLog(pCtx, TtMsgFlagsSeverityError, "recv failed with Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
                 return false;
             }
 
             bytesRead += res;
 
-            writeLog(pCtx, TtLogType::Msg, "got: %d bytes\n", res);
+            writeLog(pCtx, TtMsgFlagsSeverityMsg, "got: %d bytes\n", res);
 
             if (bytesRead == sizeof(PacketBase))
             {
                 auto* pHdr = reinterpret_cast<const PacketBase*>(pBuffer);
                 if (pHdr->dataSize == 0) {
-                    writeLog(pCtx, TtLogType::Error, "Client sent packet with length zero...");
+                    writeLog(pCtx, TtMsgFlagsSeverityError, "Client sent packet with length zero...");
                     return false;
                 }
 
                 if (pHdr->dataSize > bufLengthInOut) {
-                    writeLog(pCtx, TtLogType::Error, "Client sent oversied packet of size %i...", static_cast<tt_int32>(pHdr->dataSize));
+                    writeLog(pCtx, TtMsgFlagsSeverityError, "Client sent oversied packet of size %i...", static_cast<tt_int32>(pHdr->dataSize));
                     return false;
                 }
 
@@ -1075,7 +1086,7 @@ namespace
                 return true;
             }
             else if (bytesRead > bufLength) {
-                writeLog(pCtx, TtLogType::Error, "Overread packet bytesRead: %d recvbuflen: %d", bytesRead, bufLength);
+                writeLog(pCtx, TtMsgFlagsSeverityError, "Overread packet bytesRead: %d recvbuflen: %d", bytesRead, bufLength);
                 return false;
             }
         }
@@ -1094,7 +1105,7 @@ namespace
             case PacketType::ConnectionRequestRejected: {
                 auto* pConRej = reinterpret_cast<const ConnectionRequestRejectedHdr*>(pData);
                 auto* pStrData = reinterpret_cast<const char*>(pConRej + 1);
-                writeLog(pCtx, TtLogType::Error, "Connection rejected: %.*s", pConRej->reasonLen, pStrData);
+                writeLog(pCtx, TtMsgFlagsSeverityError, "Connection rejected: %.*s", pConRej->reasonLen, pStrData);
 
             }
             default:
@@ -1149,7 +1160,7 @@ namespace
             auto numWrite = fileWrite(pCtx, reinterpret_cast<const char*>(pData), len);
             if (numWrite != len) {
                 onFatalWorkerError(pCtx);
-                writeLog(pCtx, TtLogType::Error, "File: write failed");
+                writeLog(pCtx, TtMsgFlagsSeverityError, "File: write failed");
                 return;
             }
         }
@@ -1162,7 +1173,7 @@ namespace
                 const auto err = lastErrorWSA::Get();
 
                 onFatalWorkerError(pCtx);
-                writeLog(pCtx, TtLogType::Error, "Socket: send failed with Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
+                writeLog(pCtx, TtMsgFlagsSeverityError, "Socket: send failed with Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
                 return;
             }
         }
@@ -1174,7 +1185,7 @@ namespace
             zones.zones[zones.num++] = nz;
         }
         else {
-            writeLog(pCtx, TtLogType::Warning, "Data write zone buffer is full");
+            writeLog(pCtx, TtMsgFlagsSeverityWarning, "Data write zone buffer is full");
         }
 #endif // RUNTIME_ZONE_WRITES
     }
@@ -1318,7 +1329,7 @@ namespace
 
         if (cmpBytes <= 0) {
             onFatalWorkerError(pComp->pCtx);
-            writeLog(pComp->pCtx, TtLogType::Error, "Compression Error(0x%x)", cmpBytes);
+            writeLog(pComp->pCtx, TtMsgFlagsSeverityError, "Compression Error(0x%x)", cmpBytes);
             return;
         }
 
@@ -1345,9 +1356,8 @@ namespace
         packet.start = toRelativeTicks(pComp->pCtx, start);
         packet.end = toRelativeTicks(pComp->pCtx, end);
         packet.strIdxFile = GetStringId(pComp, TELEM_ZONE_SOURCE_FILE);
-        packet.strIdxFunction = GetStringId(pComp, "Compress");
         packet.strIdxFmt = GetStringId(pComp, "Telem Compress");
-        packet.lineNo = static_cast<tt_uint16>(0);
+        packet.lineNo = static_cast<tt_uint32>(0);
         packet.argDataSize = 0;
 
         addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
@@ -1361,11 +1371,9 @@ namespace
                 packet.stackDepth = 2;
 
                 if (pComp->pCtx->fileHandle != TELEM_INVALID_HANDLE) {
-                    packet.strIdxFunction = GetStringId(pComp, "WriteToFile");
                     packet.strIdxFmt = GetStringId(pComp, "File Write");
                 }
                 else {
-                    packet.strIdxFunction = GetStringId(pComp, "SendToServer");
                     packet.strIdxFmt = GetStringId(pComp, "Socket send");
                 }
 
@@ -1388,7 +1396,6 @@ namespace
             if (pdbZones.num) {
 
                 packet.stackDepth = 0;
-                packet.strIdxFunction = GetStringId(pComp, "PDBSendToServer");
                 packet.strIdxFmt = GetStringId(pComp, "PDB Send");
 
                 for (int32_t i = 0; i < pdbZones.num; i++) {
@@ -1781,7 +1788,7 @@ namespace
 
     struct QueueDataLockState : public QueueDataBase
     {
-        TtLockState::Enum state;
+        TtLockState state;
         TtthreadId threadID;
         tt_uint64 time;
         TtSourceInfo sourceInfo;
@@ -1826,7 +1833,7 @@ namespace
 
     struct QueueDataMessage : public QueueDataBase
     {
-        TtLogType::Enum logType;
+        TtMsgFlags flags;
         tt_uint64 time;
         const char* pFmtStr;
 
@@ -1885,7 +1892,7 @@ namespace
     static_assert(64 == GetSizeWithoutArgData<QueueDataLockCount>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataMemAlloc>());
 #if X_64
-    static_assert(56 == sizeof(QueueDataMemFree));
+    static_assert(48 == sizeof(QueueDataMemFree));
     static_assert(136 == sizeof(QueueDataCallStack));
 #else
     static_assert(40 == sizeof(QueueDataMemFree));
@@ -2162,7 +2169,7 @@ namespace
         }
     }
 
-    TELEM_INLINE void queueLockState(TraceContext* pCtx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState::Enum state)
+    TELEM_INLINE void queueLockState(TraceContext* pCtx, const char* pFile, tt_int32 line, const void* pPtr, TtLockState state)
     {
         QueueDataLockState data;
         data.type = QueueDataType::LockState;
@@ -2171,14 +2178,15 @@ namespace
         data.pLockPtr = pPtr;
         data.state = state;
         data.threadID = getThreadID();
-        data.sourceInfo = sourceInfo;
+        data.sourceInfo.pFile = pFile;
+        data.sourceInfo.line = line;
         data.pFmtStr = "<none>";
 
         constexpr tt_int32 copySize = GetSizeWithoutArgDataNoAlign<decltype(data)>();
         addToTickBuffer(pCtx, &data, copySize, GetSizeWithoutArgData<decltype(data)>());
     }
 
-    TELEM_INLINE void queueLockCount(TraceContext* pCtx, const TtSourceInfo& sourceInfo, const void* pPtr, tt_int32 count)
+    TELEM_INLINE void queueLockCount(TraceContext* pCtx, const char* pFile, tt_int32 line, const void* pPtr, tt_int32 count)
     {
         QueueDataLockCount data;
         data.type = QueueDataType::LockCount;
@@ -2187,7 +2195,8 @@ namespace
         data.pLockPtr = pPtr;
         data.count = static_cast<tt_uint16>(count);
         data.threadID = getThreadID();
-        data.sourceInfo = sourceInfo;
+        data.sourceInfo.pFile = pFile;
+        data.sourceInfo.line = line;
         data.pFmtStr = "<none>";
 
         addToTickBuffer(pCtx, &data, GetSizeWithoutArgData<decltype(data)>());
@@ -2203,10 +2212,9 @@ namespace
         packet.threadID = pBuf->threadID;
         packet.start = toRelativeTicks(pComp->pCtx, zone.start);
         packet.end = toRelativeTicks(pComp->pCtx, zone.end);
-        packet.strIdxFile = GetStringId(pComp, zone.sourceInfo.pFile_);
-        packet.strIdxFunction = GetStringId(pComp, zone.sourceInfo.pFunction_);
+        packet.strIdxFile = GetStringId(pComp, zone.sourceInfo.pFile);
         packet.strIdxFmt = GetStringId(pComp, zone.pFmtStr);
-        packet.lineNo = static_cast<tt_uint16>(zone.sourceInfo.line_);
+        packet.lineNo = static_cast<tt_uint32>(zone.sourceInfo.line);
         packet.argDataSize = pBuf->argDataSize;
 
         const auto dataSize = GetDataSize<std::remove_pointer_t<decltype(pBuf)>>(pBuf->argDataSize);
@@ -2351,11 +2359,10 @@ namespace
         packet.start = toRelativeTicks(pComp->pCtx, lock.start);
         packet.end = toRelativeTicks(pComp->pCtx, lock.end);
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
-        packet.strIdxFile = GetStringId(pComp, lock.sourceInfo.pFile_);
-        packet.strIdxFunction = GetStringId(pComp, lock.sourceInfo.pFunction_);
-        packet.lineNo = static_cast<tt_uint16>(lock.sourceInfo.line_);
+        packet.strIdxFile = GetStringId(pComp, lock.sourceInfo.pFile);
+        packet.lineNo = static_cast<tt_uint32>(lock.sourceInfo.line);
         packet.strIdxFmt = GetStringId(pComp, lock.pFmtStr);
-        packet.result = lock.result;
+        packet.result = static_cast<tt_uint8>(lock.result);
         packet.depth = static_cast<tt_uint8>(pBuf->lock.depth);
         packet.argDataSize = pBuf->argDataSize;
 
@@ -2375,12 +2382,11 @@ namespace
         DataPacketLockState packet;
         packet.type = DataStreamType::LockState;
         packet.threadID = pBuf->threadID;
-        packet.state = pBuf->state;
+        packet.state = static_cast<tt_uint8>(pBuf->state);
         packet.time = pBuf->time;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
-        packet.lineNo = static_cast<tt_uint16>(pBuf->sourceInfo.line_);
-        packet.strIdxFunction = GetStringId(pComp, pBuf->sourceInfo.pFunction_);
-        packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile_);
+        packet.lineNo = static_cast<tt_uint32>(pBuf->sourceInfo.line);
+        packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile);
         packet.strIdxFmt = GetStringId(pComp, pBuf->pFmtStr);
         packet.argDataSize = pBuf->argDataSize;
 
@@ -2403,9 +2409,8 @@ namespace
         packet.count = pBuf->count;
         packet.time = pBuf->time;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
-        packet.lineNo = static_cast<tt_uint16>(pBuf->sourceInfo.line_);
-        packet.strIdxFunction = GetStringId(pComp, pBuf->sourceInfo.pFunction_);
-        packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile_);
+        packet.lineNo = static_cast<tt_uint32>(pBuf->sourceInfo.line);
+        packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile);
 
 #if X_DEBUG
         // Should not have any args.
@@ -2427,9 +2432,8 @@ namespace
         packet.size = pBuf->size;
         packet.time = pBuf->time;
         packet.ptr = reinterpret_cast<tt_uint64>(pBuf->pPtr);
-        packet.lineNo = static_cast<tt_uint16>(pBuf->sourceInfo.line_);
-        packet.strIdxFunction = GetStringId(pComp, pBuf->sourceInfo.pFunction_);
-        packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile_);
+        packet.lineNo = static_cast<tt_uint32>(pBuf->sourceInfo.line);
+        packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile);
         packet.strIdxFmt = GetStringId(pComp, pBuf->pFmtStr);
         packet.argDataSize = pBuf->argDataSize;
 
@@ -2451,9 +2455,8 @@ namespace
         packet.threadID = pBuf->threadID;
         packet.time = pBuf->time;
         packet.ptr = reinterpret_cast<tt_uint64>(pBuf->pPtr);
-        packet.lineNo = static_cast<tt_uint16>(pBuf->sourceInfo.line_);
-        packet.strIdxFunction = GetStringId(pComp, pBuf->sourceInfo.pFunction_);
-        packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile_);
+        packet.lineNo = static_cast<tt_uint32>(pBuf->sourceInfo.line);
+        packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile);
 
 #if X_DEBUG
         // Should not have any args.
@@ -2472,7 +2475,7 @@ namespace
         packet.type = DataStreamType::Message;
         packet.time = pBuf->time;
         packet.strIdxFmt = GetStringId(pComp, pBuf->pFmtStr);
-        packet.logType = pBuf->logType;
+        packet.flags = static_cast<tt_uint8>(pBuf->flags);
         packet.argDataSize = pBuf->argDataSize;
 
         const auto dataSize = GetDataSize<std::remove_pointer_t<decltype(pBuf)>>(pBuf->argDataSize);
@@ -2830,7 +2833,7 @@ namespace
             zones.zones[zones.num++] = zone;
         }
         else {
-            writeLog(pComp->pCtx, TtLogType::Warning, "PDB zone buffer is full");
+            writeLog(pComp->pCtx, TtMsgFlagsSeverityWarning, "PDB zone buffer is full");
         }
 #endif // RUNTIME_ZONE_PDB_SEND
     }
@@ -2858,7 +2861,7 @@ namespace
     void readPackets(TraceContext* pCtx, PacketCompressor* pComp, SocketRecvState& recvState)
     {
         // don't bother reading packets if not going to get any.
-        if ((pCtx->connFlags & TtConnectionFlag::StreamPDB) == 0) {
+        if ((pCtx->connFlags & TtConnectionFlagStreamPDB) == 0) {
             return;
         }
 
@@ -2875,7 +2878,7 @@ namespace
             if (res == SOCKET_ERROR) {
                 auto err = lastErrorWSA::Get();
                 if (err != ERROR_IO_PENDING) {
-                    writeLog(pCtx, TtLogType::Error, "WSARecv failed. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
+                    writeLog(pCtx, TtMsgFlagsSeverityError, "WSARecv failed. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
                     return;
                 }
             }
@@ -2886,7 +2889,7 @@ namespace
         if (!platform::WSAGetOverlappedResult(pCtx->socket, &recvState.overlapped, &bytesTransferred, FALSE, &flags)) {
             auto err = lastErrorWSA::Get();
             if (err != WSA_IO_INCOMPLETE) {
-                writeLog(pCtx, TtLogType::Error, "WSAGetOverlappedResult failed. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
+                writeLog(pCtx, TtMsgFlagsSeverityError, "WSAGetOverlappedResult failed. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
                 return;
             }
 
@@ -3018,7 +3021,7 @@ namespace
                 continue;
             }
 
-            if ((pCtx->flags & TtFlag::DropData) != 0) {
+            if ((pCtx->flags & TtFlagDropData) != 0) {
                 continue;
             }
 
@@ -3110,9 +3113,8 @@ namespace
                 zone.zone.start = start;
                 zone.zone.end = end;
                 zone.zone.pFmtStr = "Telem process buffer";
-                zone.zone.sourceInfo.line_ = 0;
-                zone.zone.sourceInfo.pFile_ = TELEM_ZONE_SOURCE_FILE;
-                zone.zone.sourceInfo.pFunction_ = "WorkerThread";
+                zone.zone.sourceInfo.line = 0;
+                zone.zone.sourceInfo.pFile = TELEM_ZONE_SOURCE_FILE;
 
                 queueProcessZone(&comp, &zone);
             }
@@ -3130,7 +3132,7 @@ namespace
 
 // --------------------------------------------------------------------
 
-bool TelemInit(void)
+tt_bool TelemInit(void)
 {
     if (gTelemInitCount > 0) {
         ++gTelemInitCount;
@@ -3213,9 +3215,13 @@ void TelemShutDown(void)
     }
 }
 
-TtError::Enum TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size bufLen)
+TtError TelemInitializeContext(TraceContexHandle* pOut, void* pArena, tt_size bufLen)
 {
-    out = INVALID_TRACE_CONTEX;
+    if (!pOut) {
+        return TtErrorInvalidParam;
+    }
+
+    *pOut = INVALID_TRACE_CONTEX;
 
     const auto* pEnd = reinterpret_cast<tt_uint8*>(pArena) + bufLen;
 
@@ -3233,7 +3239,7 @@ TtError::Enum TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_si
     constexpr tt_size minBufferSize = 1024 * 10; // 10kb.. enougth?
     constexpr tt_size internalSize = contexSize + threadDataSize + writeZonesSize + pdbZonesSize;
     if (bufLen < internalSize + minBufferSize) {
-        return TtError::ArenaTooSmall;
+        return TtErrorArenaTooSmall;
     }
 
     // i want to split this into two buffers both starting on 64bit boundry.
@@ -3243,7 +3249,7 @@ TtError::Enum TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_si
     const tt_size bytesLeft = bufLen - internalEndAligned;
     if (bytesLeft < minBufferSize) {
         ::DebugBreak(); // should not happen.
-        return TtError::ArenaTooSmall;
+        return TtErrorArenaTooSmall;
     }
 
     const tt_size tickBufferSize = RoundDownToMultiple<tt_size>(bytesLeft, 128) / 2;
@@ -3259,11 +3265,11 @@ TtError::Enum TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_si
     const tt_ptrdiff trailingBytes = pEnd - (pTickBuffer1 + tickBufferSize);
     if (trailingBytes < 0) {
         ::DebugBreak(); // should not happen, we would write out of bounds.
-        return TtError::Error;
+        return TtErrorError;
     }
     if (trailingBytes > 128) {
         ::DebugBreak(); // should not happen, we are underusing the buffer.
-        return TtError::Error;
+        return TtErrorError;
     }
 
     TraceContext* pCtx = new (pBuf) TraceContext();
@@ -3292,7 +3298,7 @@ TtError::Enum TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_si
 
     pCtx->hThread_ = ::CreateThread(nullptr, BACKGROUND_THREAD_STACK_SIZE, WorkerThread, pCtx, 0, &pCtx->threadId_);
     if (!pCtx->hThread_) {
-        return TtError::Error;
+        return TtErrorError;
     }
 
     // make sure we don't get starved, since the host program might make use of all cores
@@ -3302,12 +3308,12 @@ TtError::Enum TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_si
 
     pCtx->hSignal_ = CreateEventW(nullptr, false, false, nullptr);
     if (!pCtx->hSignal_) {
-        return TtError::Error;
+        return TtErrorError;
     }
 
     pCtx->hSignalIdle_ = CreateEventW(nullptr, false, false, nullptr);
     if (!pCtx->hSignalIdle_) {
-        return TtError::Error;
+        return TtErrorError;
     }
 
     pCtx->shutDownFlag = 0;
@@ -3326,8 +3332,8 @@ TtError::Enum TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_si
     // initial sync of PDB info.
     syncPDBInfo(pCtx, PE::pdbInfo);
 
-    out = contextToHandle(pCtx);
-    return TtError::Ok;
+    *pOut = contextToHandle(pCtx);
+    return TtErrorOk;
 }
 
 void TelemShutdownContext(TraceContexHandle ctx)
@@ -3375,21 +3381,21 @@ void TelemSetIoFuncs(TraceContexHandle ctx, FileOpenFunc open, FileCloseFunc clo
     pCtx->pFileWrite = write;
 }
 
-TtError::Enum TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pPath,
-    TtConnectionType::Enum conType, tt_uint16 serverPort, tt_int32 timeoutMS, TtConnectionFlags flags)
+TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pPath,
+    TtConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS, TtConnectionFlags flags)
 {
     if (!isValidContext(ctx)) {
-        return TtError::InvalidContex;
+        return TtErrorInvalidContex;
     }
 
     switch (conType)
     {
-        case TtConnectionType::Tcp:
-        case TtConnectionType::File:
+        case TtConnectionTypeTcp:
+        case TtConnectionTypeFile:
             break;
 
         default:
-            return TtError::InvalidParam;
+            return TtErrorInvalidParam;
     }
 
     auto* pCtx = handleToContext(ctx);
@@ -3409,19 +3415,19 @@ TtError::Enum TelemOpen(TraceContexHandle ctx, const char* pAppName, const char*
     const auto cmdLineLen = static_cast<tt_int32>(wcslen(pCmdLine));
 
     if (appNameLen > MAX_STRING_LEN) {
-        return TtError::InvalidParam;
+        return TtErrorInvalidParam;
     }
     if (buildInfoLen > MAX_STRING_LEN) {
-        return TtError::InvalidParam;
+        return TtErrorInvalidParam;
     }
     if (cmdLineLen > MAX_CMDLINE_LEN) {
-        return TtError::InvalidParam;
+        return TtErrorInvalidParam;
     }
 
     char cmdLine[MAX_CMDLINE_LEN] = {};
     tt_int32 cmdLenUtf8;
     if (!Convert(pCmdLine, cmdLineLen, cmdLine, sizeof(cmdLine), cmdLenUtf8)) {
-        return TtError::Error;
+        return TtErrorError;
     }
 
     cr.appNameLen = static_cast<tt_uint16>(appNameLen);
@@ -3435,7 +3441,7 @@ TtError::Enum TelemOpen(TraceContexHandle ctx, const char* pAppName, const char*
     cr.connFlags = flags;
     pCtx->connFlags = static_cast<tt_uint8>(flags);
 
-    if (conType == TtConnectionType::Tcp)
+    if (conType == TtConnectionTypeTcp)
     {
         TELEM_UNUSED(timeoutMS);
 
@@ -3454,8 +3460,8 @@ TtError::Enum TelemOpen(TraceContexHandle ctx, const char* pAppName, const char*
         if (res != 0) {
             lastErrorWSA::Description Dsc;
             const auto err = lastErrorWSA::Get();
-            writeLog(pCtx, TtLogType::Error, "Failed to getaddrinfo. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
-            return TtError::Error;
+            writeLog(pCtx, TtMsgFlagsSeverityError, "Failed to getaddrinfo. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
+            return TtErrorError;
         }
 
         platform::SOCKET connectSocket = INV_SOCKET;
@@ -3464,7 +3470,7 @@ TtError::Enum TelemOpen(TraceContexHandle ctx, const char* pAppName, const char*
             // Create a SOCKET for connecting to server
             connectSocket = platform::socket(pPtr->ai_family, pPtr->ai_socktype, pPtr->ai_protocol);
             if (connectSocket == INV_SOCKET) {
-                return TtError::Error;
+                return TtErrorError;
             }
 
             // Connect to server.
@@ -3481,7 +3487,7 @@ TtError::Enum TelemOpen(TraceContexHandle ctx, const char* pAppName, const char*
         platform::freeaddrinfo(servinfo);
 
         if (connectSocket == INV_SOCKET) {
-            return TtError::Error;
+            return TtErrorError;
         }
 
         // how big?
@@ -3490,8 +3496,8 @@ TtError::Enum TelemOpen(TraceContexHandle ctx, const char* pAppName, const char*
         if (res != 0) {
             lastErrorWSA::Description Dsc;
             const auto err = lastErrorWSA::Get();
-            writeLog(pCtx, TtLogType::Error, "Failed to set sndbuf on socket. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
-            return TtError::Error;
+            writeLog(pCtx, TtMsgFlagsSeverityError, "Failed to set sndbuf on socket. Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
+            return TtErrorError;
         }
 
         pCtx->socket = connectSocket;
@@ -3507,11 +3513,11 @@ TtError::Enum TelemOpen(TraceContexHandle ctx, const char* pAppName, const char*
 
         // TODO: support timeout.
         if (!readPacket(pCtx, recvbuf, recvbuflen)) {
-            return TtError::Error;
+            return TtErrorError;
         }
 
         if (!handleConnectionResponse(pCtx, reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(recvbuflen))) {
-            return TtError::HandeshakeFail;
+            return TtErrorHandeshakeFail;
         }
     }
     else
@@ -3519,7 +3525,7 @@ TtError::Enum TelemOpen(TraceContexHandle ctx, const char* pAppName, const char*
         // open a file.
         pCtx->fileHandle = pCtx->pFileOpen(pCtx->pIOUserData, pPath);
         if (pCtx->fileHandle == TELEM_INVALID_HANDLE) {
-            return TtError::Error;
+            return TtErrorError;
         }
 
         // lets be nice and only make one IO call.
@@ -3553,18 +3559,17 @@ TtError::Enum TelemOpen(TraceContexHandle ctx, const char* pAppName, const char*
         if (fileWrite(pCtx, buf, offset) != offset) {
             pCtx->pFileClose(pCtx->pIOUserData, pCtx->fileHandle);
             pCtx->fileHandle = TELEM_INVALID_HANDLE;
-            return TtError::Error;
+            return TtErrorError;
         }
         
         // sorted?
 
     }
 
-    return TtError::Ok;
+    return TtErrorOk;
 }
 
-
-bool TelemClose(TraceContexHandle ctx)
+tt_bool TelemClose(TraceContexHandle ctx)
 {
     auto* pCtx = handleToContext(ctx);
 
@@ -3579,7 +3584,7 @@ bool TelemClose(TraceContexHandle ctx)
     if (res == SOCKET_ERROR) {
         lastErrorWSA::Description Dsc;
         const auto err = lastErrorWSA::Get();
-        writeLog(pCtx, TtLogType::Error, "socket shutdown failed with Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
+        writeLog(pCtx, TtMsgFlagsSeverityError, "socket shutdown failed with Error(0x%x): \"%s\"", err, lastErrorWSA::ToString(err, Dsc));
     }
 
     if (pCtx->socket != INV_SOCKET) {
@@ -3647,7 +3652,7 @@ void TelemSyncSymbols(TraceContexHandle ctx)
     TELEM_UNUSED(pCtx);
 }
 
-void TelemPause(TraceContexHandle ctx, bool pause)
+void TelemPause(TraceContexHandle ctx, tt_bool pause)
 {
     if (!isValidContext(ctx)) {
         return;
@@ -3660,7 +3665,7 @@ void TelemPause(TraceContexHandle ctx, bool pause)
     }
 }
 
-bool TelemIsPaused(TraceContexHandle ctx)
+tt_bool TelemIsPaused(TraceContexHandle ctx)
 {
     if (!isValidContext(ctx)) {
         return true;
@@ -3669,7 +3674,7 @@ bool TelemIsPaused(TraceContexHandle ctx)
     return handleToContext(ctx)->isEnabled;
 }
 
-void TelemSetFlag(TraceContexHandle ctx, TtFlag::Enum flag, bool set)
+void TelemSetFlag(TraceContexHandle ctx, TtFlag flag, bool set)
 {
     if (!isValidContext(ctx)) {
         return;
@@ -3685,7 +3690,7 @@ void TelemSetFlag(TraceContexHandle ctx, TtFlag::Enum flag, bool set)
     }
 }
 
-tt_int32 TelemGetStatI(TraceContexHandle ctx, TtStat::Enum stat)
+tt_int32 TelemGetStatI(TraceContexHandle ctx, TtStat stat)
 {
     if (!isValidContext(ctx)) {
         return 0;
@@ -3695,7 +3700,7 @@ tt_int32 TelemGetStatI(TraceContexHandle ctx, TtStat::Enum stat)
 
     switch (stat)
     {
-        case TtStat::NumStalls:
+        case TtStatNumStalls:
             return pCtx->numStalls;
         default:
             break;
@@ -3814,7 +3819,7 @@ void TelemSetThreadGroupDefaultSort(TraceContexHandle ctx, tt_int32 groupID, tt_
     addToTickBuffer(pCtx, &data, sizeof(data), GetSizeNotArgData<decltype(data)>());
 }
 
-tt_int32 TelemGetCallStack(TraceContexHandle ctx, TtCallStack& stackOut)
+tt_int32 TelemGetCallStack(TraceContexHandle ctx, TtCallStack* pStackOut)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
@@ -3822,17 +3827,17 @@ tt_int32 TelemGetCallStack(TraceContexHandle ctx, TtCallStack& stackOut)
     }
 
 #if X_DEBUG
-    zero_object(stackOut.frames);
+    zero_object(pStackOut->frames);
 #endif // X_DEBUG
 
-    stackOut.num = pRtlWalkFrameChain(stackOut.frames, TtCallStack::MAX_FRAMES, 0);
+    pStackOut->num = pRtlWalkFrameChain(pStackOut->frames, __TELEM_CALLSTACK_MAX_FRAMES, 0);
 
     // don't think i'm going to cap the hash actually since if we cap it.
     // displaying the stack above that is pointless as it could be totally wrong.
     // so we might as well just collect less data.
-    stackOut.id = Hash::Fnv1aHash(stackOut.frames, sizeof(stackOut.frames[0]) * stackOut.num);
+    pStackOut->id = Hash::Fnv1aHash(pStackOut->frames, sizeof(pStackOut->frames[0]) * pStackOut->num);
 
-    return stackOut.id;
+    return pStackOut->id;
 }
 
 tt_int32 TelemSendCallStack(TraceContexHandle ctx, const TtCallStack* pStack)
@@ -3848,7 +3853,7 @@ tt_int32 TelemSendCallStack(TraceContexHandle ctx, const TtCallStack* pStack)
     }
 
     TtCallStack stack;
-    TelemGetCallStack(ctx, stack);
+    TelemGetCallStack(ctx, &stack);
     queueCallStack(pCtx, stack);
     return stack.id;
 }
@@ -3861,7 +3866,7 @@ tt_int32 TelemSendCallStackSkip(TraceContexHandle ctx, const TtCallStack* pStack
 
 // ----------- Zones -----------
 
-void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemEnter(TraceContexHandle ctx, const char* pFile, tt_int32 line, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = getThreadData(pCtx);
@@ -3876,7 +3881,8 @@ void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const cha
     auto& scopeData = pThreadData->zones[depth];
     scopeData.zone.start = getTicks(); // Moving this call to the bottom slows the function down a few ns.
     scopeData.zone.pFmtStr = pFmtString;
-    scopeData.zone.sourceInfo = sourceInfo;
+    scopeData.zone.sourceInfo.pFile = pFile;
+    scopeData.zone.sourceInfo.line = line;
 
     if (numArgs)
     {
@@ -3911,7 +3917,7 @@ void TelemLeave(TraceContexHandle ctx)
     queueZone(pCtx, pThreadData, depth);
 }
 
-void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minNanoSec, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemEnterEx(TraceContexHandle ctx, const char* pFile, tt_int32 line, tt_uint64* pMatchIdOut, tt_uint64 minNanoSec, const char* pFmtString, tt_int32 numArgs, ...)
 {
     // This is a copy of TelemEnter since can't pick up the va_args later unless we always pass them.
     auto* pCtx = handleToContext(ctx);
@@ -3922,7 +3928,7 @@ void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint
     }
 
     // only do the copy when enabled?
-    matchIdOut = minNanoSec;
+    *pMatchIdOut = minNanoSec;
 
     auto depth = pThreadData->stackDepth;
     ++pThreadData->stackDepth;
@@ -3930,7 +3936,8 @@ void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint
     auto& scopeData = pThreadData->zones[depth];
     scopeData.zone.start = getTicks();
     scopeData.zone.pFmtStr = pFmtString;
-    scopeData.zone.sourceInfo = sourceInfo;
+    scopeData.zone.sourceInfo.pFile = pFile;
+    scopeData.zone.sourceInfo.line = line;
 
     if (numArgs)
     {
@@ -4011,7 +4018,7 @@ void TelemSetLockName(TraceContexHandle ctx, const void* pPtr, const char* pFmtS
     }
 }
 
-void TelemTryLock(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemTryLock(TraceContexHandle ctx, const char* pFile, tt_int32 line, const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto ticks = getTicks();
     auto* pCtx = handleToContext(ctx);
@@ -4032,7 +4039,8 @@ void TelemTryLock(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const v
     auto& lock = pLock->lock;
     lock.start = ticks;
     lock.pFmtStr = pFmtString;
-    lock.sourceInfo = sourceInfo;
+    lock.sourceInfo.pFile = pFile;
+    lock.sourceInfo.line = line;
 
     if (numArgs)
     {
@@ -4049,7 +4057,7 @@ void TelemTryLock(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const v
     }
 }
 
-void TelemTryLockEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minNanoSec,
+void TelemTryLockEx(TraceContexHandle ctx, const char* pFile, tt_int32 line, tt_uint64& matchIdOut, tt_uint64 minNanoSec,
     const void* pPtr, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto ticks = getTicks();
@@ -4073,7 +4081,8 @@ void TelemTryLockEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_ui
     auto& lock = pLock->lock;
     lock.start = ticks;
     lock.pFmtStr = pFmtString;
-    lock.sourceInfo = sourceInfo;
+    lock.sourceInfo.pFile = pFile;
+    lock.sourceInfo.line = line;
 
     if (numArgs)
     {
@@ -4090,7 +4099,7 @@ void TelemTryLockEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_ui
     }
 }
 
-void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult::Enum result)
+void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult result)
 {
     auto ticks = getTicks();
     auto* pCtx = handleToContext(ctx);
@@ -4113,7 +4122,7 @@ void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult::Enum
     queueLockTry(pCtx, pThreadData, pPtr, pLock);
 }
 
-void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPtr, TtLockResult::Enum result)
+void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPtr, TtLockResult result)
 {
     auto ticks = getTicks();
     auto* pCtx = handleToContext(ctx);
@@ -4145,29 +4154,29 @@ void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPt
     queueLockTry(pCtx, pThreadData, pPtr, pLock);
 }
 
-void TelemSetLockState(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, TtLockState::Enum state)
+void TelemSetLockState(TraceContexHandle ctx, const char* pFile, tt_int32 line, const void* pPtr, TtLockState state)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
         return;
     }
 
-    queueLockState(pCtx, sourceInfo, pPtr, state);
+    queueLockState(pCtx, pFile, line, pPtr, state);
 }
 
-void TelemSignalLockCount(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const void* pPtr, tt_int32 count)
+void TelemSignalLockCount(TraceContexHandle ctx, const char* pFile, tt_int32 line, const void* pPtr, tt_int32 count)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
         return;
     }
 
-    queueLockCount(pCtx, sourceInfo, pPtr, count);
+    queueLockCount(pCtx, pFile, line, pPtr, count);
 }
 
 // ----------- Allocation stuff -----------
 
-void TelemAlloc(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr, tt_size allocSize, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemAlloc(TraceContexHandle ctx, const char* pFile, tt_int32 line, void* pPtr, tt_size allocSize, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
@@ -4180,7 +4189,8 @@ void TelemAlloc(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPt
     data.pPtr = pPtr;
     data.size = static_cast<tt_uint32>(allocSize);
     data.threadID = getThreadID();
-    data.sourceInfo = sourceInfo;
+    data.sourceInfo.pFile = pFile;
+    data.sourceInfo.line = line;
     data.pFmtStr = pFmtString;
 
     if (!numArgs)
@@ -4203,7 +4213,7 @@ void TelemAlloc(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPt
     }
 }
 
-void TelemFree(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr)
+void TelemFree(TraceContexHandle ctx, const char* pFile, tt_int32 line, void* pPtr)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
@@ -4218,14 +4228,15 @@ void TelemFree(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, void* pPtr
     data.time = getRelativeTicks(pCtx);
     data.pPtr = pPtr;
     data.threadID = getThreadID();
-    data.sourceInfo = sourceInfo;
+    data.sourceInfo.pFile = pFile;
+    data.sourceInfo.line = line;
 
     addToTickBuffer(pCtx, &data, sizeof(data), GetSizeNotArgData<decltype(data)>());
 }
 
 // ----------- Plot stuff -----------
 
-void TelemPlotF32(TraceContexHandle ctx, TtPlotType::Enum type, float value, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemPlotF32(TraceContexHandle ctx, TtPlotType type, float value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
@@ -4235,7 +4246,7 @@ void TelemPlotF32(TraceContexHandle ctx, TtPlotType::Enum type, float value, con
     QueueDataPlot data;
     data.type = QueueDataType::Plot;
     data.time = getRelativeTicks(pCtx);
-    data.value.plotType = type;
+    data.value.plotType = static_cast<tt_uint8>(type);
     data.value.valueType = TtPlotValueType::f32;
     data.value.f32 = value;
     data.pFmtStr = pFmtString;
@@ -4260,7 +4271,7 @@ void TelemPlotF32(TraceContexHandle ctx, TtPlotType::Enum type, float value, con
     }
 }
 
-void TelemPlotF64(TraceContexHandle ctx, TtPlotType::Enum type, double value, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemPlotF64(TraceContexHandle ctx, TtPlotType type, double value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
@@ -4270,7 +4281,7 @@ void TelemPlotF64(TraceContexHandle ctx, TtPlotType::Enum type, double value, co
     QueueDataPlot data;
     data.type = QueueDataType::Plot;
     data.time = getRelativeTicks(pCtx);
-    data.value.plotType = type;
+    data.value.plotType = static_cast<tt_uint8>(type);
     data.value.valueType = TtPlotValueType::f64;
     data.value.f64 = value;
     data.pFmtStr = pFmtString;
@@ -4295,7 +4306,7 @@ void TelemPlotF64(TraceContexHandle ctx, TtPlotType::Enum type, double value, co
     }
 }
 
-void TelemPlotI32(TraceContexHandle ctx, TtPlotType::Enum type, tt_int32 value, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemPlotI32(TraceContexHandle ctx, TtPlotType type, tt_int32 value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
@@ -4305,7 +4316,7 @@ void TelemPlotI32(TraceContexHandle ctx, TtPlotType::Enum type, tt_int32 value, 
     QueueDataPlot data;
     data.type = QueueDataType::Plot;
     data.time = getRelativeTicks(pCtx);
-    data.value.plotType = type;
+    data.value.plotType = static_cast<tt_uint8>(type);
     data.value.valueType = TtPlotValueType::Int32;
     data.value.int32 = value;
     data.pFmtStr = pFmtString;
@@ -4331,7 +4342,7 @@ void TelemPlotI32(TraceContexHandle ctx, TtPlotType::Enum type, tt_int32 value, 
     }
 }
 
-void TelemPlotI64(TraceContexHandle ctx, TtPlotType::Enum type, tt_int64 value, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemPlotI64(TraceContexHandle ctx, TtPlotType type, tt_int64 value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
@@ -4341,7 +4352,7 @@ void TelemPlotI64(TraceContexHandle ctx, TtPlotType::Enum type, tt_int64 value, 
     QueueDataPlot data;
     data.type = QueueDataType::Plot;
     data.time = getRelativeTicks(pCtx);
-    data.value.plotType = type;
+    data.value.plotType = static_cast<tt_uint8>(type);
     data.value.valueType = TtPlotValueType::Int64;
     data.value.int64 = value;
     data.pFmtStr = pFmtString;
@@ -4366,7 +4377,7 @@ void TelemPlotI64(TraceContexHandle ctx, TtPlotType::Enum type, tt_int64 value, 
     }
 }
 
-void TelemPlotU32(TraceContexHandle ctx, TtPlotType::Enum type, tt_uint32 value, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemPlotU32(TraceContexHandle ctx, TtPlotType type, tt_uint32 value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
@@ -4376,7 +4387,7 @@ void TelemPlotU32(TraceContexHandle ctx, TtPlotType::Enum type, tt_uint32 value,
     QueueDataPlot data;
     data.type = QueueDataType::Plot;
     data.time = getRelativeTicks(pCtx);
-    data.value.plotType = type;
+    data.value.plotType = static_cast<tt_uint8>(type);
     data.value.valueType = TtPlotValueType::UInt32;
     data.value.uint32 = value;
     data.pFmtStr = pFmtString;
@@ -4401,7 +4412,7 @@ void TelemPlotU32(TraceContexHandle ctx, TtPlotType::Enum type, tt_uint32 value,
     }
 }
 
-void TelemPlotU64(TraceContexHandle ctx, TtPlotType::Enum type, tt_uint64 value, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemPlotU64(TraceContexHandle ctx, TtPlotType type, tt_uint64 value, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
@@ -4411,7 +4422,7 @@ void TelemPlotU64(TraceContexHandle ctx, TtPlotType::Enum type, tt_uint64 value,
     QueueDataPlot data;
     data.type = QueueDataType::Plot;
     data.time = getRelativeTicks(pCtx);
-    data.value.plotType = type;
+    data.value.plotType = static_cast<tt_uint8>(type);
     data.value.valueType = TtPlotValueType::UInt64;
     data.value.uint64 = value;
     data.pFmtStr = pFmtString;
@@ -4439,7 +4450,7 @@ void TelemPlotU64(TraceContexHandle ctx, TtPlotType::Enum type, tt_uint64 value,
 // ----------- Message Stuff -----------
 
 
-void TelemMessage(TraceContexHandle ctx, TtMsgType::Enum type, const char* pFmtString, tt_int32 numArgs, ...)
+void TelemMessage(TraceContexHandle ctx, TtMsgFlags flags, const char* pFmtString, tt_int32 numArgs, ...)
 {
     auto* pCtx = handleToContext(ctx);
     if (!pCtx->isEnabled) {
@@ -4450,7 +4461,7 @@ void TelemMessage(TraceContexHandle ctx, TtMsgType::Enum type, const char* pFmtS
     data.type = QueueDataType::Message;
     data.time = getRelativeTicks(pCtx);
     data.pFmtStr = pFmtString;
-    data.logType = type;
+    data.flags = flags;
 
     if (!numArgs)
     {
