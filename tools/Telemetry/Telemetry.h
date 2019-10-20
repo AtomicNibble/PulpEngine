@@ -611,6 +611,32 @@ namespace telem
         tt_uint64 matchId_;
     };
 
+    class SpikeDetector
+    {
+    public:
+        SpikeDetector(TraceContexHandle ctx, const char* pMsg, float thresholdMS = 5) :
+            ctx_(ctx),
+            begin_(__TELEM_FUNC_NAME(TelemFastTime)()),
+            pMsg_(pMsg),
+            msThreshold_(thresholdMS)
+        {
+        }
+
+        ~SpikeDetector()
+        {
+            float time = __TELEM_FUNC_NAME(TelemFastTimeToMs)(ctx_, __TELEM_FUNC_NAME(TelemFastTime)() - begin_);
+            if (time >= msThreshold_) {
+                __TELEM_FUNC_NAME(TelemMessage)(ctx_, TtMsgFlagsSeverityError, "(spike)%s %.2fms", 2, pMsg_, time);
+            }
+        }
+
+    private:
+        TraceContexHandle ctx_;
+        tt_uint64 begin_;
+        const char* pMsg_;
+        float msThreshold_;
+    };
+
 
 } // namespace telem
 
