@@ -2019,7 +2019,7 @@ namespace
         }
 
         // no space,
-#if X_DEBUG && 0
+#if RUNTIME_CHECKED
         if (copySize > size) {
             ::DebugBreak();
         }
@@ -2027,7 +2027,7 @@ namespace
         if (offset + size > pCtx->tickBufCapacity) {
             ::DebugBreak();
         }
-#endif // X_DEBUG
+#endif // RUNTIME_CHECKED
 
         addToTickBufferFull(pCtx, pPtr, copySize, size);
     }
@@ -2117,22 +2117,22 @@ namespace
         tt_int32 copySize = sizeof(QueueDataBase) + (sizeof(stack.frames[0]) * (stack.num - 1));
         tt_int32 size = RoundUpToMultiple(copySize, static_cast<tt_int32>(64));
 
-#if X_DEBUG
+#if RUNTIME_CHECKED
         if (size > sizeof(data)) {
             ::DebugBreak();
         }
-#endif // X_DEBUG
+#endif // RUNTIME_CHECKED
 
         addToTickBuffer(pCtx, &data, copySize, size);
     }
 
     TELEM_INLINE void queueZone(TraceContext* pCtx, TraceThread* pThread, tt_int32 depth)
     {
-#if X_DEBUG
+#if RUNTIME_CHECKED
         if (depth < 0) {
             ::DebugBreak();
         }
-#endif // X_DEBUG
+#endif // RUNTIME_CHECKED
 
         const auto& scopeData = pThread->zones[depth];
         const bool hasArgData = scopeData.argDataSize;
@@ -2423,12 +2423,12 @@ namespace
         packet.lineNo = static_cast<tt_uint32>(pBuf->sourceInfo.line);
         packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile);
 
-#if X_DEBUG
+#if RUNTIME_CHECKED
         // Should not have any args.
         if (pBuf->argDataSize) {
             ::DebugBreak();
         }
-#endif // !TELEM_DEBUG
+#endif // !RUNTIME_CHECKED
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
 
@@ -2469,12 +2469,12 @@ namespace
         packet.lineNo = static_cast<tt_uint32>(pBuf->sourceInfo.line);
         packet.strIdxFile = GetStringId(pComp, pBuf->sourceInfo.pFile);
 
-#if X_DEBUG
+#if RUNTIME_CHECKED
         // Should not have any args.
         if (pBuf->argDataSize) {
             ::DebugBreak();
         }
-#endif // !TELEM_DEBUG
+#endif // !RUNTIME_CHECKED
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
         return GetSizeNotArgData<std::remove_pointer_t<decltype(pBuf)>>();
@@ -2787,20 +2787,20 @@ namespace
 
             bufIdx ^= 1;
 
-#if X_DEBUG
+#if RUNTIME_CHECKED
             // Make sure th other buffer was reading in the background.
             if (!isPending(bufIdx)) {
                 ::DebugBreak();
             }
-#endif // X_DEBUG
+#endif // RUNTIME_CHECKED
         }
 
-#if X_DEBUG
+#if RUNTIME_CHECKED
         // This one should be pending
         if (!isPending(bufIdx)) {
             ::DebugBreak();
         }
-#endif // X_DEBUG
+#endif // RUNTIME_CHECKED
 
         // finish off.
         if (isPending(bufIdx)) {
