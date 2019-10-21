@@ -2138,6 +2138,12 @@ namespace
         const auto& scopeData = pThread->zones[depth];
         const bool hasArgData = scopeData.argDataSize;
 
+#if RUNTIME_CHECKED
+        if (!scopeData.zone.pFmtStr) {
+            ::DebugBreak();
+        }
+#endif // RUNTIME_CHECKED
+
         QueueDataZone data;
         data.type = QueueDataType::Zone;
         data.argDataSize = static_cast<tt_uint8>(scopeData.argDataSize & 0xFF);
