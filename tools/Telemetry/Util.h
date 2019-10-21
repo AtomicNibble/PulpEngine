@@ -47,6 +47,20 @@ TELEM_INLINE void* AlignTop(void* ptr, tt_size alignment)
     return as_void;
 }
 
+TELEM_INLINE void* AlignBottom(void* ptr, size_t alignment)
+{
+    union
+    {
+        void* as_void;
+        uintptr_t as_uintptr_t;
+    };
+
+    const size_t mask = alignment - 1;
+    as_void = ptr;
+    as_uintptr_t &= ~mask;
+    return as_void;
+}
+
 template<typename T>
 TELEM_INLINE constexpr bool IsAligned(T value, unsigned int alignment, unsigned int offset)
 {
