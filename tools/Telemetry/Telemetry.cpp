@@ -776,6 +776,10 @@ namespace
     // This is padded to 64bit to make placing TraceThread data on it's own boundy more simple.
     TELEM_ALIGNED_SYMBOL(struct TraceContext, 64)
     {
+        bool IsOpen(void) const {
+            return socket != INV_SOCKET && fileHandle != TELEM_INVALID_HANDLE;
+        }
+
         tt_uint64 lastTick;
         tt_uint64 lastTickNano;
 
@@ -3017,7 +3021,7 @@ namespace
             }
 
             // If the socket is dead don't bother processing, but we need to keep flipping to prevent stall.
-            if (pCtx->socket == INV_SOCKET && pCtx->fileHandle == TELEM_INVALID_HANDLE) {
+            if (!pCtx->IsOpen()) {
                 continue;
             }
 
@@ -3276,7 +3280,7 @@ TtError TelemInitializeContext(TraceContexHandle* pOut, void* pArena, tt_size bu
     pCtx->lastTick = getTicks();
     pCtx->lastFlipTick = getTicks();
     pCtx->lastTickNano = gSysTimer.GetNano();
-    pCtx->isEnabled = true;
+    pCtx->isEnabled = false; // TmOpen will set enabled.
     pCtx->flags = 0;
     pCtx->connFlags = 0;
     pCtx->socket = INV_SOCKET;
@@ -3383,7 +3387,7 @@ void TelemSetIoFuncs(TraceContexHandle ctx, FileOpenFunc open, FileCloseFunc clo
     pCtx->pFileWrite = write;
 }
 
-TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pPath,
+TtError TelemOpenInternal(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pPath,
     TtConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS, TtConnectionFlags flags)
 {
     if (!isValidContext(ctx)) {
@@ -3571,6 +3575,21 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     return TtErrorOk;
 }
 
+TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pPath,
+    TtConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS, TtConnectionFlags flags)
+{
+    auto err = TelemOpenInternal(ctx, pAppName, pBuildInfo, pPath, conType, serverPort, timeoutMS, flags);
+    if (err != TtErrorOk) {
+        handleToContext(ctx)->isEnabled = false;
+    }
+    else {
+        handleToContext(ctx)->isEnabled = true;
+    }
+
+    return err;
+}
+
+
 tt_bool TelemClose(TraceContexHandle ctx)
 {
     auto* pCtx = handleToContext(ctx);
@@ -3662,8 +3681,10 @@ void TelemPause(TraceContexHandle ctx, tt_bool pause)
 
     bool enabled = !pause;
 
-    if (handleToContext(ctx)->isEnabled != enabled) {
-        handleToContext(ctx)->isEnabled = enabled;
+    auto* pCtx = handleToContext(ctx);
+    // if the contex is not open don't let them enable it.
+    if (pCtx->isEnabled != enabled && pCtx->IsOpen()) {
+        pCtx->isEnabled = enabled;
     }
 }
 
