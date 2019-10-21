@@ -165,6 +165,12 @@ typedef enum TtConnectionFlag
 
 typedef tt_uint32 TtConnectionFlags;
 
+typedef enum TtConnectionStatus
+{
+    Conencted,
+    Disconnected
+} TtConnectionStatus;
+
 typedef enum TtStat
 {
     TtStatNumStalls,
