@@ -192,7 +192,7 @@ public:
         cmdInsertPlot(con),
         cmdInsertPDB(con),
         cmdInsertCallstack(con),
-        stringMap(arena, 1024 * 64),
+        stringMap(arena, core::bitUtil::NextPowerOfTwo<size_t>(std::numeric_limits<uint16_t>::max())),
         indexMap(arena, std::numeric_limits<uint16_t>::max())
     {
         // std::fill(indexMap.begin(), indexMap.end(), std::numeric_limits<uint16_t>::max());
