@@ -14,7 +14,7 @@
 
 #define DBGHLP_DYNAMIC_LOAD 1
 #define PACKET_COMPRESSION 1
-#define RUNTIME_ZONE_WRITES 1
+#define RUNTIME_ZONES 1
 #define RUNTIME_ZONE_PDB_SEND 1
 #define RUNTIME_CHECKED 1
 
@@ -1153,10 +1153,10 @@ namespace
         }
 #endif // X_DEBUG
 
-#if RUNTIME_ZONE_WRITES
+#if RUNTIME_ZONES
         RuntimeZone nz;
         nz.start = getTicks();
-#endif // RUNTIME_ZONE_WRITES
+#endif // RUNTIME_ZONES
 
         // send some data...
 
@@ -1183,7 +1183,7 @@ namespace
             }
         }
 
-#if RUNTIME_ZONE_WRITES
+#if RUNTIME_ZONES
         nz.end = getTicks();
         auto& zones = *pCtx->pWriteZones;
         if (zones.num < WriteZones::NUM_ZONES) {
@@ -1192,7 +1192,7 @@ namespace
         else {
             writeLog(pCtx, TtMsgFlagsSeverityWarning, "Data write zone buffer is full");
         }
-#endif // RUNTIME_ZONE_WRITES
+#endif // RUNTIME_ZONES
     }
 
 #if PACKET_COMPRESSION 
@@ -1367,7 +1367,7 @@ namespace
 
         addToCompressionBufferNoFlush(pComp, &packet, sizeof(packet));
 
-#if RUNTIME_ZONE_WRITES
+#if RUNTIME_ZONES
         // we also add net zones here.
         {
             auto& writeZones = *pComp->pCtx->pWriteZones;
@@ -1393,7 +1393,7 @@ namespace
                 writeZones.num = 0;
             }
         }
-#endif // RUNTIME_ZONE_WRITES
+#endif // RUNTIME_ZONES
 
 #if RUNTIME_ZONE_PDB_SEND
         {
@@ -1414,7 +1414,7 @@ namespace
                 pdbZones.num = 0;
             }
         }
-#endif // RUNTIME_ZONE_WRITES
+#endif // RUNTIME_ZONES
 
 
 #else
