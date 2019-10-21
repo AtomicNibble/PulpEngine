@@ -778,7 +778,7 @@ namespace
     TELEM_ALIGNED_SYMBOL(struct TraceContext, 64)
     {
         bool IsOpen(void) const {
-            return socket != INV_SOCKET && fileHandle != TELEM_INVALID_HANDLE;
+            return socket != INV_SOCKET || fileHandle != TELEM_INVALID_HANDLE;
         }
 
         tt_uint64 lastTick;
