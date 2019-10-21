@@ -2018,13 +2018,13 @@ namespace
             return;
         }
 
-        // no space,
+        // no space
 #if RUNTIME_CHECKED
         if (copySize > size) {
             ::DebugBreak();
         }
 
-        if (offset + size > pCtx->tickBufCapacity) {
+        if (offset + size <= pCtx->tickBufCapacity) {
             ::DebugBreak();
         }
 #endif // RUNTIME_CHECKED
