@@ -3958,7 +3958,7 @@ void TelemEnterEx(TraceContexHandle ctx, const char* pFile, tt_int32 line, tt_ui
     auto* pCtx = handleToContext(ctx);
     auto* pThreadData = getThreadData(pCtx);
 
-    if (!pCtx->isEnabled | (pThreadData == nullptr)) {
+    if (!pCtx->isEnabled | (pThreadData == nullptr) | (pMatchIdOut == nullptr)) {
         return;
     }
 
