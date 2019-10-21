@@ -16,6 +16,7 @@
 #define PACKET_COMPRESSION 1
 #define RUNTIME_ZONE_WRITES 1
 #define RUNTIME_ZONE_PDB_SEND 1
+#define RUNTIME_CHECKED 1
 
 TELEM_DISABLE_WARNING(4091)
 #include <DbgHelp.h>
@@ -3899,10 +3900,21 @@ void TelemEnter(TraceContexHandle ctx, const char* pFile, tt_int32 line, const c
     }
 
     auto depth = pThreadData->stackDepth;
+
+#if RUNTIME_CHECKED
+    if (depth >= MAX_ZONE_DEPTH) {
+        ::DebugBreak();
+        return;
+    }
+#endif // RUNTIME_CHECKED
+
     ++pThreadData->stackDepth;
 
     auto& scopeData = pThreadData->zones[depth];
     scopeData.zone.start = getTicks(); // Moving this call to the bottom slows the function down a few ns.
+#if RUNTIME_CHECKED
+    scopeData.zone.end = 0;
+#endif // RUNTIME_CHECKED
     scopeData.zone.pFmtStr = pFmtString;
     scopeData.zone.sourceInfo.pFile = pFile;
     scopeData.zone.sourceInfo.line = line;
@@ -3954,10 +3966,21 @@ void TelemEnterEx(TraceContexHandle ctx, const char* pFile, tt_int32 line, tt_ui
     *pMatchIdOut = minNanoSec;
 
     auto depth = pThreadData->stackDepth;
+
+#if RUNTIME_CHECKED
+    if (depth >= MAX_ZONE_DEPTH) {
+        ::DebugBreak();
+        return;
+    }
+#endif // RUNTIME_CHECKED
+
     ++pThreadData->stackDepth;
 
     auto& scopeData = pThreadData->zones[depth];
     scopeData.zone.start = getTicks();
+#if RUNTIME_CHECKED
+    scopeData.zone.end = 0;
+#endif // RUNTIME_CHECKED
     scopeData.zone.pFmtStr = pFmtString;
     scopeData.zone.sourceInfo.pFile = pFile;
     scopeData.zone.sourceInfo.line = line;
