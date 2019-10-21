@@ -63,6 +63,7 @@ FixedHashTableBase<Key, Value, Hash, KeyEqual>::FixedHashTableBase(uint8_t* pDat
     size_(0)
 {
     X_ASSERT(bitUtil::IsPowerOfTwo(maxItems), "maxItems must be pow2")(maxItems);
+    X_ASSERT(maxItems > 0, "maxItems must not be empty")(maxItems);
 
     // set to -1
     std::memset(emptyEntry_, -1, sizeof(emptyEntry_));
