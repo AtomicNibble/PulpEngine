@@ -2208,13 +2208,13 @@ namespace
 
         DataPacketZone packet;
         packet.type = DataStreamType::Zone;
-        packet.stackDepth = static_cast<tt_uint8>(pBuf->stackDepth);
         packet.threadID = pBuf->threadID;
         packet.start = toRelativeTicks(pComp->pCtx, zone.start);
         packet.end = toRelativeTicks(pComp->pCtx, zone.end);
+        packet.lineNo = static_cast<tt_uint32>(zone.sourceInfo.line);
         packet.strIdxFile = GetStringId(pComp, zone.sourceInfo.pFile);
         packet.strIdxFmt = GetStringId(pComp, zone.pFmtStr);
-        packet.lineNo = static_cast<tt_uint32>(zone.sourceInfo.line);
+        packet.stackDepth = static_cast<tt_uint8>(pBuf->stackDepth);
         packet.argDataSize = pBuf->argDataSize;
 
         const auto dataSize = GetDataSize<std::remove_pointer_t<decltype(pBuf)>>(pBuf->argDataSize);
