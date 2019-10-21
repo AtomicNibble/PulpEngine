@@ -1911,6 +1911,12 @@ namespace
     {
         ttZoneFilterd(contextToHandle(pCtx), 100, "FlipBuffers");
 
+        // If the buffer is empty no point flip?
+        // we can't wait for the background thread unless we flip also.
+        if (pCtx->tickBuffers[pCtx->activeTickBufIdx].bufOffset == 0) {
+            return;
+        }
+
         // wait for the background thread to finish process that last buffer.
         // TODO: maybe come up with a fast path for when we don't need to wait.
         // check if the signal has a userspace atomic it checks before waiting.
