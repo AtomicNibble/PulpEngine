@@ -3330,7 +3330,7 @@ TtError TelemInitializeContext(TraceContexHandle* pOut, void* pArena, tt_size bu
     pCtx->lastTick = getTicks();
     pCtx->lastFlipTick = getTicks();
     pCtx->lastTickNano = gSysTimer.GetNano();
-    pCtx->isEnabled = false; // TmOpen will set enabled.
+    pCtx->isEnabled = true; // we make this enabled so items can be added before we open a connection.
     pCtx->flags = 0;
     pCtx->connFlags = 0;
     pCtx->socket = INV_SOCKET;
