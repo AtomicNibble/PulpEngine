@@ -2001,7 +2001,7 @@ namespace
     // But keeps this logic outside the hot functio.n
     TELEM_NO_INLINE void addToTickBufferFull(TraceContext* pCtx, const void* pPtr, tt_int32 copySize, tt_int32 size)
     {
-        // We  don't pass force so that if multiple threads end up in here
+        // We don't pass force so that if multiple threads end up in here
         // the buffer is only flipped if actually running out of space still.
         // Prevents multiple flips.
         flipBuffer(pCtx, true, false);
