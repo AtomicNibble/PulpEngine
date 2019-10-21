@@ -3359,8 +3359,6 @@ void TelemShutdownContext(TraceContexHandle ctx)
 
     pCtx->shutDownFlag = 1;
 
-    _ReadWriteBarrier();
-
     ::SetEvent(pCtx->hSignal_);
 
     if (::WaitForSingleObject(pCtx->hThread_, INFINITE) == WAIT_FAILED) {
