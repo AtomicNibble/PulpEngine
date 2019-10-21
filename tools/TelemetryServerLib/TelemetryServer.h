@@ -193,7 +193,7 @@ public:
         cmdInsertPDB(con),
         cmdInsertCallstack(con),
         stringMap(arena, 1024 * 64),
-        indexMap(arena, 1024 * 8)
+        indexMap(arena, std::numeric_limits<uint16_t>::max())
     {
         // std::fill(indexMap.begin(), indexMap.end(), std::numeric_limits<uint16_t>::max());
     }
