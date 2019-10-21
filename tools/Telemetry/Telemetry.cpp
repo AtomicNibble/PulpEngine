@@ -17,6 +17,7 @@
 #define RUNTIME_ZONES 1
 #define RUNTIME_ZONE_PDB_SEND 1
 #define RUNTIME_CHECKED 1
+#define BOUNDS_CHECKED 1
 
 TELEM_DISABLE_WARNING(4091)
 #include <DbgHelp.h>
@@ -3234,13 +3235,49 @@ TtError TelemInitializeContext(TraceContexHandle* pOut, void* pArena, tt_size bu
 
     *pOut = INVALID_TRACE_CONTEX;
 
+#if BOUNDS_CHECKED
+    {
+        // i want to add some protected pages in for checked builds.
+        SYSTEM_INFO sysInfo;
+        ::GetSystemInfo(&sysInfo);
+
+        const tt_size pageSize = sysInfo.dwPageSize;
+        if (bufLen < pageSize * 4) {
+            return TtErrorArenaTooSmall;
+        }
+
+        auto* pFirstPage = AlignTop(pArena, pageSize);
+        auto* pLastPage = AlignBottom(reinterpret_cast<tt_uint8*>(pArena) + (bufLen - pageSize), pageSize);
+
+        auto startOffset = reinterpret_cast<tt_uintptr>(pFirstPage) - reinterpret_cast<tt_uintptr>(pArena);
+        auto endOffset = (reinterpret_cast<tt_uintptr>(pArena) + bufLen) - reinterpret_cast<tt_uintptr>(pLastPage);
+
+        DWORD oldProtect;
+        if (!::VirtualProtect(pFirstPage, pageSize, PAGE_NOACCESS, &oldProtect)) {
+            return TtErrorError;
+        }
+
+        if (!::VirtualProtect(pLastPage, pageSize, PAGE_NOACCESS, &oldProtect)) {
+            return TtErrorError;
+        }
+
+        auto startSize = (startOffset + pageSize);
+        auto toalSize = startSize + endOffset;
+
+        bufLen -= toalSize;
+        pArena = reinterpret_cast<tt_uint8*>(pArena) + startSize;
+    }
+#endif // BOUNDS_CHECKED
+
     const auto* pEnd = reinterpret_cast<tt_uint8*>(pArena) + bufLen;
 
     // need to align upto 64bytes.
     auto* pBuf = AlignTop(pArena, 64);
-    const tt_uintptr alignmentSize = reinterpret_cast<tt_uintptr>(pBuf) - reinterpret_cast<tt_uintptr>(pArena);
 
-    bufLen -= alignmentSize;
+    {
+        const tt_uintptr alignmentSize = reinterpret_cast<tt_uintptr>(pBuf) - reinterpret_cast<tt_uintptr>(pArena);
+        bufLen -= alignmentSize;
+    }
 
     // send packets this size?
     constexpr tt_size contexSize = sizeof(TraceContext);
