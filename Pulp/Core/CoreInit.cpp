@@ -371,7 +371,7 @@ bool XCore::Init(CoreInitParams& startupParams)
 
         // i need to make this from something.
         const size_t telemBufSize = 1024 * 1024 * 4;
-        static uint8_t telemBuf[telemBufSize];
+        alignas(64) static uint8_t telemBuf[telemBufSize];
 
         ttInitializeContext(&gEnv->ctx, telemBuf, sizeof(telemBuf));
     }
