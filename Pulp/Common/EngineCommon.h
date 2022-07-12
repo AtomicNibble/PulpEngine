@@ -15,6 +15,7 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include <limits>
 #include <array>
 #include <charconv> // TODO: try remove? (used by stringUtil)
+#include <algorithm>
 
 // Telem
 #define TTELEMETRY_ENABLED 1

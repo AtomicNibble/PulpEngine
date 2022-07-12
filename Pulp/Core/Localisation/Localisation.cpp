@@ -2,7 +2,6 @@
 #include "Localisation.h"
 
 #include <String/Json.h>
-
 #include <IFileSys.h>
 
 X_NAMESPACE_BEGIN(locale)
@@ -80,7 +79,7 @@ bool Localisation::loadDict(core::Path<char>& path)
             return false;
         }
 
-        std::string_view name(p.name.GetString(), p.name.GetStringLength());
+        core::string_view name(p.name.GetString(), p.name.GetStringLength());
         core::StrHash hash(name.data(), name.length());
         core::string val(p.value.GetString(), p.value.GetStringLength());
 

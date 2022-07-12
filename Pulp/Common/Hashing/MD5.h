@@ -4,6 +4,7 @@
 #define X_HASH_MD5_H_
 
 #include "Digest.h"
+#include <string>
 
 X_NAMESPACE_BEGIN(core)
 

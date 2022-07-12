@@ -556,6 +556,8 @@ extern TelemetryAPI __gTelemApi;
 
 #ifdef __cplusplus
 
+#include  <utility>
+
 namespace telem
 {
     static const tt_int32 DEFAULT_PORT = 8001;
@@ -580,7 +582,7 @@ namespace telem
         inline ScopedZone(TraceContexHandle ctx, const char* pFile, tt_int32 line, const char* pFormat, Args&& ... args) :
             ctx_(ctx)
         {
-            const std::size_t num = sizeof...(Args);
+            const tt_int32 num = sizeof...(Args);
             __TELEM_FUNC_NAME(TelemEnter)(ctx, pFile, line, pFormat, num, std::forward<Args>(args) ...);
         }
 
@@ -604,7 +606,7 @@ namespace telem
         inline ScopedZoneFilterd(TraceContexHandle ctx, const char* pFile, tt_int32 line, tt_uint64 minNanoSec, const char* pFormat, Args&& ... args) :
             ctx_(ctx)
         {
-            const std::size_t num = sizeof...(Args);
+            const tt_int32 num = sizeof...(Args);
             __TELEM_FUNC_NAME(TelemEnterEx)(ctx, pFile, line, matchId_, minNanoSec, pFormat, num, std::forward<Args>(args) ...);
         }
 

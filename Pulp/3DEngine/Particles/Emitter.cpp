@@ -365,7 +365,7 @@ namespace fx
 
             auto& desc = stage.getStageDesc();
 
-            const auto postionType = desc.postionType;
+            // const auto postionType = desc.postionType;
 
             if (desc.type == StageType::OrientedSprite || desc.type == StageType::BillboardSprite || desc.type == StageType::Tail) {
                 Quatf q = trans_.quat;

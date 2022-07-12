@@ -5,6 +5,8 @@
 
 #include "Digest.h"
 
+#include <string>
+
 X_NAMESPACE_BEGIN(core)
 
 namespace Hash

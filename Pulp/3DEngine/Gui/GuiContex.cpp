@@ -579,7 +579,7 @@ namespace gui
         auto pos = pWindow->dc.currentPos;
         auto size = calcItemSize(Vec2f::zero(), labelSize + style_.framePadding * 2.f);
 
-        const float arrowSize = size.y;
+        // const float arrowSize = size.y;
 
         Rectf r(pos, pos + size);
 

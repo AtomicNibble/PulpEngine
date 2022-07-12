@@ -1,8 +1,9 @@
 #pragma once
 
 #include <Util\EnumMacros.h>
-
 #include <Traits\FunctionTraits.h>
+
+#include <string>
 
 struct sqlite3;
 struct sqlite3_stmt;

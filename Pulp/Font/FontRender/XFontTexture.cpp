@@ -223,8 +223,8 @@ bool XFontTexture::CreateSlotList(int32_t listSize)
 
     slotList_.resize(listSize);
 
-    const float xbias = (0.5f / static_cast<float>(width_));
-    const float ybias = (0.5f / static_cast<float>(height_));
+    // const float xbias = (0.5f / static_cast<float>(width_));
+    // const float ybias = (0.5f / static_cast<float>(height_));
 
     for (int32_t i = 0; i < listSize; i++) {
         XTextureSlot& slot = slotList_[i];
