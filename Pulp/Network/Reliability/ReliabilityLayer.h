@@ -40,7 +40,7 @@ public:
 
 public:
     SplitPacketId splitId;
-    SplitPacketIndex packetsRecived;
+    SplitPacketIndex packetsReceived;
     core::TimeVal lastUpdate;
     PacketArr packets;
 };
@@ -75,7 +75,7 @@ public:
     bool isOrderedOrSequenced(void) const;
     bool isSequenced(void) const;
     bool hasSplitPacket(void) const;
-    size_t getHeaderLengthBits(void) const; // returns number of bits needed to store this header. it's diffrent depending on priority types etc.
+    size_t getHeaderLengthBits(void) const; // returns number of bits needed to store this header. it's different depending on priority types etc.
 
     void writeToBitStream(core::FixedBitStreamBase& bs) const;
     bool fromBitStream(core::FixedBitStreamBase& bs);
@@ -200,7 +200,7 @@ class ReliabilityLayer
     typedef core::Fifo<ReliablePacket*> PacketQeue;
     typedef core::Array<SplitPacketChannel*> SplitPacketChannelArr;
     typedef core::Array<ReliablePacket*> RelPacketArr;
-    typedef core::Array<int32_t> FrameboundryArr;
+    typedef core::Array<int32_t> FrameboundaryArr;
     typedef core::PriorityQueue<DelayedPacket, core::Array<DelayedPacket>, std::greater<>> OrderedDelaysPacketQueue;
 
     typedef uint64_t WeightType;
@@ -264,7 +264,7 @@ public:
         core::TimeVal time);
 
     // pop any packets that have arrived.
-    bool recive(PacketData& dataOut);
+    bool receive(PacketData& dataOut);
 
     void getStatistics(NetStatistics& stats);
     void getStatistics(NetStatistics& stats) const;
@@ -282,7 +282,7 @@ private:
 private:
     ProcessResult::Enum prcoessIncomingPacket(ReliablePacket*& pPacketInOut, core::TimeVal time);
     void ignorePacket(ReliablePacket* pPacket, core::TimeVal time);
-    void addPacketToRecivedQueue(ReliablePacket* pPacket, core::TimeVal time);
+    void addPacketToReceivedQueue(ReliablePacket* pPacket, core::TimeVal time);
 
 private:
     X_INLINE void addAck(DataGramSequenceNumber messageNumber);
@@ -308,7 +308,7 @@ private:
     bool splitPacket(ReliablePacket* pPacket);
     void freeSplitPacketChannel(SplitPacketChannel* pSPC);
 
-    // recived split packets.
+    // received split packets.
     ReliablePacket* addIncomingSplitPacket(ReliablePacket* pPacket, core::TimeVal time);
 
 private:
@@ -354,11 +354,11 @@ private:
     OrderedPacketQueues orderingQueues_;       // used for storing out of order packets.
 
     PacketQeue outGoingPackets_;
-    PacketQeue recivedPackets_;
+    PacketQeue receivedPackets_;
     DataGramHistoryQeue dataGramHistory_;
     DataGramSequenceNumber dataGramHistoryPopCnt_;
-    DataGramSequenceNumber recivedPacketBaseIdx_; // the number we are expecting and
-    BoolQeue recivedPacketQueue_;
+    DataGramSequenceNumber receivedPacketBaseIdx_; // the number we are expecting and
+    BoolQeue receivedPacketQueue_;
 
     DataGramNumberRangeList incomingAcks_;
     DataGramNumberRangeList naks_;
@@ -371,7 +371,7 @@ private:
 
     // per udate buffers, here to keep bufferes around.
     RelPacketArr packetsThisFrame_;
-    FrameboundryArr packetsThisFrameBoundaries_;
+    FrameboundaryArr packetsThisFrameBoundaries_;
 
     bool connectionDead_;
     bool _pad[3];

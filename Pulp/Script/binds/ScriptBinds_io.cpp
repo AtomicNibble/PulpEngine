@@ -227,7 +227,7 @@ int XBinds_Io_File::seek(IFunctionHandler* pH)
     }
 
     // if random access is not set, file system will print error.
-    // may add a check here, and handle it diffrently.
+    // may add a check here, and handle it differently.
     pFile->seek(offset, mode);
 
     return pH->endFunction();

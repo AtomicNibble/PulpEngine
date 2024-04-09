@@ -33,7 +33,7 @@ namespace atomic
 
 #if X_64
 
-        /// Template specialization for 8-byte types.
+        // Template specialization for 8-byte types.
         template<>
         struct Implementation<8u>
         {
@@ -80,7 +80,7 @@ namespace atomic
         };
 #endif // !X_64
 
-        /// Template specialization for 4-byte types.
+        // Template specialization for 4-byte types.
         template<>
         struct Implementation<4u>
         {
@@ -150,7 +150,7 @@ namespace atomic
             }
         };
 
-        /// Template specialization for 2-byte types.
+        // Template specialization for 2-byte types.
         template<>
         struct Implementation<2u>
         {

@@ -575,10 +575,10 @@ bool SymResolver::getSymInfoFromPDB(core::Path<>& path, SymInfo& info)
     };
 
     // Make this bit more simple and only care about first page
-    // think it's very unlikley page size ever be less than 32bytes.
-    // be suprised if it was ever not 4096.
+    // think it's very unlikely page size ever be less than 32bytes.
+    // be surprised if it was ever not 4096.
     if (sizeof(PDBVersionInfo) > hdr.pageSize) {
-        X_ERROR("TelemSym", "Unsupported PDB pagesize");
+        X_ERROR("TelemSym", "Unsupported PDB pagesize %" PRIu32, hdr.pageSize);
         return false;
     }
 

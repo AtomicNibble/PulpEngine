@@ -16,7 +16,7 @@ class LoggerConsoleWritePolicy
 public:
     explicit LoggerConsoleWritePolicy(const Console& console);
 
-    /// Initializes a custom color table for the console.
+    // Initializes a custom color table for the console.
     void Init(void);
     void Exit(void);
 

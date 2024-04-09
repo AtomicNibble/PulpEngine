@@ -191,13 +191,13 @@ public:
     const MatchParameters& getMatchParams(void) const X_FINAL;
     bool getPingInfo(SystemHandle systemHandle, PingInfo& info) const X_FINAL;
 
-    Vec2f drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const X_FINAL;
+    Vec2f drawDebug(Vec2f base, engine::IPrimitiveContext* pPrim) const X_FINAL;
 
 private:
     ConnectionAttemptResult::Enum connectToPeer(LobbyType::Enum type, SystemAddress sa) X_FINAL;
     void closeConnection(LobbyType::Enum type, SystemHandle systemHandle) X_FINAL;
     void onLostConnectionToHost(LobbyType::Enum type) X_FINAL;
-    void onReciveSnapShot(SnapShot&& snap) X_FINAL;
+    void onReceiveSnapShot(SnapShot&& snap) X_FINAL;
     void connectAndMoveToLobby(LobbyType::Enum type, SystemAddress sa) X_FINAL;
     void peerJoinedLobby(LobbyType::Enum type, SystemHandle handle) X_FINAL;
     void leaveGameLobby(void) X_FINAL;
@@ -261,7 +261,7 @@ private:
 
     // Snapshot - reciving
     int32_t numSnapsReceived_;
-    SnapShotRingBuffer recivedSnaps_;
+    SnapShotRingBuffer receivedSnaps_;
 
     SnapTime snapTime_;
     SnapTime snapRecvTime_;

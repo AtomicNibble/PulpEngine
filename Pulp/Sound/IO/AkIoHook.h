@@ -34,7 +34,7 @@ public:
 
     // IAkIOHookDeferred
 
-    /// Reads data from a file (asynchronous).
+    // Reads data from a file (asynchronous).
     AKRESULT Read(AkFileDesc& fileDesc, const AkIoHeuristics& heuristics, // Heuristics for this data transfer.
         AkAsyncIOTransferInfo& transferInfo                               // Asynchronous data transfer info.
         ) X_OVERRIDE;

@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(render)
 RenderVars::RenderVars() :
     pNativeRes_(nullptr)
 {
-    varsRegisterd_ = false;
+    varsRegistered_ = false;
 
     // defaults
     debugLayer_ = 0; // the debug override is not done here, otherwise it would not override config values.
@@ -18,7 +18,7 @@ RenderVars::RenderVars() :
 
 void RenderVars::registerVars(void)
 {
-    X_ASSERT(!varsRegisterd_, "Vars already init")(varsRegisterd_);
+    X_ASSERT(!varsRegistered_, "Vars already init")(varsRegistered_);
 
     ADD_CVAR_REF("r_d3d_debug_layer", debugLayer_, debugLayer_, 0, 1, core::VarFlag::RENDERER | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
         "Enable d3d debug layer");
@@ -29,7 +29,7 @@ void RenderVars::registerVars(void)
     pNativeRes_ = ADD_CVAR_STRING("r_native_res", "<unset>", core::VarFlag::RENDERER | core::VarFlag::READONLY,
         "The window render resolution");
 
-    varsRegisterd_ = true;
+    varsRegistered_ = true;
 }
 
 void RenderVars::setNativeRes(const Vec2i& res)

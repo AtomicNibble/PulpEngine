@@ -7,17 +7,17 @@ X_NAMESPACE_BEGIN(core)
 
 class CpuInfo
 {
-    /// The maximum number of caches per cache level (1, 2, 3) that can be handled.
+    // The maximum number of caches per cache level (1, 2, 3) that can be handled.
     static const size_t MAX_CACHE_COUNT = 64;
 
 public:
-    /// From  http://msdn.microsoft.com/en-us/library/hskdteyh%28v=vs.100%29.aspx
+    // From  http://msdn.microsoft.com/en-us/library/hskdteyh%28v=vs.100%29.aspx
     union CpuID
     {
-        /// The type expected by the <tt>__cpuid</tt> intrinsics that aliases with the individual info structs.
+        // The type expected by the <tt>__cpuid</tt> intrinsics that aliases with the individual info structs.
         int as_array[4];
 
-        /// Internal class representing general information (info type 0).
+        // Internal class representing general information (info type 0).
         struct Info0
         {
             struct EAX
@@ -46,7 +46,7 @@ public:
             X_ENSURE_SIZE(EDX, 4);
         };
 
-        /// Internal class representing general information (info type 1).
+        // Internal class representing general information (info type 1).
         struct Info1
         {
             struct EAX
@@ -143,7 +143,7 @@ public:
             X_ENSURE_SIZE(EDX, 4);
         };
 
-        /// Internal class representing extended information 0 (extended info type 0).
+        // Internal class representing extended information 0 (extended info type 0).
         struct InfoEx0
         {
             struct EAX
@@ -172,7 +172,7 @@ public:
             X_ENSURE_SIZE(EDX, 4);
         };
 
-        /// Internal class representing extended information 1 (extended info type 1).
+        // Internal class representing extended information 1 (extended info type 1).
         struct InfoEx1
         {
             struct EAX
@@ -240,7 +240,7 @@ public:
 
     typedef PROCESSOR_CACHE_TYPE CacheType;
 
-    /// Holds information about a particular cache.
+    // Holds information about a particular cache.
     struct CacheInfo
     {
         uint32_t size_;
@@ -250,49 +250,49 @@ public:
     };
 
 public:
-    /// Gathers information about the CPU using the CPUID instruction.
+    // Gathers information about the CPU using the CPUID instruction.
     CpuInfo(void);
 
-    /// Returns the CPU name.
+    // Returns the CPU name.
     X_INLINE const char* GetCpuName(void) const;
 
-    /// Returns the CPU brand.
+    // Returns the CPU brand.
     X_INLINE const char* GetCpuVendor(void) const;
 
-    /// Returns the number of available cores.
+    // Returns the number of available cores.
     X_INLINE uint32_t GetCoreCount(void) const;
 
-    /// Returns the number of logical processors.
+    // Returns the number of logical processors.
     X_INLINE uint32_t GetLogicalProcessorCount(void) const;
 
-    /// Returns general CPU information.
+    // Returns general CPU information.
     X_INLINE const CpuID::Info0& GetInfoType0(void) const;
 
-    /// Returns general CPU information.
+    // Returns general CPU information.
     X_INLINE const CpuID::Info1& GetInfoType1(void) const;
 
-    /// Returns extended CPU information.
+    // Returns extended CPU information.
     X_INLINE const CpuID::InfoEx0& GetExtendedInfoType0(void) const;
 
-    /// Returns extended CPU information.
+    // Returns extended CPU information.
     X_INLINE const CpuID::InfoEx1& GetExtendedInfoType1(void) const;
 
-    /// Returns the number of L1 caches present.
+    // Returns the number of L1 caches present.
     X_INLINE uint32_t GetL1CacheCount(void) const;
 
-    /// Returns the number of L2 caches present.
+    // Returns the number of L2 caches present.
     X_INLINE uint32_t GetL2CacheCount(void) const;
 
-    /// Returns the number of L3 caches present.
+    // Returns the number of L3 caches present.
     X_INLINE uint32_t GetL3CacheCount(void) const;
 
-    /// Returns the i-th L1 cache info.
+    // Returns the i-th L1 cache info.
     X_INLINE const CacheInfo& GetL1CacheInfo(unsigned int i) const;
 
-    /// Returns the i-th L2 cache info.
+    // Returns the i-th L2 cache info.
     X_INLINE const CacheInfo& GetL2CacheInfo(unsigned int i) const;
 
-    /// Returns the i-th L3 cache info.
+    // Returns the i-th L3 cache info.
     X_INLINE const CacheInfo& GetL3CacheInfo(unsigned int i) const;
 
 private:

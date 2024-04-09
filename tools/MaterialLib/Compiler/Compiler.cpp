@@ -84,10 +84,10 @@ bool MaterialCompiler::loadFromJson(core::string& str)
         return false;
     }
 
-    // so now that we have a tech def you fucking TWAT!
+    // so now that we have a tech def
     // we know all the techs this material supports.
     // and we also know what extra params we need to include in the material for sending to const buffer.
-    // we also know the permatation for the shader that's been used / features so we could compile it?
+    // we also know the permutation for the shader that's been used / features so we could compile it?
     // or hold our heads been our legs and hope it compiles itself magically.
 
     // so we must now iterate the params and make sure they are set.
@@ -149,7 +149,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
                     std::fill(&p.val[1], &p.val[3], p.val[0]);
                     break;
                 case ParamType::Color: {
-                    // this is space seperated floats. "1 1 1 1"
+                    // this is space separated floats. "1 1 1 1"
                     const char* pEnd = nullptr;
                     // TODO: use StringToFloat taking begin / end with a end return
                     p.val[0] = core::strUtil::StringToFloat(pValue, &pEnd);
@@ -250,7 +250,6 @@ bool MaterialCompiler::loadFromJson(core::string& str)
     }
 
     // tilling shit.
-    // how many goats for a given N pickles
     const char* pTilingWidth = d["tilingWidth"].GetString();
     const char* pTilingHeight = d["tilingHeight"].GetString();
 
@@ -290,7 +289,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 
     std::array<std::pair<const char*, MaterialFlag::Enum>, 16> flags = {{
         {"f_nodraw", MaterialFlag::NODRAW},
-        {"f_editorvisible", MaterialFlag::EDITOR_VISABLE},
+        {"f_editorvisible", MaterialFlag::EDITOR_VISIBLE},
         {"f_solid", MaterialFlag::SOLID},
         {"f_structual", MaterialFlag::STRUCTURAL},
         {"f_detail", MaterialFlag::DETAIL},

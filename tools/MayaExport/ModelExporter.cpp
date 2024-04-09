@@ -234,14 +234,14 @@ MStatus ModelExporter::convert(const MArgList& args)
             }
 
             int32_t assetId, modId;
-            status = maya::AssetDB::Get()->AssetExsists(maya::AssetDB::AssetType::MODEL, getName(), &assetId, &modId);
+            status = maya::AssetDB::Get()->AssetExists(maya::AssetDB::AssetType::MODEL, getName(), &assetId, &modId);
             if (!status) {
                 X_ERROR("Model", "Failed to get meta from server");
                 return status;
             }
 
             if (assetId == assetDb::INVALID_ASSET_ID || modId == assetDb::INVALID_MOD_ID) {
-                X_ERROR("Model", "Asset is not registerd with server");
+                X_ERROR("Model", "Asset is not registered with server");
                 return MS::kFailure;
             }
 
@@ -270,12 +270,12 @@ MStatus ModelExporter::convert(const MArgList& args)
                 core::Compression::Compressor<core::Compression::LZ4> comp;
 
                 if (!comp.deflate(g_arena, rawModel, compressed, core::Compression::CompressLevel::HIGH)) {
-                    X_ERROR("Model", "Failed to defalte raw model");
+                    X_ERROR("Model", "Failed to deflate raw model");
                     return MS::kFailure;
                 }
                 else {
                     core::HumanSize::Str sizeStr, sizeStr2;
-                    X_LOG0("Model", "Defalated %s -> %s",
+                    X_LOG0("Model", "Deflated %s -> %s",
                         core::HumanSize::toString(sizeStr, rawModel.size()),
                         core::HumanSize::toString(sizeStr2, compressed.size()));
                 }

@@ -1,6 +1,6 @@
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 X_INLINE void* GrowingGenericAllocator::allocate(size_t size, size_t alignment, size_t offset)
 {
     // defer small allocations to the micro allocator, and use the block allocator for the rest
@@ -24,8 +24,8 @@ X_INLINE void* GrowingGenericAllocator::allocate(size_t size, size_t alignment, 
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 X_INLINE void GrowingGenericAllocator::free(void* ptr)
 {
     // we need to figure out which allocator made the allocation in order to free it. asking the micro allocator
@@ -43,8 +43,8 @@ X_INLINE void GrowingGenericAllocator::free(void* ptr)
 #endif
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 X_INLINE void GrowingGenericAllocator::free(void* ptr, size_t size)
 {
     if (microAllocator_.containsAllocation(ptr, size)) {
@@ -59,8 +59,8 @@ X_INLINE void GrowingGenericAllocator::free(void* ptr, size_t size)
 #endif
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 X_INLINE size_t GrowingGenericAllocator::getSize(void* ptr) const
 {
     size_t size;
@@ -72,8 +72,8 @@ X_INLINE size_t GrowingGenericAllocator::getSize(void* ptr) const
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 X_INLINE size_t GrowingGenericAllocator::usableSize(void* ptr) const
 {
     if (microAllocator_.containsAllocation(ptr)) {

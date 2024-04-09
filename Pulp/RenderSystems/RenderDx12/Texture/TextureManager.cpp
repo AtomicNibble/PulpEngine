@@ -109,7 +109,7 @@ Texture* TextureManager::createTexture(core::string_view nickName, Vec2i dim,
 
         pTexRes->addReference();
 
-        X_WARNING("Texture", "Created texture with matching name of exsisting texture, returning original: \"%.*s\"", nickName.length(), nickName.data());
+        X_WARNING("Texture", "Created texture with matching name of existing texture, returning original: \"%.*s\"", nickName.length(), nickName.data());
         if (pInitialData) {
             // update?
         }
@@ -174,7 +174,7 @@ Texture* TextureManager::createPixelBuffer(core::string_view nickName, Vec2i dim
         threadPolicy.Leave();
 
         // do we want to allow ref counted pixelBuffers?
-        X_WARNING("TexMan", "Pixel buffer already exsists: \"%.*s\"", nickName.length(), nickName.data());
+        X_WARNING("TexMan", "Pixel buffer already exists: \"%.*s\"", nickName.length(), nickName.data());
         pTexRes->addReference();
         return pTexRes;
     }

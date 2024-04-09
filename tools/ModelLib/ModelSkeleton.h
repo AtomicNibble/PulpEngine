@@ -25,10 +25,10 @@ public:
 
     void dumpToLog(void) const;
 
-    bool LoadCompiledSkelton(const core::Path<char>& path);
+    bool LoadCompiledSkeleton(const core::Path<char>& path);
 
-    bool LoadRawModelSkelton(const core::Path<char>& path);
-    bool LoadRawModelSkelton(const core::Array<uint8_t>& data);
+    bool LoadRawModelSkeleton(const core::Path<char>& path);
+    bool LoadRawModelSkeleton(const core::Array<uint8_t>& data);
 
     void scale(float scale);
 
@@ -40,7 +40,7 @@ public:
     const size_t getBoneParent(size_t idx) const;
 
 private:
-    bool LoadRawModelSkelton_int(core::XLexer& lex);
+    bool LoadRawModelSkeleton_int(core::XLexer& lex);
 
     bool ReadBones(core::XLexer& lex, int32_t numBones);
     bool ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut);

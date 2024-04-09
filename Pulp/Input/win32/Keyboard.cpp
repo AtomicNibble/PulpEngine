@@ -517,22 +517,22 @@ void XKeyboard::processKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
             }
 
             if (pSymbol->type == InputSymbol::Toggle) {
-                if (modifierFlags.IsSet(pSymbol->modiferMask))
-                    modifierFlags.Remove(pSymbol->modiferMask);
+                if (modifierFlags.IsSet(pSymbol->modifierMask))
+                    modifierFlags.Remove(pSymbol->modifierMask);
                 else
-                    modifierFlags.Set(pSymbol->modiferMask);
+                    modifierFlags.Set(pSymbol->modifierMask);
             }
-            else if (pSymbol->modiferMask != ModifiersMasks::NONE) {
-                modifierFlags.Set(pSymbol->modiferMask);
+            else if (pSymbol->modifierMask != ModifiersMasks::NONE) {
+                modifierFlags.Set(pSymbol->modifierMask);
             }
 
             newstate = InputState::PRESSED;
             pSymbol->value = 1.f;
         }
         else {
-            if (pSymbol->modiferMask != ModifiersMasks::NONE && pSymbol->type == InputSymbol::Button) {
+            if (pSymbol->modifierMask != ModifiersMasks::NONE && pSymbol->type == InputSymbol::Button) {
                 // this key is a modifer but is not togle type :)
-                modifierFlags.Remove(pSymbol->modiferMask);
+                modifierFlags.Remove(pSymbol->modifierMask);
             }
 
             newstate = InputState::RELEASED;

@@ -186,7 +186,7 @@ typename FixedFifo<T, N>::const_iterator FixedFifo<T, N>::end(void) const
     return const_iterator(startPtr(), endPtr(), write_, num_);
 }
 
-/// ------------------------------------------------------
+// ------------------------------------------------------
 
 template<typename T, size_t N>
 typename FixedFifo<T, N>::Reference FixedFifo<T, N>::front(void)
@@ -244,7 +244,7 @@ X_INLINE const T* FixedFifo<T, N>::endPtr(void) const
     return reinterpret_cast<const T*>(array_) + N;
 }
 
-/// ------------------------------------------------------
+// ------------------------------------------------------
 
 template<typename T, size_t N>
 inline T& FixedFifoIterator<T, N>::operator*(void)
@@ -290,7 +290,7 @@ inline bool FixedFifoIterator<T, N>::operator!=(const FixedFifoIterator& rhs) co
     return count_ != rhs.count_;
 }
 
-/// ------------------------------------------------------
+// ------------------------------------------------------
 
 template<typename T, size_t N>
 inline const T& FixedFifoConstIterator<T, N>::operator*(void)const

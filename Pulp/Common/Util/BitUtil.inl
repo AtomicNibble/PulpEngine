@@ -1,5 +1,4 @@
 
-/// \ingroup Util
 namespace bitUtil
 {
     // tell the compiler to use the intrinsic versions of these functions
@@ -11,22 +10,14 @@ namespace bitUtil
     X_INTRINSIC(_BitScanForward64)
 #endif // !X_64
 
-    /// \ingroup Util
     namespace internal
     {
-        /// \brief Base template for types of size N.
-        /// \details The individual template specializations take care of working with the correct unsigned type
-        /// based on the size of the generic type T. First, this allows for optimizations based on the size of a given
-        /// type (counting bits for 16-bit types differs from counting bits for 32-bit types). Second, the implementations can make
-        /// sure to only use unsigned types when working with individual bits. Signed types should be avoided for bit
-        /// manipulation because some operations like e.g. a right-shift are implementation-defined for signed types
-        /// in C++.
+
         template<size_t N>
         struct Implementation
         {
         };
 
-        /// Template specialization for 4-byte types.
         template<>
         struct Implementation<8u>
         {
@@ -57,7 +48,6 @@ namespace bitUtil
                 return (static_cast<uint64_t>(value) | flag);
             }
 
-            /// Internal function used by bitUtil::RoundUpToMultiple.
             template<typename T>
             static inline constexpr uint64_t RoundUpToMultiple(T numToRound, T multipleOf)
             {
@@ -66,7 +56,6 @@ namespace bitUtil
                 return (numToRound + multipleOf - 1) & ~(multipleOf - 1);
             }
 
-            /// Internal function used by bitUtil::CountBits.
             template<typename T>
             static inline unsigned int CountBits(T value)
             {
@@ -77,8 +66,7 @@ namespace bitUtil
                 return (((v + (v >> 4ui64) & 0xF0F0F0F0F0F0F0Fui64) * 0x101010101010101ui64) >> 56ui64);
             }
 
-            /// Internal function used by bitUtil::ScanBits.
-            /// index of MSB
+            // index of MSB
             template<typename T>
             static inline unsigned int ScanBits(T value)
             {
@@ -127,7 +115,7 @@ namespace bitUtil
 #endif // !X_64
             }
 
-            /// index of LSB
+            // index of LSB
             template<typename T>
             static inline unsigned int ScanBitsForward(T value)
             {
@@ -153,7 +141,6 @@ namespace bitUtil
 #endif // !X_64
             }
 
-            /// Internal function used by bitUtil::SetBit.
             template<typename T>
             static inline T SetBit(T value, unsigned int whichBit)
             {
@@ -162,7 +149,6 @@ namespace bitUtil
                 return (static_cast<T>(static_cast<uint64_t>(value) | (1ui64 << whichBit)));
             }
 
-            /// Internal function used by bitUtil::ClearBit.
             template<typename T>
             static inline T ClearBit(T value, unsigned int whichBit)
             {
@@ -171,7 +157,6 @@ namespace bitUtil
                 return (static_cast<T>(static_cast<uint64_t>(value) & (~(1ui64 << whichBit))));
             }
 
-            /// Internal function used by bitUtil::ReplaceBits.
             template<typename T>
             static inline T ReplaceBits(T value, unsigned int startBit, unsigned int howMany, T bits)
             {
@@ -182,7 +167,6 @@ namespace bitUtil
                 return (static_cast<T>((static_cast<uint64_t>(value) & mask) | (cappedBits << startBit)));
             }
 
-            /// Internal function used by bitUtil::IsBitSet.
             template<typename T>
             static inline bool IsBitSet(T value, unsigned int whichBit)
             {
@@ -224,11 +208,9 @@ namespace bitUtil
             }
         };
 
-        /// Template specialization for 4-byte types.
         template<>
         struct Implementation<4u>
         {
-            /// Internal function used by bitUtil::IsBitFlagSet.
             template<typename T>
             static inline bool IsBitFlagSet(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
             {
@@ -256,7 +238,6 @@ namespace bitUtil
                 return (static_cast<uint32_t>(value) | flag);
             }
 
-            /// Internal function used by bitUtil::IsBitSet.
             template<typename T>
             static inline bool IsBitSet(T value, unsigned int whichBit)
             {
@@ -265,7 +246,6 @@ namespace bitUtil
                 return ((static_cast<uint32_t>(value) & (1u << whichBit)) != 0);
             }
 
-            /// Internal function used by bitUtil::SetBit.
             template<typename T>
             static inline T SetBit(T value, unsigned int whichBit)
             {
@@ -274,7 +254,6 @@ namespace bitUtil
                 return (static_cast<T>(static_cast<uint32_t>(value) | (1u << whichBit)));
             }
 
-            /// Internal function used by bitUtil::ClearBit.
             template<typename T>
             static inline T ClearBit(T value, unsigned int whichBit)
             {
@@ -283,7 +262,6 @@ namespace bitUtil
                 return (static_cast<T>(static_cast<uint32_t>(value) & (~(1u << whichBit))));
             }
 
-            /// Internal function used by bitUtil::ReplaceBits.
             template<typename T>
             static inline T ReplaceBits(T value, unsigned int startBit, unsigned int howMany, T bits)
             {
@@ -294,7 +272,6 @@ namespace bitUtil
                 return (static_cast<T>((static_cast<uint32_t>(value) & mask) | (cappedBits << startBit)));
             }
 
-            /// Internal function used by bitUtil::CountBits.
             template<typename T>
             static inline unsigned int CountBits(T value)
             {
@@ -305,7 +282,6 @@ namespace bitUtil
                 return (((v + (v >> 4u) & 0xF0F0F0Fu) * 0x1010101u) >> 24u);
             }
 
-            /// Internal function used by bitUtil::ScanBits.
             template<typename T>
             static inline unsigned int ScanBits(T value)
             {
@@ -334,7 +310,6 @@ namespace bitUtil
                 return index;
             }
 
-            /// Internal function used by bitUtil::RoundUpToMultiple.
             template<typename T>
             static inline constexpr unsigned int RoundUpToMultiple(T numToRound, T multipleOf)
             {
@@ -406,7 +381,6 @@ namespace bitUtil
                 return (static_cast<uint16_t>(value) | flag);
             }
 
-            /// Internal function used by bitUtil::IsBitSet.
             template<typename T>
             static inline bool IsBitSet(T value, unsigned int whichBit)
             {
@@ -415,7 +389,6 @@ namespace bitUtil
                 return ((static_cast<uint16_t>(value) & (1u << whichBit)) != 0);
             }
 
-            /// Internal function used by bitUtil::SetBit.
             template<typename T>
             static inline T SetBit(T value, unsigned int whichBit)
             {
@@ -424,7 +397,6 @@ namespace bitUtil
                 return (static_cast<T>(static_cast<uint16_t>(value) | (1u << whichBit)));
             }
 
-            /// Internal function used by bitUtil::ClearBit.
             template<typename T>
             static inline T ClearBit(T value, unsigned int whichBit)
             {
@@ -503,7 +475,6 @@ namespace bitUtil
                 return (static_cast<uint8_t>(value) | flag);
             }
 
-            /// Internal function used by bitUtil::IsBitSet.
             template<typename T>
             static inline bool IsBitSet(T value, unsigned int whichBit)
             {
@@ -512,7 +483,6 @@ namespace bitUtil
                 return ((static_cast<uint8_t>(value) & (1u << whichBit)) != 0);
             }
 
-            /// Internal function used by bitUtil::SetBit.
             template<typename T>
             static inline T SetBit(T value, unsigned int whichBit)
             {
@@ -521,7 +491,6 @@ namespace bitUtil
                 return (static_cast<T>(static_cast<uint8_t>(value) | (1u << whichBit)));
             }
 
-            /// Internal function used by bitUtil::ClearBit.
             template<typename T>
             static inline T ClearBit(T value, unsigned int whichBit)
             {
@@ -557,70 +526,60 @@ namespace bitUtil
     template<typename T>
     inline T ClearBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
     {
-        // defer the implementation to the correct helper template, based on the size of the type
         return internal::Implementation<sizeof(T)>::ClearBitFlag(value, flag);
     }
 
     template<typename T>
     inline T SetBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
     {
-        // defer the implementation to the correct helper template, based on the size of the type
         return internal::Implementation<sizeof(T)>::SetBitFlag(value, flag);
     }
 
     template<typename T>
     inline bool IsBitSet(T value, unsigned int whichBit)
     {
-        // defer the implementation to the correct helper template, based on the size of the type
         return internal::Implementation<sizeof(T)>::IsBitSet(value, whichBit);
     }
 
     template<typename T>
     inline bool IsBitNotSet(T value, unsigned int whichBit)
     {
-        // defer the implementation to the correct helper template, based on the size of the type
         return internal::Implementation<sizeof(T)>::IsBitSet(value, whichBit) == false;
     }
 
     template<typename T>
     inline T SetBit(T value, unsigned int whichBit)
     {
-        // defer the implementation to the correct helper template, based on the size of the type
         return internal::Implementation<sizeof(T)>::SetBit(value, whichBit);
     }
 
     template<typename T>
     inline T ClearBit(T value, unsigned int whichBit)
     {
-        // defer the implementation to the correct helper template, based on the size of the type
         return internal::Implementation<sizeof(T)>::ClearBit(value, whichBit);
     }
 
     template<typename T>
     inline T ReplaceBits(T value, unsigned int startBit, unsigned int howMany, T bits)
     {
-        // defer the implementation to the correct helper template, based on the size of the type
         return internal::Implementation<sizeof(T)>::ReplaceBits(value, startBit, howMany, bits);
     }
 
     template<typename T>
     inline unsigned int CountBits(T value)
     {
-        // defer the implementation to the correct helper template, based on the size of the type
         return internal::Implementation<sizeof(T)>::CountBits(value);
     }
 
     template<typename T>
     inline unsigned int ScanBits(T value)
     {
-        // defer the implementation to the correct helper template, based on the size of the type
         return internal::Implementation<sizeof(T)>::ScanBits(value);
     }
 
     template<typename T>
     inline unsigned int ScanBitsForward(T value)
     {
-        // defer the implementation to the correct helper template, based on the size of the type
         return internal::Implementation<sizeof(T)>::ScanBitsForward(value);
     }
 

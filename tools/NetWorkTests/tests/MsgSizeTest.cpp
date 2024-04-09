@@ -8,7 +8,7 @@ TEST(net, msgSizeTest)
     net::IPeer* pServer = pNet->createPeer();
     net::IPeer* pPeer = pNet->createPeer();
 
-    // create a server and a peer and send diffrent size msg's
+    // create a server and a peer and send different size msg's
     // some bigger than MTU.
 
     net::SocketDescriptor sd(SERVER_PORT_BASE);
@@ -59,13 +59,13 @@ TEST(net, msgSizeTest)
 
     buf[0] = myPacketID;
 
-    size_t recivedCount = 0;
+    size_t receivedCount = 0;
     size_t sendCount = 10;
     size_t testSize = 1; // starting size
 
     size_t packetsSent = 0;
     size_t bytesSent = 0;
-    size_t bytesRecived = 0;
+    size_t bytesReceived = 0;
 
     core::StopWatch timer;
 
@@ -123,7 +123,7 @@ TEST(net, msgSizeTest)
 
             packetsSent += sendCount;
 
-            recivedCount = 0;
+            receivedCount = 0;
             curState = State::Reciving;
         }
         else if (curState == State::Reciving) {
@@ -135,19 +135,19 @@ TEST(net, msgSizeTest)
             for (pPacket = pServer->receive(); pPacket; pServer->freePacket(pPacket), pPacket = pServer->receive()) {
                 if (pPacket->getID() == myPacketID) {
                     // we got the packet data, check it's correct.
-                    X_LOG2("ServerTest", "Recived packet. length: %" PRIu32, pPacket->bitLength);
+                    X_LOG2("ServerTest", "Received packet. length: %" PRIu32, pPacket->bitLength);
 
-                    X_ASSERT(pPacket->bitLength == core::bitUtil::bytesToBits(testSize), "Recived incorrect packet size")(pPacket->bitLength, testSize); 
+                    X_ASSERT(pPacket->bitLength == core::bitUtil::bytesToBits(testSize), "Received incorrect packet size")(pPacket->bitLength, testSize); 
 
                     for (size_t i = 1; i < testSize; i++) {
                         X_ASSERT(pPacket->pData[i] == i % 255, "Data invalid")(); 
                     }
 
-                    bytesRecived += testSize;
+                    bytesReceived += testSize;
 
-                    ++recivedCount;
-                    if (recivedCount == sendCount) {
-                        X_LOG1("ServerTest", "Recived all packets");
+                    ++receivedCount;
+                    if (receivedCount == sendCount) {
+                        X_LOG1("ServerTest", "Received all packets");
 
                         if (testSize == sizeof(buf)) {
                             curState = State::Complete;
@@ -170,7 +170,7 @@ TEST(net, msgSizeTest)
             X_LOG0("ServerTest", "elapsed: ^5%.2fms", elpased);
             X_LOG0("ServerTest", "packetSent: ^5%" PRIuS, packetsSent);
             X_LOG0("ServerTest", "bytesSent: ^5%s", core::HumanSize::toString(sizeStr, bytesSent));
-            X_LOG0("ServerTest", "bytesRecived: ^5%s", core::HumanSize::toString(sizeStr, bytesRecived));
+            X_LOG0("ServerTest", "bytesReceived: ^5%s", core::HumanSize::toString(sizeStr, bytesReceived));
             break;
         }
     }

@@ -87,8 +87,8 @@ private:
     core::TimeVal startTime_;
     EntryHdr nextEntry_;
 
-    Vec2i lastCusorPos_;
-    Vec2i lastCusorPosClient_;
+    Vec2i lastCursorPos_;
+    Vec2i lastCursorPosClient_;
 
 };
 

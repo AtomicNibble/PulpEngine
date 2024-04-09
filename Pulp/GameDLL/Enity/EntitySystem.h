@@ -53,7 +53,7 @@ namespace entity
 {
     static const EnitiyRegister::entity_type INVALID_ID = EnitiyRegister::INVALID_ID;
 
-    class EnititySystem
+    class EntitySystem
     {
         using EntityIdMapArr = std::array< EntityId, MAX_ENTS>;
          
@@ -76,7 +76,7 @@ namespace entity
         typedef EnitiyRegister::entity_type EntityId;
 
     public:
-        EnititySystem(GameVars& vars, net::SessionInfo& sessionInfo, weapon::WeaponDefManager& weaponDefs,
+        EntitySystem(GameVars& vars, net::SessionInfo& sessionInfo, weapon::WeaponDefManager& weaponDefs,
             Multiplayer* pMultiplayer, core::MemoryArenaBase* arena);
 
         bool init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);

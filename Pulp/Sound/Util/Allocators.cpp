@@ -78,14 +78,14 @@ namespace AK
             }
 
         private:
-            /// Allocates raw memory that satisfies the alignment requirements.
+            // Allocates raw memory that satisfies the alignment requirements.
             virtual void* allocate(size_t, size_t, size_t X_MEM_HUMAN_IDS_CB(const char*) X_MEM_HUMAN_IDS_CB(const char*) X_SOURCE_INFO_MEM_CB(const core::SourceInfo&)) X_FINAL
             {
                 X_ASSERT_UNREACHABLE();
                 return nullptr;
             }
 
-            /// Frees memory previously allocated by Allocate().
+            // Frees memory previously allocated by Allocate().
             virtual void free(void* ptr) X_FINAL
             {
                 X_UNUSED(ptr);

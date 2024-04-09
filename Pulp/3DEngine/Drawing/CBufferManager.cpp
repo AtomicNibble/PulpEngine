@@ -91,7 +91,7 @@ void CBufferManager::updatePerFrameCBs(render::CommandBucket<uint32_t>& bucket, 
             }
 #endif // X_SUPER
 
-            // dam fucker needs updateing.
+            // needs updating.
             auto* pCBufUpdate = bucket.appendCommand<render::Commands::CopyConstantBufferData>(pCmd, cb.getBindSize());
 
             char* pAuxData = render::CommandPacket::getAuxiliaryMemory(pCBufUpdate);
@@ -146,11 +146,11 @@ void CBufferManager::setMatrixes(const Matrix44f& view, const Matrix44f& proj,
 
 bool CBufferManager::autoUpdateBuffer(render::shader::XCBuffer& cbuf)
 {
-    // if this cbuffer was updated last frame we know what was chnaged since then.
+    // if this cbuffer was updated last frame we know what was changed since then.
     // so we can skip updating potentially anything.
     const auto cbufVersion = cbuf.getCpuDataVersion();
 
-    // if the version is same and the cbuf only changes everyframe nothing will have changed.
+    // if the version is same and the cbuf only changes every frame nothing will have changed.
     if (cbufVersion == frameIdx_ && cbuf.getUpdateFreg() == render::shader::UpdateFreq::FRAME) {
         //	return false;
     }

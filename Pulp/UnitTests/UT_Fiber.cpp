@@ -35,7 +35,7 @@ namespace
 
 TEST(Threading, Fiber)
 {
-    // make some fibers with diffrent data values.
+    // make some fibers with different data values.
     for (size_t i = 0; i < NUM_FIBERS - 1; i++) {
         Fiber::FiberHandle newFiber = Fiber::CreateFiber(FIBER_STACK_SIZE, FIBER_STACK_SIZE, FiberStart,
             reinterpret_cast<void*>(i));

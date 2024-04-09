@@ -11,15 +11,15 @@ X_NAMESPACE_BEGIN(core)
 class ThreadLocalStorage
 {
 public:
-    /// Allocate a thread local storage slot from the OS.
+    // Allocate a thread local storage slot from the OS.
     inline ThreadLocalStorage(void);
     inline ~ThreadLocalStorage(void);
 
-    /// Associate data with the calling thread.
+    // Associate data with the calling thread.
     inline void setValue(void* value);
     inline void setValueInt(intptr_t value);
 
-    /// Retrieve data from thread local storage for the calling thread.
+    // Retrieve data from thread local storage for the calling thread.
     template<typename T>
     inline T* getValue(void) const;
     inline intptr_t getValueInt(void) const;

@@ -54,7 +54,7 @@ struct Search
 };
 
 struct XFindData;
-struct PendingCompiltionOp;
+struct PendingCompletionOp;
 
 class xFileSys : public IFileSys
     , private core::ThreadAbstract
@@ -78,12 +78,12 @@ class xFileSys : public IFileSys
         core::UniquePointer<IoRequestBase> pRequest;
     };
 
-    struct PendingCompiltionOp : public PendingOpBase
+    struct PendingCompletionOp : public PendingOpBase
     {
-        PendingCompiltionOp(core::UniquePointer<IoRequestBase>&& req, XFileAsyncOperationCompiltion&& op);
-        PendingCompiltionOp(PendingCompiltionOp&& oth);
+        PendingCompletionOp(core::UniquePointer<IoRequestBase>&& req, XFileAsyncOperationCompiltion&& op);
+        PendingCompletionOp(PendingCompletionOp&& oth);
 
-        PendingCompiltionOp& operator=(PendingCompiltionOp&& oth);
+        PendingCompletionOp& operator=(PendingCompletionOp&& oth);
         XFileAsyncOperationCompiltion op;
     };
 
@@ -114,32 +114,32 @@ class xFileSys : public IFileSys
 
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
 
-    struct DelayedPendingCompiltionOp
+    struct DelayedPendingCompletionOp
     {
-        DelayedPendingCompiltionOp(PendingCompiltionOp&& op, core::TimeVal time) :
+        DelayedPendingCompletionOp(PendingCompletionOp&& op, core::TimeVal time) :
             op(std::move(op)),
             time(time)
         {
         }
 
-        DelayedPendingCompiltionOp(DelayedPendingCompiltionOp&& oth) = default;
+        DelayedPendingCompletionOp(DelayedPendingCompletionOp&& oth) = default;
 
-        DelayedPendingCompiltionOp& operator=(DelayedPendingCompiltionOp&& oth) = default;
+        DelayedPendingCompletionOp& operator=(DelayedPendingCompletionOp&& oth) = default;
 
-        mutable PendingCompiltionOp op;
+        mutable PendingCompletionOp op;
         core::TimeVal time;
     };
 
     struct pendingop_less
     {
-        bool operator()(const DelayedPendingCompiltionOp& lhs, const DelayedPendingCompiltionOp& rhs) const
+        bool operator()(const DelayedPendingCompletionOp& lhs, const DelayedPendingCompletionOp& rhs) const
         {
             return (lhs.time < rhs.time);
         }
     };
 
-    typedef core::PriorityQueue<DelayedPendingCompiltionOp,
-        core::Array<DelayedPendingCompiltionOp>, pendingop_less>
+    typedef core::PriorityQueue<DelayedPendingCompletionOp,
+        core::Array<DelayedPendingCompletionOp>, pendingop_less>
         PendingComplitionOpPriorityQueue;
 
 #endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
@@ -231,7 +231,7 @@ public:
     static const size_t PENDING_IO_QUE_SIZE = 0x100;
 
     typedef std::array<uint8_t, MAX_REQ_SIZE> RequestBuffer;
-    typedef core::FixedArray<PendingCompiltionOp, PENDING_IO_QUE_SIZE> AsyncComplitionOps;
+    typedef core::FixedArray<PendingCompletionOp, PENDING_IO_QUE_SIZE> AsyncComplitionOps;
     typedef core::FixedArray<PendingOp, PENDING_IO_QUE_SIZE> AsyncOps;
 
     typedef core::PriorityQueue<IoRequestBase*, core::Array<IoRequestBase*>, iorequest_less> IoRequestPriorityQueue;
@@ -247,7 +247,7 @@ public:
     bool initWorker(void) X_FINAL;
     void shutDown(void) X_FINAL;
 
-    bool initDirectorys(bool workingDir);
+    bool initDirectories(bool workingDir);
 
     bool getWorkingDirectory(PathT& pathOut) const X_FINAL;
     bool getWorkingDirectory(PathWT& pathOut) const X_FINAL;
@@ -274,7 +274,7 @@ public:
     // Find util
     FindPair findFirst(const PathT& relPath, FindData& findinfo) X_FINAL;
     FindPair findFirstOS(const PathWT& osPath, FindData& findinfo) X_FINAL;
-    bool findnext(findhandle handle, FindData& findinfo) X_FINAL;
+    bool findNext(findhandle handle, FindData& findinfo) X_FINAL;
     void findClose(findhandle handle) X_FINAL;
 
     // Delete
@@ -289,7 +289,7 @@ public:
     bool createDirectoryTreeOS(const PathWT& osPath) const X_FINAL;
     bool createDirectoryTreeOS(const PathT& osPath) const X_FINAL;
 
-    // exsists.
+    // exists.
     bool fileExists(const PathT& relPath) const X_FINAL;
     bool fileExists(const PathT& relPath, VirtualDirectory::Enum dir) const X_FINAL;
     bool fileExistsOS(const PathWT& osPath) const X_FINAL;
@@ -298,7 +298,7 @@ public:
     bool directoryExists(const PathT& relPath, VirtualDirectory::Enum dir) const X_FINAL;
     bool directoryExistsOS(const PathWT& osPath) const X_FINAL;
 
-    // does not error, when it's a file or not exsist.
+    // does not error, when it's a file or not exist.
     bool isDirectory(const PathT& relPath, VirtualDirectory::Enum dir) const X_FINAL;
     bool isDirectoryOS(const PathWT& osPath) const X_FINAL;
 
@@ -342,9 +342,9 @@ private:
 private:
     IoRequestBase* popRequest(void);
     IoRequestBase* tryPopRequest(void);
-    void onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd);
+    void onOpFinished(PendingOpBase& asyncOp, uint32_t bytesTransferred);
 
-    void AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOperation, uint32_t bytesTransferd);
+    void AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOperation, uint32_t bytesTransferred);
 
     RequestHandle getNextRequestHandle(void);
 
@@ -402,7 +402,7 @@ private:
     core::LinearAllocator virtualDirAllocator_;
     VirtualDirArena virtualDirArena_;
 
-    core::MallocFreeAllocator memfileAllocator_;
+    core::MallocFreeAllocator memFileAllocator_;
     MemfileArena memFileArena_;
 
     int32_t numDir_;

@@ -33,9 +33,9 @@ public:
     {
     }
 
-    // run the simulartion, passing how much time to progress the simulation by.
+    // run the simulation, passing how much time to progress the simulation by.
     virtual bool advance(physx::PxScene* scene, float32_t dt, void* scratchBlock, uint32_t scratchBlockSize) X_ABSTRACT;
-    // blocks till all simulation substeps have finished.
+    // blocks till all simulation sub steps have finished.
     virtual void wait(physx::PxScene* scene) X_ABSTRACT;
     // called after render done, used by inverted stepper.
     virtual void postRender(const float32_t stepSize) X_ABSTRACT;
@@ -126,7 +126,7 @@ protected:
     void substep(StepperTask& completionTask);
 
 protected:
-    // we need two completion tasks because when multistepping we can't submit completion0 from the
+    // we need two completion tasks because when multi stepping we can't submit completion0 from the
     // substepDone function which is running inside completion0
     bool firstCompletionPending_;
     StepperTaskCollide collideTask_;

@@ -21,8 +21,8 @@ namespace pureVirtualFunctionCallHandler
         }
     } // namespace
 
-    /// \brief Starts the pure virtual function call handler.
-    /// \remark This is called automatically when starting the Core module.
+    // Starts the pure virtual function call handler.
+    // This is called automatically when starting the Core module.
     void Startup(void)
     {
         //	X_LOG0( "PureVfcHandler", "Registering pure virtual function call handler." );
@@ -30,8 +30,8 @@ namespace pureVirtualFunctionCallHandler
         g_oldHandler = _set_purecall_handler(_PureVirtualFunctionCallHandler);
     }
 
-    /// \brief Shuts down the pure virtual function call handler.
-    /// \remark This is called automatically when shutting down the Core module.
+    // Shuts down the pure virtual function call handler.
+    // This is called automatically when shutting down the Core module.
     void Shutdown(void)
     {
         //	X_LOG0( "PureVfcHandler", "Unregistering pure virtual function call handler." );

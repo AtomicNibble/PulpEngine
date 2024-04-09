@@ -40,7 +40,7 @@ X_LINK_ENGINE_LIB("AnimLib");
 #include <ISound.h>
 #include <INetwork.h>
 
-#include <IPrimativeContext.h>
+#include <IPrimitiveContext.h>
 #include <IFont.h>
 
 #include "ECS\EntityId.h"

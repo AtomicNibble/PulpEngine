@@ -57,7 +57,7 @@ public:
 
     bool GetConverterInfo(ConverterInfo& infoOut);
     bool GetModInfo(int32_t id, Mod& modOut);
-    MStatus AssetExsists(AssetType::Enum type, const MString& name, int32_t* pIdOut, int32_t* pModIdOut);
+    MStatus AssetExists(AssetType::Enum type, const MString& name, int32_t* pIdOut, int32_t* pModIdOut);
 
     MStatus AddAsset(AssetType::Enum type, const MString& name);
     MStatus RemoveAsset(AssetType::Enum type, const MString& name);

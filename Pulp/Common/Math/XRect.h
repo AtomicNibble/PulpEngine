@@ -35,7 +35,7 @@ public:
     void inflate(const Vec2<T>& amount);
     RectT inflated(const Vec2<T>& amount) const;
 
-    //! Translates the rectangle so that its center is at \a center
+    // Translates the rectangle so that its center is at center
     void offsetCenterTo(const Vec2<T>& center);
     
     void scaleCentered(const Vec2<T>& scale);
@@ -48,22 +48,22 @@ public:
     RectT scaled(T scale) const;
     RectT scaled(const Vec2<T>& scale) const;
 
-    /** \brief Is a point \a pt inside the rectangle **/
+    /** \brief Is a point pt inside the rectangle **/
     template<typename Y>
     bool contains(const Vec2<Y>& pt) const;
 
-    /** \brief Is a point \a pt inside the rectangle **/
+    /** \brief Is a point pt inside the rectangle **/
     bool contains(const RectT& rect) const;
 
-    //! Returns whether \a rect intersects with this
+    // Returns whether rect intersects with this
     bool intersects(const RectT& rect) const;
 
-    //! Returns the distance between the point \a pt and the rectangle. Points inside the rectangle return \c 0.
+    // Returns the distance between the point pt and the rectangle. Points inside the rectangle return \c 0.
     T distance(const Vec2<T>& pt) const;
-    //! Returns the squared distance between the point \a pt and the rectangle. Points inside the rectangle return \c 0.
+    // Returns the squared distance between the point pt and the rectangle. Points inside the rectangle return \c 0.
     T distanceSquared(const Vec2<T>& pt) const;
 
-    //! Returns the nearest point on the Rect \a rect. Points inside the rectangle return \a pt.
+    // Returns the nearest point on the Rect rect. Points inside the rectangle return pt.
     Vec2<T> closestPoint(const Vec2<T>& pt) const;
 
     T getX1(void) const;
@@ -78,12 +78,12 @@ public:
     Vec2<T> getCenter(void) const;
     Vec2<T> getSize(void) const;
 
-    /** \return Scaled copy with the same aspect ratio centered relative to and scaled to fit inside \a other. If \a expand then the rectangle is expanded if it is smaller than \a other */
+    /** \return Scaled copy with the same aspect ratio centered relative to and scaled to fit inside other. If expand then the rectangle is expanded if it is smaller than other */
     RectT getCenteredFit(const RectT& other, bool expand) const;
 
-    /** Expands the Rect to include \a point in its interior **/
+    /** Expands the Rect to include point in its interior **/
     void include(const Vec2<T>& point);
-    /** Expands the Rect to include \a rect in its interior **/
+    /** Expands the Rect to include rect in its interior **/
     void include(const RectT& rect);
 
     // align

@@ -297,7 +297,7 @@ void AnimCompiler::Position::calculateDeltaFrames(const float posError)
     max_ = Vec3f::min();
 
     /*
-		This logic looks for linera movement and only stores info when the
+		This logic looks for linear movement and only stores info when the
 		the translation deviates more than 'posError'.
 
 		For example if the bone moves in the same direction at the same speed every frame
@@ -637,7 +637,7 @@ void AnimCompiler::Angle::calculateDeltaFrames(const float angError)
             }
         }
 
-        // I only want a end frame if it's diffrent.
+        // I only want a end frame if it's different.
         if (lastStoredFrame != totalFrames - 1) {
             const Matrix33f& lastStoredM = relAngles_[lastStoredFrame];
             const Matrix33f& curFrameM = relAngles_[totalFrames - 1];
@@ -677,10 +677,10 @@ void AnimCompiler::Bone::clearData(void)
 
 // ----------------------------------------------------
 
-AnimCompiler::AnimCompiler(core::MemoryArenaBase* arena, const Inter::Anim& inter, const model::ModelSkeleton& skelton) :
+AnimCompiler::AnimCompiler(core::MemoryArenaBase* arena, const Inter::Anim& inter, const model::ModelSkeleton& skeleton) :
     arena_(arena),
     inter_(inter),
-    skelton_(skelton),
+    skeleton_(skeleton),
     scale_(1.f),
     type_(AnimType::RELATIVE),
     bones_(arena),
@@ -793,7 +793,7 @@ bool AnimCompiler::compile(const float posError, const float angError)
         return false;
     }
     // any anims in the model skeleton?
-    if (skelton_.getNumBones() < 1) {
+    if (skeleton_.getNumBones() < 1) {
         X_WARNING("Anim", "skipping compile of anim, source model skeleton has no bones");
         return false;
     }
@@ -841,7 +841,7 @@ bool AnimCompiler::compile(const float posError, const float angError)
     loadBones();
 
     if (bones_.isEmpty()) {
-        X_WARNING("Anim", "skipping compile of anim, inter anim and model skelton have no bones in common");
+        X_WARNING("Anim", "skipping compile of anim, inter anim and model skeleton have no bones in common");
         return true;
     }
 
@@ -1035,23 +1035,23 @@ void AnimCompiler::loadBones(void)
 {
     bones_.reserve(inter_.getNumBones());
 
-    size_t i, x, numModelBones = skelton_.getNumBones();
+    size_t i, x, numModelBones = skeleton_.getNumBones();
     for (i = 0; i < numModelBones; i++) {
-        const char* pBoneName = skelton_.getBoneName(i);
+        const char* pBoneName = skeleton_.getBoneName(i);
 
         // got anim data for this bone?
         for (x = 0; x < inter_.getNumBones(); x++) {
             const anim::Inter::Bone& interBone = inter_.getBone(x);
             if (interBone.name == pBoneName) {
-                size_t parentIdx = skelton_.getBoneParent(i);
-                const Quatf& angleWorld = skelton_.getBoneAngle(i);
-                const Vec3f& posWorld = skelton_.getBonePos(i);
+                size_t parentIdx = skeleton_.getBoneParent(i);
+                const Quatf& angleWorld = skeleton_.getBoneAngle(i);
+                const Vec3f& posWorld = skeleton_.getBonePos(i);
 
-                const Quatf& angleParWorld = skelton_.getBoneAngle(parentIdx);
-                const Vec3f& posParWorld = skelton_.getBonePos(parentIdx);
+                const Quatf& angleParWorld = skeleton_.getBoneAngle(parentIdx);
+                const Vec3f& posParWorld = skeleton_.getBonePos(parentIdx);
 
                 // work out parent index for anim.
-                const char* pParentName = skelton_.getBoneName(parentIdx);
+                const char* pParentName = skeleton_.getBoneName(parentIdx);
                 auto it = std::find_if(bones_.begin(), bones_.end(), [pParentName](const Bone& b) {
                     return b.name == pParentName;
                 });

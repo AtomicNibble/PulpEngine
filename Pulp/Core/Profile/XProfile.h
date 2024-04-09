@@ -15,7 +15,7 @@
 X_NAMESPACE_DECLARE(render, struct IRender);
 
 X_NAMESPACE_DECLARE(engine,
-                    class IPrimativeContext;
+                    class IPrimitiveContext;
                     class Material;);
 
 X_NAMESPACE_BEGIN(core)
@@ -73,7 +73,7 @@ namespace profiler
         void OnFrameEnd(void);
         bool onInputEvent(const input::InputEvent& event);
 
-        Vec2f Render(engine::IPrimativeContext* pPrim, Vec2f pos,
+        Vec2f Render(engine::IPrimitiveContext* pPrim, Vec2f pos,
             const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys);
 
         X_INLINE const ProfilerVars& getVars(void) const;
@@ -83,24 +83,24 @@ namespace profiler
         void OnCoreEvent(const CoreEventData& ed) X_FINAL;
 
     private:
-        Vec2f RenderStartupData(engine::IPrimativeContext* pPrim, Vec2f pos);
-        Vec2f RenderArenaTree(engine::IPrimativeContext* pPrim, Vec2f pos, core::MemoryArenaBase* arena);
-        Vec2f RenderStr(engine::IPrimativeContext* pPrim, Vec2f pos, core::string_view title, const core::StackString512& str);
+        Vec2f RenderStartupData(engine::IPrimitiveContext* pPrim, Vec2f pos);
+        Vec2f RenderArenaTree(engine::IPrimitiveContext* pPrim, Vec2f pos, core::MemoryArenaBase* arena);
+        Vec2f RenderStr(engine::IPrimitiveContext* pPrim, Vec2f pos, core::string_view title, const core::StackString512& str);
 
         static size_t countChildren_r(core::MemoryArenaBase* arena);
 
 #if X_ENABLE_JOBSYS_PROFILER
-        Vec2f RenderJobSystem(engine::IPrimativeContext* pPrim, Vec2f pos, const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys, int32_t profileIdx);
-        void DrawThreadInfo(const FrameTimeData& frameTimeInfo, engine::IPrimativeContext* pPrim, float xStart, float yStart, float width, float height,
+        Vec2f RenderJobSystem(engine::IPrimitiveContext* pPrim, Vec2f pos, const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys, int32_t profileIdx);
+        void DrawThreadInfo(const FrameTimeData& frameTimeInfo, engine::IPrimitiveContext* pPrim, float xStart, float yStart, float width, float height,
             const core::V2::JobQueueHistory::FrameHistory& history, SubSystemTimeArr& subTimesOut);
 
-        void DrawSubsysInfo(engine::IPrimativeContext* pPrim, float xStart, float yStart, float width, float height,
+        void DrawSubsysInfo(engine::IPrimitiveContext* pPrim, float xStart, float yStart, float width, float height,
             const SubSystemTimeArr& subTimes);
 
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
 #if X_ENABLE_PROFILER_WARNINGS
-        void drawWarnings(engine::IPrimativeContext* pPrim);
+        void drawWarnings(engine::IPrimitiveContext* pPrim);
 #endif // !X_ENABLE_PROFILER_WARNINGS
 
     private:

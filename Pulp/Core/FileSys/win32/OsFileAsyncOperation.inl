@@ -38,7 +38,7 @@ X_INLINE XOsFileAsyncOperationBase& XOsFileAsyncOperationBase::operator=(XOsFile
 
 X_INLINE bool XOsFileAsyncOperationBase::operator==(const XOsFileAsyncOperationBase& oth) const
 {
-    // the overlapped instance should be enougth but check file also.
+    // the overlapped instance should be enough but check file also.
     return hFile_ == oth.hFile_ && overlapped_.instance() == oth.overlapped_.instance();
 }
 

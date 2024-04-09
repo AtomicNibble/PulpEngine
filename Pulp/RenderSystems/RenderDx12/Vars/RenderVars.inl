@@ -2,9 +2,9 @@
 
 X_NAMESPACE_BEGIN(render)
 
-X_INLINE bool RenderVars::varsRegisterd(void) const
+X_INLINE bool RenderVars::varsRegistered(void) const
 {
-    return varsRegisterd_ != 0;
+    return varsRegistered_ != 0;
 }
 
 X_INLINE bool RenderVars::enableDebugLayer(void) const

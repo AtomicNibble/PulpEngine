@@ -1,5 +1,5 @@
 #include "EngineCommon.h"
-#include "IPrimativeContext.h"
+#include "IPrimitiveContext.h"
 
 #include "Math\VertexFormats.h"
 
@@ -18,15 +18,15 @@ namespace
 // is that when we pass a material to draw with it may have a state that is not tristrip.
 // and if not doing tristrip we can have less draw calls.
 
-IPrimativeContext::IPrimativeContext()
+IPrimitiveContext::IPrimitiveContext()
 {
 }
 
-IPrimativeContext::~IPrimativeContext()
+IPrimitiveContext::~IPrimitiveContext()
 {
 }
 
-void IPrimativeContext::drawQuad(float x, float y, float z, float width, float height, Color8u col)
+void IPrimitiveContext::drawQuad(float x, float y, float z, float width, float height, Color8u col)
 {
     const float fx = x;
     const float fy = y;
@@ -34,7 +34,7 @@ void IPrimativeContext::drawQuad(float x, float y, float z, float width, float h
     const float fw = width;
     const float fh = height;
 
-    PrimVertex* pQuad = addPrimative(6, PrimitiveType::TRIANGLELIST);
+    PrimVertex* pQuad = addPrimitive(6, PrimitiveType::TRIANGLELIST);
 
     // TL
     pQuad[0].pos.x = fx;
@@ -64,9 +64,9 @@ void IPrimativeContext::drawQuad(float x, float y, float z, float width, float h
     pQuad[5] = pQuad[1];
 }
 
-void IPrimativeContext::drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Color8u col)
+void IPrimitiveContext::drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Color8u col)
 {
-    PrimVertex* pQuad = addPrimative(6, PrimitiveType::TRIANGLELIST);
+    PrimVertex* pQuad = addPrimitive(6, PrimitiveType::TRIANGLELIST);
 
     pQuad[0].pos = tl;
     pQuad[1].pos = tr;
@@ -88,9 +88,9 @@ void IPrimativeContext::drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& 
     pQuad[5] = pQuad[1];
 }
 
-void IPrimativeContext::drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Material* pMaterial, Color8u col)
+void IPrimitiveContext::drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Material* pMaterial, Color8u col)
 {
-    PrimVertex* pQuad = addPrimative(6, PrimitiveType::TRIANGLELIST, pMaterial);
+    PrimVertex* pQuad = addPrimitive(6, PrimitiveType::TRIANGLELIST, pMaterial);
 
     pQuad[0].pos = tl;
     pQuad[1].pos = tr;
@@ -111,10 +111,10 @@ void IPrimativeContext::drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& 
     }
 }
 
-void IPrimativeContext::drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br,
+void IPrimitiveContext::drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br,
     Material* pMaterial, Color8u col, const Rectf& r)
 {
-    PrimVertex* pQuad = addPrimative(6, PrimitiveType::TRIANGLELIST, pMaterial);
+    PrimVertex* pQuad = addPrimitive(6, PrimitiveType::TRIANGLELIST, pMaterial);
 
     pQuad[0].pos = tl;
     pQuad[1].pos = tr;
@@ -141,7 +141,7 @@ void IPrimativeContext::drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& 
     pQuad[5] = pQuad[1];
 }
 
-void IPrimativeContext::drawLines(core::span<const Vec3f> points, Color8u col)
+void IPrimitiveContext::drawLines(core::span<const Vec3f> points, Color8u col)
 {
     int32_t num = safe_static_cast<int32_t>(points.length());
 
@@ -151,7 +151,7 @@ void IPrimativeContext::drawLines(core::span<const Vec3f> points, Color8u col)
         return;
     }
 
-    PrimVertex* pLine = addPrimative(num, PrimitiveType::LINELIST);
+    PrimVertex* pLine = addPrimitive(num, PrimitiveType::LINELIST);
 
     for (int32_t i = 0; i < num; i += 2) {
         pLine[i].pos = points[i];
@@ -163,7 +163,7 @@ void IPrimativeContext::drawLines(core::span<const Vec3f> points, Color8u col)
     }
 }
 
-void IPrimativeContext::drawLines(core::span<const Vec3f> points, core::span<const Color8u> col)
+void IPrimitiveContext::drawLines(core::span<const Vec3f> points, core::span<const Color8u> col)
 {
     int32_t num = safe_static_cast<int32_t>(points.length());
     int32_t numCol = safe_static_cast<int32_t>(col.length());
@@ -175,7 +175,7 @@ void IPrimativeContext::drawLines(core::span<const Vec3f> points, core::span<con
         return;
     }
 
-    PrimVertex* pLine = addPrimative(num, PrimitiveType::LINELIST);
+    PrimVertex* pLine = addPrimitive(num, PrimitiveType::LINELIST);
 
     for (int32_t i = 0; i < num; i += 2) {
         pLine[i].pos = points[i];
@@ -187,7 +187,7 @@ void IPrimativeContext::drawLines(core::span<const Vec3f> points, core::span<con
     }
 }
 
-void IPrimativeContext::drawRect(float x, float y, float width, float height, Color8u col)
+void IPrimitiveContext::drawRect(float x, float y, float width, float height, Color8u col)
 {
     const float x1 = x;
     const float y1 = y;
@@ -202,7 +202,7 @@ void IPrimativeContext::drawRect(float x, float y, float width, float height, Co
     drawRect(tl, tr, bl, br, col);
 }
 
-void IPrimativeContext::drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Color8u col)
+void IPrimitiveContext::drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Color8u col)
 {
     const Vec3f points[8] = {
         tl, tr,
@@ -213,7 +213,7 @@ void IPrimativeContext::drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& 
     drawLines(points, col);
 }
 
-void IPrimativeContext::drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br,
+void IPrimitiveContext::drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br,
     Color8u tlCol, Color8u trCol, Color8u blCol, Color8u brCol)
 {
     const Vec3f points[8] = {
@@ -231,7 +231,7 @@ void IPrimativeContext::drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& 
     drawLines(points, col);
 }
 
-void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, const float* pHeights,
+void IPrimitiveContext::drawBarChart(const Rectf& rect, uint32_t num, const float* pHeights,
     float padding, uint32_t max, Color8u col)
 {
     X_ASSERT_NOT_NULL(pHeights);
@@ -249,7 +249,7 @@ void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, const floa
 
     const Color8u col8(col);
 
-    PrimVertex* pQuads = addPrimative(num * 6, PrimitiveType::TRIANGLELIST);
+    PrimVertex* pQuads = addPrimitive(num * 6, PrimitiveType::TRIANGLELIST);
 
     // TL - TR - BR
     // BR - BL - TL
@@ -297,7 +297,7 @@ void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, const floa
     }
 }
 
-void IPrimativeContext::drawGraph(const Rectf& rect, float* pBegin, float* pEnd, Color8u col, Color8u colBck,
+void IPrimitiveContext::drawGraph(const Rectf& rect, float* pBegin, float* pEnd, Color8u col, Color8u colBck,
     float scaleMin, float scaleMax)
 {
     auto arrayGetter = [](const void* pData, int32_t idx) -> float {
@@ -312,7 +312,7 @@ void IPrimativeContext::drawGraph(const Rectf& rect, float* pBegin, float* pEnd,
     drawGraph(rect, pBegin, num, arrayGetter, col, colBck, scaleMin, scaleMax);
 }
 
-void IPrimativeContext::drawGraph(const Rectf& rect, const void* pUserData, size_t numValues, 
+void IPrimitiveContext::drawGraph(const Rectf& rect, const void* pUserData, size_t numValues, 
     DataCallBack::Pointer dataFunc, Color8u col, Color8u colBck, float scaleMin, float scaleMax)
 {
     int32_t num = safe_static_cast<int32_t>(numValues); 
@@ -360,7 +360,7 @@ void IPrimativeContext::drawGraph(const Rectf& rect, const void* pUserData, size
     drawQuad(rect, colBck);
     drawRect(rect, Color8u(50, 50, 50, 128));
 
-    PrimVertex* pLine = addPrimative(res_w * 2, PrimitiveType::LINELIST);
+    PrimVertex* pLine = addPrimitive(res_w * 2, PrimitiveType::LINELIST);
     
     for (int32_t i = 0; i < res_w; i++)
     {
@@ -391,7 +391,7 @@ void IPrimativeContext::drawGraph(const Rectf& rect, const void* pUserData, size
     }
 }
 
-void IPrimativeContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, Color8u c0)
+void IPrimitiveContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, Color8u c0)
 {
     if (numPoints == 0) {
         return;
@@ -400,7 +400,7 @@ void IPrimativeContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, Col
     X_ASSERT(numPoints % 3 == 0, "Num points must be a multiple of 3")(numPoints);
 
     // we do the case to uint32_t here just to make the interface nicer to use.
-    PrimVertex* pTri = addPrimative(static_cast<uint32_t>(numPoints), PrimitiveType::TRIANGLELIST);
+    PrimVertex* pTri = addPrimitive(static_cast<uint32_t>(numPoints), PrimitiveType::TRIANGLELIST);
 
     for (size_t i = 0; i < numPoints; i++) {
         pTri[i].pos = pPoints[i];
@@ -408,7 +408,7 @@ void IPrimativeContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, Col
     }
 }
 
-void IPrimativeContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, const Color8u* pCol)
+void IPrimitiveContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, const Color8u* pCol)
 {
     if (numPoints == 0) {
         return;
@@ -416,7 +416,7 @@ void IPrimativeContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, con
 
     X_ASSERT(numPoints % 3 == 0, "Num points must be a multiple of 3")(numPoints);
 
-    PrimVertex* pTri = addPrimative(static_cast<uint32_t>(numPoints), PrimitiveType::TRIANGLELIST);
+    PrimVertex* pTri = addPrimitive(static_cast<uint32_t>(numPoints), PrimitiveType::TRIANGLELIST);
 
     for (size_t i = 0; i < numPoints; i++) {
         pTri[i].pos = pPoints[i];
@@ -424,14 +424,14 @@ void IPrimativeContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, con
     }
 }
 
-void IPrimativeContext::drawAABB(const AABB& aabb, bool solid, Color8u col)
+void IPrimitiveContext::drawAABB(const AABB& aabb, bool solid, Color8u col)
 {
     // for now we do this none indexed
     if (!solid) {
         const uint32_t numPoints = 24;
 
         // so we need 4 * 3 lines.
-        PrimVertex* pLines = addPrimative(numPoints, PrimitiveType::LINELIST);
+        PrimVertex* pLines = addPrimitive(numPoints, PrimitiveType::LINELIST);
 
         // create the 8 points.
         const Vec3f& xyz = aabb.min;
@@ -489,7 +489,7 @@ void IPrimativeContext::drawAABB(const AABB& aabb, bool solid, Color8u col)
     }
     else {
         // we do this as triangles.
-        PrimVertex* pVerts = addPrimative(36, PrimitiveType::TRIANGLELIST);
+        PrimVertex* pVerts = addPrimitive(36, PrimitiveType::TRIANGLELIST);
 
         const Vec3f& xyz = aabb.min;
         const Vec3f xyZ(aabb.min.x, aabb.min.y, aabb.max.z);
@@ -599,7 +599,7 @@ void IPrimativeContext::drawAABB(const AABB& aabb, bool solid, Color8u col)
     }
 }
 
-void IPrimativeContext::drawOBB(const OBB& obb, bool solid, Color8u col)
+void IPrimitiveContext::drawOBB(const OBB& obb, bool solid, Color8u col)
 {
     const auto& orien = obb.orientation();
     const auto& pos = obb.center();
@@ -619,7 +619,7 @@ void IPrimativeContext::drawOBB(const OBB& obb, bool solid, Color8u col)
         const uint32_t numPoints = 24;
 
         // so we need 4 * 3 lines.
-        PrimVertex* pLines = addPrimative(numPoints, PrimitiveType::LINELIST);
+        PrimVertex* pLines = addPrimitive(numPoints, PrimitiveType::LINELIST);
 
         // bottom row (all lower case z's)
         pLines[0].pos = xyz;
@@ -665,7 +665,7 @@ void IPrimativeContext::drawOBB(const OBB& obb, bool solid, Color8u col)
         }
     }
     else {
-        PrimVertex* pVerts = addPrimative(36, PrimitiveType::TRIANGLELIST);
+        PrimVertex* pVerts = addPrimitive(36, PrimitiveType::TRIANGLELIST);
 
         Color8u colBot(col * 0.5f);
         Color8u colTop(col);
@@ -766,7 +766,7 @@ void IPrimativeContext::drawOBB(const OBB& obb, bool solid, Color8u col)
     }
 }
 
-void IPrimativeContext::drawOBB(const OBB& obb, const Vec3f& offset, bool solid, Color8u col)
+void IPrimitiveContext::drawOBB(const OBB& obb, const Vec3f& offset, bool solid, Color8u col)
 {
     const auto& orien = obb.orientation();
     const auto& max = obb.halfVec();
@@ -786,7 +786,7 @@ void IPrimativeContext::drawOBB(const OBB& obb, const Vec3f& offset, bool solid,
         const uint32_t numPoints = 24;
 
         // so we need 4 * 3 lines.
-        PrimVertex* pLines = addPrimative(numPoints, PrimitiveType::LINELIST);
+        PrimVertex* pLines = addPrimitive(numPoints, PrimitiveType::LINELIST);
 
         // bottom row (all lower case z's)
         pLines[0].pos = xyz;
@@ -832,7 +832,7 @@ void IPrimativeContext::drawOBB(const OBB& obb, const Vec3f& offset, bool solid,
         }
     }
     else {
-        PrimVertex* pVerts = addPrimative(36, PrimitiveType::TRIANGLELIST);
+        PrimVertex* pVerts = addPrimitive(36, PrimitiveType::TRIANGLELIST);
 
         Color8u colBot(col * 0.5f);
         Color8u colTop(col);
@@ -934,7 +934,7 @@ void IPrimativeContext::drawOBB(const OBB& obb, const Vec3f& offset, bool solid,
 }
 
 // Sphere
-void IPrimativeContext::drawSphere(const Sphere& sphere, Color8u col, bool solid, int32_t lodIdx)
+void IPrimitiveContext::drawSphere(const Sphere& sphere, Color8u col, bool solid, int32_t lodIdx)
 {
     if (sphere.radius() > 0.0f) {
         Matrix44f mat = Matrix44f::createScale(Vec3f(sphere.radius()));
@@ -946,7 +946,7 @@ void IPrimativeContext::drawSphere(const Sphere& sphere, Color8u col, bool solid
     }
 }
 
-void IPrimativeContext::drawSphere(const Sphere& sphere, const Matrix34f& mat, Color8u col, bool solid, int32_t lodIdx)
+void IPrimitiveContext::drawSphere(const Sphere& sphere, const Matrix34f& mat, Color8u col, bool solid, int32_t lodIdx)
 {
     if (sphere.radius() > 0.0f) {
         Matrix44f scale = Matrix44f::createScale(sphere.radius());
@@ -960,7 +960,7 @@ void IPrimativeContext::drawSphere(const Sphere& sphere, const Matrix34f& mat, C
 }
 
 // Cone
-void IPrimativeContext::drawCone(const Vec3f& pos, const Vec3f& dir, float radius, float height,
+void IPrimitiveContext::drawCone(const Vec3f& pos, const Vec3f& dir, float radius, float height,
     Color8u col, bool solid, int32_t lodIdx)
 {
     if (radius > 0.0f && height > 0.0f && dir.lengthSquared() > 0.0f) {
@@ -984,7 +984,7 @@ void IPrimativeContext::drawCone(const Vec3f& pos, const Vec3f& dir, float radiu
 }
 
 // Cylinder
-void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius, float height,
+void IPrimitiveContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius, float height,
     Color8u col, bool solid, int32_t lodIdx)
 {
     if (radius > 0.0f && height > 0.0f && dir.lengthSquared() > 0.0f) {
@@ -1007,7 +1007,7 @@ void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float r
     }
 }
 
-void IPrimativeContext::drawCylinder(const Transformf& trans, float radius, float height, Color8u col)
+void IPrimitiveContext::drawCylinder(const Transformf& trans, float radius, float height, Color8u col)
 {
     const float halfHeight = height * 0.5f;
 
@@ -1041,7 +1041,7 @@ void IPrimativeContext::drawCylinder(const Transformf& trans, float radius, floa
     drawLines(points, col);
 }
 
-void IPrimativeContext::drawCapsule(const Transformf& trans, float radius, float height, Color8u col)
+void IPrimitiveContext::drawCapsule(const Transformf& trans, float radius, float height, Color8u col)
 {
     const float halfHeight = height * 0.5f;
 
@@ -1076,11 +1076,11 @@ void IPrimativeContext::drawCapsule(const Transformf& trans, float radius, float
     drawLines(points, col);
 }
 
-void IPrimativeContext::drawCircle(const Transformf& trans, int32_t segments, float radius, Color8u col)
+void IPrimitiveContext::drawCircle(const Transformf& trans, int32_t segments, float radius, Color8u col)
 {
     // Lines!
     // TODO: why don't i support linestrips again?
-    PrimVertex* pLines = addPrimative(segments * 2, PrimitiveType::LINELIST);
+    PrimVertex* pLines = addPrimitive(segments * 2, PrimitiveType::LINELIST);
 
     const float step = math<float>::TWO_PI / segments;
     float angle = 0.f;
@@ -1109,10 +1109,10 @@ void IPrimativeContext::drawCircle(const Transformf& trans, int32_t segments, fl
     pLines[(i * 2) + 1].color = col;
 }
 
-void IPrimativeContext::drawArc(const Transformf& trans, int32_t segments, float radius, float minAng, float maxAng, Color8u col)
+void IPrimitiveContext::drawArc(const Transformf& trans, int32_t segments, float radius, float minAng, float maxAng, Color8u col)
 {
     // TODO: use linestrip
-    PrimVertex* pLines = addPrimative(segments * 2, PrimitiveType::LINELIST);
+    PrimVertex* pLines = addPrimitive(segments * 2, PrimitiveType::LINELIST);
 
     const float step = (minAng - maxAng) / segments;
     float angle = minAng;
@@ -1140,7 +1140,7 @@ void IPrimativeContext::drawArc(const Transformf& trans, int32_t segments, float
 }
 
 // Bone
-void IPrimativeContext::drawBone(const Transformf& rParent, const Transformf& rChild, Color8u col)
+void IPrimitiveContext::drawBone(const Transformf& rParent, const Transformf& rChild, Color8u col)
 {
     Vec3f p = rParent.getPosition();
     Vec3f c = rChild.getPosition();
@@ -1184,7 +1184,7 @@ void IPrimativeContext::drawBone(const Transformf& rParent, const Transformf& rC
 
     // we draw some lines. :)
 
-    PrimVertex* pLines = addPrimative(24, PrimitiveType::LINELIST);
+    PrimVertex* pLines = addPrimitive(24, PrimitiveType::LINELIST);
     pLines[0].pos = points[0];
     pLines[0].color = comp;
     pLines[1].pos = points[1];
@@ -1240,13 +1240,13 @@ void IPrimativeContext::drawBone(const Transformf& rParent, const Transformf& rC
 }
 
 // Frustum - Sexyyyyyyyyyy
-void IPrimativeContext::drawFrustum(const XFrustum& frustum, Color8u nearCol, Color8u farCol, bool solid)
+void IPrimitiveContext::drawFrustum(const XFrustum& frustum, Color8u nearCol, Color8u farCol, bool solid)
 {
     XFrustum::FarNearVertsArr v;
     frustum.GetFrustumVertices(v);
 
     if (!solid) {
-        PrimVertex* pLines = addPrimative(4 * 6, PrimitiveType::LINELIST);
+        PrimVertex* pLines = addPrimitive(4 * 6, PrimitiveType::LINELIST);
 
         for (int32_t i = 0; i < 4; i++) {
             pLines[0].pos = v[i];
@@ -1268,7 +1268,7 @@ void IPrimativeContext::drawFrustum(const XFrustum& frustum, Color8u nearCol, Co
         }
     }
     else {
-        PrimVertex* pVertices = addPrimative(6 * 2, PrimitiveType::TRIANGLELIST);
+        PrimVertex* pVertices = addPrimitive(6 * 2, PrimitiveType::TRIANGLELIST);
 
         // far
         pVertices[0].pos = v[0];
@@ -1300,7 +1300,7 @@ void IPrimativeContext::drawFrustum(const XFrustum& frustum, Color8u nearCol, Co
         pVertices[11].pos = v[7];
         pVertices[11].color = nearCol;
 
-        PrimVertex* pLines = addPrimative(4 * 6, PrimitiveType::LINELIST);
+        PrimVertex* pLines = addPrimitive(4 * 6, PrimitiveType::LINELIST);
 
         Color8u lineColFar(farCol);
         Color8u lineColNear(nearCol);
@@ -1330,7 +1330,7 @@ void IPrimativeContext::drawFrustum(const XFrustum& frustum, Color8u nearCol, Co
 }
 
 // Arrow
-void IPrimativeContext::drawArrow(const Vec3f& posA, const Vec3f& posB, Color8u color)
+void IPrimitiveContext::drawArrow(const Vec3f& posA, const Vec3f& posB, Color8u color)
 {
     const Vec3f t0 = (posB - posA).normalized();
     const Vec3f a = math<float32_t>::abs(t0.x) < 0.707f ? Vec3f(1, 0, 0) : Vec3f(0, 1, 0);
@@ -1347,7 +1347,7 @@ void IPrimativeContext::drawArrow(const Vec3f& posA, const Vec3f& posB, Color8u 
     drawLines(points, color);
 }
 
-void IPrimativeContext::drawAxis(const Vec3f& pos, const Vec3f& extends)
+void IPrimitiveContext::drawAxis(const Vec3f& pos, const Vec3f& extends)
 {
     Vec3f x(pos);
     Vec3f y(pos);
@@ -1362,7 +1362,7 @@ void IPrimativeContext::drawAxis(const Vec3f& pos, const Vec3f& extends)
     drawArrow(pos, z, Col_Blue);
 }
 
-void IPrimativeContext::drawAxis(const Transformf& trans, const Vec3f& extends)
+void IPrimitiveContext::drawAxis(const Transformf& trans, const Vec3f& extends)
 {
     auto x = trans.transform(Vec3f(extends.x, 0.f, 0.f));
     auto y = trans.transform(Vec3f(0.f, extends.y, 0.f));
@@ -1373,7 +1373,7 @@ void IPrimativeContext::drawAxis(const Transformf& trans, const Vec3f& extends)
     drawArrow(trans.pos, z, Col_Blue);
 }
 
-void IPrimativeContext::drawAxis(const Transformf& trans, const Vec3f& offset, const Vec3f& extends)
+void IPrimitiveContext::drawAxis(const Transformf& trans, const Vec3f& offset, const Vec3f& extends)
 {
     auto x = trans.transform(Vec3f(extends.x, 0.f, 0.f));
     auto y = trans.transform(Vec3f(0.f, extends.y, 0.f));
@@ -1387,7 +1387,7 @@ void IPrimativeContext::drawAxis(const Transformf& trans, const Vec3f& offset, c
     drawArrow(offsetPos, z + rotatedOffset, Col_Blue);
 }
 
-void IPrimativeContext::drawCrosshair(const Vec3f& pos, float size, Color8u color)
+void IPrimitiveContext::drawCrosshair(const Vec3f& pos, float size, Color8u color)
 {
     Vec3f points[4] = {
         Vec3f(pos.x - size, pos.y, pos.z), // left
@@ -1399,13 +1399,13 @@ void IPrimativeContext::drawCrosshair(const Vec3f& pos, float size, Color8u colo
     drawLines(points, color);
 }
 
-void IPrimativeContext::drawImageWithUV(float xpos, float ypos, float z, float w, float h,
+void IPrimitiveContext::drawImageWithUV(float xpos, float ypos, float z, float w, float h,
     Material* pMaterial, const CoordArr& s, const CoordArr& t,
     const Colorf& col, bool filtered)
 {
     X_UNUSED(filtered);
 
-    PrimVertex* pQuad = addPrimative(6, PrimitiveType::TRIANGLELIST, pMaterial);
+    PrimVertex* pQuad = addPrimitive(6, PrimitiveType::TRIANGLELIST, pMaterial);
 
     // TL
     pQuad[0].pos.x = xpos;

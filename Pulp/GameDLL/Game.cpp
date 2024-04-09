@@ -11,7 +11,7 @@
 
 // TMP
 #include <I3DEngine.h>
-#include <IPrimativeContext.h>
+#include <IPrimitiveContext.h>
 #include <SnapShot.h>
 
 #include <IGui.h>
@@ -260,7 +260,7 @@ bool XGame::update(core::FrameData& frame)
     // but i have all the input events in this
     // but they are no use since i don't know if i'm allowed to use them all.
     // i likethe input sinks tho
-    // as things are registerd with priority
+    // as things are registered with priority
     // and each devices gets input events it's allowed to use.
     // the problem is this data not linked to framedata
     // so
@@ -714,7 +714,7 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
         else
         {
             X_WARNING("Game", "no userCmd for remote player %" PRIi32, playerIdx);
-            // dam slut no sending user commads run a empty command.
+            // dam user not sending user commads run an empty command.
             auto userCmd = lastUserCmdRun_[playerIdx];
             runUserCmdForPlayer(dt, userCmd, playerIdx);
 
@@ -731,7 +731,7 @@ void XGame::runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& userCmd, i
     lastUserCmdRunTime_[playerIdx] = userCmd.clientGameTimeMS;
 }
 
-bool XGame::drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
+bool XGame::drawMenu(core::FrameData& frame, engine::IPrimitiveContext* pPrim)
 {
     if (!pMenuHandler_) {
         return false;
@@ -747,7 +747,7 @@ bool XGame::drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
     return true;
 }
 
-void XGame::drawDebug(engine::IPrimativeContext* pPrim)
+void XGame::drawDebug(engine::IPrimitiveContext* pPrim)
 {
     Vec2f base(5.f, 50.f);
 

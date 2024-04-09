@@ -42,7 +42,6 @@ class XEngineModule_Network : public IEngineModule
         X_ASSERT_NOT_NULL(gEnv);
         X_ASSERT_NOT_NULL(gEnv->pArena);
 
-        // kinky shit.
         g_NetworkArena = X_NEW(NetworkArena, gEnv->pArena, "NetworkArena")(&g_NetworkAlloc, "NetworkArena");
         auto* pNet = X_NEW(net::XNet, g_NetworkArena, "XNet")(g_NetworkArena);
 

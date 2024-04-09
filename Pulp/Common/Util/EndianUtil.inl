@@ -9,7 +9,7 @@ namespace Endian
         {
         };
 
-        /// Template specialization for 8-byte types.
+        // Template specialization for 8-byte types.
         template<>
         struct Implementation<8u>
         {
@@ -21,7 +21,7 @@ namespace Endian
             }
         };
 
-        /// Template specialization for 4-byte types.
+        // Template specialization for 4-byte types.
         template<>
         struct Implementation<4u>
         {
@@ -33,7 +33,7 @@ namespace Endian
             }
         };
 
-        /// Template specialization for 2-byte types.
+        // Template specialization for 2-byte types.
         template<>
         struct Implementation<2u>
         {

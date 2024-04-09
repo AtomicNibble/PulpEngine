@@ -12,7 +12,7 @@ X_NAMESPACE_DECLARE(physics,
     struct IScene);
 
 X_NAMESPACE_DECLARE(engine,
-    class IPrimativeContext);
+    class IPrimitiveContext);
 
 X_NAMESPACE_BEGIN(sound)
 
@@ -120,7 +120,7 @@ X_DECLARE_ENUM(CurveInterpolation)
     SineRecip,     ///< Reciprocal of sine curve
                    //	Exp3,			///< Exp3 == is same value as LastFadeCurve -_-
     LastFadeCurve, ///< Update this value to reflect last curve available for fades
-    Constant       /// constant ( not valid for fading values )
+    Constant       // constant ( not valid for fading values )
 );
 
 X_DECLARE_ENUM8(OcclusionType)
@@ -176,9 +176,8 @@ struct ISound : public core::IEngineSysBase
 
     virtual bool asyncInitFinalize(void) X_ABSTRACT;
 
-    virtual Vec2f drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const X_ABSTRACT;
+    virtual Vec2f drawDebug(engine::IPrimitiveContext* pPrim, Vec2f pos) const X_ABSTRACT;
 
-    // ting tong wong, sing me a song in a thong!
     virtual void update(core::FrameData& frame) X_ABSTRACT;
     virtual void setPhysicsScene(physics::IScene* pScene) X_ABSTRACT;
 

@@ -31,7 +31,7 @@ X_DECLARE_ENUM8(AssetType)
     ANIM,
     MATERIAL,
     IMG,
-    WEAPON, // do we want diffent weapon types, or will the asset contain the sub type?
+    WEAPON, // do we want different weapon types, or will the asset contain the sub type?
     TURRET,
     // will allow for data driven lights, that can then be placed in editor rather than having fixed light types.
     LIGHT,
@@ -47,7 +47,7 @@ X_DECLARE_ENUM8(AssetType)
     // these will be pre defined camera paths
     // that can be played.
     // option to loop, hude hud, trigger note tracks..
-    // basically a anim for the camera
+    // basically an anim for the camera
     CAMERA,
 
     VIDEO,

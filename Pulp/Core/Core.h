@@ -135,8 +135,8 @@ public:
 
     bool RunGameLoop(void) X_FINAL;
     core::string_view GetCommandLineArg(core::string_view name) const X_FINAL;
-    bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_FINAL;
-    bool IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName,
+    bool InitializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_FINAL;
+    bool InitializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName,
         IConverterModule** pConvertModuleOut = nullptr, IConverter** pConverterInstance = nullptr) X_FINAL;
     bool FreeConverterModule(IConverterModule* pConvertModule) X_FINAL;
 

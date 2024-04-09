@@ -20,13 +20,13 @@ namespace
 {
     const wchar_t* g_ClassName = X_WIDEN(X_ENGINE_NAME) L"Engine";
 
-    bool g_ClassRegisterd = false;
+    bool g_ClassRegistered = false;
 
     LRESULT CALLBACK PreWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
     void RegisterClass(void)
     {
-        if (!g_ClassRegisterd) {
+        if (!g_ClassRegistered) {
 
             auto hInstance = GetModuleHandle(NULL);
             WNDCLASSEXW wcex;
@@ -54,12 +54,12 @@ namespace
                 return;
             }
 
-            g_ClassRegisterd = true;
+            g_ClassRegistered = true;
         }
     }
 
     // We have a pre and final winproc.
-    // The pre one waits untill we can get the class pointer.
+    // The pre one waits until we can get the class pointer.
     // Then switches to a lightweight winproc as each window is only created once.
     // and we no longer need to do checks for msgs.
 
@@ -94,7 +94,7 @@ namespace
 
 int32_t Window::s_var_windowDebug = 0;
 
-/// --------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 
 Window::Window() :
     numMsgs_(0),
@@ -113,7 +113,7 @@ Window::~Window(void)
     Destroy();
 }
 
-/// --------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 
 void Window::RegisterVars(void)
 {
@@ -124,13 +124,13 @@ void Window::RegisterVars(void)
         "Window debug. 0=disable, 1=enable.");
 }
 
-/// --------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 
 bool Window::Create(core::string_view title, Rect r, Mode::Enum mode)
 {
     lastError::Description Dsc;
 
-    if (!g_ClassRegisterd) {
+    if (!g_ClassRegistered) {
         X_FATAL("Window", "Class not registered.");
         return false;
     }
@@ -219,7 +219,7 @@ Window::Notification::Enum Window::PumpMessages(void)
     return Notification::NONE;
 }
 
-/// --------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 
 void Window::SetMode(Mode::Enum mode)
 {
@@ -351,7 +351,7 @@ Recti Window::GetClientRect(void) const
     return Convert(rect);
 }
 
-/// --------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 
 
 Recti Window::GetActiveMonitorRect(void)
@@ -402,7 +402,7 @@ Recti Window::GetDesktopRect(void)
 }
 
 
-/// --------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 
 LRESULT Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -479,7 +479,7 @@ LRESULT Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-/// --------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------
 
 
 void Window::onSizing(WPARAM side, RECT* pRect)

@@ -463,7 +463,7 @@ void DynamicDescriptorHeap::copyAndBindStagedTables(DescriptorHandleCache& handl
         retireCurrentHeap();
         unbindAllValid();
 
-        // recalculate the size it might be diffrent if stale params has changed.
+        // recalculate the size it might be different if stale params has changed.
         neededSize = handleCache.computeStagedSize();
 
 #if X_DEBUG

@@ -152,9 +152,9 @@ namespace Fiber
         }
 
         if (startUpThreadId_ != curThreadId) {
-            // we ended up on a diffrent thread.
+            // we ended up on a different thread.
             // this happens when the main thread waited for a counter and then once
-            // counter reached zero got picked up by a diffrent thread than what it was on before.
+            // counter reached zero got picked up by a different thread than what it was on before.
 
             // wait for them to exit out.
             while (activeWorkers_ > 0) {

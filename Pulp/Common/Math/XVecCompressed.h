@@ -28,8 +28,8 @@ struct compressedVec3
     }
 
 private:
-    /// unsigned packing
-    /// 10|10|10|2
+    // unsigned packing
+    // 10|10|10|2
     void PackVecU(const Vec3f& vec)
     {
         // Convert to 0 to (2^10)-1 range
@@ -39,8 +39,8 @@ private:
         compValue = ((uiX & 0x3FF) | ((uiY & 0x3FF) << 10) | ((uiZ & 0x3FF) << 20));
     }
 
-    /// signed packing
-    /// 10|10|10|2
+    // signed packing
+    // 10|10|10|2
     void PackVec(const Vec3f& vec)
     {
         int32_t iX = (int32_t)(vec.x * 511.0f);

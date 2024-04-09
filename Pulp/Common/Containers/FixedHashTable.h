@@ -8,7 +8,7 @@
 
 X_NAMESPACE_BEGIN(core)
 
-// Simple hash table that can't resize and uses linera probing.
+// Simple hash table that can't resize and uses linear probing.
 
 template <typename HashTableT, typename IterVal> 
 struct HashTableIterator 

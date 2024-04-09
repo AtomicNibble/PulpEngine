@@ -17,32 +17,32 @@ void XFontNull::FreeTexture(void)
 {
 }
 
-void XFontNull::DrawTestText(engine::IPrimativeContext* pPrimCon, const core::FrameTimeData& time)
+void XFontNull::DrawTestText(engine::IPrimitiveContext* pPrimCon, const core::FrameTimeData& time)
 {
     X_UNUSED(pPrimCon, time);
 }
 
-// these draw the text into the primative context.
-void XFontNull::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+// these draw the text into the primitive context.
+void XFontNull::DrawString(engine::IPrimitiveContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
     const TextDrawContext& contex, const char* pBegin, const char* pEnd)
 {
     X_UNUSED(pPrimCon, pos, ang, contex, pBegin, pEnd);
 }
 
-void XFontNull::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+void XFontNull::DrawString(engine::IPrimitiveContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
     const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd)
 {
     X_UNUSED(pPrimCon, pos, ang, contex, pBegin, pEnd);
 }
 
-void XFontNull::DrawString(engine::IPrimativeContext* pPrimCon,
+void XFontNull::DrawString(engine::IPrimitiveContext* pPrimCon,
     const Vec3f& pos, const TextDrawContext& contex, const char* pBegin, const char* pEnd)
 {
     X_UNUSED(pPrimCon, pos, contex, pBegin, pEnd);
 
 }
 
-void XFontNull::DrawString(engine::IPrimativeContext* pPrimCon,
+void XFontNull::DrawString(engine::IPrimitiveContext* pPrimCon,
     const Vec3f& pos, const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd)
 {
     X_UNUSED(pPrimCon, pos, contex, pBegin, pEnd);

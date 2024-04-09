@@ -14,11 +14,11 @@ public:
     // Constructs a freelist in the memory range [start, end).
     inline Freelist(void* pStart, void* pEnd, size_t elementSize, size_t alignment, size_t offset);
 
-    // \brief Obtains an element from the freelist.
-    // \remark Returns a \c nullptr if no free entry is available.
+    // Obtains an element from the freelist.
+    // Returns a nullptr if no free entry is available.
     inline void* Obtain(void);
 
-    /// Returns an entry to the list.
+    // Returns an entry to the list.
     inline void Return(void* pPtr);
 
 private:

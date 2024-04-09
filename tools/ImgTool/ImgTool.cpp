@@ -166,10 +166,10 @@ namespace
         // output exists?
         if (gEnv->pFileSys->fileExistsOS(outFile)) {
             if (force) {
-                X_WARNING("ImgTool", "Target already exsists overwriting");
+                X_WARNING("ImgTool", "Target already exists overwriting");
             }
             else {
-                X_WARNING("ImgTool", "Target already exsists skipping");
+                X_WARNING("ImgTool", "Target already exists skipping");
                 return true;
             }
         }

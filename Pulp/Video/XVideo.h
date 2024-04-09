@@ -16,7 +16,7 @@ X_NAMESPACE_DECLARE(core,
                     struct XFileAsync);
 
 X_NAMESPACE_DECLARE(engine,
-                    class IPrimativeContext);
+                    class IPrimitiveContext);
 
 X_NAMESPACE_BEGIN(video)
 
@@ -99,7 +99,7 @@ public:
 
     bool processHdr(core::XFileAsync* pFile, core::span<uint8_t> data);
 
-    Vec2f drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const;
+    Vec2f drawDebug(engine::IPrimitiveContext* pPrim, Vec2f pos) const;
 
     X_INLINE State::Enum getState(void) const;
     X_INLINE uint16_t getWidth(void) const;

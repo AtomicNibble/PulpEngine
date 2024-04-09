@@ -22,7 +22,7 @@ X_NAMESPACE_DECLARE(core,
                     struct FrameView;)
 
 X_NAMESPACE_DECLARE(engine,
-                    class IPrimativeContext);
+                    class IPrimitiveContext);
 
 X_NAMESPACE_DECLARE(physics,
                     struct IScene);
@@ -123,7 +123,7 @@ public:
     void shutDown(void) X_FINAL;
     void release(void) X_FINAL;
 
-    Vec2f drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const X_FINAL;
+    Vec2f drawDebug(engine::IPrimitiveContext* pPrim, Vec2f pos) const X_FINAL;
 
     void update(core::FrameData& frame) X_FINAL;
     void setPhysicsScene(physics::IScene* pScene) X_FINAL;
@@ -228,7 +228,7 @@ private:
 
 private:
     core::MemoryArenaBase* arena_;
-    engine::IPrimativeContext* pPrimCon_;
+    engine::IPrimitiveContext* pPrimCon_;
     physics::IScene* pScene_;
 
     AllocatorHooks allocators_;

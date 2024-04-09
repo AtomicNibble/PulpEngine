@@ -38,7 +38,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
     params.bCoreOnly = true;
     params.bEnableBasicConsole = true;
     params.bEnableJobSystem = true;
-    params.bEnableNetowrking = true;
+    params.bEnableNetworking = true;
     params.bFileSysWorkingDir = true;
     params.consoleDesc.pTitle = X_ENGINE_NAME " - Network Tests";
 

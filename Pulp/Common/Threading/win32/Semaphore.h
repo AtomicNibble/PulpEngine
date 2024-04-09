@@ -57,7 +57,7 @@ public:
     // release a slot, allowing other threads that call wait to take a slot.
     X_INLINE void ReleaseSlot(void);
 
-    // wait untill we have a free slot.
+    // wait until we have a free slot.
     X_INLINE void AcquireSlot(void);
 
     // see if we can

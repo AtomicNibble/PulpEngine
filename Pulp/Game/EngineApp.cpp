@@ -51,7 +51,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
     params.pCmdLine = pInCmdLine;
     params.hInstance = hInstance;
     params.bSkipInput = false;
-    params.bEnableNetowrking = true;
+    params.bEnableNetworking = true;
     params.bEnableVideo = true;
     params.bProfileSysEnabled = true;
     params.bIsGame = true;

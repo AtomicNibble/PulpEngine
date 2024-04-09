@@ -33,7 +33,7 @@ namespace Compression
     typedef Flags8<CompressFlag> CompressFlags;
     typedef uint16_t SharedDictId;
 
-    // placed at start of defalted buffers.
+    // placed at start of deflated buffers.
     // that are made via Compressor<T>
     struct BufferHdr
     {
@@ -250,7 +250,7 @@ namespace Compression
             return T::maxSourceSize();
         }
 
-        // buffer than source is garanted to fit into.
+        // buffer than source is guaranteed to fit into.
         virtual size_t requiredDeflateDestBuf(size_t sourceLen) const X_FINAL
         {
             X_ASSERT(sourceLen <= T::maxSourceSize(), "Source len exceeds max source size")(sourceLen, T::maxSourceSize());

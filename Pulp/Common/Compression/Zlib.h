@@ -18,7 +18,7 @@ X_NAMESPACE_BEGIN(core)
 namespace Compression
 {
     ///
-    ///   Zlib decompressor(CompressBuf);
+    //   Zlib decompressor(CompressBuf);
     ///
     ///
     ///
@@ -116,10 +116,10 @@ namespace Compression
     };
 
     // can compress into blocks.
-    class ZlibDefalte
+    class ZlibDeflate
     {
-        X_NO_COPY(ZlibDefalte);
-        X_NO_ASSIGN(ZlibDefalte);
+        X_NO_COPY(ZlibDeflate);
+        X_NO_ASSIGN(ZlibDeflate);
 
     public:
         typedef ZlibInflate::Result Result;
@@ -129,14 +129,14 @@ namespace Compression
         typedef core::Function<void(const uint8_t* pData, size_t len, size_t deflatedOffset), 64> DeflateCallback;
 
     public:
-        ZlibDefalte(core::MemoryArenaBase* arena, DeflateCallback&& defalteCallBack, CompressLevel::Enum lvl = CompressLevel::NORMAL);
-        ~ZlibDefalte();
+        ZlibDeflate(core::MemoryArenaBase* arena, DeflateCallback&& deflateCallBack, CompressLevel::Enum lvl = CompressLevel::NORMAL);
+        ~ZlibDeflate();
 
         void setBufferSize(size_t size);
         size_t deflatedSize(void) const;
 
-        // this will accept N input blocks and call the deflate callback everytime the buffer is full or we are flusing (finish == true)
-        // you can just pass a huge src block with finish == true and the callback will keep been called with blocks untill it's finished.
+        // this will accept N input blocks and call the deflate callback every time the buffer is full or we are flushing (finish == true)
+        // you can just pass a huge src block with finish == true and the callback will keep been called with blocks until it's finished.
         Result::Enum Deflate(const void* pSrcData, size_t len, bool finish);
 
     private:

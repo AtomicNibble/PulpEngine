@@ -263,7 +263,7 @@ const char* XNet::systemAddressToString(const SystemAddress& systemAddress, IPSt
 NetGUID XNet::generateGUID(void)
 {
     // this needs to be unique as much as possible.
-    // even if game started with same seed needs to be diffrent so clients are still unique.
+    // even if game started with same seed needs to be different so clients are still unique.
     core::TimeVal now = gEnv->pTimer->GetTimeNowReal();
     core::DateStamp date = core::DateStamp::getSystemDate();
 

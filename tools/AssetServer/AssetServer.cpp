@@ -211,7 +211,7 @@ bool AssetServer::Client::listen(void)
                 as_.RenameAsset(request.rename(), responseBuf);
                 break;
             case ProtoBuf::AssetDB::Request::kExists:
-                as_.AssetExsists(request.exists(), responseBuf);
+                as_.AssetExists(request.exists(), responseBuf);
                 break;
             case ProtoBuf::AssetDB::Request::kModInfo:
                 as_.ModInfo(request.modinfo(), responseBuf);
@@ -262,9 +262,9 @@ bool AssetServer::Client::readRequest(ProtoBuf::AssetDB::Request& request)
     }
 
     // we on;y read buffer size, so if we get a message that fills buffer
-    // I don't think we handle reciving it in sections so error.
+    // I don't think we handle receiving it in sections so error.
     if (bytesRead >= BUF_LENGTH) {
-        X_ERROR("AssetServer", "Msg too big, increase bugger size: %" PRIuS " recived: %" PRIuS, BUF_LENGTH, bytesRead);
+        X_ERROR("AssetServer", "Msg too big, increase bugger size: %" PRIuS " received: %" PRIuS, BUF_LENGTH, bytesRead);
         return false;
     }
 
@@ -386,7 +386,7 @@ AssetServer::~AssetServer()
         join();
     }
 
-    // shut down the slut.
+    // shut down.
     google::protobuf::ShutdownProtobufLibrary();
 }
 
@@ -412,7 +412,7 @@ bool AssetServer::Run_Internal(void)
     }
 
     // spawn off new clients for each connection.
-    // ideally handle all clients on single thread by performnce requirement for this is pretty much none exsistent.
+    // ideally handle all clients on single thread the performance requirement for this is pretty much none existent.
     // maybe 4-5 clients max.
     while (1) {
         auto client = core::makeUnique<Client>(arena_, *this, arena_);
@@ -495,7 +495,7 @@ void AssetServer::ModInfo(const ProtoBuf::AssetDB::ModInfo& modInfo, ResponseBuf
     }
 }
 
-void AssetServer::AssetExsists(const ProtoBuf::AssetDB::AssetExists& exists, ResponseBuffer& outputBuffer)
+void AssetServer::AssetExists(const ProtoBuf::AssetDB::AssetExists& exists, ResponseBuffer& outputBuffer)
 {
     AssetType::Enum type;
     core::string name = fromStdString(exists.name());
@@ -504,13 +504,13 @@ void AssetServer::AssetExsists(const ProtoBuf::AssetDB::AssetExists& exists, Res
     response.set_name(name.c_str());
 
     if (!MapAssetType(exists.type(), type)) {
-        writeError(response, outputBuffer, "Unknown asset type in AssetExsists()");
+        writeError(response, outputBuffer, "Unknown asset type in AssetExists()");
         return;
     }
 
     response.set_type(exists.type());
 
-    X_LOG1("AssetServer", "AssetExsists: \"%s\" name: \"%s\"", AssetType::ToString(type), name.c_str());
+    X_LOG1("AssetServer", "AssetExists: \"%s\" name: \"%s\"", AssetType::ToString(type), name.c_str());
 
     {
         core::CriticalSection::ScopedLock slock(lock_);
@@ -632,13 +632,13 @@ void AssetServer::UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core
 template<typename MessageT>
 void AssetServer::writeError(MessageT& response, ResponseBuffer& outputBuffer, const char* pMsg)
 {
-    X_ERROR("Assetserver", "Error: %s", pMsg);
+    X_ERROR("AssetServer", "Error: %s", pMsg);
 
     response.set_result(ProtoBuf::AssetDB::Result::ERROR);
     response.set_error(pMsg);
 
     if (!WriteDelimitedTo(response, outputBuffer)) {
-        X_ERROR("Assetserver", "Failed to write error response");
+        X_ERROR("AssetServer", "Failed to write error response");
     }
 }
 
@@ -649,7 +649,7 @@ void AssetServer::writeResponse(MessageT& response, ResponseBuffer& outputBuffer
     response.set_error("");
 
     if (!WriteDelimitedTo(response, outputBuffer)) {
-        X_ERROR("Assetserver", "Failed to write error response");
+        X_ERROR("AssetServer", "Failed to write error response");
     }
 }
 

@@ -61,7 +61,7 @@ namespace mapFile
         // ensure we never resize, otherwise originals pointers fuck up.
         ent.brushes.reserve(mapEnt->GetNumPrimitives());
 
-        // we process brushes / patches diffrent.
+        // we process brushes / patches different.
         for (size_t i = 0; i < mapEnt->GetNumPrimitives(); i++) {
             auto* pPrim = mapEnt->GetPrimitive(i);
 
@@ -304,7 +304,7 @@ namespace mapFile
         // maybe thats just incorrect logic.
         X_ASSERT(pMaterial->isLoaded(), "Material should be loaded?")(); 
 
-        // create a Primative
+        // create a Primitive
         for (int32_t i = 0; i < patch.GetNumIndexes(); i += 3) {
             LvlTris& tri = ent.patches.AddOne();
 

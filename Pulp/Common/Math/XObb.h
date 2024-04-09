@@ -3,7 +3,7 @@
 #ifndef _X_MATH_OBB_H_
 #define _X_MATH_OBB_H_
 
-//	OBB - Oriented Boinding Box
+//	OBB - Oriented Bounding Box
 //
 //
 //

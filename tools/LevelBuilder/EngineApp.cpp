@@ -74,7 +74,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
     LinkModule(pICore_, "LevelBuilder");
 
     // we can use logging now.
-    if (!pICore_->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "ModelLib", "Engine_ModelLib")) {
+    if (!pICore_->InitializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "ModelLib", "Engine_ModelLib")) {
         X_ERROR("LvlBuilder", "Failed to init shaderLib");
         return false;
     }
@@ -82,19 +82,19 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
     // ConvertLib
     IConverter* pConverterInstance = nullptr;
 
-    if (!pICore_->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "Physics", "Engine_PhysLib",
+    if (!pICore_->InitializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "Physics", "Engine_PhysLib",
             &pPhysConverterMod_, &pConverterInstance)) {
         X_ERROR("LvlBuilder", "Engine Init Failed");
         return false;
     }
 
     // LinkerLib
-    if (!pICore_->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "LinkerLib", "Engine_LinkerLib")) {
+    if (!pICore_->InitializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "LinkerLib", "Engine_LinkerLib")) {
         return false;
     }
 
     // AssetDB
-    if (!pICore_->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "AssetDB", "Engine_AssetDB")) {
+    if (!pICore_->InitializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "AssetDB", "Engine_AssetDB")) {
         X_ERROR("LvlBuilder", "Failed to init AssetDB");
         return false;
     }

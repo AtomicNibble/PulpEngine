@@ -32,11 +32,11 @@ namespace CI
 
     bool XTexLoaderCI::isValidData(const DataVec& fileData)
     {
-        if (fileData.size() < sizeof(CITexureHeader)) {
+        if (fileData.size() < sizeof(CITextureHeader)) {
             return false;
         }
 
-        const CITexureHeader* pHdr = reinterpret_cast<const CITexureHeader*>(fileData.data());
+        const CITextureHeader* pHdr = reinterpret_cast<const CITextureHeader*>(fileData.data());
 
         return pHdr->fourCC == CI_FOURCC;
     }
@@ -77,7 +77,7 @@ namespace CI
 
         ttZone(gEnv->ctx, "(Texture) Load CI");
 
-        CITexureHeader hdr;
+        CITextureHeader hdr;
 
         // file system will report read error in log.
         // but lets return here also.
@@ -131,10 +131,10 @@ namespace CI
 
         // set the info
         imgFile.setWidth(hdr.width);
-        imgFile.setHeigth(hdr.height);
+        imgFile.setHeight(hdr.height);
         imgFile.setNumMips(hdr.Mips);
         imgFile.setNumFaces(hdr.Faces); // 1 for 2D 6 for a cube.
-        imgFile.setDepth(1);            /// We Don't allow volume texture loading yet.
+        imgFile.setDepth(1);            // We Don't allow volume texture loading yet.
         imgFile.setFlags(flags);
         imgFile.setFormat(hdr.format);
         imgFile.resize();

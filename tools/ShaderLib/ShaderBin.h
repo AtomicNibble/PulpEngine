@@ -23,7 +23,7 @@ namespace shader
         SHADERLIB_EXPORT ShaderBin(core::MemoryArenaBase* arena);
         SHADERLIB_EXPORT ~ShaderBin();
 
-        // this is thread safe if saveShader and loadShader are not called for the same instance, must be diffrent instances.
+        // this is thread safe if saveShader and loadShader are not called for the same instance, must be different instances.
         SHADERLIB_EXPORT bool saveShader(const XHWShader* pShader, const SourceFile* pSource);
         SHADERLIB_EXPORT bool loadShader(XHWShader* pShader, const SourceFile* pSource);
 
@@ -32,7 +32,7 @@ namespace shader
         X_INLINE void setCompressionLvl(core::Compression::CompressLevel::Enum lvl);
 
     private:
-        // returns true if we know the file has a diffrent crc32.
+        // returns true if we know the file has a different crc32.
         // saves opening it.
         bool cacheNotValid(const core::Path<char>& path, uint32_t sourceCrc32);
         void updateCacheCrc(const core::Path<char>& path, uint32_t sourceCrc32);

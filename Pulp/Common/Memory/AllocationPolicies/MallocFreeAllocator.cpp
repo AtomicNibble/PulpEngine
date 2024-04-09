@@ -17,7 +17,7 @@ namespace
 #endif
 } // namespace
 
-/// Default constructor.
+// Default constructor.
 MallocFreeAllocator::MallocFreeAllocator(void)
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
@@ -27,8 +27,8 @@ MallocFreeAllocator::MallocFreeAllocator(void)
 #endif
 }
 
-/// \brief Allocates raw memory.
-/// \remark The returned pointer will always adhere to the following alignment requirements: <tt>((ptr + offset) % alignment) == 0</tt>.
+// Allocates raw memory.
+// The returned pointer will always adhere to the following alignment requirements: <tt>((ptr + offset) % alignment) == 0</tt>.
 void* MallocFreeAllocator::allocate(size_t Origsize, size_t alignment, size_t offset)
 {
     X_ASSERT(alignment > 0, "Alignmnet must be greater than zero")(alignment);
@@ -84,7 +84,7 @@ void* MallocFreeAllocator::allocate(size_t Origsize, size_t alignment, size_t of
     return nullptr;
 }
 
-/// Frees an allocation
+// Frees an allocation
 void MallocFreeAllocator::free(void* ptr)
 {
     X_ASSERT_NOT_NULL(ptr);
@@ -124,7 +124,7 @@ void MallocFreeAllocator::free(void* ptr, size_t size)
     free(ptr);
 }
 
-/// Returns statistics regarding the allocations made by the allocator.
+// Returns statistics regarding the allocations made by the allocator.
 MemoryAllocatorStatistics MallocFreeAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS

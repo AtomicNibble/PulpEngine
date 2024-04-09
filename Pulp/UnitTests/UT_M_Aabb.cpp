@@ -152,7 +152,7 @@ TEST(AAbb, Clip)
 
     aabb.clip(AABB(Vec3f(0.f), Vec3f(8.f))); // should give us: 5,5,5 : 8,8,8
 
-    // just check these, we checked the others enougth.
+    // just check these, we checked the others enough.
     EXPECT_EQ(Vec3f(3.f), aabb.size());
     EXPECT_EQ(Vec3f(6.5f), aabb.center());
 }

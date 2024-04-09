@@ -359,7 +359,7 @@ struct ClientConnection
         X_DECLARE_ENUM(Status)(
             Unknown,
             Pending,
-            Exsists,
+            Exists,
             Missing,
             Error
         );

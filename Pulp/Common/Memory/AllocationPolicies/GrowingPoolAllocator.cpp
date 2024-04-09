@@ -63,7 +63,7 @@ GrowingPoolAllocator::GrowingPoolAllocator(size_t maxSizeInBytes, size_t growSiz
 #endif
 }
 
-/// Frees all physical memory owned by the allocator.
+// Frees all physical memory owned by the allocator.
 GrowingPoolAllocator::~GrowingPoolAllocator(void)
 {
     VirtualMem::ReleaseAddressSpace(virtualStart_);

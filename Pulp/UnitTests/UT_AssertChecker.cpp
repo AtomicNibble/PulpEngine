@@ -49,7 +49,7 @@ void UtAssetCheckerHandler::OnAssert(const SourceInfo& sourceInfo)
 void UtAssetCheckerHandler::OnAssertVariable(const SourceInfo& sourceInfo)
 {
     X_UNUSED(sourceInfo);
-    /// o hi.
+    // o hi.
 }
 
 X_NAMESPACE_END

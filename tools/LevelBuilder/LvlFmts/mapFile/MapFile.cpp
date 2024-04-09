@@ -16,14 +16,14 @@ namespace mapFile
 {
     namespace
     {
-        static const size_t MAX_PRIMATIVES = 1 << 17;
+        static const size_t MAX_PRIMITIVES = 1 << 17;
 
-        static const size_t PRIMATIVE_ALLOC_SIZE = core::Max(sizeof(XMapBrush),
+        static const size_t PRIMITIVE_ALLOC_SIZE = core::Max(sizeof(XMapBrush),
             core::Max(sizeof(XMapPatch),
                 core::Max(sizeof(XMapBrushSide),
                     sizeof(XMapEntity))));
 
-        static const size_t PRIMATIVE_ALLOC_ALIGN = core::Max(X_ALIGN_OF(XMapBrush),
+        static const size_t PRIMITIVE_ALLOC_ALIGN = core::Max(X_ALIGN_OF(XMapBrush),
             core::Max(X_ALIGN_OF(XMapPatch),
                 core::Max(X_ALIGN_OF(XMapBrushSide),
                     X_ALIGN_OF(XMapPatch))));
@@ -450,7 +450,7 @@ namespace mapFile
     // ----------------------------------
 
     XMapFile::XMapFile(core::MemoryArenaBase* arena) :
-        pool_(PRIMATIVE_ALLOC_SIZE, PRIMATIVE_ALLOC_ALIGN, MAX_PRIMATIVES, MAX_PRIMATIVES / 10),
+        pool_(PRIMITIVE_ALLOC_SIZE, PRIMITIVE_ALLOC_ALIGN, MAX_PRIMITIVES, MAX_PRIMITIVES / 10),
         entities_(arena),
         layers_(arena),
         arena_(arena)
@@ -598,7 +598,7 @@ namespace mapFile
     {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
         core::MemoryAllocatorStatistics stats = pool_.allocator_.getStatistics();
-        X_LOG0("Map", "Listing map loader primative allocator stats");
+        X_LOG0("Map", "Listing map loader primitive allocator stats");
         X_LOG_BULLET;
 
         X_LOG0("Map", "allocationCount: ^6%i", stats.allocationCount_);

@@ -177,7 +177,7 @@ void CVarColRef::Set(core::string_view str)
         return;
     }
 
-    // any diffrent?
+    // any different?
     if (colValue_.compare(col, 0.001f)) {
         return;
     }
@@ -237,7 +237,7 @@ void CVarVec3Ref::Set(core::string_view str)
         return;
     }
 
-    // any diffrent?
+    // any different?
     if (value_.compare(vec, 0.001f)) {
         return;
     }

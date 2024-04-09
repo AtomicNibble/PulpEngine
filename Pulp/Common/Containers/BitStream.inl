@@ -17,13 +17,13 @@ inline void BitStream::write(const T* pVal, size_type num)
 
 inline void BitStream::writeAligned(const Type* pBuf, size_type numBytes)
 {
-    alignWriteToByteBoundry();
+    alignWriteToByteBoundary();
     write(pBuf, numBytes);
 }
 
 inline void BitStream::writeBitsAligned(const Type* pBuf, size_type numBits)
 {
-    alignWriteToByteBoundry();
+    alignWriteToByteBoundary();
     writeBits(pBuf, numBits);
 }
 
@@ -51,24 +51,24 @@ inline void BitStream::read(T* pVal, size_type num)
 
 inline void BitStream::readAligned(Type* pBuf, size_type numBytes)
 {
-    alignReadToByteBoundry();
+    alignReadToByteBoundary();
     read(pBuf, numBytes);
 }
 
 inline void BitStream::readBitsAligned(Type* pBuf, size_type numBits)
 {
-    alignReadToByteBoundry();
+    alignReadToByteBoundary();
     readBits(pBuf, numBits);
 }
 
 // --------------------------------------------------------
 
-inline void BitStream::alignWriteToByteBoundry(void)
+inline void BitStream::alignWriteToByteBoundary(void)
 {
     bitIdx_ = core::bitUtil::RoundUpToMultiple(bitIdx_, 8_sz);
 }
 
-inline void BitStream::alignReadToByteBoundry(void)
+inline void BitStream::alignReadToByteBoundary(void)
 {
     readBitIdx_ = core::bitUtil::RoundUpToMultiple(readBitIdx_, 8_sz);
 }

@@ -35,8 +35,7 @@ struct mallinfo
     size_t keepcost;
 };
 
-/// \ingroup dlmalloc
-/// \brief Returns information about allocations in a memory space.
+// Returns information about allocations in a memory space.
 extern struct mallinfo mspace_mallinfo(mspace msp);
 };
 

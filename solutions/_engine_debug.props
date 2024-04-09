@@ -2,15 +2,15 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <_PropertySheetDisplayName>Engine Debug</_PropertySheetDisplayName>
-    <OutDir>$(SolutionDir)..\..\build\$(PlatformName)\Debug\</OutDir>
-    <IntDir>$(SolutionDir)..\..\Temp\$(Platform)\Debug\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)..\build\$(PlatformName)\Debug\</OutDir>
+    <IntDir>$(SolutionDir)..\Temp\$(Platform)\Debug\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-	  <ProgramDataBaseFileName>$(SolutionDir)..\..\Temp\$(Platform)\Debug\$(ProjectName)\engine_$(ProjectName).compile.pdb</ProgramDataBaseFileName>
+	  <ProgramDataBaseFileName>$(SolutionDir)..\Temp\$(Platform)\Debug\$(ProjectName)\engine_$(ProjectName).compile.pdb</ProgramDataBaseFileName>
     </ClCompile>
 	<Link>
-		<AdditionalLibraryDirectories>$(SolutionDir)..\3rdparty\$(PlatformToolset)\$(PlatformName)\;$(SolutionDir)..\..\build\$(PlatformName)\Debug\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+		<AdditionalLibraryDirectories>$(SolutionDir)..\3rdparty\$(PlatformToolset)\$(PlatformName)\;$(SolutionDir)..\build\$(PlatformName)\Debug\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 	</Link>
   </ItemDefinitionGroup>
 </Project>

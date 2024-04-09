@@ -110,31 +110,31 @@ int32_t FaceTreeBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 {
     Vec3f halfSize = node->bounds.halfVec();
 
-    // force split any bounds that cross block size boundry.
-    // so if block size is 1024 anything crossing it we force a split on the boundry.
+    // force split any bounds that cross block size boundary.
+    // so if block size is 1024 anything crossing it we force a split on the boundary.
     for (int32_t axis = 0; axis < 3; axis++) {
-        float blockBoundry;
+        float blockBoundary;
 
-        // if the bounds are over double boundry size split somewhere near the middle.
-        // otherwise we split at first boundry after min.
+        // if the bounds are over double boundary size split somewhere near the middle.
+        // otherwise we split at first boundary after min.
         if (halfSize[axis] > BSP_TREE_BLOCK_SIZE) {
             float middleAxis = (node->bounds.min[axis] + halfSize[axis]);
-            blockBoundry = middleAxis;
+            blockBoundary = middleAxis;
         }
         else {
-            blockBoundry = node->bounds.min[axis];
+            blockBoundary = node->bounds.min[axis];
         }
 
-        // clamp it to nearest boundry.
-        blockBoundry /= BSP_TREE_BLOCK_SIZE;
-        blockBoundry = BSP_TREE_BLOCK_SIZE * (math<float>::floor(blockBoundry) + 1.0f);
+        // clamp it to nearest boundary.
+        blockBoundary /= BSP_TREE_BLOCK_SIZE;
+        blockBoundary = BSP_TREE_BLOCK_SIZE * (math<float>::floor(blockBoundary) + 1.0f);
 
-        // does the boundry end inside the axis bounds?
-        if (blockBoundry > (node->bounds.min[axis] + 1.0f)) {
-            if (blockBoundry < (node->bounds.max[axis] - 1.0f)) {
+        // does the boundary end inside the axis bounds?
+        if (blockBoundary > (node->bounds.min[axis] + 1.0f)) {
+            if (blockBoundary < (node->bounds.max[axis] - 1.0f)) {
                 Planef plane;
                 plane[axis] = 1.0f;
-                plane.setDistance(blockBoundry);
+                plane.setDistance(blockBoundary);
                 int32_t planeNum = FindFloatPlane(plane);
                 return planeNum;
             }

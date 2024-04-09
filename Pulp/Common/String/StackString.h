@@ -23,17 +23,17 @@ public:
     static const size_t BUF_SIZE = N;
 
 public:
-    /// Constructs an empty string.
+    // Constructs an empty string.
     inline StackString(void);
 
     inline StackString(const StackString<N, TChar>& oth);
 
-    /// Constructs a string by copying the given string.
+    // Constructs a string by copying the given string.
     explicit StackString(const TChar* const str);
     explicit StackString(const wchar_t* const str);
     explicit StackString(const wchar_t* const beginInclusive, const wchar_t* const endExclusive);
 
-    /// Constructs a string by copying the given range.
+    // Constructs a string by copying the given range.
     explicit StackString(const StringRange<TChar>& range);
 
     explicit StackString(const bool b);
@@ -45,18 +45,18 @@ public:
     explicit StackString(const unsigned __int64 f);
     explicit StackString(const __int64 f);
 
-    /// Constructs a string by copying the given range.
+    // Constructs a string by copying the given range.
     StackString(const TChar* const beginInclusive, const TChar* const endExclusive);
 
     void append(TChar ch);
     void append(TChar ch, size_t count);
-    /// Appends a string.
+    // Appends a string.
     inline void append(const TChar* str);
-    /// Appends part of another string.
+    // Appends part of another string.
     void append(const TChar* str, size_t length);
-    /// Appends part of another string.
+    // Appends part of another string.
     inline void append(const TChar* str, const TChar* end);
-    /// Appends a formatted string.
+    // Appends a formatted string.
     void appendFmt(const TChar* format, ...);
     void appendFmt(const TChar* format, va_list args);
 
@@ -68,22 +68,22 @@ public:
     void setFmt(const TChar* format, ...);
     void setFmt(const TChar* format, va_list args);
 
-    /// \brief Replaces part of the string.
-    /// \remark Returns whether the string was found and replaced.
+    // Replaces part of the string.
+    // Returns whether the string was found and replaced.
     bool replace(const TChar* original, const TChar* replacement);
     bool replace(const TChar* start, const TChar* original, const TChar* replacement);
-    /// \brief Replaces first occurenct of character
-    /// \remark Returns whether the string was found and replaced.
+    // Replaces first occurenct of character
+    // Returns whether the string was found and replaced.
     bool replace(const TChar original, const TChar replacement);
 
-    /// Replaces all occurrences of a string, and returns the number of occurrences replaced.
+    // Replaces all occurrences of a string, and returns the number of occurrences replaced.
     size_t replaceAll(const TChar* original, const TChar* replacement);
-    /// Replaces all occurrences of a character, and returns the number of occurrences replaced.
+    // Replaces all occurrences of a character, and returns the number of occurrences replaced.
     size_t replaceAll(const TChar original, const TChar replacement);
 
-    /// Trims all whitespace to the left and right of the string.
+    // Trims all whitespace to the left and right of the string.
     void trimWhitespace(void);
-    /// Trims all occurrences of the given character to the left and right of the string.
+    // Trims all occurrences of the given character to the left and right of the string.
     void trim(TChar character);
 
     void trimLeft(TChar ch);
@@ -93,23 +93,23 @@ public:
     void trimRight(const TChar* pos);
 
     StackString<N, TChar>& trim(void);
-    /// removes all white space chars in front of string.
+    // removes all white space chars in front of string.
     StackString<N, TChar>& trimLeft(void);
     // removes any leading white space chars.
     StackString<N, TChar>& trimRight(void);
 
-    /// \brief strip char from end as many times as the char occurs
-    /// Same as trimRight.
+    // strip char from end as many times as the char occurs
+    // Same as trimRight.
     inline void stripTrailing(const TChar c);
 
-    /// removes the color codes ^1 ..
+    // removes the color codes ^1 ..
     inline void stripColorCodes(void);
 
-    /// \brief Clears the string such that GetLength() yields 0.
-    /// \remark No assumptions about the characters stored in the internal array should be made.
+    // Clears the string such that GetLength() yields 0.
+    // No assumptions about the characters stored in the internal array should be made.
     inline void clear(void);
 
-    /// Returns whether the string equals a given string.
+    // Returns whether the string equals a given string.
     inline bool isEqual(const TChar* other) const;
 
     
@@ -156,15 +156,15 @@ template<size_t N>
 class StackString<N, wchar_t>
 {
 public:
-    /// Constructs an empty string.
+    // Constructs an empty string.
     inline StackString(void);
 
-    /// Constructs a string by copying the given string.
+    // Constructs a string by copying the given string.
     explicit StackString(const wchar_t* const str);
     explicit StackString(const char* const str);
     explicit StackString(const char* const beginInclusive, const char* const endExclusive);
 
-    /// Constructs a string by copying the given range.
+    // Constructs a string by copying the given range.
     explicit StackString(const StringRange<wchar_t>& range);
 
     explicit StackString(const bool b);

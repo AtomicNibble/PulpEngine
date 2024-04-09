@@ -96,7 +96,7 @@ namespace Converter
     {
         // check in here also even thos it's checked again, logic might change later to not use function below.
         if (inputFileFmt == ImgFileFormat::UNKNOWN) {
-            X_ERROR("Img", "Failed to load img srcFmt unkNown");
+            X_ERROR("Img", "Failed to load img srcFmt unknown");
             return false;
         }
 
@@ -106,7 +106,7 @@ namespace Converter
     bool ImgConveter::loadImg(core::XFile* pFile, ImgFileFormat::Enum inputFileFmt)
     {
         if (inputFileFmt == ImgFileFormat::UNKNOWN) {
-            X_ERROR("Img", "Failed to load img srcFmt unkNown");
+            X_ERROR("Img", "Failed to load img srcFmt unknown");
             return false;
         }
 
@@ -226,7 +226,7 @@ namespace Converter
         fltImg.resize(outImg, swapArena_, filter, dim.x, dim.y, wrapMode);
 
         srcImg_.setWidth(dim.x);
-        srcImg_.setHeigth(dim.y);
+        srcImg_.setHeight(dim.y);
         srcImg_.resize();
 
         if (!outImg.saveToImg(srcImg_, 0, 0)) {
@@ -253,7 +253,7 @@ namespace Converter
 
         tmp.setFormat(Texturefmt::R8G8B8A8);
         tmp.setType(srcImg_.getType());
-        tmp.setHeigth(srcImg_.getHeight());
+        tmp.setHeight(srcImg_.getHeight());
         tmp.setWidth(srcImg_.getWidth());
         tmp.setNumFaces(srcImg_.getNumFaces());
         tmp.setDepth(1);
@@ -315,7 +315,7 @@ namespace Converter
         const uint32_t requiredMips = Util::maxMipsForSize(srcImg_.getWidth(), srcImg_.getHeight());
 
         // if we have mips and it's the correct count return ok.
-        // later on we might want to discard them and generate with a diffrent filter.
+        // later on we might want to discard them and generate with a different filter.
         // for now i could not give a shit, since we can always reprocess every image in one click.
         if (curMips > 1 && curMips == requiredMips && !ignoreSrcMips) {
             return true;
@@ -702,7 +702,7 @@ namespace Converter
             }
         }
         else if (fmt == Texturefmt::BC6) {
-            // the bc6 ones have diffrent naming but same count so i've shiffted them up.
+            // the bc6 ones have different naming but same count so i've shifted them up.
             // veryslow is now slow and slow is basic etc.
             switch (profile) {
                 case Profile::UltraFast:

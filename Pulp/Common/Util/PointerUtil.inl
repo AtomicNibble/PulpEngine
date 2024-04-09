@@ -4,7 +4,7 @@ namespace pointerUtil
 {
     namespace internal
     {
-        /// Generic alignment function used internally.
+        // Generic alignment function used internally.
         X_INLINE void* AlignTop(void* ptr, size_t alignment)
         {
             union
@@ -20,7 +20,7 @@ namespace pointerUtil
             return as_void;
         }
 
-        /// Generic alignment function used internally.
+        // Generic alignment function used internally.
         X_INLINE void* AlignBottom(void* ptr, size_t alignment)
         {
             union

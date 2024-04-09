@@ -71,7 +71,7 @@ namespace fx
 
         // fucking emmiters.
         // how to i keep track of them for deleting.
-        // can just shove in array, but free requires linera searhc, meh.
+        // can just shove in array, but free requires linear searhc, meh.
         core::CriticalSection::ScopedLock lock(cs_);
 
         emmiters_.push_back(pEmitter);

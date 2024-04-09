@@ -9,12 +9,12 @@ void LoggerMayaWritePolicy::Init(void)
 {
 }
 
-/// Empty implementation.
+// Empty implementation.
 void LoggerMayaWritePolicy::Exit(void)
 {
 }
 
-/// Writes a log message to the debugger.
+// Writes a log message to the debugger.
 void LoggerMayaWritePolicy::WriteLog(const core::LoggerBase::Line& line, uint32_t length)
 {
     X_UNUSED(length);
@@ -22,35 +22,35 @@ void LoggerMayaWritePolicy::WriteLog(const core::LoggerBase::Line& line, uint32_
     MayaUtil::MayaPrintMsg(line);
 }
 
-/// Writes a warning message to the debugger.
+// Writes a warning message to the debugger.
 void LoggerMayaWritePolicy::WriteWarning(const core::LoggerBase::Line& line, uint32_t length)
 {
     X_UNUSED(length);
     MayaUtil::MayaPrintWarning(line);
 }
 
-/// Writes an error message to the debugger.
+// Writes an error message to the debugger.
 void LoggerMayaWritePolicy::WriteError(const core::LoggerBase::Line& line, uint32_t length)
 {
     X_UNUSED(length);
     MayaUtil::MayaPrintError(line);
 }
 
-/// Writes a fatal error message to the debugger.
+// Writes a fatal error message to the debugger.
 void LoggerMayaWritePolicy::WriteFatal(const core::LoggerBase::Line& line, uint32_t length)
 {
     X_UNUSED(length);
     MayaUtil::MayaPrintError(line);
 }
 
-/// Writes an assert message to the debugger.
+// Writes an assert message to the debugger.
 void LoggerMayaWritePolicy::WriteAssert(const core::LoggerBase::Line& line, uint32_t length)
 {
     X_UNUSED(length);
     MayaUtil::MayaPrintError(line);
 }
 
-/// Writes an assert variable message to the debugger.
+// Writes an assert variable message to the debugger.
 void LoggerMayaWritePolicy::WriteAssertVariable(const core::LoggerBase::Line& line, uint32_t length)
 {
     X_UNUSED(length);

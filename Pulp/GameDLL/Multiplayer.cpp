@@ -99,7 +99,7 @@ void Multiplayer::update(void)
     }
 }
 
-void Multiplayer::drawChat(core::FrameTimeData& time, engine::IPrimativeContext* pPrim)
+void Multiplayer::drawChat(core::FrameTimeData& time, engine::IPrimitiveContext* pPrim)
 {
     // TODO: maybe seperate this out.
     updateChat(time.deltas[core::Timer::UI]);
@@ -107,7 +107,7 @@ void Multiplayer::drawChat(core::FrameTimeData& time, engine::IPrimativeContext*
     drawChat(pPrim);
 }
 
-void Multiplayer::drawEvents(core::FrameTimeData& time, engine::IPrimativeContext* pPrim)
+void Multiplayer::drawEvents(core::FrameTimeData& time, engine::IPrimitiveContext* pPrim)
 {
     // TODO: maybe seperate this out.
     updateEvents(time.deltas[core::Timer::UI]);
@@ -214,7 +214,7 @@ void Multiplayer::addEventLine(core::string_view line)
     eventLines_.emplace(line);
 }
 
-void Multiplayer::drawChat(engine::IPrimativeContext* pPrim)
+void Multiplayer::drawChat(engine::IPrimitiveContext* pPrim)
 {
     if (chatLines_.isEmpty()) {
         return;
@@ -245,7 +245,7 @@ void Multiplayer::drawChat(engine::IPrimativeContext* pPrim)
     }
 }
 
-void Multiplayer::drawEvents(engine::IPrimativeContext* pPrim)
+void Multiplayer::drawEvents(engine::IPrimitiveContext* pPrim)
 {
     if (eventLines_.isEmpty()) {
         return;
@@ -422,7 +422,7 @@ void Multiplayer::buildChatPacket(ChatPacketBs& bs, core::string_view name, core
     bs.write(msg.data(), msgLen);
 }
 
-void Multiplayer::drawLeaderboard(engine::IPrimativeContext* pPrim)
+void Multiplayer::drawLeaderboard(engine::IPrimitiveContext* pPrim)
 {
     // want some rows that are fixed size maybe?
     // but centered in screen.

@@ -33,7 +33,7 @@ X_DECLARE_FLAGS(VarFlag)
     STATIC_DECL, // statically declared, not user created
     CHEAT,       // variable is considered a cheat
     READONLY,    // display only, cannot be set by user / config
-    HIDDEN,      // not visable to the user.
+    HIDDEN,      // not visible to the user.
     ARCHIVE,     // set to cause it to be saved to a config file
     MODIFIED,    // set when the variable is modified
     CONFIG,      // loaded or set from a config file.
@@ -97,7 +97,7 @@ struct IConsole
 
     // called at start when not much else exists, just so subsystems can register vars
     virtual bool init(ICore* pCore, bool basic) X_ABSTRACT;
-    // finialize any async init tasks.
+    // finalize any async init tasks.
     virtual bool asyncInitFinalize(void) X_ABSTRACT;
     virtual bool loadRenderResources(void) X_ABSTRACT;
 
@@ -117,7 +117,7 @@ struct IConsole
     virtual ICVar* registerInt(core::string_view name, int Value, int Min, int Max, VarFlags flags, core::string_view desc) X_ABSTRACT;
     virtual ICVar* registerFloat(core::string_view name, float Value, float Min, float Max, VarFlags flags, core::string_view desc) X_ABSTRACT;
 
-    // refrenced based, these are useful if we want to use the value alot so we just register it's address.
+    // referenced based, these are useful if we want to use the value a lot so we just register it's address.
     virtual ICVar* registerRef(core::string_view name, float* src, float defaultvalue, float Min, float Max, VarFlags flags, core::string_view desc) X_ABSTRACT;
     virtual ICVar* registerRef(core::string_view name, int* src, int defaultvalue, int Min, int Max, VarFlags flags, core::string_view desc) X_ABSTRACT;
     virtual ICVar* registerRef(core::string_view name, Color* src, Color defaultvalue, VarFlags flags, core::string_view desc) X_ABSTRACT;

@@ -27,7 +27,7 @@ struct ThreadStats
     }
 
     TimeVal waitforJobTime;
-    uint64_t numExecLists; // jobs lists execuced
+    uint64_t numExecLists; // jobs lists executed
 };
 
 class JobThread : public ThreadAbstract

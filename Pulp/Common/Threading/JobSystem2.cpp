@@ -269,7 +269,7 @@ namespace V2
 #endif // !X_ENABLE_JOBSYS_PROFILER
     }
 
-    /// ===============================================
+    // ===============================================
 
     void JobSystem::CreateQueForCurrentThread(void)
     {
@@ -311,7 +311,7 @@ namespace V2
         return arr;
     }
 
-    /// ===============================================
+    // ===============================================
 
     bool JobSystem::StartThreads(void)
     {
@@ -369,7 +369,7 @@ namespace V2
         numQueue_ = idx + 1;
     }
 
-    /// ===============================================
+    // ===============================================
 
     Job* JobSystem::CreateJob(JobFunction::Pointer function JOB_SYS_SUB_PARAM)
     {
@@ -415,7 +415,7 @@ namespace V2
         return job;
     }
 
-    /// ===============================================
+    // ===============================================
 
     void JobSystem::Run(Job* pJob)
     {
@@ -469,7 +469,7 @@ namespace V2
         return false;
     }
 
-    /// ===============================================
+    // ===============================================
 
     Job* JobSystem::AllocateJob(void)
     {
@@ -509,7 +509,7 @@ namespace V2
         X_ASSERT_NOT_IMPLEMENTED();
     }
 
-    /// ===============================================
+    // ===============================================
 
     bool JobSystem::CurrentThreadHasWorkerQueue(void) const
     {
@@ -540,7 +540,7 @@ namespace V2
         return pJobAllocators_[threadIdx];
     }
 
-    /// ===============================================
+    // ===============================================
 
     Job* JobSystem::GetJob(void)
     {

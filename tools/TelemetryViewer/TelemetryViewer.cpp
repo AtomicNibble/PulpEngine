@@ -688,7 +688,7 @@ void LockStateTooltip(TraceView& view, uint64_t lockId, const LockState& lockSta
 
     // these should never driff across threads?
     // currently no.
-    X_ASSERT(lockStateNext.threadID == lockState.threadID, "Lock state on diffrent thread")();
+    X_ASSERT(lockStateNext.threadID == lockState.threadID, "Lock state on different thread")();
 
     auto strLock = view.strings.getLockName(lockId);
     auto strThread = view.strings.getThreadName(lockState.threadID);
@@ -1141,7 +1141,6 @@ int DrawLocks(TraceView& view, const LockDataMap& locks, bool hover, double pxns
 
     int cnt = 0;
 
-    // want to draw all the locks like a dirty sket.
     // have the LockStates then lockTry
 
     // need to fix overlapping try's either server side or viewer side.
@@ -2486,7 +2485,7 @@ void DrawFrame(Client& client, float ww, float wh)
                                 ImGui::SameLine();
                                 if (ImGui::Button("Open"))
                                 {
-                                    // TODO: check if exsists  then open / focus.
+                                    // TODO: check if exists  then open / focus.
                                     OpenTrace ot;
                                     ot.dataSize = sizeof(ot);
                                     ot.type = PacketType::OpenTrace;
@@ -3646,7 +3645,7 @@ bool connectToServer(Client& client)
         return false;
     }
 
-    // Set a big recive buffer.
+    // Set a big receive buffer.
     sock_opt = 1024 * 256;
     res = platform::setsockopt(connectSocket, SOL_SOCKET, SO_RCVBUF, (char*)&sock_opt, sizeof(sock_opt));
     if (res != 0) {

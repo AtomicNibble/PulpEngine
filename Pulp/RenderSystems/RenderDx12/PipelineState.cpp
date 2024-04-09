@@ -17,7 +17,7 @@ namespace
         }
 
 #else
-        // if we don't reload shaders hashing the pointer to byte code is enougth.
+        // if we don't reload shaders hashing the pointer to byte code is enough.
         X_UNUSED(hasher, s);
 #endif // !X_ENABLE_RENDER_SHADER_RELOAD
     };
@@ -204,7 +204,7 @@ PSODeviceCache::HashVal PSODeviceCache::getHash(D3D12_COMPUTE_PIPELINE_STATE_DES
 {
     core::Hash::xxHash64 hasher;
 
-    hasher.reset(0x79371); // diffrent seed to graphics desc.
+    hasher.reset(0x79371); // different seed to graphics desc.
     hasher.update(cpsoDesc);
 
     hashShader(hasher, cpsoDesc.CS);

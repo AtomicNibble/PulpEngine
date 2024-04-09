@@ -1,14 +1,14 @@
 #pragma once
 
 X_NAMESPACE_DECLARE(engine,
-                    class IPrimativeContext);
+                    class IPrimitiveContext);
 
 X_NAMESPACE_BEGIN(physics)
 
 class DebugRender
 {
 public:
-    DebugRender(engine::IPrimativeContext* pPrimCon);
+    DebugRender(engine::IPrimitiveContext* pPrimCon);
     ~DebugRender();
 
 public:
@@ -17,7 +17,7 @@ public:
     void clear(void);
 
 private:
-    engine::IPrimativeContext* pPrimCon_;
+    engine::IPrimitiveContext* pPrimCon_;
 };
 
 X_NAMESPACE_END

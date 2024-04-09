@@ -179,7 +179,7 @@ namespace Converter
             const float* pRedChannel = channel(0);
 
             const size_t expectedSize = numPixels;
-            X_ASSERT(mipSize == expectedSize, "Size missmatch for expected vs provided size")(mipSize, expectedSize);
+            X_ASSERT(mipSize == expectedSize, "Size mismatch for expected vs provided size")(mipSize, expectedSize);
 
             for (uint32_t i = 0; i < numPixels; i++) {
                 uint8_t* pPixel = &pMipDst[i];
@@ -205,7 +205,7 @@ namespace Converter
 
         if (fmt == Texturefmt::R8G8B8A8 || fmt == Texturefmt::B8G8R8A8) {
             const size_t expectedSize = (numPixels * 4);
-            X_ASSERT(mipSize == expectedSize, "Size missmatch for expected vs provided size")(mipSize, expectedSize); 
+            X_ASSERT(mipSize == expectedSize, "Size mismatch for expected vs provided size")(mipSize, expectedSize); 
 
             if (componentCount() >= 4) {
                 for (uint32_t i = 0; i < numPixels; i++) {
@@ -228,7 +228,7 @@ namespace Converter
         }
         else if (fmt == Texturefmt::R8G8B8 || fmt == Texturefmt::B8G8R8) {
             const size_t expectedSize = (numPixels * 3);
-            X_ASSERT(mipSize == expectedSize, "Size missmatch for expected vs provided size")(mipSize, expectedSize); 
+            X_ASSERT(mipSize == expectedSize, "Size mismatch for expected vs provided size")(mipSize, expectedSize); 
 
             for (uint32_t i = 0; i < numPixels; i++) {
                 uint8_t* pPixel = &pMipDst[i * 3];
@@ -240,7 +240,7 @@ namespace Converter
         else if (fmt == Texturefmt::R16G16B16A16_FLOAT) {
             // are we on the same page? (mentally)
             const size_t expectedSize = (numPixels * 8);
-            X_ASSERT(mipSize == expectedSize, "Size missmatch for expected vs provided size")(mipSize, expectedSize); 
+            X_ASSERT(mipSize == expectedSize, "Size mismatch for expected vs provided size")(mipSize, expectedSize); 
 
             if (componentCount() >= 4) {
                 for (uint32_t i = 0; i < numPixels; i++) {
@@ -509,8 +509,6 @@ namespace Converter
 
     void FloatImage::resize(FloatImage& dst, core::MemoryArenaBase* arena, const Filter& filter, uint32_t w, uint32_t h, uint32_t d, WrapMode::Enum wm) const
     {
-        // @@ Use monophase filters when frac(m_width / w) == 0
-
         // Use the existing 2d version if we are not resizing in the Z axis:
         if (depth_ == d) {
             return resize(dst, arena, filter, w, h, wm);

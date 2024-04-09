@@ -10,7 +10,7 @@
 
 #include <IConsole.h>
 #include <I3DEngine.h>
-#include <IPrimativeContext.h>
+#include <IPrimitiveContext.h>
 #include <IPhysics.h>
 #include <IFrameData.h>
 #include <IFont.h>
@@ -213,8 +213,8 @@ namespace
 
 } // namespace
 
-static_assert(sizeof(SndObjectHandle) == sizeof(AkGameObjectID), "Handle size mismtach");
-static_assert(sizeof(PlayingID) == sizeof(AkPlayingID), "PlayingID size mismtach");
+static_assert(sizeof(SndObjectHandle) == sizeof(AkGameObjectID), "Handle size mismatch");
+static_assert(sizeof(PlayingID) == sizeof(AkPlayingID), "PlayingID size mismatch");
 
 static_assert(GLOBAL_OBJECT_ID == static_cast<SndObjectHandle>(2), "Should be 2 yo");
 static_assert(LISTNER_OBJECT_ID == static_cast<SndObjectHandle>(1), "Should be 1 yo");
@@ -519,7 +519,7 @@ void XSound::release(void)
     X_DELETE(this, g_SoundArena);
 }
 
-Vec2f XSound::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
+Vec2f XSound::drawDebug(engine::IPrimitiveContext* pPrim, Vec2f pos) const
 {
     if (!vars_.drawDebug()) {
         return Vec2f();
@@ -656,7 +656,7 @@ void XSound::drawDebug(void) const
         }
 
         int32_t lodIdx = static_cast<int32_t>(distance / 500.f);
-        lodIdx = math<int32_t>::clamp(lodIdx, minLod, engine::IPrimativeContext::SHAPE_NUM_LOD - 1);
+        lodIdx = math<int32_t>::clamp(lodIdx, minLod, engine::IPrimitiveContext::SHAPE_NUM_LOD - 1);
 
         X_ASSERT(lodIdx >= 0, "invalid index")(lodIdx);
 
@@ -726,7 +726,7 @@ void XSound::performOcclusionChecks(void)
 
     physics::IScene* pScene = pScene_;
     if (!pScene) {
-        X_WARNING("SoundSys", "Can't occlude %" PRIuS " emmiters, no physical world", occlusion_.size());
+        X_WARNING("SoundSys", "Can't occlude %" PRIuS " emitters, no physical world", occlusion_.size());
         return;
     }
 
@@ -1008,14 +1008,14 @@ bool XSound::registerBaseObjects(void)
     res = AK::SoundEngine::RegisterGameObj(LISTNER_OBJECT_ID, "Default Listener");
     if (res != AK_Success) {
         AkResult::Description desc;
-        X_ERROR("SoundSys", "Error creating listner object. %s", AkResult::ToString(res, desc));
+        X_ERROR("SoundSys", "Error creating listener object. %s", AkResult::ToString(res, desc));
         return false;
     }
 
     res = AK::SoundEngine::SetDefaultListeners(&LISTNER_OBJECT_ID, 1);
     if (res != AK_Success) {
         AkResult::Description desc;
-        X_ERROR("SoundSys", "Error setting default listners. %s", AkResult::ToString(res, desc));
+        X_ERROR("SoundSys", "Error setting default listener. %s", AkResult::ToString(res, desc));
         return false;
     }
 
@@ -1059,7 +1059,7 @@ void XSound::freeDangling(void)
         core::CriticalSection::ScopedLock lock(cs_);
 
         if (objects_.isNotEmpty()) {
-            X_WARNING("Sound", "Cleaning up %" PRIuS " dangaling sound objects", objects_.size());
+            X_WARNING("Sound", "Cleaning up %" PRIuS " dangling sound objects", objects_.size());
         }
     }
 
@@ -1067,7 +1067,7 @@ void XSound::freeDangling(void)
         core::CriticalSection::ScopedLock lock(memStreamCS_);
 
         if (memoryInputStreams_.isNotEmpty()) {
-            X_WARNING("Sound", "Cleaning up %" PRIuS " dangaling memory streams", memoryInputStreams_.size());
+            X_WARNING("Sound", "Cleaning up %" PRIuS " dangling memory streams", memoryInputStreams_.size());
 
             for (auto& mis : memoryInputStreams_) {
                 AK::SoundEngine::StopPlayingID(mis.playingID);

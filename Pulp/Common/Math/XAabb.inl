@@ -4,7 +4,7 @@ X_INLINE AABB::AABB()
 {
     // don't clear otherwise it will have bounds.
     // clear before adding points etc.
-    // that way it's empty by defauly not huge.
+    // that way it's empty by default not huge.
     // clear();
 }
 
@@ -81,13 +81,12 @@ X_INLINE bool AABB::isEmpty(void) const
     return min == max;
 }
 
-// retruns if the box contains anyspace
 X_INLINE Vec3f AABB::center(void) const
 {
     // size / 2
     return (min + max) * 0.5f;
 }
-// the center point of the box
+
 X_INLINE Vec3f AABB::size(void) const
 {
     return (max - min);

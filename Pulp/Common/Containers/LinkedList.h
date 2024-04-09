@@ -7,7 +7,7 @@ X_NAMESPACE_BEGIN(core)
 
 //
 //	this is intrusive also.
-//	works a bit diffrent tho.
+//	works a bit different tho.
 //
 //
 //	struct MyData

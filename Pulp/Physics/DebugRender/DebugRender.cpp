@@ -2,12 +2,12 @@
 #include "DebugRender.h"
 #include "Util/MathHelpers.h"
 
-#include <IPrimativeContext.h>
+#include <IPrimitiveContext.h>
 #include <IFont.h>
 
 X_NAMESPACE_BEGIN(physics)
 
-DebugRender::DebugRender(engine::IPrimativeContext* pPrimCon) :
+DebugRender::DebugRender(engine::IPrimitiveContext* pPrimCon) :
     pPrimCon_(pPrimCon)
 {
     X_ASSERT_NOT_NULL(pPrimCon_);
@@ -19,13 +19,14 @@ DebugRender::~DebugRender()
 
 void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 {
-    // We need to handle the case where any of the primatives take more verts than a given page.
-    // we can handle the case where points lines and triangles use allmost a page each just fine
+    // We need to handle the case where any of the primitives take more verts than a given page.
+    // we can handle the case where points lines and triangles use almost a page each just fine
     // it's just if one of them is bigger than a single page we will crash due to access violation.
-    // the ideall way to handle this is for the primContex to tell use how many verts we got back that way we can spread
+    // the ideal way to handle this is for the primContex to tell us how many verts we got back that way we can spread
     // the prims across multiple pages if required.
-    // or what if we just know the answer and break it up ourself, since this is the only place that requires this logic.
+    // or what if we just know the answer and break it up ourselves, since this is the only place that requires this logic.
     // so might as well just write it here.
+    // Note: done.
 
     const uint32_t maxVertsPerBatch = safe_static_cast<uint32_t>(pPrimCon_->maxVertsPerPrim());
 
@@ -37,8 +38,8 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
         while (numPoints) {
             const uint32_t pointBatchSize = core::Min(maxVertsPerBatch, numPoints);
 
-            engine::IPrimativeContext::PrimVertex* X_RESTRICT pPoints = pPrimCon_->addPrimative(pointBatchSize,
-                engine::IPrimativeContext::PrimitiveType::POINTLIST);
+            engine::IPrimitiveContext::PrimVertex* X_RESTRICT pPoints = pPrimCon_->addPrimitive(pointBatchSize,
+                engine::IPrimitiveContext::PrimitiveType::POINTLIST);
 
             for (uint32_t i = 0; i < pointBatchSize; i++) {
                 const physx::PxDebugPoint& point = points[i];
@@ -57,15 +58,15 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
     if (numLines) {
         const physx::PxDebugLine* X_RESTRICT lines = debugRenderable.getLines();
 
-        // lets do the batching ourself, since we need to cast so we can't use the range submit.
+        // lets do the batching ourselves, since we need to cast so we can't use the range submit.
         while (numLines) {
             const uint32_t lineBatchVertSize = core::Min(maxVertsPerBatch, numLines * 2);
             const uint32_t lineBatchSize = lineBatchVertSize >> 1;
 
             X_ASSERT(lineBatchSize * 2 == lineBatchVertSize, "")();
 
-            engine::IPrimativeContext::PrimVertex* X_RESTRICT pLines = pPrimCon_->addPrimative(lineBatchVertSize,
-                engine::IPrimativeContext::PrimitiveType::LINELIST);
+            engine::IPrimitiveContext::PrimVertex* X_RESTRICT pLines = pPrimCon_->addPrimitive(lineBatchVertSize,
+                engine::IPrimitiveContext::PrimitiveType::LINELIST);
 
             for (uint32_t i = 0; i < lineBatchSize; i++) {
                 const physx::PxDebugLine& line = lines[i];
@@ -93,8 +94,8 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 
             X_ASSERT(triBatchSize * 3 == triBatchVertSize, "")();
 
-            engine::IPrimativeContext::PrimVertex* X_RESTRICT pVerts = pPrimCon_->addPrimative(triBatchVertSize,
-                engine::IPrimativeContext::PrimitiveType::TRIANGLELIST);
+            engine::IPrimitiveContext::PrimVertex* X_RESTRICT pVerts = pPrimCon_->addPrimitive(triBatchVertSize,
+                engine::IPrimitiveContext::PrimitiveType::TRIANGLELIST);
 
             for (uint32_t i = 0; i < triBatchSize; i++) {
                 const physx::PxDebugTriangle& triangle = triangles[i];
@@ -122,12 +123,12 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
     if (numText) {
         X_ASSERT_NOT_IMPLEMENTED(); // check this logic below is correct.
 
-        const physx::PxDebugText* X_RESTRICT texts = debugRenderable.getTexts();
+        const physx::PxDebugText* X_RESTRICT pTexts = debugRenderable.getTexts();
 
         font::TextDrawContext con;
 
         for (uint32_t i = 0; i < numText; i++) {
-            const auto text = texts[i];
+            const auto& text = pTexts[i];
 
             con.size.x = text.size;
             con.size.y = text.size;

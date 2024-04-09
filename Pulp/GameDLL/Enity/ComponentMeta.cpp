@@ -4,12 +4,12 @@
 #include <MetaTable.h>
 
 /*
-    So I need a way to serialize components for the network, and I want to be able to deifne custom packing.
+    So I need a way to serialize components for the network, and I want to be able to define custom packing.
     and also not sync every field.
 
-    So I need to define some meta for hte component fields.
+    So I need to define some meta for the component fields.
 
-    Poitentially I will be able to use this meta for processing ent descripts from disc.
+    Potentially I will be able to use this meta for processing ent descripts from disc.
     Will see.
 
 

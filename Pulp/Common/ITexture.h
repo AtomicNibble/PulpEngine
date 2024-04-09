@@ -143,7 +143,7 @@ X_DECLARE_FLAGS(TexFlag)
     HI_MIP_STREAMING, // only high mips can be streamed.
     FORCE_STREAM,     // force stream even if only one mip
 
-    // can be used to force a img that would normaly be stream to be sync loaded.
+    // can be used to force a img that would normally be stream to be sync loaded.
     // useful for enforcing sync loads for required assets.
     DONT_STREAM,
 
@@ -176,7 +176,7 @@ Streaming:
 some images can be streamed in, not all since it don't make sense to stream.
 for example UI images we want the whole image before a load finishes.
 
-but otherwise we will load the smallest collection of mipmaps syncrosly, 
+but otherwise we will load the smallest collection of mipmaps synchronously, 
 then stream in larger mips on demand.
 
 we support 4 blocks of data so a image of 4096x4096 will be:
@@ -186,7 +186,7 @@ block 3: 2048x2048
 block 2: 1024x1204
 block 1: 512x512 256x256 128x128 64x64 32x32 16x16 8x8 4x4 2x2 1x1
 
-when we sotorre the diffrent blocks we should order them how we preditate them to 
+when we store the different blocks we should order them how we predicate them to 
 be loaded. for example if a collection of models are near each other.
 it makes sense to store the bigger res blocks for the images the models use
 next to each other in the file, giving us a good chance of reduced seeking 
@@ -198,7 +198,7 @@ Here is a thought:
 
 do we need to store the small mips when close to the object?
 
-meanes we could place other image data in it's place, allowing us to make
+means we could place other image data in it's place, allowing us to make
 better use of vram.
 
 What are the downsides?
@@ -206,12 +206,12 @@ What are the downsides?
 1. if we are storing another image where the small mips use to be, and we are wanting
 	to start using the smaller mips, we are going to have to put the old image back
 
-	a potential solution could be to force the gpu to use the higer images
-	untill we have got the correct small mips back into memory.
+	a potential solution could be to force the gpu to use the higher images
+	until we have got the correct small mips back into memory.
 
 we could just do it but not be aggressive about it.
 so say we have block 4 been used currently we would only allow block 1
-to be overwriteen, then as soon as block 3 is been used start getting 
+to be overwritten, then as soon as block 3 is been used start getting 
 block 1 in vram again.
 
 

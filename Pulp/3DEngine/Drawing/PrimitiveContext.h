@@ -1,7 +1,7 @@
 #pragma once
 
 #include <IRenderCommands.h>
-#include "IPrimativeContext.h"
+#include "IPrimitiveContext.h"
 
 #include <Util\PointerFlags.h>
 
@@ -13,13 +13,13 @@ X_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
 
 // this stores resources that are shared between contex's.
 // like materials and shape meshes.
-X_ALIGNED_SYMBOL(class PrimativeContextSharedResources, 64)
+X_ALIGNED_SYMBOL(class PrimitiveContextSharedResources, 64)
 {
-    static const int32_t SHAPES_NUM_LOD = IPrimativeContext::SHAPE_NUM_LOD;
+    static const int32_t SHAPES_NUM_LOD = IPrimitiveContext::SHAPE_NUM_LOD;
 
-    typedef IPrimativeContext::PrimitiveType PrimitiveType;
-    typedef IPrimativeContext::ShapeInstanceData ShapeInstanceData;
-    typedef IPrimativeContext::ShapeType ShapeType;
+    typedef IPrimitiveContext::PrimitiveType PrimitiveType;
+    typedef IPrimitiveContext::ShapeInstanceData ShapeInstanceData;
+    typedef IPrimitiveContext::ShapeType ShapeType;
 
     typedef Vertex_P3F_T2S_C4B ShapeVertex;
 
@@ -40,7 +40,7 @@ public:
     typedef std::array<ShapeLod, SHAPES_NUM_LOD> ShapeLodArr;
 
     // we put all the lods for a given shape in a single buffer.
-    // that way we don't need to switch when rendering same shape with diffrent active lods.
+    // that way we don't need to switch when rendering same shape with different active lods.
     // potentialy doing something else might work out better in pratice, like all shapes of given lod index in same buffer etc..
     struct Shape
     {
@@ -85,7 +85,7 @@ public:
     typedef std::array<PrimMaterialArr, MaterialSet::ENUM_COUNT> PrimMaterialSetArr;
 
 public:
-    PrimativeContextSharedResources();
+    PrimitiveContextSharedResources();
 
     bool init(render::IRender * pRender, XMaterialManager * pMatMan);
     void releaseResources(render::IRender * pRender, XMaterialManager * pMatMan);
@@ -118,8 +118,8 @@ private:
     InstancedPageArr shapeInstancePages_;
 };
 
-X_ALIGNED_SYMBOL(class PrimativeContext, 64) :
-    public IPrimativeContext
+X_ALIGNED_SYMBOL(class PrimitiveContext, 64) :
+    public IPrimitiveContext
 {
 public:
     typedef core::PointerFlags<Material, 3> MaterialWithPageIdx;
@@ -136,7 +136,7 @@ public:
         uint16_t numVertices;
         uint16_t vertexOffs;
         // 4
-        //	int32_t pageIdx; // need to try find a good place to put this, 3 bits is enougth to store this.
+        //	int32_t pageIdx; // need to try find a good place to put this, 3 bits is enough to store this.
 
         // if i fource all materials to be 8byte aligned i can store the page index in here :D
         // could props get away with shoving it in the msb's but not as portable and safe.
@@ -200,7 +200,7 @@ public:
 
     typedef std::array<ShapeInstanceDataContainer, ShapeType::ENUM_COUNT> ShapeParamLodTypeArr; // come up with better name for this?
 
-    using MaterialSet = PrimativeContextSharedResources::MaterialSet;
+    using MaterialSet = PrimitiveContextSharedResources::MaterialSet;
 
 private:
     // I think i'm going to just support pages of verts.
@@ -222,8 +222,8 @@ private:
     typedef std::array<render::VertexBufferHandle, MAX_PAGES> VertexPageHandlesArr;
 
 public:
-    PrimativeContext(PrimativeContextSharedResources& sharedRes, Mode mode, MaterialSet::Enum set, core::MemoryArenaBase* arena);
-    ~PrimativeContext() X_OVERRIDE;
+    PrimitiveContext(PrimitiveContextSharedResources& sharedRes, Mode mode, MaterialSet::Enum set, core::MemoryArenaBase* arena);
+    ~PrimitiveContext() X_OVERRIDE;
 
     bool freePages(render::IRender* pRender);
 
@@ -240,10 +240,10 @@ public:
     const ShapeParamLodTypeArr& getShapeArrayBuffers(void) const;
     ShapeParamLodTypeArr& getShapeArrayBuffers(void);
     VertexPageHandlesArr getVertBufHandles(void) const;
-    const PrimativeContextSharedResources::Shape& getShapeResources(ShapeType::Enum shape) const;
+    const PrimitiveContextSharedResources::Shape& getShapeResources(ShapeType::Enum shape) const;
 
 public:
-    using IPrimativeContext::drawText; // bring in the helpers.
+    using IPrimitiveContext::drawText; // bring in the helpers.
 
     void drawText(const Vec3f& poss, const Matrix33f& ang, const font::TextDrawContext& con, const char* pText, const char* pEnd) X_FINAL;
     void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pBegin, const char* pEnd) X_FINAL;
@@ -252,15 +252,15 @@ private:
     VertexPage& getPage(size_t requiredVerts);
 
 private:
-    PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, Material * pMaterial) X_FINAL;
-    PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type) X_FINAL;
+    PrimVertex* addPrimitive(uint32_t num, PrimitiveType::Enum type, Material * pMaterial) X_FINAL;
+    PrimVertex* addPrimitive(uint32_t num, PrimitiveType::Enum type) X_FINAL;
     ShapeInstanceData* addShape(ShapeType::Enum type, bool solid, int32_t lodIdx = 0) X_FINAL;
 
 private:
     PushBufferArr pushBufferArr_;
     VertexPagesArr vertexPages_;
 
-    PrimativeContextSharedResources::MaterialSet::Enum set_;
+    PrimitiveContextSharedResources::MaterialSet::Enum set_;
     int32_t currentPage_;
     Mode mode_;
 
@@ -268,11 +268,11 @@ private:
 
     ShapeParamLodTypeArr shapeLodArrays_;
 
-    const PrimativeContextSharedResources& sharedRes_;
+    const PrimitiveContextSharedResources& sharedRes_;
 };
 
 X_NAMESPACE_END
 
-#include "PrimativeContext.inl"
+#include "PrimitiveContext.inl"
 
 X_ENABLE_WARNING(4324) //  structure was padded due to alignment specifier

@@ -80,7 +80,7 @@ bool AssetLoader::onFileChanged(const char* pName)
     core::AssetName assetName(pName);
     assetName.replaceSeprators();
 
-    // must be in a asset folder.
+    // must be in an asset folder.
     auto* pSlash = assetName.find(core::AssetName::ASSET_NAME_SLASH);
     if (!pSlash) {
         return false;
@@ -116,7 +116,7 @@ bool AssetLoader::onFileChanged(const char* pName)
 
     core::string nameStr(tmp.begin(), tmp.end());
 
-    // TODO: what's the diffrence?
+    // TODO: what's the difference?
     // is one just without folder prefix and extension?
     assetsinks_[type]->onFileChanged(assetName, nameStr);
     return true;
@@ -161,10 +161,10 @@ void AssetLoader::reload(AssetBase* pAsset, ReloadFlags flags)
 
 void AssetLoader::addLoadRequest(AssetBase* pAsset)
 {
-    X_ASSERT(assetsinks_[pAsset->getType()], "Asset type doest not have a registered handler")(assetDb::AssetType::ToString(pAsset->getType()));
+    X_ASSERT(assetsinks_[pAsset->getType()], "Asset type does not have a registered handler")(assetDb::AssetType::ToString(pAsset->getType()));
     X_ASSERT(pAsset->getName().isNotEmpty(), "Asset name is empty")(assetDb::AssetType::ToString(pAsset->getType()));
 
-    X_LOG0_IF(vars_.debugLvl() > 1, "AssetLoader", "Recived request: ^4%s^7 -> \"%s\"",
+    X_LOG0_IF(vars_.debugLvl() > 1, "AssetLoader", "Received request: ^4%s^7 -> \"%s\"",
         assetDb::AssetType::ToString(pAsset->getType()), pAsset->getName().c_str());
 
     core::CriticalSection::ScopedLock lock(loadReqLock_);

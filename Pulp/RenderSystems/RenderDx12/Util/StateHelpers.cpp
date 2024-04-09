@@ -168,7 +168,7 @@ void createDescFromState(const StateDesc& state, D3D12_BLEND_DESC& blendDesc)
         }
     }
     else {
-        // disabling 'BlendEnable' is not actually enougth... it still requires valid values.
+        // disabling 'BlendEnable' is not actually enough... it still requires valid values.
         D3D12_RENDER_TARGET_BLEND_DESC defaultDesc = {
             FALSE,
             FALSE,

@@ -85,7 +85,7 @@ private:
 
     void ConverterInfo(const ProtoBuf::AssetDB::ConverterInfoReqest& modInfo, ResponseBuffer& outputBuffer);
     void ModInfo(const ProtoBuf::AssetDB::ModInfo& modInfo, ResponseBuffer& outputBuffer);
-    void AssetExsists(const ProtoBuf::AssetDB::AssetExists& exists, ResponseBuffer& outputBuffer);
+    void AssetExists(const ProtoBuf::AssetDB::AssetExists& exists, ResponseBuffer& outputBuffer);
     void AddAsset(const ProtoBuf::AssetDB::AddAsset& add, ResponseBuffer& outputBuffer);
     void DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, ResponseBuffer& outputBuffer);
     void RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, ResponseBuffer& outputBuffer);

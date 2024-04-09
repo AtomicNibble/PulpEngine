@@ -43,7 +43,7 @@ namespace entity
         auto deimension = gEnv->pRender->getDisplayRes();
         cam_.setFrustum(deimension.x, deimension.y, DEFAULT_FOV, 1.f, 2048.f);
 
-        // we don't store fov var here, since this system only exsistins in game.
+        // we don't store fov var here, since this system only existins in game.
         // so can't change the setting out of game.
         if (vars_.getFovVar()) {
             auto* pFov = vars_.getFovVar();

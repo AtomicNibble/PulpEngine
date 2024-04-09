@@ -7,7 +7,7 @@
 #include <Util/FloatIEEEUtil.h>
 
 #include <I3DEngine.h>
-#include <IPrimativeContext.h>
+#include <IPrimitiveContext.h>
 #include <IFont.h>
 #include <ITimer.h>
 #include <IFrameData.h>
@@ -99,7 +99,7 @@ Session::~Session()
 {
     arena_->removeChildArena(&snapArena_);
 
-    recivedSnaps_.clear();
+    receivedSnaps_.clear();
 }
 
 void Session::update(void)
@@ -110,7 +110,7 @@ void Session::update(void)
     // do a network tick.
     pPeer_->runUpdate();
 
-    // potentially we have now recived packets.
+    // potentially we have now received packets.
     readPackets();
 
     lobbys_[LobbyType::Party].handleState();
@@ -130,7 +130,7 @@ void Session::handleSnapShots(core::FrameTimeData& timeInfo)
     // - speed up or slow down interpolation speed based on this.
 
     // if we have interpolated past current snap delta and have new snaps process them.
-    while (snapInterpolationTimeMS_ > snapTime_.deltaMS && recivedSnaps_.isNotEmpty())
+    while (snapInterpolationTimeMS_ > snapTime_.deltaMS && receivedSnaps_.isNotEmpty())
     {
         snapInterpolationTimeMS_ -= snapTime_.deltaMS;
         processSnapShot();
@@ -206,7 +206,7 @@ Session::SnapBufferTimeInfo Session::calculateSnapShotBufferTime(void) const
     int32_t totalRecvTimeMS = snapRecvTime_.deltaMS;
 
     // look at all the pending snaps. (might be none)
-    for (const auto& snap : recivedSnaps_)
+    for (const auto& snap : receivedSnaps_)
     {
         auto snapTime = snap.getTimeMS();
         auto snapRecvTime = snap.getRecvTimeMS();
@@ -230,12 +230,12 @@ void Session::processSnapShot(void)
 {
     ttZone(gEnv->ctx, "(Net/Session) SnapShot");
 
-    if (recivedSnaps_.isEmpty()) {
+    if (receivedSnaps_.isEmpty()) {
         X_ERROR("Session", "No snapshot to process");
         return;
     }
 
-    auto& snap = recivedSnaps_.peek();
+    auto& snap = receivedSnaps_.peek();
 
     snapTime_.rotate(snap.getTimeMS());
     snapRecvTime_.rotate(snap.getRecvTimeMS());
@@ -246,7 +246,7 @@ void Session::processSnapShot(void)
 
     pGameCallbacks_->applySnapShot(snap);
 
-    recivedSnaps_.pop();
+    receivedSnaps_.pop();
 }
 
 void Session::connect(SystemAddress address)
@@ -581,22 +581,22 @@ void Session::onLostConnectionToHost(LobbyType::Enum type)
     quitToMenu();
 }
 
-void Session::onReciveSnapShot(SnapShot&& snap)
+void Session::onReceiveSnapShot(SnapShot&& snap)
 {
     X_ASSERT(snap.getTimeMS() >= 0, "Shapshot time is not valid")(snap.getTimeMS(), snap.getRecvTimeMS());
     X_ASSERT(snap.getRecvTimeMS() < 0, "Shapshot recvtime should not be set")(snap.getTimeMS(), snap.getRecvTimeMS());
 
-    if (recivedSnaps_.freeSpace() == 0)
+    if (receivedSnaps_.freeSpace() == 0)
     {
         X_ERROR("Session", "Snapshot buffer full forcing snap apply");
         processSnapShot();
-        X_ASSERT(recivedSnaps_.freeSpace() > 0, "Should have space for snapshot")();
+        X_ASSERT(receivedSnaps_.freeSpace() > 0, "Should have space for snapshot")();
     }
 
     auto time = gEnv->pTimer->GetTimeNowNoScale();
     snap.setRecvTime(time.GetMilliSecondsAsInt32());
 
-    recivedSnaps_.emplace(std::move(snap));
+    receivedSnaps_.emplace(std::move(snap));
 
     // process the snap shot.
     // not sure where i want to put this logic.
@@ -606,7 +606,7 @@ void Session::onReciveSnapShot(SnapShot&& snap)
     // but all local games have a session, humm..
     ++numSnapsReceived_;
 
-    X_LOG0_IF(vars_.snapDebug(), "Session", "Recived snapshot: %" PRIi32, numSnapsReceived_);
+    X_LOG0_IF(vars_.snapDebug(), "Session", "Received snapshot: %" PRIi32, numSnapsReceived_);
 
     if (state_ != SessionState::InGame)
     {
@@ -901,7 +901,6 @@ bool Session::stateLoading(void)
     }
     else
     {
-        // we are a dirty pleb, and have finished loading.
         // we will keep coming back here until we have synced world with host.
         // so check we are still connected.
         if (gameLobby.getNumConnectedPeers() < 1)
@@ -1074,7 +1073,6 @@ void Session::handleTransportConnectionTermPacket(Packet* pPacket)
     // MessageID::ConnectionClosed:
     // MessageID::DisconnectNotification:
 
-    // the peer is a slut!
     for (int32_t i = 0; i < LobbyType::ENUM_COUNT; i++)
     {
         if (lobbys_[i].isActive()) {
@@ -1093,7 +1091,7 @@ void Session::handleTransportConnectionTermPacket(Packet* pPacket)
 void Session::handleTransportConnectionResponse(Packet* pPacket)
 {
     if (state_ == SessionState::Idle) {
-        X_ERROR("Session", "Recived connection failure packet while idle. Msg: \"%s\"", MessageID::ToString(pPacket->getID()));
+        X_ERROR("Session", "Received connection failure packet while idle. Msg: \"%s\"", MessageID::ToString(pPacket->getID()));
         X_ASSERT_UNREACHABLE(); // we tried to connect to a peer but are idle?
         return;
     }
@@ -1162,7 +1160,7 @@ void Session::handleTransportConnectionHandShake(Packet* pPacket)
         // we got a packet when idle, should this ever happen?
         // This means we have set the transport to allow incoming connections.
         // we should tell them to go away?
-        X_ERROR("Session", "Recived packet while idle. Msg: \"%s\"", MessageID::ToString(pPacket->getID()));
+        X_ERROR("Session", "Received packet while idle. Msg: \"%s\"", MessageID::ToString(pPacket->getID()));
         // close connections for now when this happens
         pPeer_->closeConnection(pPacket->systemHandle, true, OrderingChannel::Default, PacketPriority::Low);
         return;
@@ -1193,7 +1191,7 @@ void Session::sendPacketToLobbyIfGame(Packet* pPacket)
 
         default:
             // TODO: if we just leave a game, can prevent incoming snapshots hitting this?
-            X_WARNING("Session", "Recived Game packet when not in game state: %s", SessionState::ToString(state_));
+            X_WARNING("Session", "Received Game packet when not in game state: %s", SessionState::ToString(state_));
             break;
     }
 }
@@ -1206,7 +1204,7 @@ void Session::sendPacketToDesiredLobby(Packet* pPacket)
     // ignore the packet if idle.
     // should we send them a packet to tell them, or let them timeout?
     if (state_ == SessionState::Idle) {
-        X_WARNING("Session", "Recived lobby packet when idle. LobbyType: %" PRIu8, LobbyType::ToString(lobbyType));
+        X_WARNING("Session", "Received lobby packet when idle. LobbyType: %" PRIu8, LobbyType::ToString(lobbyType));
         return;
     }
 
@@ -1217,7 +1215,7 @@ void Session::sendPacketToDesiredLobby(Packet* pPacket)
             break;
 
         default:
-            X_ERROR("Session", "Recived packet with invalid lobbyType: %s Type: %" PRIu8, SessionState::ToString(state_), lobbyType);
+            X_ERROR("Session", "Received packet with invalid lobbyType: %s Type: %" PRIu8, SessionState::ToString(state_), lobbyType);
             X_ASSERT_UNREACHABLE();
             return;
     }
@@ -1225,7 +1223,7 @@ void Session::sendPacketToDesiredLobby(Packet* pPacket)
     auto& lobby = lobbys_[lobbyType];
 
     if (!lobby.isActive()) {
-        X_WARNING("Session", "Recived packet for inactive lobby. LobbyType: %" PRIu8, LobbyType::ToString(lobbyType));
+        X_WARNING("Session", "Received packet for inactive lobby. LobbyType: %" PRIu8, LobbyType::ToString(lobbyType));
         return;
     }
 
@@ -1293,7 +1291,7 @@ bool Session::getPingInfo(SystemHandle systemHandle, PingInfo& info) const
     return pPeer_->getPingInfo(systemHandle, info);
 }
 
-Vec2f Session::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
+Vec2f Session::drawDebug(Vec2f base, engine::IPrimitiveContext* pPrim) const
 {
     const auto debugLvl = vars_.drawLobbyDebug();
 

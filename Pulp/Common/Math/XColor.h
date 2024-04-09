@@ -92,10 +92,10 @@ struct ColorT
     static ColorT<T> white(void);
     static ColorT<T> gray(T value, T alpha = CHANTRAIT<T>::max());
 
-    //! Returns a ColorA from a hexadecimal-encoded RGB triple. For example, red is 0xFF0000
+    // Returns a ColorA from a hexadecimal-encoded RGB triple. For example, red is 0xFF0000
     static ColorT<T> hex(uint32_t hexValue);
 
-    //! Returns a ColorA from a hexadecimal-encoded ARGB ordering. For example, 50% transparent red is 0x80FF0000
+    // Returns a ColorA from a hexadecimal-encoded ARGB ordering. For example, 50% transparent red is 0x80FF0000
     static ColorT<T> hexA(uint32_t hexValue);
 
     static bool fromString(const char* pBegin, const char* pEnd, ColorT<T>& out, bool slient = true);

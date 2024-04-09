@@ -73,7 +73,7 @@ public:
     ~CmdPacketAllocator();
 
     // creates allocators for calling thread and all jobSys threads.
-    void createAllocaotrsForThreads(core::V2::JobSystem& jobSys);
+    void createAllocatorsForThreads(core::V2::JobSystem& jobSys);
 
     template<typename CommandT>
     X_INLINE CommandPacket::Packet create(size_t threadIdx, size_t auxMemorySize);
@@ -136,8 +136,8 @@ public:
     typedef core::FixedArray<RenderTargetWithFlags, MAX_RENDER_TARGETS> RenderTargetsArr;
 
 #if X_COMPILER_CLANG == 0
-    static_assert(PixelBufferWithFlags::BIT_COUNT >= DepthBindFlag::FLAGS_COUNT, "Not enougth space for flags");
-    static_assert(RenderTargetWithFlags::BIT_COUNT >= RenderTargetFlag::FLAGS_COUNT, "Not enougth space for flags");
+    static_assert(PixelBufferWithFlags::BIT_COUNT >= DepthBindFlag::FLAGS_COUNT, "Not enough space for flags");
+    static_assert(RenderTargetWithFlags::BIT_COUNT >= RenderTargetFlag::FLAGS_COUNT, "Not enough space for flags");
 #endif // !X_COMPILE_CLANG
 
 protected:
@@ -145,7 +145,7 @@ protected:
     ~CommandBucketBase() = default;
 
 public:
-    // Maybe allowing diffrent index's to be set is better idea.
+    // Maybe allowing different index's to be set is better idea.
     // and what ever is not null is set.
     X_INLINE void appendRenderTarget(IRenderTarget* pRTV, RenderTargetFlags flags = RenderTargetFlags());
     X_INLINE void setDepthStencil(render::IPixelBuffer* pPB, DepthBindFlags bindFlags = DepthBindFlags());
@@ -175,7 +175,7 @@ protected:
 template<typename KeyT>
 class CommandBucket : public CommandBucketBase
 {
-    // number of slots to fetch for each thread, should be atleast 32 to prevent fales sharing.
+    // number of slots to fetch for each thread, should be atleast 32 to prevent false sharing.
     // could make this number based on the size of KeyT.
     static const size_t FETCH_SIZE = 64 / sizeof(KeyT);
 
@@ -224,7 +224,7 @@ public:
     X_INLINE const KeyArr& getKeys(void);
 
 private:
-    // offset and coutns for each thread adding commands
+    // offset and counts for each thread adding commands
     X_ALIGNED_SYMBOL(AlignedIntArr, 64)
     threadSlotsInfo_;
 

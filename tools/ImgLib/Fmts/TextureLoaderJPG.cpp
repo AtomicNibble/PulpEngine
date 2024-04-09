@@ -263,7 +263,7 @@ namespace JPG
         imgFile.setDepth(1);
         imgFile.setFlags(flags);
         imgFile.setType(TextureType::T2D);
-        imgFile.setHeigth(safe_static_cast<uint16_t, uint32_t>(cinfo.output_height));
+        imgFile.setHeight(safe_static_cast<uint16_t, uint32_t>(cinfo.output_height));
         imgFile.setWidth(safe_static_cast<uint16_t, uint32_t>(cinfo.output_width));
         
         if (cinfo.out_color_space == JCS_RGB)
@@ -290,7 +290,7 @@ namespace JPG
             pBuffer += row_stride;
         }
 
-        X_ASSERT((pEnd - pBuffer) == 0, "Faield to decode jpg")(pEnd, pBuffer, (pEnd - pBuffer));
+        X_ASSERT((pEnd - pBuffer) == 0, "Failed to decode jpg")(pEnd, pBuffer, (pEnd - pBuffer));
 
         jpeg_finish_decompress(&cinfo);
         jpeg_destroy_decompress(&cinfo);

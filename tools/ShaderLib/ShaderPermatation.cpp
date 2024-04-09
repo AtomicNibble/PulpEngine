@@ -12,7 +12,7 @@ using namespace core;
 
 namespace shader
 {
-    // flags for the diffrent input types that can be present in a shader.
+    // flags for the different input types that can be present in a shader.
     //
     //	base is awlways:
     //
@@ -24,7 +24,7 @@ namespace shader
     //		BiNornmals & Tangents (always together)
     //		Color
     //
-    //		Nolte we have diffrent types for some.
+    //		Nolte we have different types for some.
     //		like there is UV that is 3 floats.
     //		other uv's are 2 16bit floats.
     //

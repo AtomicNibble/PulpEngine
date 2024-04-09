@@ -54,16 +54,16 @@ TEST(net, OrderedPacketsTest)
     core::TimeVal testTime = core::TimeVal::fromMS(5000);
     core::TimeVal endTime = timer.GetTimeVal() + testTime;
 
-    std::array<int32_t, MAX_ORDERED_STREAMS> streamsCnts, recivedStreamCnts;
+    std::array<int32_t, MAX_ORDERED_STREAMS> streamsCnts, receivedStreamCnts;
     streamsCnts.fill(0);
-    recivedStreamCnts.fill(0);
+    receivedStreamCnts.fill(0);
 
     core::Array<uint8_t> data(g_arena);
     data.resize(1024 * 60);
 
     // now we need to wait for connection to complete.
     int32_t packetsSent = 0;
-    int32_t packetsRecived = 0;
+    int32_t packetsReceived = 0;
     int32_t numTestsComplete = 0;
 
     while (1) {
@@ -108,9 +108,9 @@ TEST(net, OrderedPacketsTest)
         }
         else if (curState == State::Sending) {
             packetsSent = 0;
-            packetsRecived = 0;
+            packetsReceived = 0;
 
-            // sends packets on diffrent streams.
+            // sends packets on different streams.
             uint32_t numStream = gEnv->xorShift.randRange(1u, 10u);
             for (uint32_t x = 0; x < numStream; x++) {
                 size_t stream = gEnv->xorShift.randIndex(MAX_ORDERED_STREAMS);
@@ -164,7 +164,7 @@ TEST(net, OrderedPacketsTest)
             for (pPacket = pServer->receive(); pPacket; pServer->freePacket(pPacket), pPacket = pServer->receive()) {
                 if (pPacket->getID() == PACKET_ID) {
                     // we got the packet data, check it's correct.
-                    X_LOG0("SeqTest", "Recived packet. length: %" PRIu32, pPacket->bitLength);
+                    X_LOG0("SeqTest", "Received packet. length: %" PRIu32, pPacket->bitLength);
 
                     int32_t packetNumber;
                     int32_t streamIdx;
@@ -174,11 +174,11 @@ TEST(net, OrderedPacketsTest)
                     bs.read(streamIdx);
 
                     // skipped any?
-                    if (packetNumber > recivedStreamCnts[streamIdx]) {
+                    if (packetNumber > receivedStreamCnts[streamIdx]) {
                         // out of order.
                         X_ASSERT_UNREACHABLE();
                     }
-                    else if (packetNumber < recivedStreamCnts[streamIdx]) {
+                    else if (packetNumber < receivedStreamCnts[streamIdx]) {
                         // out of order.
                         X_ASSERT_UNREACHABLE();
                     }
@@ -187,15 +187,15 @@ TEST(net, OrderedPacketsTest)
                             packetNumber, streamIdx);
                     }
 
-                    recivedStreamCnts[streamIdx] = packetNumber + 1;
-                    ++packetsRecived;
+                    receivedStreamCnts[streamIdx] = packetNumber + 1;
+                    ++packetsReceived;
                 }
                 else {
                 }
             }
 
-            if (packetsRecived >= packetsSent) {
-                EXPECT_EQ(packetsSent, packetsRecived);
+            if (packetsReceived >= packetsSent) {
+                EXPECT_EQ(packetsSent, packetsReceived);
 
                 ++numTestsComplete;
 

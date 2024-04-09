@@ -1,102 +1,102 @@
 
-template<class T, typename Primative>
-ReferenceCountedInstance<T, Primative>::ReferenceCountedInstance(void) :
+template<class T, typename Primitive>
+ReferenceCountedInstance<T, Primitive>::ReferenceCountedInstance(void) :
     instance_(),
     refCount_(1)
 {
 }
 
-template<class T, typename Primative>
-ReferenceCountedInstance<T, Primative>::ReferenceCountedInstance(const T& instance) :
+template<class T, typename Primitive>
+ReferenceCountedInstance<T, Primitive>::ReferenceCountedInstance(const T& instance) :
     instance_(instance),
     refCount_(1)
 {
 }
 
-template<class T, typename Primative>
-int32_t ReferenceCountedInstance<T, Primative>::addReference(void) const
+template<class T, typename Primitive>
+int32_t ReferenceCountedInstance<T, Primitive>::addReference(void) const
 {
     return ++refCount_;
 }
 
-template<class T, typename Primative>
-int32_t ReferenceCountedInstance<T, Primative>::removeReference(void) const
+template<class T, typename Primitive>
+int32_t ReferenceCountedInstance<T, Primitive>::removeReference(void) const
 {
     return --refCount_;
 }
 
-template<class T, typename Primative>
-int32_t ReferenceCountedInstance<T, Primative>::getRefCount(void) const
+template<class T, typename Primitive>
+int32_t ReferenceCountedInstance<T, Primitive>::getRefCount(void) const
 {
     return refCount_;
 }
 
-template<class T, typename Primative>
-T* ReferenceCountedInstance<T, Primative>::instance(void)
+template<class T, typename Primitive>
+T* ReferenceCountedInstance<T, Primitive>::instance(void)
 {
     return &instance_;
 }
 
-template<class T, typename Primative>
-const T* ReferenceCountedInstance<T, Primative>::instance(void) const
+template<class T, typename Primitive>
+const T* ReferenceCountedInstance<T, Primitive>::instance(void) const
 {
     return &instance_;
 }
 
 // ======================================
 
-template<class T, typename Primative>
-int32_t ReferenceCountedInherit<T, Primative>::addReference(void) const
+template<class T, typename Primitive>
+int32_t ReferenceCountedInherit<T, Primitive>::addReference(void) const
 {
     return ++refCount_;
 }
 
-template<class T, typename Primative>
-int32_t ReferenceCountedInherit<T, Primative>::removeReference(void) const
+template<class T, typename Primitive>
+int32_t ReferenceCountedInherit<T, Primitive>::removeReference(void) const
 {
     return --refCount_;
 }
 
-template<class T, typename Primative>
-int32_t ReferenceCountedInherit<T, Primative>::getRefCount(void) const
+template<class T, typename Primitive>
+int32_t ReferenceCountedInherit<T, Primitive>::getRefCount(void) const
 {
     return refCount_;
 }
 
-template<class T, typename Primative>
-T* ReferenceCountedInherit<T, Primative>::instance(void)
+template<class T, typename Primitive>
+T* ReferenceCountedInherit<T, Primitive>::instance(void)
 {
     return this;
 }
 
-template<class T, typename Primative>
-const T* ReferenceCountedInherit<T, Primative>::instance(void) const
+template<class T, typename Primitive>
+const T* ReferenceCountedInherit<T, Primitive>::instance(void) const
 {
     return this;
 }
 
 // ======================================
 
-template<typename Primative>
-ReferenceCounted<Primative>::ReferenceCounted(void) :
+template<typename Primitive>
+ReferenceCounted<Primitive>::ReferenceCounted(void) :
     refCount_(1)
 {
 }
 
-template<typename Primative>
-X_INLINE int32_t ReferenceCounted<Primative>::addReference(void) const
+template<typename Primitive>
+X_INLINE int32_t ReferenceCounted<Primitive>::addReference(void) const
 {
     return ++refCount_;
 }
 
-template<typename Primative>
-X_INLINE int32_t ReferenceCounted<Primative>::removeReference(void) const
+template<typename Primitive>
+X_INLINE int32_t ReferenceCounted<Primitive>::removeReference(void) const
 {
     return --refCount_;
 }
 
-template<typename Primative>
-X_INLINE int32_t ReferenceCounted<Primative>::getRefCount(void) const
+template<typename Primitive>
+X_INLINE int32_t ReferenceCounted<Primitive>::getRefCount(void) const
 {
     return refCount_;
 }

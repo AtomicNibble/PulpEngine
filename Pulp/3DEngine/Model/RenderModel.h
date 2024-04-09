@@ -8,7 +8,7 @@
 #include "RenderMesh.h"
 
 X_NAMESPACE_DECLARE(engine,
-                    class PrimativeContext;)
+                    class PrimitiveContext;)
 
 X_NAMESPACE_BEGIN(model)
 
@@ -29,11 +29,11 @@ public:
     void releaseLodRenderBuffers(size_t idx, render::IRender* pRender);
     bool canRenderLod(size_t idx) const;
 
-    void RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col) const;
-    void RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col, const Matrix44f* pBoneMatrix, size_t num) const;
-    void RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
+    void RenderBones(engine::PrimitiveContext* pPrimContex, const Matrix44f& modelMat, const Color8u col) const;
+    void RenderBones(engine::PrimitiveContext* pPrimContex, const Matrix44f& modelMat, const Color8u col, const Matrix44f* pBoneMatrix, size_t num) const;
+    void RenderBoneNames(engine::PrimitiveContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
         Vec3f offset, float textSize, const Color8u col) const;
-    void RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
+    void RenderBoneNames(engine::PrimitiveContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
         Vec3f offset, float textSize, const Color8u col, const Matrix44f* pBoneMatrix, size_t num) const;
 
     void assignDefault(RenderModel* pDefault);

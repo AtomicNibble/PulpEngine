@@ -164,7 +164,7 @@ public:
     static const float NOISE_ELIPSON;
 
 public:
-    AnimCompiler(core::MemoryArenaBase* arena, const Inter::Anim& inter, const model::ModelSkeleton& skelton);
+    AnimCompiler(core::MemoryArenaBase* arena, const Inter::Anim& inter, const model::ModelSkeleton& skeleton);
     ~AnimCompiler();
 
     void printStats(bool verbose = false) const;
@@ -188,7 +188,7 @@ private:
     core::MemoryArenaBase* arena_;
 
     const Inter::Anim& inter_;
-    const model::ModelSkeleton& skelton_;
+    const model::ModelSkeleton& skeleton_;
 
 private:
     float scale_;

@@ -213,12 +213,12 @@ bool SqlLiteDb::setThreadMode(ThreadMode::Enum threadMode)
         res = setConfig(SQLITE_CONFIG_MULTITHREAD);
     }
     else if (threadMode == ThreadMode::SERIALIZED) {
-        // why are you using this mode you twat.
-        /// I actually use this mode now :(
-        /// but I don't use it for performance reasons.
-        /// I use it so the DB can be accssed from the UI thread and background thread that performs converting in AssetManager.
-        /// the standalone converter still uses single threaded mode.
-        //X_WARNING("SqlLiteDb", "Enabling multi threading for single db connection, are you sure you want this? (answer is no.)");
+        // Ideally don't use this mode
+        // I actually use this mode now :(
+        // but I don't use it for performance reasons.
+        // I use it so the DB can be accessed from the UI thread and background thread that performs converting in AssetManager.
+        // the standalone converter still uses single threaded mode.
+        // X_WARNING("SqlLiteDb", "Enabling multi threading for single db connection, are you sure you want this? (answer is no.)");
         res = setConfig(SQLITE_CONFIG_SERIALIZED);
     }
     else {
@@ -250,7 +250,7 @@ bool SqlLiteDb::connect(const char* pDb, OpenFlags flags)
     }
 
     if (!disconnect()) {
-        X_ERROR("SqlLiteDb", "Failed to disconeect beofre conencting to new db: \"%s\"", pDb);
+        X_ERROR("SqlLiteDb", "Failed to disconnect before connecting to new db: \"%s\"", pDb);
         return false;
     }
 
@@ -348,7 +348,7 @@ bool SqlLiteDb::execute(const char* sql)
         return true;
     }
 
-    X_ERROR("SqlDb", "execue failed for \"%s\" err(%i): %s", sql, res, errorMsg());
+    X_ERROR("SqlDb", "execute failed for \"%s\" err(%i): %s", sql, res, errorMsg());
     return false;
 }
 
@@ -369,7 +369,7 @@ Result::Enum SqlLiteDb::executeRes(const char* sql)
         return res;
     }
 
-    X_ERROR("SqlDb", "execue failed for \"%s\" err(%i): %s", sql, res, errorMsg());
+    X_ERROR("SqlDb", "execute failed for \"%s\" err(%i): %s", sql, res, errorMsg());
     return res;
 }
 

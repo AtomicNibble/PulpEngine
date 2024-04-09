@@ -10,7 +10,7 @@ X_NAMESPACE_BEGIN(engine)
 
 class EffectVars;
 
-class IPrimativeContext;
+class IPrimitiveContext;
 
 namespace fx
 {
@@ -102,7 +102,7 @@ namespace fx
         void setTrans(const Transformf& trans, const Vec3f& offset) X_FINAL;
 
         void update(core::TimeVal delta);
-        void draw(core::FrameView& view, IPrimativeContext* pPrim);
+        void draw(core::FrameView& view, IPrimitiveContext* pPrim);
 
     private:
         void updateStages(core::TimeVal delta);

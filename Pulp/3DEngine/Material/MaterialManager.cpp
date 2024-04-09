@@ -234,7 +234,7 @@ void XMaterialManager::onLoadRequestFail(core::AssetBase* pAsset)
     if (pDefaultMtl_ != pMaterial) {
         // what if default Material not loaded :| ?
         if (!pDefaultMtl_->isLoaded()) {
-            // we can't wait for fucking IO load, since this is called by the IO thread.
+            // we can't wait for IO load, since this is called by the IO thread.
             // if it's not loaded it will never load.
             core::CriticalSection::ScopedLock lock(failedLoadLock_);
 
@@ -316,7 +316,7 @@ bool XMaterialManager::processData(Material* pMaterial, core::XFile* pFile)
     }
 
     // we want to load all the textures now.
-    // so that we are not 'creating' refrences for every tech.
+    // so that we are not 'creating' references for every tech.
     texture::TextureFlags texFlags = texture::TextureFlags();
 
     for (auto& tex : textures) {
@@ -382,14 +382,14 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 
     X_ASSERT_NOT_NULL(pTechDefState);
 
-    // now we have the tech we wnat to create a permatation of it supporting what we want.
+    // now we have the tech we want to create a permutation of it supporting what we want.
     TechDef* pTechDef = pTechDefState->getTech(techNameHash);
     if (!pTechDef) {
         X_ERROR("MatMan", "Tech not found");
         return nullptr;
     }
 
-    // we now have a permatation of the shader that we want.
+    // we now have a permutation of the shader that we want.
     // this gives us the pipeline state handle.
     // we just now need to make variable state.
     TechDefPerm* pPerm = pTechDef->getOrCreatePerm(vrtFmt, permFlags);
@@ -418,11 +418,11 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
         numSamplers = 0;
     }
 
-    // temp, should move over to using values from perm somepoint.
-    X_ASSERT(numTex == (size_t)pPerm->numTextStates, "Mistatch")();
-    X_ASSERT(numSamplers == (size_t)pPerm->numSamplers, "Mistatch")();
-    X_ASSERT(numCb == (size_t)pPerm->numCbs, "Mistatch")();
-    X_ASSERT(numBuffers == (size_t)pPerm->numBuffers, "Mistatch")();
+    // temp, should move over to using values from perm some point.
+    X_ASSERT(numTex == (size_t)pPerm->numTextStates, "Mismatch")();
+    X_ASSERT(numSamplers == (size_t)pPerm->numSamplers, "Mismatch")();
+    X_ASSERT(numCb == (size_t)pPerm->numCbs, "Mismatch")();
+    X_ASSERT(numBuffers == (size_t)pPerm->numBuffers, "Mismatch")();
 
     render::Commands::ResourceStateBase* pVariableState = vsMan_.createVariableState(
         numTex,
@@ -687,7 +687,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
                     std::memcpy(&cpuData[cbParam.getBindOffset()], &matParam.value, sizeof(matParam.value));
                 }
 
-                // optermisation:
+                // optimisation:
                 // might be better to not store these material cb instance for each tech and instead share them within a material
                 // so if a material has multiple techs that have identical material cbuffers they could share them.
                 // since the material params will be the same for all techs.
@@ -770,7 +770,7 @@ X_INLINE void XMaterialManager::setRegisters(TechDefPerm* pTech,
 {
     TechDef* pTechDef = pTech->pTechDef;
 
-    // set the fooking state yo!
+    // set the state yo!
     const auto& permTextures = pTech->pShaderPerm->getTextures();
 
     for (auto& cb : pTechDef->codeBinds_) {
@@ -780,7 +780,7 @@ X_INLINE void XMaterialManager::setRegisters(TechDefPerm* pTech,
             auto& p = permTextures[i];
 
             if (p.getName() == cb.resourceName) {
-                X_ASSERT(i < static_cast<size_t>(pResourceState->getNumTextStates()), "Resouce index out of bounds")(i, pResourceState->getNumTextStates());
+                X_ASSERT(i < static_cast<size_t>(pResourceState->getNumTextStates()), "Resource index out of bounds")(i, pResourceState->getNumTextStates());
                 pResourceState->getTexStates()[i].textureId = val;
                 break;
             }

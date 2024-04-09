@@ -39,8 +39,6 @@ private:
     type* owner_;
 };
 
-// get kinky.
-
 template<typename T>
 Hierarchy<T>::Hierarchy()
 {
@@ -150,7 +148,7 @@ typename Hierarchy<T>::type* Hierarchy<T>::next(void) const
     }
 
     node = this;
-    // go back up untill we have a brother.
+    // go back up until we have a brother.
     while (node && node->brother_ == nullptr) {
         node = node->parent_;
     }

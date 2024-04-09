@@ -568,9 +568,6 @@
     <ClInclude Include="Debugging\DebuggerBreakpointMacros.h">
       <Filter>Headers\Debugging</Filter>
     </ClInclude>
-    <ClInclude Include="Debugging\DefaultAssertionHandler.h">
-      <Filter>Headers\Debugging</Filter>
-    </ClInclude>
     <ClInclude Include="Debugging\ExceptionHandler.h">
       <Filter>Headers\Debugging</Filter>
     </ClInclude>
@@ -786,9 +783,6 @@
     </ClInclude>
     <ClInclude Include="Memory\AllocationPolicies\StackAllocator.h">
       <Filter>Headers\Memory\AllocationPolicies</Filter>
-    </ClInclude>
-    <ClInclude Include="Debugging\AssertionHandler.h">
-      <Filter>Headers\Debugging</Filter>
     </ClInclude>
     <ClInclude Include="Hashing\sha1.h">
       <Filter>Headers\Hashing</Filter>
@@ -1114,7 +1108,7 @@
     <ClInclude Include="IRenderCommands.h">
       <Filter>Interfaces_h\Render</Filter>
     </ClInclude>
-    <ClInclude Include="IPrimativeContext.h">
+    <ClInclude Include="IPrimitiveContext.h">
       <Filter>Interfaces_h\3DEngine</Filter>
     </ClInclude>
     <ClInclude Include="String\HumanDuration.h">
@@ -1641,7 +1635,7 @@
     <None Include="CmdBucket.inl">
       <Filter>Interfaces_h\Render</Filter>
     </None>
-    <None Include="IPrimativeContext.inl">
+    <None Include="IPrimitiveContext.inl">
       <Filter>Interfaces_h\3DEngine</Filter>
     </None>
     <None Include="Util\Function.inl">
@@ -2040,7 +2034,7 @@
     <ClCompile Include="CmdBucket.cpp">
       <Filter>Interfaces_h\Render</Filter>
     </ClCompile>
-    <ClCompile Include="IPrimativeContext.cpp">
+    <ClCompile Include="IPrimitiveContext.cpp">
       <Filter>Interfaces_h\3DEngine</Filter>
     </ClCompile>
     <ClCompile Include="String\HumanDuration.cpp">

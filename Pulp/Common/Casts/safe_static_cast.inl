@@ -3,7 +3,7 @@ X_NAMESPACE_BEGIN(core)
 
 namespace internal
 {
-    /// Template specialization for casting from an unsigned type into an unsigned type
+    // Template specialization for casting from an unsigned type into an unsigned type
     template<>
     struct safe_static_cast_helper<false, false>
     {
@@ -16,7 +16,7 @@ namespace internal
         }
     };
 
-    /// Template specialization for casting from an unsigned type into a signed type
+    // Template specialization for casting from an unsigned type into a signed type
     template<>
     struct safe_static_cast_helper<false, true>
     {
@@ -29,7 +29,7 @@ namespace internal
         }
     };
 
-    /// Template specialization for casting from a signed type into an unsigned type
+    // Template specialization for casting from a signed type into an unsigned type
     template<>
     struct safe_static_cast_helper<true, false>
     {
@@ -47,7 +47,7 @@ namespace internal
         }
     };
 
-    /// Template specialization for casting from a signed type into a signed type
+    // Template specialization for casting from a signed type into a signed type
     template<>
     struct safe_static_cast_helper<true, true>
     {

@@ -316,8 +316,8 @@ RecvResult::Enum NetSocket::recv(RecvData& dataOut)
     }
 
 #if X_ENABLE_NET_STATS
-    ++stats_.numPacketsRecived;
-    stats_.numBytesRecived += bytesRead;
+    ++stats_.numPacketsReceived;
+    stats_.numBytesReceived += bytesRead;
 #endif // !X_ENABLE_NET_STATS
 
     dataOut.timeRead = gEnv->pTimer->GetTimeNowReal();
@@ -386,11 +386,11 @@ void NetSocket::setSocketOptions(void)
     int32_t sock_opt;
     lastErrorWSA::Description Dsc;
 
-    // TODO: these buffers should be diffrent for server / client.
+    // TODO: these buffers should be different for server / client.
     // but if you are a client that then hosts a server we would need to change it?
 
     // TODO: perf maybe lower these buffers
-    // set the recive buffer to decent size
+    // set the receive buffer to decent size
     sock_opt = 1024 * 256;
     res = platform::setsockopt(socket_, SOL_SOCKET, SO_RCVBUF, (char*)&sock_opt, sizeof(sock_opt));
     if (res != 0) {

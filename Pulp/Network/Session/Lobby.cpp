@@ -12,7 +12,7 @@
 #include <Platform\Process.h>
 
 // debug drawing
-#include <IPrimativeContext.h>
+#include <IPrimitiveContext.h>
 #include <IFont.h>
 
 X_NAMESPACE_BEGIN(net)
@@ -329,7 +329,7 @@ void Lobby::connectTo(SystemAddress address)
     // we are already connected to the remote system we just wanna join the lobby.
     auto systemHandle = pPeer_->getSystemHandleForAddress(address);
     if (systemHandle == INVALID_SYSTEM_HANDLE) {
-        X_ERROR("Lobby", "Failed to get system handle for exsiting peer connection");
+        X_ERROR("Lobby", "Failed to get system handle for existing peer connection");
         setState(LobbyState::Error);
         return;
     }
@@ -360,7 +360,7 @@ void Lobby::startHosting(const MatchParameters& params)
     {
         // TODO: if we have a remote lobby, like on a server.
         // would need to dispatch request and wait.
-        // for now just instant readdy.
+        // for now just instant ready.
 
     }
 
@@ -419,7 +419,7 @@ void Lobby::sendMembersToLobby(LobbyType::Enum type) const
     bs.write(safe_static_cast<uint8_t>(type_));
     bs.write(safe_static_cast<uint8_t>(type));
 
-    // TODO: inssert remote address.
+    // TODO: insert remote address.
     SystemAddress sa = pPeer_->getMyBoundAddress();
     sa.writeToBitStream(bs);
 
@@ -668,7 +668,7 @@ int32_t Lobby::findPeerIdx(SystemHandle handle) const
 
 int32_t Lobby::addPeer(SystemAddress address)
 {
-    // X_ASSERT(findPeer(handle) == nullptr, "Peer already exsists")(handle);
+    // X_ASSERT(findPeer(handle) == nullptr, "Peer already exists")(handle);
 
     // find free idx.
     int32_t idx = -1;
@@ -700,9 +700,9 @@ int32_t Lobby::addPeer(SystemAddress address)
 void Lobby::disconnectPeer(int32_t peerIdx)
 {
     X_ASSERT(peerIdx >= 0 && peerIdx < safe_static_cast<int32_t>(peers_.size()), "Invalid peerIdx")(peerIdx, peers_.size());
-    X_ASSERT(isHost(), "Should not be trying to diconnectPeer if not host")(isHost(), isPeer());
+    X_ASSERT(isHost(), "Should not be trying to disconnect peer if not host")(isHost(), isPeer());
 
-    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Diconnecting peerIdx: %" PRIi32, peerIdx);
+    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Disconnecting peerIdx: %" PRIi32, peerIdx);
 
     setPeerConnectionState(peerIdx, LobbyPeer::ConnectionState::Free);
 }
@@ -778,7 +778,7 @@ void Lobby::addUsersFromBs(core::FixedBitStreamBase& bs, int32_t peerIdx)
     const auto numUsersStart = getNumUsers();
     int32_t numUsers = bs.read<int32_t>();
 
-    X_ASSERT(numUsers < MAX_PLAYERS, "Recived more users than max players")(numUsers, MAX_PLAYERS);
+    X_ASSERT(numUsers < MAX_PLAYERS, "Received more users than max players")(numUsers, MAX_PLAYERS);
 
     for (int32_t i = 0; i < numUsers; i++)
     {
@@ -803,7 +803,7 @@ void Lobby::addUsersFromBs(core::FixedBitStreamBase& bs, int32_t peerIdx)
         }
         else
         {
-            X_ASSERT(peerIdx == hostIdx_, "Should only recive user list from host")(peerIdx, hostIdx_);
+            X_ASSERT(peerIdx == hostIdx_, "Should only receive user list from host")(peerIdx, hostIdx_);
 
             // only the host's user address need patching.
             // since the host will have set the address for all other users.
@@ -814,7 +814,7 @@ void Lobby::addUsersFromBs(core::FixedBitStreamBase& bs, int32_t peerIdx)
             }
             else
             {
-                user.peerIdx = -1; // peer indexes aree not valid on clients.
+                user.peerIdx = -1; // peer indexes are not valid on clients.
             }
         }
 
@@ -887,7 +887,6 @@ void Lobby::addLocalUsers(void)
     core::SysInfo::UserNameStr nameStr;
     core::SysInfo::GetUserName(nameStr);
 
-    // Lerrooooooooooooy JENKINS!!! (is a twat? O_O)
     char buffer[sizeof(nameStr) / 2];
 
     auto localGuid = pPeer_->getMyGUID();
@@ -1074,13 +1073,13 @@ void Lobby::sendChatHistoryToPeer(int32_t peerIdx)
 
 void Lobby::handleSnapShot(Packet* pPacket)
 {
-    X_ASSERT(isPeer(), "Recived snapshot when not a peer")(isPeer());
-    X_ASSERT(type_ == LobbyType::Game, "None game lobby recived snapshot")(type_);
+    X_ASSERT(isPeer(), "Received snapshot when not a peer")(isPeer());
+    X_ASSERT(type_ == LobbyType::Game, "None game lobby received snapshot")(type_);
 
     auto& hostPeer = peers_[hostIdx_];
     if (pPacket->guid != hostPeer.guid) {
         NetGuidStr str0, str1;
-        X_ERROR("Lobby", "Recived snapshot was not from host peer. Packed: %s Host: %s", pPacket->guid.toString(str0), hostPeer.guid.toString(str1));
+        X_ERROR("Lobby", "Received snapshot was not from host peer. Packed: %s Host: %s", pPacket->guid.toString(str0), hostPeer.guid.toString(str1));
         return;
     }
 
@@ -1103,16 +1102,16 @@ void Lobby::handleSnapShot(Packet* pPacket)
     // now we need to just give this snapshot to someone o.o
     // i'm in the lobby :(
     // need a way back to session?
-    pCallbacks_->onReciveSnapShot(std::move(snap));
+    pCallbacks_->onReceiveSnapShot(std::move(snap));
 }
 
 void Lobby::handleUserCmd(Packet* pPacket)
 {
-    X_ASSERT(isHost(), "Recived usercmd when not host")(isPeer(), isHost());
+    X_ASSERT(isHost(), "Received usercmd when not host")(isPeer(), isHost());
 
     auto peerIdx = findPeerIdx(pPacket->systemHandle);
     if (peerIdx < 0) {
-        X_ERROR("Lobby", "Failed to find peer for incomming userCmd");
+        X_ERROR("Lobby", "Failed to find peer for incoming userCmd");
         return;
     }
 
@@ -1136,7 +1135,7 @@ void Lobby::handleConnectionAccepted(Packet* pPacket)
 
     if (state_ != LobbyState::Connecting)
     {
-        X_ERROR("Lobby", "Recived connection accepted when not trying to connect. State: \"%s\"", LobbyState::ToString(state_));
+        X_ERROR("Lobby", "Received connection accepted when not trying to connect. State: \"%s\"", LobbyState::ToString(state_));
         return;
     }
 
@@ -1162,7 +1161,7 @@ void Lobby::handleConnectionAccepted(Packet* pPacket)
     // ask to join the lobby.
     sendJoinRequestToHost();
 
-    // todo wait for reponse.
+    // todo wait for response.
     setState(LobbyState::Joining);
 }
 
@@ -1171,7 +1170,7 @@ void Lobby::handleConnectionAttemptFailed(MessageID::Enum id)
 {
     if (state_ != LobbyState::Connecting)
     {
-        X_ERROR("Lobby", "Recived connection failed when not trying to connect. State: \"%s\" Msg: \"%s\"", 
+        X_ERROR("Lobby", "Received connection failed when not trying to connect. State: \"%s\" Msg: \"%s\"", 
             LobbyState::ToString(state_), MessageID::ToString(id));
         return;
     }
@@ -1180,7 +1179,7 @@ void Lobby::handleConnectionAttemptFailed(MessageID::Enum id)
     
     // TODO: clean up peers and hostIdx?
     // or just let session call reset on us.
-    X_ASSERT(hostIdx_ != -1, "Recived connection failed when don't have a valid host idx")();
+    X_ASSERT(hostIdx_ != -1, "Received connection failed when don't have a valid host idx")();
 
     setState(LobbyState::Error);
 }
@@ -1245,9 +1244,9 @@ void Lobby::handleDisconnectNotification(Packet* pPacket)
 
 void Lobby::handleLobbyJoinRequest(Packet* pPacket)
 {
-    X_ASSERT(isHost(), "Should only recive LobbyJoinRequest if host")(isPeer(), isHost());
+    X_ASSERT(isHost(), "Should only receive LobbyJoinRequest if host")(isPeer(), isHost());
 
-    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Recived join request for \"%s\" lobby", LobbyType::ToString(type_));
+    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Received join request for \"%s\" lobby", LobbyType::ToString(type_));
 
     auto peerIdx = findPeerIdx(pPacket->systemHandle);
     if (peerIdx >= 0) {
@@ -1270,7 +1269,7 @@ void Lobby::handleLobbyJoinRequest(Packet* pPacket)
     }
 
     if (!params_.flags.IsSet(MatchFlag::Online)) {
-        X_ERROR("Lobby", "Recived LobbyJoinRequest to \"%s\" which is not online. rejecting", LobbyType::ToString(type_));
+        X_ERROR("Lobby", "Received LobbyJoinRequest to \"%s\" which is not online. rejecting", LobbyType::ToString(type_));
         rejectConnection(MessageID::LobbyJoinRejected);
         return;
     }
@@ -1295,11 +1294,11 @@ void Lobby::handleLobbyJoinRequest(Packet* pPacket)
     {
         core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
         auto type = bs.read<LobbyType::Enum>();
-        X_ASSERT(type == type_, "Recived Lobby packet with type mismatch")(type_, type);
+        X_ASSERT(type == type_, "Received Lobby packet with type mismatch")(type_, type);
         
         auto numUsers = users_.size();
 
-        // the peer sent us user info, what a cunt!
+        // the peer sent us user info!
         addUsersFromBs(bs, peerIdx);
 
         if (numUsers == users_.size())
@@ -1330,7 +1329,7 @@ void Lobby::handleLobbyJoinRequest(Packet* pPacket)
 
         if (type_ == LobbyType::Party)
         {
-            // if a user just connected to our party lobby, and we are in gamelobby have them join us.
+            // if a user just connected to our party lobby, and we are in game lobby have them join us.
             if (sessionStatus >= SessionStatus::GameLobby)
             {
                 // we are in game, join the orgy!
@@ -1354,22 +1353,22 @@ void Lobby::handleLobbyJoinRequest(Packet* pPacket)
 
 void Lobby::handleLobbyJoinAccepted(Packet* pPacket)
 {
-    X_ASSERT(isPeer(), "Should only recive LobbyJoinAccepted if peer")(isPeer(), isHost());
+    X_ASSERT(isPeer(), "Should only receive LobbyJoinAccepted if peer")(isPeer(), isHost());
     core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
 
     auto type = bs.read<LobbyType::Enum>();
-    X_ASSERT(type == type_, "Recived Lobby packet with type mismatch")(type_, type);
+    X_ASSERT(type == type_, "Received Lobby packet with type mismatch")(type_, type);
 
     auto peerIdx = findPeerIdx(pPacket->systemHandle);
     if (peerIdx < 0) {
-        X_ERROR("Lobby", "Recived \"%s\" lobby join accepted from a unknown peer", LobbyType::ToString(type_));
+        X_ERROR("Lobby", "Received \"%s\" lobby join accepted from a unknown peer", LobbyType::ToString(type_));
         return;
     }
 
     X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Join request to \"%s\" lobby was accepted", LobbyType::ToString(type_));
 
     // should be host.
-    X_ASSERT(peerIdx == hostIdx_, "Recoved join accepted from a peer that's not host")( peerIdx, hostIdx_);
+    X_ASSERT(peerIdx == hostIdx_, "Received join accepted from a peer that's not host")( peerIdx, hostIdx_);
 
     auto& host = peers_[peerIdx];
     X_ASSERT(host.getConnectionState() == LobbyPeer::ConnectionState::Pending, "Unexpected connection state")(host.getConnectionState());
@@ -1387,10 +1386,10 @@ void Lobby::handleLobbyJoinAccepted(Packet* pPacket)
 
 void Lobby::handleLobbyJoinRejected(Packet* pPacket)
 {
-    X_ASSERT(isPeer(), "Should only recive LobbyJoinRejected if peer")(isPeer(), isHost());
+    X_ASSERT(isPeer(), "Should only receive LobbyJoinRejected if peer")(isPeer(), isHost());
 
     if (state_ != LobbyState::Joining) {
-        X_ERROR("Lobby", "Recived join rejection when not trying to join. State: \"%s\"", LobbyState::ToString(state_));
+        X_ERROR("Lobby", "Received join rejection when not trying to join. State: \"%s\"", LobbyState::ToString(state_));
         return;
     }
 
@@ -1402,15 +1401,15 @@ void Lobby::handleLobbyJoinRejected(Packet* pPacket)
 
 void Lobby::handleLobbyUsersConnected(Packet* pPacket)
 {
-    X_ASSERT(isPeer(), "Recived user-con list when not peer")(isPeer(), isHost());
+    X_ASSERT(isPeer(), "Received user-con list when not peer")(isPeer(), isHost());
 
     core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
     auto type = bs.read<LobbyType::Enum>();
-    X_ASSERT(type == type_, "Recived Lobby packet with type mismatch")(type_, type);
+    X_ASSERT(type == type_, "Received Lobby packet with type mismatch")(type_, type);
 
     auto peerIdx = findPeerIdx(pPacket->systemHandle);
     if (peerIdx < 0) {
-        X_ERROR("Lobby", "Recived user list from a unknown peer");
+        X_ERROR("Lobby", "Received user list from a unknown peer");
         return;
     }
 
@@ -1419,18 +1418,18 @@ void Lobby::handleLobbyUsersConnected(Packet* pPacket)
 
 void Lobby::handleLobbyUsersDiconnected(Packet* pPacket)
 {
-    X_ASSERT(isPeer(), "Recived user-decon list when not peer")(isPeer(), isHost());
+    X_ASSERT(isPeer(), "Received user-decon list when not peer")(isPeer(), isHost());
 
     core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
 
     auto type = bs.read<LobbyType::Enum>();
-    X_ASSERT(type == type_, "Recived Lobby packet with type mismatch")(type_, type);
+    X_ASSERT(type == type_, "Received Lobby packet with type mismatch")(type_, type);
 
     // users have left ;(
     // WEAK!
     const auto num = bs.read<int32_t>();
     if (num < 0 || num > MAX_PLAYERS) {
-        X_ERROR("Lobby", "Recived invalud user diconnect msg, num users: %" PRIi32, num);
+        X_ERROR("Lobby", "Received invalid user disconnect msg, num users: %" PRIi32, num);
         return;
     }
 
@@ -1441,7 +1440,7 @@ void Lobby::handleLobbyUsersDiconnected(Packet* pPacket)
     for (auto& id : guids)
     {
         NetGuidStr buf;
-        X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "User Diconnected: %s", id.toString(buf));
+        X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "User disconnected: %s", id.toString(buf));
     }
 
     removeUsersByGuid(guids);
@@ -1449,13 +1448,13 @@ void Lobby::handleLobbyUsersDiconnected(Packet* pPacket)
 
 void Lobby::handleLobbyGameParams(Packet* pPacket)
 {
-    X_ASSERT(isPeer(), "Recived GameParams when not peer")(isPeer(), isHost());
+    X_ASSERT(isPeer(), "Received GameParams when not peer")(isPeer(), isHost());
     X_ASSERT(params_.flags.IsSet(MatchFlag::Online), "Missing online flag")();
 
     core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
 
     auto type = bs.read<LobbyType::Enum>();
-    X_ASSERT(type == type_, "Recived Lobby packet with type mismatch")(type_, type);
+    X_ASSERT(type == type_, "Received Lobby packet with type mismatch")(type_, type);
 
     params_.fromBitStream(bs);
 
@@ -1464,17 +1463,17 @@ void Lobby::handleLobbyGameParams(Packet* pPacket)
 
 void Lobby::handleLobbyConnectAndMove(Packet* pPacket)
 {
-    X_ASSERT(isPeer(), "Recived ConnectAndMove when not peer")(isPeer(), isHost());
+    X_ASSERT(isPeer(), "Received ConnectAndMove when not peer")(isPeer(), isHost());
 
     core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
 
     auto type = bs.read<LobbyType::Enum>();
-    X_ASSERT(type == type_, "Recived Lobby packet with type mismatch")(type_, type);
+    X_ASSERT(type == type_, "Received Lobby packet with type mismatch")(type_, type);
 
     // Where do you want me!
     auto destType = bs.read<LobbyType::Enum>();
     
-    X_ASSERT(destType < LobbyType::ENUM_COUNT, "Recived Lobby packet with invalid type")(destType);
+    X_ASSERT(destType < LobbyType::ENUM_COUNT, "Received Lobby packet with invalid type")(destType);
     X_ASSERT(destType > type, "Invalid lobby transition")(destType, type);
 
     SystemAddress sa;
@@ -1485,32 +1484,32 @@ void Lobby::handleLobbyConnectAndMove(Packet* pPacket)
 
 void Lobby::handleLobbyLeaveGameLobby(Packet* pPacket)
 {
-    X_ASSERT(type_ == LobbyType::Party, "Recived leave game not from party")(type_);
-    X_ASSERT(isPeer(), "Recived LeaveGameLobby when not peer")(isPeer(), isHost());
+    X_ASSERT(type_ == LobbyType::Party, "Received leave game not from party")(type_);
+    X_ASSERT(isPeer(), "Received LeaveGameLobby when not peer")(isPeer(), isHost());
 
 
     // only reason i handle packet in here, is for validation really.
-    // but also might easy some 3rd party lobby intergation.
+    // but also might easy some 3rd party lobby integration.
 
     pCallbacks_->leaveGameLobby();
 }
 
 void Lobby::handleLoadingStart(Packet* pPacket)
 {
-    X_ASSERT(type_ == LobbyType::Game, "None game lobby recived loading start")(type_);
-    X_ASSERT(isPeer(), "Recived LoadingStart when not peer")(isPeer(), isHost());
+    X_ASSERT(type_ == LobbyType::Game, "None game lobby received loading start")(type_);
+    X_ASSERT(isPeer(), "Received LoadingStart when not peer")(isPeer(), isHost());
     X_ASSERT(params_.flags.IsSet(MatchFlag::Online), "Missing online flag")();
 
     // stu will take all your loads.
     auto peerIdx = findPeerIdx(pPacket->systemHandle);
     if (peerIdx < 0) {
-        X_ERROR("Lobby", "Recived loading start from a unknown peer");
+        X_ERROR("Lobby", "Received loading start from a unknown peer");
         return;
     }
 
     if (peerIdx != hostIdx_) {
         NetGuidStr buf;
-        X_ERROR("Lobby", "Recived loading start from a peer that's not host. guid: %s", peers_[peerIdx].guid.toString(buf));
+        X_ERROR("Lobby", "Received loading start from a peer that's not host. guid: %s", peers_[peerIdx].guid.toString(buf));
         return;
     }
 
@@ -1521,12 +1520,12 @@ void Lobby::handleLoadingStart(Packet* pPacket)
 
 void Lobby::handleLoadingDone(Packet* pPacket)
 {
-    X_ASSERT(type_ == LobbyType::Game, "None game lobby recived loading done")(type_);
-    X_ASSERT(isHost(), "Recived LoadingDone when not host")(isPeer(), isHost());
+    X_ASSERT(type_ == LobbyType::Game, "None game lobby received loading done")(type_);
+    X_ASSERT(isHost(), "Received LoadingDone when not host")(isPeer(), isHost());
 
     auto peerIdx = findPeerIdx(pPacket->systemHandle);
     if (peerIdx < 0) {
-        X_ERROR("Lobby", "Recived loading done from a unknown peer");
+        X_ERROR("Lobby", "Received loading done from a unknown peer");
         return;
     }
 
@@ -1542,11 +1541,11 @@ void Lobby::handleLoadingDone(Packet* pPacket)
 
 void Lobby::handleInGame(Packet* pPacket)
 {
-    X_ASSERT(type_ == LobbyType::Game, "None game lobby recived inGame")(type_);
+    X_ASSERT(type_ == LobbyType::Game, "None game lobby received inGame")(type_);
 
     auto peerIdx = findPeerIdx(pPacket->systemHandle);
     if (peerIdx < 0) {
-        X_ERROR("Lobby", "Recived InGame from a unknown peer");
+        X_ERROR("Lobby", "Received InGame from a unknown peer");
         return;
     }
 
@@ -1560,18 +1559,18 @@ void Lobby::handleInGame(Packet* pPacket)
 
 void Lobby::handleEndGame(Packet* pPacket)
 {
-    X_ASSERT(type_ == LobbyType::Game, "None game lobby recived EndGame")(type_);
-    X_ASSERT(isPeer(), "Recived EndGame when not peer")(isPeer(), isHost());
+    X_ASSERT(type_ == LobbyType::Game, "None game lobby received EndGame")(type_);
+    X_ASSERT(isPeer(), "Received EndGame when not peer")(isPeer(), isHost());
 
     auto peerIdx = findPeerIdx(pPacket->systemHandle);
     if (peerIdx < 0) {
-        X_ERROR("Lobby", "Recived EndGame from a unknown peer");
+        X_ERROR("Lobby", "Received EndGame from a unknown peer");
         return;
     }
 
     if (peerIdx != hostIdx_) {
         NetGuidStr buf;
-        X_ERROR("Lobby", "Recived EndGame from a peer that's not host. guid: %s", peers_[peerIdx].guid.toString(buf));
+        X_ERROR("Lobby", "Received EndGame from a peer that's not host. guid: %s", peers_[peerIdx].guid.toString(buf));
         return;
     }
 
@@ -1585,29 +1584,29 @@ void Lobby::handleEndGame(Packet* pPacket)
 
 void Lobby::handleLobbyChatMsg(Packet* pPacket)
 {
-    X_ASSERT(isHost() || isPeer(), "Recived chat msg when not peer or host")(isPeer(), isHost());
+    X_ASSERT(isHost() || isPeer(), "Received chat msg when not peer or host")(isPeer(), isHost());
 
     // meow, meow meow
     core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
 
     int32_t num = bs.read<int32_t>();
     if (num <= 0) {
-        X_ERROR("Lobby", "Recived chat packet with zero msg's");
+        X_ERROR("Lobby", "Received chat packet with zero msg's");
         return;
     }
  
-    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Recived %" PRIi32 " chat msg(s)", num);
+    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Received %" PRIi32 " chat msg(s)", num);
 
     for (int32_t i = 0; i < num; i++)
     {
         ChatMsg cm;
         cm.fromBitStream(bs);
         if (cm.msg.length() > MAX_CHAT_MSG_LEN) {
-            X_ERROR("Lobby", "Recived oversized chat msg");
+            X_ERROR("Lobby", "Received oversized chat msg");
             return;
         }
 
-        // re stamp it based on time recived.
+        // re stamp it based on time received.
         if (isHost())
         {
             cm.dateTimeStamp = core::DateTimeStamp::getSystemDateTime();
@@ -1832,7 +1831,7 @@ bool Lobby::tryPopChatMsg(ChatMsg& msg)
     return true;
 }
 
-Vec2f Lobby::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
+Vec2f Lobby::drawDebug(Vec2f base, engine::IPrimitiveContext* pPrim) const
 {
     X_UNUSED(pPrim);
 

@@ -309,9 +309,9 @@ namespace PathUtil
         }
 
         DWORD err = lastError::Get();
-        // This means we checked for a file in a directory that don't exsists.
+        // This means we checked for a file in a directory that don't exists.
         if (err == ERROR_PATH_NOT_FOUND) {
-            X_LOG2_IF(!supressMissingDirWarn, "FileSys", "FileExsits failed, a parent directory does not exsist: \"%ls\"", pFilePath);
+            X_LOG2_IF(!supressMissingDirWarn, "FileSys", "FileExsits failed, a parent directory does not exist: \"%ls\"", pFilePath);
         }
         else if (err != ERROR_FILE_NOT_FOUND) {
             lastError::Description Dsc;
@@ -397,7 +397,7 @@ namespace PathUtil
         if (handle == -1) {
             auto err = errno;
             if (err == ENOENT) {
-                // if it don't exsist return valid?
+                // if it don't exist return valid?
                 // seams resonable.
                 return{ INVALID_FIND_HANDLE, true };
             }

@@ -151,7 +151,7 @@ class ZlibBufferd : public ::testing::TestWithParam<BufInfo>
 {
 };
 
-// run the test with a load of diffrent buffer sizes to make sure
+// run the test with a load of different buffer sizes to make sure
 // buffers that are allowed to be bigger / smaller than others behave correct
 INSTANTIATE_TEST_CASE_P(buffered, ZlibBufferd, ::testing::Values(BufInfo(4096, 1, 256), BufInfo(4096, 4096, 256), BufInfo(4096, 4096, 4096), BufInfo(4096, 8096, 256), BufInfo(4096, 8096, 4096), BufInfo(1, 1, 1), BufInfo(8538, 16, 8096), BufInfo(8538, 16, 8096 * 2)));
 
@@ -231,13 +231,13 @@ TEST_P(ZlibBufferd, bufferedDeflate)
     size_t comrpessedBufSize = Zlib::requiredDeflateDestBuf(srcBufSize);
     uint8_t* pDeflated = X_NEW_ARRAY(uint8_t, comrpessedBufSize, g_arena, "ZlibCompressed");
 
-    ZlibDefalte deflater(g_arena, [&](const uint8_t* pData, size_t len, size_t deflateOffset) {
+    ZlibDeflate deflater(g_arena, [&](const uint8_t* pData, size_t len, size_t deflateOffset) {
         ASSERT_LE(deflateOffset + len, comrpessedBufSize);
         std::memcpy(&pDeflated[deflateOffset], pData, len);
     });
 
     deflater.setBufferSize(bufInfo.outBufSize);
-    ZlibDefalte::Result::Enum res;
+    ZlibDeflate::Result::Enum res;
 
     {
         const size_t bufSize = bufInfo.blockBufSize;
@@ -253,10 +253,10 @@ TEST_P(ZlibBufferd, bufferedDeflate)
             res = deflater.Deflate(&pUncompressed[bufSize * i], srcSize, last);
 
             i++;
-        } while (res == ZlibDefalte::Result::OK && bufLeft > 0);
+        } while (res == ZlibDeflate::Result::OK && bufLeft > 0);
 
         EXPECT_EQ(0, bufLeft);
-        EXPECT_EQ(ZlibDefalte::Result::DONE, res);
+        EXPECT_EQ(ZlibDeflate::Result::DONE, res);
     }
 
     // now deflate normal and compare.
@@ -264,7 +264,7 @@ TEST_P(ZlibBufferd, bufferedDeflate)
     bool inflateOk = Zlib::inflate(g_arena, pDeflated, deflatedSize, pUncompressed2, srcBufSize);
     EXPECT_TRUE(inflateOk);
 
-    if (ZlibDefalte::Result::DONE == res) {
+    if (ZlibDeflate::Result::DONE == res) {
         EXPECT_EQ(0, memcmp(pUncompressed, pUncompressed2, srcBufSize));
     }
 

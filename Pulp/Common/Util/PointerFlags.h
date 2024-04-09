@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(core)
 template<class T, uintptr_t BIT_COUNT>
 class PointerFlags
 {
-    ///  bit-mask to get actual pointer
+    //  bit-mask to get actual pointer
 public:
     static const uintptr_t BIT_MASK = (1ul << BIT_COUNT) - 1ul;
     static const uintptr_t BIT_COUNT = BIT_COUNT;

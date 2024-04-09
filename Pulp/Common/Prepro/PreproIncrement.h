@@ -68,13 +68,6 @@
 #define X_PP_INCREMENT_62 63
 #define X_PP_INCREMENT_63 64
 
-/// \def X_PP_INCREMENT
-/// \ingroup Preprocessor
-/// \brief Increments the given argument by one.
-/// \code
-///   // outputs 51
-///   X_PP_INCREMENT(50)
-/// \endcode
 #define X_PP_INCREMENT(n) X_PP_JOIN_2(X_PP_INCREMENT_, n)
 
 #endif

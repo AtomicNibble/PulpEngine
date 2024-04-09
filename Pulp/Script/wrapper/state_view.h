@@ -21,7 +21,7 @@ namespace lua
         // misc
         X_INLINE void checkstack(lua_State* L, int32_t requiredSlots)
         {
-            luaL_checkstack(L, requiredSlots, "Not enougth stack slots");
+            luaL_checkstack(L, requiredSlots, "Not enough stack slots");
         }
 
         X_INLINE bool is_empty(lua_State* L)

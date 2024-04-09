@@ -143,7 +143,7 @@ public:
     StrT& insert(size_type nIndex, const_str pstr);
     StrT& insert(size_type nIndex, const_str pstr, size_type count);
 
-    //! delete count characters starting at zero-based index
+    // delete count characters starting at zero-based index
     StrT& erase(size_type nIndex, size_type count = npos);
 
     // compare the goat.com
@@ -170,7 +170,7 @@ public:
     // swap a pickle
     void swap(StrT& oth);
 
-    //! simple sub-string extraction
+    // simple sub-string extraction
     //	StrT substr(size_type pos, const_str end = nullptr) const;
     StrT substr(const_str pBegin, const_str pEnd = nullptr) const;
 

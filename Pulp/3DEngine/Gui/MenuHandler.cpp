@@ -4,7 +4,7 @@
 #include "Menu.h"
 #include "MenuManger.h"
 #include "GuiContex.h"
-#include "Drawing\PrimativeContext.h"
+#include "Drawing\PrimitiveContext.h"
 
 #include <IFrameData.h>
 
@@ -27,9 +27,9 @@ namespace gui
         return !stack_.isEmpty();
     }
 
-    void MenuHandler::update(MenuParams& params, core::FrameData& frame, IPrimativeContext* pIPrim)
+    void MenuHandler::update(MenuParams& params, core::FrameData& frame, IPrimitiveContext* pIPrim)
     {
-        auto* pPrim = static_cast<PrimativeContext*>(pIPrim);
+        auto* pPrim = static_cast<PrimitiveContext*>(pIPrim);
 
         if (stack_.isEmpty()) {
             return;

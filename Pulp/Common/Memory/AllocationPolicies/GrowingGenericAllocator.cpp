@@ -15,7 +15,7 @@ GrowingGenericAllocator::GrowingGenericAllocator(uint32_t maxSizeInBytesPerPool,
 #endif
 }
 
-/// Returns statistics regarding the allocations made by the allocator.
+// Returns statistics regarding the allocations made by the allocator.
 MemoryAllocatorStatistics GrowingGenericAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS

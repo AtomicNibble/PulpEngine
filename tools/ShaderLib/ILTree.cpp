@@ -70,12 +70,12 @@ namespace shader
 
     const ILTreeNode* ILTreeNode::getILTree(void)
     {
-        // all the posible node types.
+        // all the possible node types.
 
         // for shader input layouts the format is not given since the shader
         // don't care what the format comes in as.
         // so how can i work out what the formats are since i support identical sematic layouts
-        // with diffrent foramts :(
+        // with different formats :(
         //
         // maybe i should just have a sematic format, which can be used to tell if the current input
         // layout will work with the shader :)

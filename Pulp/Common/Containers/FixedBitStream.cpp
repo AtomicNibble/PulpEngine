@@ -9,7 +9,7 @@ void FixedBitStreamBase::writeBits(const Type* pBuf, size_type numBits)
         return;
     }
 
-    X_ASSERT(numBits <= freeSpace(), "Tried to write more bits than avalible space")(numBits, size(), freeSpace(), isEos());
+    X_ASSERT(numBits <= freeSpace(), "Tried to write more bits than available space")(numBits, size(), freeSpace(), isEos());
 
     size_type bitsMod8 = bitIdx_ & 7;
     size_type srcTrailingBits = numBits & 7;
@@ -74,8 +74,8 @@ void FixedBitStreamBase::writeBits(const Type* pBuf, size_type numBits)
         // shift them over.
         srcByte <<= 8 - numBits;
 
-        // now we need to split what ever is left across the boundry.
-        // it may not actually coross the boundry tho.
+        // now we need to split what ever is left across the boundary.
+        // it may not actually coross the boundary tho.
         *(pDst) |= (srcByte >> bitsMod8) & 0xff;
 
         if ((8 - bitsMod8) < numBits) {
@@ -92,7 +92,7 @@ void FixedBitStreamBase::readBits(Type* pBuf, size_type numBits)
         return;
     }
 
-    X_ASSERT(numBits <= size(), "Tried to read more bits than avalible")(numBits, size(), freeSpace(), isEos());
+    X_ASSERT(numBits <= size(), "Tried to read more bits than available")(numBits, size(), freeSpace(), isEos());
 
     size_type bitsMod8 = readBitIdx_ & 7;
     size_type srcTrailingBits = numBits & 7;
@@ -133,7 +133,7 @@ void FixedBitStreamBase::readBits(Type* pBuf, size_type numBits)
         Type* pSrc = (pBegin_ + readByteIndex());
         Type* pDst = pBuf++;
 
-        // this is basically a sliding window across a byte boundry.
+        // this is basically a sliding window across a byte boundary.
         // and we take trailng bits from current byte and leading from next.
         Type trailing = (*pSrc << bitsMod8) & 0xFF;
         Type leading = (*(pSrc + 1) >> (8 - bitsMod8));

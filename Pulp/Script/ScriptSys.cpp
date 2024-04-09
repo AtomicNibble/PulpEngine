@@ -256,9 +256,9 @@ void XScriptSys::processLoadedScritpts(void)
         X_LOG0("ScriptSys", "Processing loaded script: \"%s\"", pScript->getName().c_str());
 
         // the script can either error.
-        // fail on dependancy
+        // fail on dependency
         // or run okay.
-        // we only don't remove if we are waiting for a depedancy,
+        // we only don't remove if we are waiting for a dependency,
         if (!processLoadedScript(pScript)) {
             // failed?
 
@@ -285,7 +285,7 @@ bool XScriptSys::processLoadedScript(Script* pScript)
 
         auto* pInclude = X_ASSERT_NOT_NULL(pScript->getPendingInclude());
         if (pInclude->getStatus() == core::LoadStatus::Error) {
-            X_ERROR("Script", "\"%s\" depeancy failed to load: \"%s\"", pScript->getName().c_str(), pInclude->getName().c_str());
+            X_ERROR("Script", "\"%s\" dependency failed to load: \"%s\"", pScript->getName().c_str(), pInclude->getName().c_str());
             return false;
         }
 
@@ -295,7 +295,7 @@ bool XScriptSys::processLoadedScript(Script* pScript)
         }
 
         if (!processLoadedScript(pInclude)) {
-            X_ERROR("Script", "\"%s\" depeancy failed to load: \"%s\"", pScript->getName().c_str(), pInclude->getName().c_str());
+            X_ERROR("Script", "\"%s\" dependency failed to load: \"%s\"", pScript->getName().c_str(), pInclude->getName().c_str());
             return false;
         }
 
@@ -304,7 +304,7 @@ bool XScriptSys::processLoadedScript(Script* pScript)
             return true;
         }
 
-        // sanity check the dependancy
+        // sanity check the dependency
         X_ASSERT(pInclude->getStatus() == core::LoadStatus::Complete, "Script is not loaded")(pInclude->getStatus());
         X_ASSERT(pInclude->getLastCallResult() == lua::CallResult::Ok, "Script did not run ok")(pInclude->getLastCallResult());
         X_ASSERT(!pInclude->hasPendingInclude(), "Script has pending include")(pInclude->hasPendingInclude());
@@ -1138,7 +1138,7 @@ void XScriptSys::freeDangling(void)
         core::CriticalSection::ScopedLock lock(cs_);
         if (scriptTables_.isNotEmpty())
         {
-            X_WARNING("Script", "Cleaning up %" PRIuS " dangaling script tables", scriptTables_.size());
+            X_WARNING("Script", "Cleaning up %" PRIuS " dangling script tables", scriptTables_.size());
 
             for (auto* pTable : scriptTables_) {
                 X_DELETE(pTable, &poolArena_);
@@ -1194,7 +1194,7 @@ void XScriptSys::IoRequestCallback(core::IFileSys& fileSys, const core::IoReques
 {
     X_UNUSED(fileSys, pRequest, pFile, bytesTransferred);
 
-    X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Unecpted request")(pRequest->getType());
+    X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Unexcepted request")(pRequest->getType());
     X_ASSERT(preloadFileReq_ != core::INVALID_IO_REQ_HANDLE, "Load request not set")(preloadFileReq_);
 
     const auto* pOpenReadReq = static_cast<const core::IoRequestOpenRead*>(pRequest);
@@ -1202,9 +1202,9 @@ void XScriptSys::IoRequestCallback(core::IFileSys& fileSys, const core::IoReques
     {
         core::UniquePointer<uint8[]> data(pOpenReadReq->arena, pOpenReadReq->pBuf);
 
-        // we preocess the preload here, so the scripts start loading now.
+        // we process the preload here, so the scripts start loading now.
         if (!processPreload(data.get(), pOpenReadReq->dataSize)) {
-            X_ERROR("Script", "Failed to prase preload info");
+            X_ERROR("Script", "Failed to parse preload info");
             preloadParseFailed_ = true;
         }
     }

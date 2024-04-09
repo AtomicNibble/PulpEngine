@@ -148,14 +148,14 @@ MStatus PotatoAnimExporter::convert(const MArgList& args)
         MString name(getName().data(), static_cast<int32_t>(getName().length()));
 
         int32_t assetId, modId;
-        status = maya::AssetDB::Get()->AssetExsists(maya::AssetDB::AssetType::ANIM, name, &assetId, &modId);
+        status = maya::AssetDB::Get()->AssetExists(maya::AssetDB::AssetType::ANIM, name, &assetId, &modId);
         if (!status) {
             X_ERROR("Anim", "Failed to get meta from server");
             return status;
         }
 
         if (assetId == assetDb::INVALID_ASSET_ID || modId == assetDb::INVALID_MOD_ID) {
-            X_ERROR("Anim", "Asset is not registerd with server");
+            X_ERROR("Anim", "Asset is not registered with server");
             return MS::kFailure;
         }
 
@@ -181,12 +181,12 @@ MStatus PotatoAnimExporter::convert(const MArgList& args)
         {
             core::Compression::Compressor<core::Compression::LZ4> comp;
             if (!comp.deflate(g_arena, core::make_span<const char>(interMidiateData.begin(), interMidiateData.end()), compressed, core::Compression::CompressLevel::HIGH)) {
-                X_ERROR("Anim", "Failed to defalte inter anim");
+                X_ERROR("Anim", "Failed to deflate inter anim");
                 return MS::kFailure;
             }
             else {
                 core::HumanSize::Str sizeStr, sizeStr2;
-                X_LOG0("Anim", "Defalated %s -> %s",
+                X_LOG0("Anim", "Deflated %s -> %s",
                     core::HumanSize::toString(sizeStr, interMidiateData.size()),
                     core::HumanSize::toString(sizeStr2, compressed.size()));
             }

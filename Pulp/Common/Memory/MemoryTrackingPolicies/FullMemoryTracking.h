@@ -18,19 +18,13 @@
 
 X_NAMESPACE_BEGIN(core)
 
-/// \ingroup Memory
-/// \brief A class that implements a tracking policy for memory arenas.
-/// \details This class implements the concepts of a tracking policy as expected by the MemoryArena class. It is similar
-/// to the ExtendedMemoryTracking policy, but additionally stores a complete call stack for each allocation. Because of
-/// the additional overhead caused by storing the call stack, this kind of tracker should be used only in circumstances
-/// where the root cause of a memory leak is hard to find.
-/// \sa NoMemoryTracking SimpleMemoryTracking ExtendedMemoryTracking
+// A class that implements a tracking policy for memory arenas.
 class FullMemoryTracking
 {
-    /// \brief The data stored for each allocation.
+    // The data stored for each allocation.
     struct AllocationData
     {
-        /// Default constructor.
+        // Default constructor.
         AllocationData(size_t originalSize, size_t internalSize X_MEM_HUMAN_IDS_CB(const char* ID) X_MEM_HUMAN_IDS_CB(const char* typeName) X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo),
             const char* memoryArenaName, const CallStack& callStack);
 
@@ -50,31 +44,19 @@ class FullMemoryTracking
         X_NO_ASSIGN(AllocationData);
     };
 
-    /// A type representing the hash map that is used to store allocation data.
-    //	typedef HashMap<void*, AllocationData, &hashMapHashFunction::PointerType<void> > AllocationTable;
     typedef HashMap<void*, AllocationData> AllocationTable;
-
-    /// The type of arena that is used to allocate memory for the hash map.
     typedef MemoryArena<LinearAllocator, SingleThreadPolicy, NoBoundsChecking, NoMemoryTracking, NoMemoryTagging> LinearArena;
 
 public:
-    /// A human-readable string literal containing the policy's type.
     static const char* const TYPE_NAME;
-
-    /// Defines the amount of overhead that each allocation causes.
     static const size_t PER_ALLOCATION_OVERHEAD = AllocationTable::PER_ENTRY_SIZE;
 
-    /// Default constructor.
     FullMemoryTracking(void);
-
-    /// Default destructor, reporting all detected leaks.
     ~FullMemoryTracking(void);
 
-    /// Stores the allocation along with additional data and a call stack in a hash map.
     void OnAllocation(void* memory, size_t originalSize, size_t internalSize, size_t alignment, size_t offset X_MEM_HUMAN_IDS_CB(const char* ID) X_MEM_HUMAN_IDS_CB(const char* typeName) X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo),
         const char* memoryArenaName);
 
-    /// Removes the allocation data from a hash map.
     void OnDeallocation(void* memory);
 
 private:

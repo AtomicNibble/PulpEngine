@@ -166,7 +166,7 @@ void UserCmdGen::keyMove(void)
     forward += buttonState(UserButton::MOVE_FORWARD);
     forward -= buttonState(UserButton::MOVE_BACK);
 
-    cmd_.moveForwrd += safe_static_cast<int16_t>(forward);
+    cmd_.moveForward += safe_static_cast<int16_t>(forward);
     cmd_.moveRight += safe_static_cast<int16_t>(side);
 }
 

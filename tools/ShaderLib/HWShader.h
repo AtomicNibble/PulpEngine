@@ -46,10 +46,10 @@ namespace shader
     X_ALIGNED_SYMBOL(class XHWShader, 64) :
         public IHWShader
     {
-        typedef IShaderPermatation::LineraArray<XCBuffer> CBufferArr;
-        typedef IShaderPermatation::LineraArray<Sampler> SamplerArr;
-        typedef IShaderPermatation::LineraArray<Texture> TextureArr;
-        typedef IShaderPermatation::LineraArray<Buffer> BufferArr;
+        typedef IShaderPermatation::LinearArray<XCBuffer> CBufferArr;
+        typedef IShaderPermatation::LinearArray<Sampler> SamplerArr;
+        typedef IShaderPermatation::LinearArray<Texture> TextureArr;
+        typedef IShaderPermatation::LinearArray<Buffer> BufferArr;
         typedef core::Array<uint8_t> ByteArr;
 
         friend class ShaderBin;

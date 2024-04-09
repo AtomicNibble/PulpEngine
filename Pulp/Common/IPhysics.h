@@ -177,9 +177,9 @@ struct HeightFieldDesc
 
 X_DECLARE_ENUM(CookingMode)
 (
-    Fast, // quickiest possible cooking time
+    Fast, // quickest possible cooking time
     Slow,
-    VerySlow // all cooking optermistations enabled
+    VerySlow // all cooking optimisations enabled
 );
 
 X_DECLARE_ENUM(JointType)
@@ -212,7 +212,7 @@ struct JointLimit
     // as the solver enforces constraints on the other DOFs.
 
     // This limitation applies to both angular and linear limits, however it is generally most apparent with limited
-    // angular DOFs.Disabling joint projection and increasing the solver iteration count may improve this behavior
+    // angular DOFs.Disabling joint projection and increasing the solver iteration count may improve this behaviour
     // to some extent.
 
     // Also, combining soft joint limits with joint drives driving against those limits may affect stability.
@@ -1070,7 +1070,7 @@ struct IScene
     // best to just make all regions for level on load before adding any actors to scene.
     // regions can overlap but none overlapping is best for performance.
     virtual RegionHandle addRegion(const AABB& bounds) X_ABSTRACT;
-    // removes the region, anything that stil resides in this regions bounds and another region don't overlap
+    // removes the region, anything that still resides in this regions bounds and another region don't overlap
     // will be reported as out of bounds.
     virtual bool removeRegion(RegionHandle handles) X_ABSTRACT;
 
@@ -1230,7 +1230,7 @@ struct IPhysics
 
     // debug name for logs, only stores the pointer you must ensure the memory outlives the actor :) !
     virtual void setActorDebugNamePointer(ActorHandle handle, const char* pNamePointer) X_ABSTRACT;
-    // value between 0-31 groups that higer can pusher lower ones, all actors default to 0.
+    // value between 0-31 groups that higher can pusher lower ones, all actors default to 0.
     virtual void setActorDominanceGroup(ActorHandle handle, int8_t group) X_ABSTRACT;
     // actors have default group, only need to call this for none default.
     virtual void setGroup(ActorHandle handle, const GroupFlag::Enum group) X_ABSTRACT;

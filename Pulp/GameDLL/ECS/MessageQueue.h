@@ -40,7 +40,6 @@ namespace ecs
 
         using MessageFunc = core::Function<void(const Message&), 32>;
 
-        // how do i make these sluts.
         using MessageSink = core::Array<MessageFunc>;
         using MessageSinkArr = core::FixedArray<MessageSink, NUM_MSG>;
 
@@ -133,7 +132,7 @@ namespace ecs
         template<typename Payload, typename Message>
         static const Payload& message_cast(const Message& m)
         {
-            X_ASSERT(Payload::MSG_ID == m.type, "Msg type missmatch")(m.type);
+            X_ASSERT(Payload::MSG_ID == m.type, "Msg type mismatch")(m.type);
             static_assert(sizeof(Payload) < sizeof(Message::payload), "Payload size over limit!");
             return *reinterpret_cast<const Payload*>(&(m.payload));
         }

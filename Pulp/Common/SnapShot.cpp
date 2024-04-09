@@ -91,7 +91,7 @@ void SnapShot::addObject(ObjectID id, core::FixedBitStreamBase& bs)
 
     if (safe_static_cast<size_t>(state.buffer.size()) != bs.sizeInBytes())
     {
-        // leaning towards making this allocated from a linera arena.
+        // leaning towards making this allocated from a linear arena.
 
         auto* pData = X_NEW_ARRAY(uint8_t, bs.sizeInBytes(), arena_, "SnapObjectData");
 

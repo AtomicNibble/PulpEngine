@@ -5,7 +5,7 @@
 
 //
 // This is the log interface, so that all modules can sends logs.
-// it will be part of the global enviroment
+// it will be part of the global environment
 //
 // What info do we want?
 //

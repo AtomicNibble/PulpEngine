@@ -106,21 +106,21 @@ typedef int tt_bool;
 
 #if __TELEM_64
 
-typedef tt_int64 tt_intptr;
-typedef tt_uint64 tt_uintptr;
-typedef tt_intptr tt_ptrdiff;
-typedef tt_uint64 tt_size;
+typedef long long tt_intptr;
+typedef unsigned long long tt_uintptr;
+typedef long long tt_ptrdiff;
+typedef unsigned long long tt_size;
 
 #else
 
-typedef tt_int64 int;
-typedef tt_uint64 unsigned int;
-typedef tt_intptr int;
-typedef tt_uint64 unsigned int;
+typedef int tt_intptr;
+typedef unsigned int tt_uintptr;
+typedef int tt_ptrdiff;
+typedef unsigned int tt_size;
 
 #endif // __TELEM_64
 
-static_assert(sizeof(tt_uintptr) == sizeof(void*), "Size missmatch");
+static_assert(sizeof(tt_uintptr) == sizeof(void*), "Size mismatch");
 
 typedef enum TtConnectionType
 {
@@ -546,7 +546,7 @@ private:
     HMODULE hLib_;
 };
 
-// if you have multiple dll's this will be diffrent.
+// if you have multiple dll's this will be different.
 // so you would have to call init in each dll.
 // but also means you can conditionally enable telemetry for various modules.
 // it's not safe to resolve functions during a zone for the same module.

@@ -7,7 +7,7 @@ X_NAMESPACE_BEGIN(net)
 
 namespace
 {
-    // just match the paltform values, if the platform valeus are diffrent i'll abstract the values.
+    // just match the paltform values, if the platform valeus are different i'll abstract the values.
     static_assert(AddressFamily::INet == AF_INET, "AddressFamily enum don't match platform value");
 
 #if NET_IPv6_SUPPORT
@@ -350,7 +350,7 @@ bool SystemAddressEx::resolve(const HostStr& hostStr, bool isHost, AddressArr& a
 #if NET_IPv6_SUPPORT
         else {
             X_ASSERT(pCurAddr->ai_family == AF_INET6, "Unexpected familey")(pCurAddr->ai_family);
-            X_ASSERT(pCurAddr->ai_addrlen == sizeof(struct platform::sockaddr_in6), "Address length is diffrent than expected")(servinfo->ai_addrlen, sizeof(struct platform::sockaddr_in6));
+            X_ASSERT(pCurAddr->ai_addrlen == sizeof(struct platform::sockaddr_in6), "Address length is different than expected")(servinfo->ai_addrlen, sizeof(struct platform::sockaddr_in6));
 
             static_assert(sizeof(address_.addr6) == sizeof(struct platform::sockaddr_in6), "Potentiall buffer overrun.");
 

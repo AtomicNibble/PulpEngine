@@ -34,7 +34,7 @@ namespace CI
 
         X_ASSERT_NOT_NULL(pCrc);
 
-        CITexureHeader hdr;
+        CITextureHeader hdr;
         hdr.fourCC = CI_FOURCC;
         hdr.version = CI_VERSION;
         hdr.format = imgFile.getFormat();

@@ -112,7 +112,7 @@ bool XAnimLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args,
         return false;
     }
 
-    // we now need to load the models skelton.
+    // we now need to load the models skeleton.
     DataArr modelFile(g_AnimLibArena);
     ConvertArgs modelArgs;
 
@@ -136,18 +136,18 @@ bool XAnimLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args,
         }
     }
 
-    model::ModelSkeleton skelton(g_AnimLibArena);
-    if (!skelton.LoadRawModelSkelton(modelFile)) {
-        X_ERROR("AnimLib", "Failed to load skelton for model: \"%s\"", modelName.c_str());
+    model::ModelSkeleton skeleton(g_AnimLibArena);
+    if (!skeleton.LoadRawModelSkeleton(modelFile)) {
+        X_ERROR("AnimLib", "Failed to load skeleton for model: \"%s\"", modelName.c_str());
         return false;
     }
 
     if (scale != 1.f) {
-        skelton.scale(scale);
+        skeleton.scale(scale);
     }
 
     // right now it's time to process the anim :S
-    AnimCompiler compiler(g_AnimLibArena, inter, skelton);
+    AnimCompiler compiler(g_AnimLibArena, inter, skeleton);
     compiler.setScale(scale);
     compiler.setLooping(looping);
     //	compiler.disableOptimizations(true);

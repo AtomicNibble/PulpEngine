@@ -45,9 +45,9 @@ TEST(StringUtil, Find)
     const char* fin_fail2 = strUtil::FindCaseInsensitive(str2.begin(), str2.begin() + 10, "bob");
 
     EXPECT_TRUE(find == (str.begin() + 16));
-    EXPECT_FALSE(findNCI == (str.begin() + 16)); // should not find as case is diffrent
+    EXPECT_FALSE(findNCI == (str.begin() + 16)); // should not find as case is different
     EXPECT_TRUE(findCI == (str.begin() + 16));
-    EXPECT_TRUE(fin_fail == nullptr);  // should not find as case is diffrent
+    EXPECT_TRUE(fin_fail == nullptr);  // should not find as case is different
     EXPECT_TRUE(fin_fail2 == nullptr); // should not find as end is before null term
 }
 
@@ -63,9 +63,9 @@ TEST(StringUtil, FindW)
     const wchar_t* fin_fail2 = strUtil::FindCaseInsensitive(str2.begin(), str2.begin() + 10, L"bob");
 
     EXPECT_TRUE(find == (str.begin() + 16));
-    EXPECT_FALSE(findNCI == (str.begin() + 16)); // should not find as case is diffrent
+    EXPECT_FALSE(findNCI == (str.begin() + 16)); // should not find as case is different
     EXPECT_TRUE(findCI == (str.begin() + 16));
-    EXPECT_TRUE(fin_fail == nullptr);  // should not find as case is diffrent
+    EXPECT_TRUE(fin_fail == nullptr);  // should not find as case is different
     EXPECT_TRUE(fin_fail2 == nullptr); // should not find as end is before null term
 }
 
@@ -364,7 +364,7 @@ TEST(StringUtil, Wide)
 
     EXPECT_TRUE(strcmp("wideee like your ass o.o", full) == 0);
 
-#if 1 // TODO: The new conversion logic using WideCharToMultiByte only works if was enougth space, rip.
+#if 1 // TODO: The new conversion logic using WideCharToMultiByte only works if was enough space, rip.
     EXPECT_TRUE(strcmp("", OutSub) == 0);
 #else
     EXPECT_TRUE(strcmp("wideee", OutSub) == 0);

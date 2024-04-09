@@ -1,6 +1,6 @@
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 StackString<N, wchar_t>::StackString(void) :
     len_(0)
@@ -8,8 +8,8 @@ StackString<N, wchar_t>::StackString(void) :
     str_[0] = 0;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 StackString<N, wchar_t>::StackString(const wchar_t* const str) :
     len_(strUtil::strlen(str))
@@ -18,8 +18,8 @@ StackString<N, wchar_t>::StackString(const wchar_t* const str) :
     memcpy(str_, str, (len_ + 1) * sizeof(wchar_t));
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 StackString<N, wchar_t>::StackString(const char* const str)
 {
@@ -31,8 +31,8 @@ StackString<N, wchar_t>::StackString(const char* const str)
     str_[len_] = L'\0';
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 StackString<N, wchar_t>::StackString(const char* const beginInclusive, const char* const endExclusive)
 {
@@ -44,8 +44,8 @@ StackString<N, wchar_t>::StackString(const char* const beginInclusive, const cha
     str_[len_] = L'\0';
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 
 template<size_t N>
 StackString<N, wchar_t>::StackString(const StringRange<wchar_t>& range) :
@@ -58,8 +58,8 @@ StackString<N, wchar_t>::StackString(const StringRange<wchar_t>& range) :
     str_[len_] = L'\0';
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 StackString<N, wchar_t>::StackString(const wchar_t* const beginInclusive, const wchar_t* const endExclusive) :
     len_(safe_static_cast<size_t>(endExclusive - beginInclusive))
@@ -69,8 +69,8 @@ StackString<N, wchar_t>::StackString(const wchar_t* const beginInclusive, const 
     str_[len_] = 0;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 StackString<N, wchar_t>::StackString(const bool b) :
     len_(1)
@@ -81,8 +81,8 @@ StackString<N, wchar_t>::StackString(const bool b) :
     str_[1] = L'\0';
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 StackString<N, wchar_t>::StackString(const char c) :
     len_(1)
@@ -93,8 +93,8 @@ StackString<N, wchar_t>::StackString(const char c) :
     str_[1] = '\0';
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 StackString<N, wchar_t>::StackString(const wchar_t c) :
     len_(1)
@@ -105,8 +105,8 @@ StackString<N, wchar_t>::StackString(const wchar_t c) :
     str_[1] = '\0';
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 StackString<N, wchar_t>::StackString(const int i) :
     len_(12)
@@ -116,8 +116,8 @@ StackString<N, wchar_t>::StackString(const int i) :
     len_ = swprintf_s(str_, L"%" X_WIDEN(PRIi32), i);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 StackString<N, wchar_t>::StackString(const unsigned u) :
     len_(12)
@@ -127,8 +127,8 @@ StackString<N, wchar_t>::StackString(const unsigned u) :
     len_ = swprintf_s(str_, L"%" X_WIDEN(PRIu32), u);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 StackString<N, wchar_t>::StackString(const float f) :
     len_(24) // represent any float.
@@ -150,8 +150,8 @@ StackString<N, wchar_t>::StackString(const float f) :
     len_ = l;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 StackString<N, wchar_t>::StackString(const unsigned __int64 u) :
     len_(24)
@@ -161,8 +161,8 @@ StackString<N, wchar_t>::StackString(const unsigned __int64 u) :
     len_ = swprintf_s(str_, L"%" X_WIDEN(PRIu64), u);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 StackString<N, wchar_t>::StackString(const __int64 u) :
     len_(24)
@@ -172,8 +172,8 @@ StackString<N, wchar_t>::StackString(const __int64 u) :
     len_ = swprintf_s(str_, L"%" X_WIDEN(PRIi64), u);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 void StackString<N, wchar_t>::append(wchar_t ch)
 {
@@ -182,8 +182,8 @@ void StackString<N, wchar_t>::append(wchar_t ch)
     str_[len_] = 0;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 void StackString<N, wchar_t>::append(wchar_t ch, size_t count)
 {
@@ -201,16 +201,16 @@ void StackString<N, wchar_t>::append(wchar_t ch, size_t count)
     str_[len_] = 0;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 void StackString<N, wchar_t>::append(const wchar_t* str)
 {
     append(str, strUtil::strlen(str));
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 void StackString<N, wchar_t>::append(const wchar_t* str, size_t length)
 {
@@ -224,16 +224,16 @@ void StackString<N, wchar_t>::append(const wchar_t* str, size_t length)
     str_[len_] = 0;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 void StackString<N, wchar_t>::append(const wchar_t* str, const wchar_t* end)
 {
     append(str, safe_static_cast<size_t>(end - str));
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 void StackString<N, wchar_t>::appendFmt(const wchar_t* format, ...)
 {
@@ -267,8 +267,8 @@ void StackString<N, wchar_t>::appendFmt(const wchar_t* format, va_list args)
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 void StackString<N, wchar_t>::set(const wchar_t* str)
 {
@@ -309,8 +309,8 @@ void StackString<N, wchar_t>::set(const StringRange<wchar_t>& range)
 }
 
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<size_t N>
 void StackString<N, wchar_t>::setFmt(const wchar_t* format, ...)
 {
@@ -350,8 +350,8 @@ void StackString<N, wchar_t>::setFmt(const wchar_t* format, va_list args)
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 
 template<size_t N>
 bool StackString<N, wchar_t>::replace(const wchar_t* start, const wchar_t* original, const wchar_t* replacement)
@@ -448,7 +448,7 @@ size_t StackString<N, wchar_t>::replaceAll(const wchar_t* original, const wchar_
     }
 }
 
-/// Replaces all occurrences of a character, and returns the number of occurrences replaced.
+// Replaces all occurrences of a character, and returns the number of occurrences replaced.
 template<size_t N>
 size_t StackString<N, wchar_t>::replaceAll(const wchar_t original, const wchar_t replacement)
 {
@@ -608,7 +608,7 @@ StackString<N, wchar_t>& StackString<N, wchar_t>::trimLeft(void)
 template<size_t N>
 StackString<N, wchar_t>& StackString<N, wchar_t>::trimRight(void)
 {
-    // we want to start at the end and continue untill no more whitespace or end :)
+    // we want to start at the end and continue until no more whitespace or end :)
     const wchar_t* str = end() - 1;
     const wchar_t* start = begin();
 

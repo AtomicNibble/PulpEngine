@@ -6,7 +6,7 @@ X_NAMESPACE_BEGIN(core)
 
 // ReferenceCountedInstance can be used to keep one copy of a instance so that the memory address
 // does not change if when the owner does.
-template<class T, typename Primative = int32_t>
+template<class T, typename Primitive = int32_t>
 class ReferenceCountedInstance
 {
 public:
@@ -23,14 +23,14 @@ public:
 
 private:
     T instance_;
-    mutable Primative refCount_;
+    mutable Primitive refCount_;
 };
 
-template<class T, typename Primative = int32_t>
+template<class T, typename Primitive = int32_t>
 class ReferenceCountedInherit : public T
 {
 public:
-    typedef Primative PrimativeType;
+    typedef Primitive PrimitiveType;
     using T::T;
 
     // these are const as the class data don't change
@@ -42,11 +42,11 @@ public:
     X_INLINE const T* instance(void) const;
 
 private:
-    mutable Primative refCount_{1};
+    mutable Primitive refCount_{1};
 };
 
 // inherit this to add ref counting.
-template<typename Primative = int32_t>
+template<typename Primitive = int32_t>
 class ReferenceCounted
 {
 public:
@@ -58,7 +58,7 @@ public:
     X_INLINE int32_t getRefCount(void) const;
 
 private:
-    mutable Primative refCount_;
+    mutable Primitive refCount_;
 };
 
 #include "ReferenceCounted.inl"

@@ -6,7 +6,7 @@
 #include "Material\MaterialManager.h"
 #include "Vars\EffectVars.h"
 
-#include <IPrimativeContext.h>
+#include <IPrimitiveContext.h>
 #include <IFrameData.h>
 
 X_NAMESPACE_BEGIN(engine)
@@ -69,7 +69,7 @@ namespace fx
     void Emitter::update(core::TimeVal delta)
     {
         // so how this needs to work is.
-        // when we play a fx, we keep looping throught it's stages untill they are all 'active'.
+        // when we play a fx, we keep looping throught it's stages until they are all 'active'.
         // then we just clear the fx.
         // any active stages live on, and die out as defined.
         // this way if you change the active fx half way through any active stages will continue.
@@ -352,7 +352,7 @@ namespace fx
         }
     }
 
-    void Emitter::draw(core::FrameView& view, IPrimativeContext* pPrim)
+    void Emitter::draw(core::FrameView& view, IPrimitiveContext* pPrim)
     {
         for (size_t i = 0; i < activeStages_.size(); i++) {
             auto& stage = activeStages_[i];

@@ -42,7 +42,7 @@ X_FORCE_LINK_FACTORY("XEngineModule_Video")
 X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSingletonFactory@VXEngineModule_Render@render@Potato@@@@A");
 // X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@render@Potato@@0V1234@A");
 
-// some libs that w link against.
+// some libs that we link against.
 X_LINK_ENGINE_LIB("ImgLib")
 X_LINK_ENGINE_LIB("ShaderLib")
 X_LINK_ENGINE_LIB("ModelLib")

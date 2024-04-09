@@ -28,29 +28,7 @@
 #define X_PP_LIST_22(op) X_PP_LIST_21(op), op(21)
 #define X_PP_LIST_23(op) X_PP_LIST_22(op), op(22)
 
-/// \def X_PP_LIST
-/// \ingroup Preprocessor
-/// \brief Expands the arguments so that a user-defined operation is called N number of times.
-/// \details This macro is useful for e.g. generating a list of arguments based on a predefined count.
-///
-/// The operation to call must be a macro with one parameter, which denotes how many times the operation has been called.
-///
-/// Check the provided code example for example usage:
-/// \code
-///   // assume that we want to define a function Invoke with different overloads for 0, 1, 2, etc. arguments
-///   // define our operation macro
-///   #define ARGS(n)					ARG##n arg##n
-///
-///   // assume COUNT has been defined to 0, 1, 2, etc.
-///   void Invoke(X_PP_LIST(COUNT, ARGS_IMPL))
-///
-///   // based on the definition of COUNT, the output will be one of the following
-///   void Invoke()
-///   void Invoke(ARG0 arg0)
-///   void Invoke(ARG0 arg0, ARG1 arg1)
-///   void Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2)
-///   ...
-/// \endcode
+
 #define X_PP_LIST(count, op) X_PP_JOIN_2(X_PP_LIST_, count) \
 (op)
 

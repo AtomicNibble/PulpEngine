@@ -16,7 +16,7 @@ X_INLINE void XConsole::showConsole(consoleState::Enum state)
     consoleState_ = state;
 }
 
-X_INLINE bool XConsole::isVisable(void) const
+X_INLINE bool XConsole::isVisible(void) const
 {
     return consoleState_ != consoleState::CLOSED;
 }
@@ -28,7 +28,7 @@ X_INLINE bool XConsole::isExpanded(void) const
 
 X_INLINE void XConsole::toggleConsole(bool expand)
 {
-    if (isVisable()) {
+    if (isVisible()) {
         showConsole(consoleState::CLOSED);
     }
     else {

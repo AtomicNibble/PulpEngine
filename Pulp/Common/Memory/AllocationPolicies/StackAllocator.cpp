@@ -44,7 +44,6 @@ void* StackAllocator::allocate(size_t size, size_t alignment, size_t align_offse
     // of return data not actual start as alignment can waste some memory.
     current_ = pointerUtil::AlignTop(current_ + align_offset, alignment) - align_offset;
 
-    // Do we even have room slut?
     if ((current_ + size) > end_) {
         X_ASSERT((current_ + size) <= end_, "Stack overflow!, a stack allocator can't satisfy the request.")();
         return nullptr;

@@ -19,7 +19,7 @@ X_NAMESPACE_DECLARE(core,
 
 
 X_NAMESPACE_DECLARE(engine,
-                    class IPrimativeContext);
+                    class IPrimitiveContext);
 
 X_NAMESPACE_BEGIN(video)
 
@@ -77,7 +77,7 @@ public:
 	void setBytesRead(size_t size);
 
 private:
-	int32_t avalibleBlocks(void) const;
+	int32_t availableBlocks(void) const;
 	void fillBufffer();
 
 	void IoCallback(core::IFileSys&, const core::IoRequestBase*, core::XFileAsync*, uint32_t);
@@ -141,7 +141,7 @@ public:
     void shutDown(void) X_FINAL;
     void release(void) X_FINAL;
 
-    Vec2f drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const X_FINAL;
+    Vec2f drawDebug(engine::IPrimitiveContext* pPrim, Vec2f pos) const X_FINAL;
 
     void update(const core::FrameTimeData& frameTimeInfo) X_FINAL;
 

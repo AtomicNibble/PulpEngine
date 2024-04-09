@@ -143,7 +143,7 @@ protected:
         ASSERT_EQ(SessionStatus::PartyLobby, pSeverSes_->getStatus());
         ASSERT_EQ(SessionStatus::PartyLobby, pClientSes_->getStatus());
 
-        // sluts are in our lobby.
+        // users are in our lobby.
         pSeverSes_->createMatch(params);
         ASSERT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
 
@@ -151,7 +151,7 @@ protected:
         ASSERT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
 
         // The host should of moved to game lobby, and peers have been notified to join.
-        // but they won't of yet recived the packet.
+        // but they won't of yet received the packet.
         ASSERT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
         ASSERT_EQ(SessionStatus::PartyLobby, pClientSes_->getStatus());
 
@@ -170,11 +170,11 @@ protected:
             {
                 if (status == SessionStatus::PartyLobby)
                 {
-                    // waiting for cleint to be told to move.
+                    // waiting for client to be told to move.
                 }
                 if (status == SessionStatus::Connecting)
                 {
-                    X_LOG0("LobbyPartyToGame", "Conneting to lobby");
+                    X_LOG0("LobbyPartyToGame", "Connecting to lobby");
                     EXPECT_EQ(SessionStatus::PartyLobby, lastStatus);
                 }
                 else if (status == SessionStatus::GameLobby)
@@ -361,7 +361,7 @@ TEST_F(SessionTest, ConnectToOfflineLobbyFail)
         EXPECT_EQ(1, pLobby->getNumUsers());
         EXPECT_TRUE(pLobby->isHost());
         EXPECT_FALSE(pLobby->isPeer());
-        EXPECT_TRUE(pLobby->allPeersLoaded()); // we have no peers, so tecnically they are loaded. 
+        EXPECT_TRUE(pLobby->allPeersLoaded()); // we have no peers, so technically they are loaded. 
     }
 
     {
@@ -477,7 +477,7 @@ TEST_F(SessionTest, ReConnectToPartyLobby)
         pClientSes_->disconnect();
 
         // the client should send disconnect msg to host, but it might not arrive.
-        // in this test it should awlays arrive.
+        // in this test it should always arrive.
         // it would just timeout in the real world.
         // what i want to test is that we can re join after.
         // so wait for the peer to leave hosts list.
@@ -573,7 +573,7 @@ TEST_F(SessionTest, LobbyPartyToGameAndOut)
     EXPECT_EQ(SessionStatus::PartyLobby, pSeverSes_->getStatus());
     EXPECT_EQ(SessionStatus::PartyLobby, pClientSes_->getStatus());
 
-    // sluts are in our lobby.
+    // users are in our lobby.
 
     pSeverSes_->createMatch(params);
 
@@ -583,7 +583,7 @@ TEST_F(SessionTest, LobbyPartyToGameAndOut)
     EXPECT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
 
     // The host should of moved to game lobby, and peers have been notified to join.
-    // but they won't of yet recived the packet.
+    // but they won't of yet received the packet.
     EXPECT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
     EXPECT_EQ(SessionStatus::PartyLobby, pClientSes_->getStatus());
 
@@ -602,11 +602,11 @@ TEST_F(SessionTest, LobbyPartyToGameAndOut)
         {
             if (status == SessionStatus::PartyLobby)
             {
-                // waiting for cleint to be told to move.
+                // waiting for client to be told to move.
             }
             if (status == SessionStatus::Connecting)
             {
-                X_LOG0("LobbyPartyToGame", "Conneting to lobby");
+                X_LOG0("LobbyPartyToGame", "Connecting to lobby");
                 EXPECT_EQ(SessionStatus::PartyLobby, lastStatus);
             }
             else if (status == SessionStatus::GameLobby)
@@ -912,7 +912,7 @@ TEST_F(SessionTest, LoadGameSyncPeerFirst)
 
     core::Thread::sleep(5);
 
-    // The player finished loading, but should stay in loading state untill told by host.
+    // The player finished loading, but should stay in loading state until told by host.
     pClientSes_->finishedLoading();
 
     EXPECT_EQ(SessionStatus::Loading, pSeverSes_->getStatus());
@@ -925,7 +925,7 @@ TEST_F(SessionTest, LoadGameSyncPeerFirst)
     EXPECT_EQ(0, pGameLobby->getNumConnectedPeersInGame());
     EXPECT_TRUE(pGameLobby->isHost());
 
-    // this should be false, as host won't of recived packet telling peer has loaded.
+    // this should be false, as host won't of received packet telling peer has loaded.
     EXPECT_FALSE(pGameLobby->allPeersLoaded());
 
     for (i = 0; i < 100; i++)
@@ -938,7 +938,7 @@ TEST_F(SessionTest, LoadGameSyncPeerFirst)
 
     }
 
-    ASSERT_TRUE(i < 100) << "Failed to recive loading done packet";
+    ASSERT_TRUE(i < 100) << "Failed to receive loading done packet";
 
     EXPECT_EQ(1, pGameLobby->getNumConnectedPeers());
     EXPECT_EQ(1, pGameLobby->getNumConnectedPeersLoaded());
@@ -955,7 +955,7 @@ TEST_F(SessionTest, LoadGameSyncPeerFirst)
     EXPECT_EQ(SessionStatus::InGame, pSeverSes_->getStatus());
     EXPECT_EQ(SessionStatus::Loading, pClientSes_->getStatus());
 
-    // Send a snap shot to the player, kinky.
+    // Send a snap shot to the player.
     SnapShot snap0(g_arena);
     SnapShot snap1(g_arena);
     pSeverSes_->sendSnapShot(std::move(snap0));
@@ -1023,7 +1023,7 @@ TEST_F(SessionTest, LoadGameSyncHostFirst)
 
     core::Thread::sleep(5);
 
-    // The host finished loading, but should stay in loading state untill told by host.
+    // The host finished loading, but should stay in loading state until told by host.
     pSeverSes_->finishedLoading();
 
     pump();
@@ -1057,7 +1057,7 @@ TEST_F(SessionTest, LoadGameSyncHostFirst)
         }
     }
 
-    ASSERT_TRUE(i < 100) << "Failed to recive loading done packet";
+    ASSERT_TRUE(i < 100) << "Failed to receive loading done packet";
 
     // The host will of switched to in game now players have loaded.
     pump();
@@ -1072,7 +1072,7 @@ TEST_F(SessionTest, LoadGameSyncHostFirst)
     EXPECT_EQ(SessionStatus::InGame, pSeverSes_->getStatus());
     EXPECT_EQ(SessionStatus::Loading, pClientSes_->getStatus());
 
-    // Send a snap shot to the player, kinky.
+    // Send a snap shot to the player.
     SnapShot snap0(g_arena);
     SnapShot snap1(g_arena);
     pSeverSes_->sendSnapShot(std::move(snap0));
@@ -1104,7 +1104,7 @@ TEST_F(SessionTest, LoadGameSyncHostFirst)
 TEST_F(SessionTest, LoadGameTimeout)
 {
     // we start loading and the transport dies for both client and server
-    // make sure both slient and server end up in correct state.
+    // make sure both client and server end up in correct state.
     createAndJoinGameServer();
 
     EXPECT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
@@ -1133,7 +1133,7 @@ TEST_F(SessionTest, LoadGameTimeout)
     // okay now just sleep!
     core::Thread::sleep(defaultTimeout_.GetMilliSecondsAsInt32() + 100);
 
-    // is once enougth?
+    // is once enough?
     pump();
 
     // now server should be in game and client idle.

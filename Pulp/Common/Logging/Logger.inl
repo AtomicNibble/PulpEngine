@@ -1,6 +1,6 @@
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
 Logger<FilterPolicy, FormatPolicy, WritePolicy>::Logger(void) :
     LoggerBase(),
@@ -13,8 +13,8 @@ Logger<FilterPolicy, FormatPolicy, WritePolicy>::Logger(void) :
     writer_.Init();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
 Logger<FilterPolicy, FormatPolicy, WritePolicy>::Logger(const FilterPolicy& filter, const FormatPolicy& formatter, const WritePolicy& writer) :
     LoggerBase(),
@@ -27,8 +27,8 @@ Logger<FilterPolicy, FormatPolicy, WritePolicy>::Logger(const FilterPolicy& filt
     writer_.Init();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
 Logger<FilterPolicy, FormatPolicy, WritePolicy>::~Logger(void)
 {
@@ -37,8 +37,8 @@ Logger<FilterPolicy, FormatPolicy, WritePolicy>::~Logger(void)
     writer_.Exit();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
 void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoLog(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* pChannel, int verbosity, const char* pFormat, va_list args)
 {
@@ -49,8 +49,8 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoLog(X_SOURCE_INFO_LOG_CA
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
 void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoWarning(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* pChannel, const char* pFormat, va_list args)
 {
@@ -61,8 +61,8 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoWarning(X_SOURCE_INFO_LO
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
 void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoError(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* pChannel, const char* pFormat, va_list args)
 {
@@ -73,8 +73,8 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoError(X_SOURCE_INFO_LOG_
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
 void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoFatal(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* pChannel, const char* pFormat, va_list args)
 {
@@ -85,8 +85,8 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoFatal(X_SOURCE_INFO_LOG_
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
 void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoAssert(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* pFormat, va_list args)
 {
@@ -97,8 +97,8 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoAssert(X_SOURCE_INFO_LOG
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
 void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoAssertVariable(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* pFormat, va_list args)
 {
@@ -109,48 +109,48 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoAssertVariable(X_SOURCE_
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
 const FilterPolicy& Logger<FilterPolicy, FormatPolicy, WritePolicy>::GetFilterPolicy(void) const
 {
     return filter_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
 const FormatPolicy& Logger<FilterPolicy, FormatPolicy, WritePolicy>::GetFormatPolicy(void) const
 {
     return formatter_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
 const WritePolicy& Logger<FilterPolicy, FormatPolicy, WritePolicy>::GetWritePolicy(void) const
 {
     return writer_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
 FilterPolicy& Logger<FilterPolicy, FormatPolicy, WritePolicy>::GetFilterPolicy(void)
 {
     return filter_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
 FormatPolicy& Logger<FilterPolicy, FormatPolicy, WritePolicy>::GetFormatPolicy(void)
 {
     return formatter_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
 WritePolicy& Logger<FilterPolicy, FormatPolicy, WritePolicy>::GetWritePolicy(void)
 {

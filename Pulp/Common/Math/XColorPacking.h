@@ -98,7 +98,7 @@ struct CHANTRAIT<float>
     {
         return r * 0.2126f + g * 0.7152f + b * 0.0722f;
     } // luma coefficients from Rec. 709
-    //! Calculates the multiplied version of a color component \a c by alpha \a a
+    // Calculates the multiplied version of a color component c by alpha a
     static constexpr float premultiply(float c, float a)
     {
         return c * a;

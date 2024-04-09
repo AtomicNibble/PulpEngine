@@ -33,8 +33,8 @@ public:
 public:
     virtual ~MemoryArenaBase(void) = default;
 
-    /// The ID of an allocation is a human-readable string that is used to identify an allocation.
-    /// typeName is a human-readable string that denotes the type of an allocation.
+    // The ID of an allocation is a human-readable string that is used to identify an allocation.
+    // typeName is a human-readable string that denotes the type of an allocation.
     virtual void* allocate(size_t size, size_t alignment, size_t offset X_MEM_HUMAN_IDS_CB(const char* ID) X_MEM_HUMAN_IDS_CB(const char* typeName) X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo)) X_ABSTRACT;
 
     virtual void free(void* ptr) X_ABSTRACT;
@@ -42,10 +42,10 @@ public:
 
     virtual size_t getSize(void* ptr) X_ABSTRACT;
 
-    /// Returns how much of the buffer you can use.
+    // Returns how much of the buffer you can use.
     virtual size_t usableSize(void* ptr) const X_ABSTRACT;
 
-    /// Returns statistics regarding the allocations made by the memory arena.
+    // Returns statistics regarding the allocations made by the memory arena.
     virtual MemoryArenaStatistics getStatistics(void) const X_ABSTRACT;
 
     virtual MemoryAllocatorStatistics getAllocatorStatistics(bool children = false) const X_ABSTRACT;

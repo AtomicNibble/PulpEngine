@@ -56,12 +56,12 @@ namespace
         sizeof(IoRequestWrite),
         sizeof(IoRequestRead)};
 
-    static_assert(ioReqSize[IoRequest::OPEN] == sizeof(IoRequestOpen), "Enum mismtach?");
-    static_assert(ioReqSize[IoRequest::OPEN_WRITE_ALL] == sizeof(IoRequestOpenWrite), "Enum mismtach?");
-    static_assert(ioReqSize[IoRequest::OPEN_READ_ALL] == sizeof(IoRequestOpenRead), "Enum mismtach?");
-    static_assert(ioReqSize[IoRequest::CLOSE] == sizeof(IoRequestClose), "Enum mismtach?");
-    static_assert(ioReqSize[IoRequest::READ] == sizeof(IoRequestRead), "Enum mismtach?");
-    static_assert(ioReqSize[IoRequest::WRITE] == sizeof(IoRequestWrite), "Enum mismtach?");
+    static_assert(ioReqSize[IoRequest::OPEN] == sizeof(IoRequestOpen), "Enum mismatch?");
+    static_assert(ioReqSize[IoRequest::OPEN_WRITE_ALL] == sizeof(IoRequestOpenWrite), "Enum mismatch?");
+    static_assert(ioReqSize[IoRequest::OPEN_READ_ALL] == sizeof(IoRequestOpenRead), "Enum mismatch?");
+    static_assert(ioReqSize[IoRequest::CLOSE] == sizeof(IoRequestClose), "Enum mismatch?");
+    static_assert(ioReqSize[IoRequest::READ] == sizeof(IoRequestRead), "Enum mismatch?");
+    static_assert(ioReqSize[IoRequest::WRITE] == sizeof(IoRequestWrite), "Enum mismatch?");
 
     // I know want it so all open requests that reach the file system are basically asset names.
     // unless a OS path.
@@ -95,19 +95,19 @@ X_INLINE IoRequest::Enum xFileSys::PendingOpBase::getType(void) const
 
 // ------------------------------------
 
-xFileSys::PendingCompiltionOp::PendingCompiltionOp(core::UniquePointer<IoRequestBase>&& req, XFileAsyncOperationCompiltion&& op) :
+xFileSys::PendingCompletionOp::PendingCompletionOp(core::UniquePointer<IoRequestBase>&& req, XFileAsyncOperationCompiltion&& op) :
     PendingOpBase(std::forward<core::UniquePointer<IoRequestBase>>(req)),
     op(std::forward<XFileAsyncOperationCompiltion>(op))
 {
 }
 
-xFileSys::PendingCompiltionOp::PendingCompiltionOp(PendingCompiltionOp&& oth) :
+xFileSys::PendingCompletionOp::PendingCompletionOp(PendingCompletionOp&& oth) :
     PendingOpBase(std::move(oth)),
     op(std::move(oth.op))
 {
 }
 
-xFileSys::PendingCompiltionOp& xFileSys::PendingCompiltionOp::operator=(PendingCompiltionOp&& oth)
+xFileSys::PendingCompletionOp& xFileSys::PendingCompletionOp::operator=(PendingCompletionOp&& oth)
 {
     PendingOpBase::operator=(std::move(oth));
     op = std::move(oth.op);
@@ -172,7 +172,7 @@ xFileSys::xFileSys(core::MemoryArenaBase* arena) :
     virtualDirAllocator_(virtualDirHeap_.start(), virtualDirHeap_.end()),
     virtualDirArena_(&virtualDirAllocator_, "VirtualDirPool"),
     // ..
-    memFileArena_(&memfileAllocator_, "MemFileData"),
+    memFileArena_(&memFileAllocator_, "MemFileData"),
     numDir_(0),
     numPak_(0),
     currentRequestIdx_(0),
@@ -217,7 +217,7 @@ bool xFileSys::init(const CoreInitParams& params)
     X_ASSERT_NOT_NULL(gEnv->pCore);
     X_LOG0("FileSys", "Starting Filesys..");
 
-    if (!initDirectorys(params.FileSysWorkingDir())) {
+    if (!initDirectories(params.FileSysWorkingDir())) {
         X_ERROR("FileSys", "Failed to set game directories");
         return false;
     }
@@ -258,9 +258,9 @@ void xFileSys::shutDown(void)
     }
 }
 
-bool xFileSys::initDirectorys(bool working)
+bool xFileSys::initDirectories(bool working)
 {
-    loadPacks_ = !working; // TODO: work out somethign better? basically only want packs in game and maybe some tools?
+    loadPacks_ = !working; // TODO: work out something better? basically only want packs in game and maybe some tools?
 
     if (!PathUtil::GetCurrentDirectory(basePath_)) {
         return false;
@@ -340,7 +340,7 @@ bool xFileSys::getWorkingDirectory(PathT& pathOut) const
 
 bool xFileSys::getWorkingDirectory(PathWT& pathOut) const
 {
-    // TODO: should this be exposed? should we not just expose basepath which may be diffrent than sys working dir.
+    // TODO: should this be exposed? should we not just expose basepath which may be different than sys working dir.
     return PathUtil::GetCurrentDirectory(pathOut);
 }
 
@@ -558,13 +558,13 @@ FileT* xFileSys::findFile(const PathT& relPath, FileFlags mode, VirtualDirectory
 
 bool xFileSys::setBaseDir(const PathWT& osPath)
 {
-    X_ASSERT(baseDir_ == nullptr, "can only set one game directoy")(osPath.c_str(), baseDir_);
+    X_ASSERT(baseDir_ == nullptr, "can only set one game directory")(osPath.c_str(), baseDir_);
 
     // check if the directory is even valid.
     if (!directoryExistsOS(osPath)) {
         PathWT fullPath;
         PathUtil::GetFullPath(osPath, fullPath);
-        X_ERROR("FileSys", "Faled to set game directory, path does not exsists: \"%ls\"", fullPath.c_str());
+        X_ERROR("FileSys", "Failed to set game directory, path does not exists: \"%ls\"", fullPath.c_str());
         return false;
     }
 
@@ -579,13 +579,13 @@ bool xFileSys::setBaseDir(const PathWT& osPath)
 
 bool xFileSys::setSaveDir(const PathWT& osPath)
 {
-    X_ASSERT(saveDir_ == nullptr, "can only set one game directoy")(osPath.c_str(), saveDir_);
+    X_ASSERT(saveDir_ == nullptr, "can only set one game directory")(osPath.c_str(), saveDir_);
 
     // check if the directory is even valid.
     if (!directoryExistsOS(osPath)) {
         PathWT fullPath;
         PathUtil::GetFullPath(osPath, fullPath);
-        X_ERROR("FileSys", "Faled to set save directory, path does not exsists: \"%ls\"", fullPath.c_str());
+        X_ERROR("FileSys", "Failed to set save directory, path does not exists: \"%ls\"", fullPath.c_str());
         return false;
     }
 
@@ -627,7 +627,7 @@ Directory* xFileSys::addDirInteral(const PathWT& osPath)
     }
 
     if (!directoryExistsOS(osPath)) {
-        X_ERROR("FileSys", "Faled to add virtual drectory, the directory does not exsists: \"%ls\"", osPath.c_str());
+        X_ERROR("FileSys", "Failed to add virtual directory, the directory does not exists: \"%ls\"", osPath.c_str());
         return nullptr;
     }
 
@@ -641,12 +641,12 @@ Directory* xFileSys::addDirInteral(const PathWT& osPath)
     PathUtil::ensureSlash(fixedPath);
 
     if (!directoryExistsOS(fixedPath)) {
-        X_ERROR("FileSys", "Fixed path does not exsists: \"%ls\"", fixedPath.c_str());
+        X_ERROR("FileSys", "Fixed path does not exists: \"%ls\"", fixedPath.c_str());
         return nullptr;
     }
 
     // work out if this directory is a sub directory of any of the current
-    // searxh paths.
+    // search paths.
     for (Search* s = searchPaths_; s; s = s->pNext) {
         if (!s->pDir) {
             continue;
@@ -667,7 +667,7 @@ Directory* xFileSys::addDirInteral(const PathWT& osPath)
 
     ++numDir_;
 
-    // add hotreload dir.
+    // add hot reload dir.
 #if X_ENABLE_DIR_WATCHER
     gEnv->pDirWatcher->addDirectory(fixedPath);
 #endif // !X_ENABLE_DIR_WATCHER
@@ -704,9 +704,9 @@ Directory* xFileSys::addDirInteral(const PathWT& osPath)
 
 FindPair xFileSys::findFirst(const PathT& relPath, FindData& findinfo)
 {
-    // i don't like how the findData shit works currently it's anoying!
+    // i don't like how the findData shit works currently it's annoying!
     // so this is start of new version but i dunno how i want it to work yet.
-    // i want somthing better but don't know what it is :)
+    // i want something better but don't know what it is :)
     // list of shit:
     // 1. should return relative paths to the requested search dir.
     // 2. should expose some nicer scoped based / maybe iterative design to make nicer to use.
@@ -726,7 +726,7 @@ FindPair xFileSys::findFirstOS(const PathWT& osPath, FindData& findinfo)
     return fp;
 }
 
-bool xFileSys::findnext(findhandle handle, FindData& findinfo)
+bool xFileSys::findNext(findhandle handle, FindData& findinfo)
 {
     X_ASSERT(handle != INVALID_FIND_HANDLE, "FindNext called with invalid handle")(handle);
 
@@ -778,7 +778,7 @@ bool xFileSys::deleteDirectoryContents(const PathT& path, VirtualDirectory::Enum
         X_LOG0("FileSys", "deleteDirectoryContents: \"%s\"", path.c_str());
     }
 
-    // check if the dir exsists.
+    // check if the dir exists.
     if (!directoryExistsOS(osPath)) {
         return false;
     }
@@ -891,7 +891,7 @@ bool xFileSys::createDirectoryTreeOS(const PathT& osPath) const
     return PathUtil::CreateDirectoryTree(path);
 }
 
-// --------------------- exsists ---------------------
+// --------------------- exists ---------------------
 
 bool xFileSys::fileExists(const PathT& relPath) const
 {
@@ -1041,7 +1041,7 @@ size_t xFileSys::getMinimumSectorSize(void) const
     for (Search* s = searchPaths_; s; s = s->pNext) {
         if (s->pDir) {
             const auto& path = s->pDir->path;
-            int8_t driveIdx = path.getDriveNumber(); // watch this be a bug at somepoint.
+            int8_t driveIdx = path.getDriveNumber(); // watch this be a bug at some point.
             if (driveIdx >= 0) {
                 wchar_t driveLetter = (L'A' + driveIdx);
 
@@ -1072,7 +1072,7 @@ size_t xFileSys::getMinimumSectorSize(void) const
         sectorSize = 4096;
     }
 
-    X_LOG2("FileSys", "Minimumsector size for all virtual dir: %" PRIuS, sectorSize);
+    X_LOG2("FileSys", "Minimum sector size for all virtual dir: %" PRIuS, sectorSize);
     return sectorSize;
 }
 
@@ -1302,7 +1302,6 @@ IoRequestBase* xFileSys::popRequest(void)
         requestLock_.Enter();
     }
 
-    // read the request you dirty little grass hoper.
     auto* pReq = requests_.peek();
     requests_.pop();
     return pReq;
@@ -1324,7 +1323,7 @@ IoRequestBase* xFileSys::tryPopRequest(void)
     return pReq;
 }
 
-void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
+void xFileSys::onOpFinished(PendingOpBase& asyncOp, uint32_t bytesTransferred)
 {
     if (asyncOp.getType() == IoRequest::READ) {
         const IoRequestRead* pAsyncReq = asyncOp.as<const IoRequestRead>();
@@ -1338,11 +1337,11 @@ void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
             X_LOG0("FileSys", "IoRequest(0x%x) '%s' async read request complete. "
                               "bytesTrans: 0x%x pBuf: %p",
                 threadId, IoRequest::ToString(pAsyncReq->getType()),
-                bytesTransferd, pAsyncReq->pBuf);
+                bytesTransferred, pAsyncReq->pBuf);
         }
 
         ttZone(gEnv->ctx, "(Core/FileSys) Callback - Read");
-        pAsyncReq->callback.Invoke(*this, pAsyncReq, pReqFile, bytesTransferd);
+        pAsyncReq->callback.Invoke(*this, pAsyncReq, pReqFile, bytesTransferred);
     }
     else if (asyncOp.getType() == IoRequest::WRITE) {
         const IoRequestWrite* pAsyncReq = asyncOp.as<const IoRequestWrite>();
@@ -1356,11 +1355,11 @@ void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
             X_LOG0("FileSys", "IoRequest(0x%x) '%s' async write request complete. "
                               "bytesTrans: 0x%x pBuf: %p",
                 threadId, IoRequest::ToString(pAsyncReq->getType()),
-                bytesTransferd, pAsyncReq->pBuf);
+                bytesTransferred, pAsyncReq->pBuf);
         }
 
         ttZone(gEnv->ctx, "(Core/FileSys) Callback - Write");
-        pAsyncReq->callback.Invoke(*this, pAsyncReq, pReqFile, bytesTransferd);
+        pAsyncReq->callback.Invoke(*this, pAsyncReq, pReqFile, bytesTransferred);
     }
     else if (asyncOp.getType() == IoRequest::OPEN_READ_ALL) {
         IoRequestOpenRead* pAsyncReq = asyncOp.as<IoRequestOpenRead>();
@@ -1374,24 +1373,24 @@ void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
             X_LOG0("FileSys", "IoRequest(0x%x) '%s' async open-read request complete. "
                               "bytesTrans: 0x%x pBuf: %p",
                 threadId, IoRequest::ToString(pAsyncReq->getType()),
-                bytesTransferd, pAsyncReq->pBuf);
+                bytesTransferred, pAsyncReq->pBuf);
         }
 
         {
             ttZone(gEnv->ctx, "(Core/FileSys) Callback - OpenReadAll");
 
-            if (pAsyncReq->dataSize != bytesTransferd) {
+            if (pAsyncReq->dataSize != bytesTransferred) {
                 X_ERROR("FileSys", "Failed to read whole file contents. requested: %" PRIu32 " got %" PRIu32,
-                    pAsyncReq->dataSize, bytesTransferd);
+                    pAsyncReq->dataSize, bytesTransferred);
 
                 X_DELETE_ARRAY(static_cast<uint8_t*>(pAsyncReq->pBuf), pAsyncReq->arena);
-                // we didnt not read the whole file, pretend we failed to open.
+                // we didn't not read the whole file, pretend we failed to open.
                 pAsyncReq->pBuf = nullptr;
                 pAsyncReq->dataSize = 0;
                 pAsyncReq->callback.Invoke(*this, pAsyncReq, nullptr, 0);
             }
             else {
-                pAsyncReq->callback.Invoke(*this, pAsyncReq, pReqFile, bytesTransferd);
+                pAsyncReq->callback.Invoke(*this, pAsyncReq, pReqFile, bytesTransferred);
             }   
         }
         // close it.
@@ -1407,21 +1406,21 @@ void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
             X_LOG0("FileSys", "IoRequest(0x%x) '%s' async open-write request complete. "
                               "bytesTrans: 0x%x pBuf: %p",
                 threadId, IoRequest::ToString(pAsyncReq->getType()),
-                bytesTransferd, pAsyncReq->data.ptr());
+                bytesTransferred, pAsyncReq->data.ptr());
         }
 
         {
             ttZone(gEnv->ctx, "(Core/FileSys) Callback - OpenWriteAll");
 
-            if (pAsyncReq->data.size() != bytesTransferd) {
+            if (pAsyncReq->data.size() != bytesTransferred) {
                 X_ERROR("FileSys", "Failed to write whole file contents. requested: %" PRIu32 " got %" PRIu32,
-                    pAsyncReq->data.size(), bytesTransferd);
+                    pAsyncReq->data.size(), bytesTransferred);
 
-                // we didnt not write the whole file, pretend we failed to open.
+                // we didn't not write the whole file, pretend we failed to open.
                 pAsyncReq->callback.Invoke(*this, pAsyncReq, nullptr, 0);
             }
             else {
-                pAsyncReq->callback.Invoke(*this, pAsyncReq, pReqFile, bytesTransferd);
+                pAsyncReq->callback.Invoke(*this, pAsyncReq, pReqFile, bytesTransferred);
             }
         }
 
@@ -1438,12 +1437,12 @@ void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
     }
 }
 
-void xFileSys::AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOperation, uint32_t bytesTransferd)
+void xFileSys::AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOperation, uint32_t bytesTransferred)
 {
-    X_ASSERT(pendingCompOps_.isNotEmpty(), "Recived a unexpected Async complition")(pOperation, bytesTransferd);
+    X_ASSERT(pendingCompOps_.isNotEmpty(), "Received a unexpected Async completion")(pOperation, bytesTransferred);
 
     for (size_t i = 0; i < pendingCompOps_.size(); i++) {
-        PendingCompiltionOp& asyncOp = pendingCompOps_[i];
+        PendingCompletionOp& asyncOp = pendingCompOps_[i];
 
         if (asyncOp.op.ownsAsyncOp(pOperation)) {
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
@@ -1461,7 +1460,7 @@ void xFileSys::AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOpera
                     const auto delay = core::TimeVal::fromMS(delayMS);
                     auto time = gEnv->pTimer->GetTimeNowReal() + delay;
 
-                    delayedOps_.emplace(DelayedPendingCompiltionOp(std::move(asyncOp), time));
+                    delayedOps_.emplace(DelayedPendingCompletionOp(std::move(asyncOp), time));
                     pendingCompOps_.removeIndex(i);
 
                     stats_.DelayedOps = delayedOps_.size();
@@ -1470,7 +1469,7 @@ void xFileSys::AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOpera
             }
 #endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
 
-            onOpFinsihed(asyncOp, bytesTransferd);
+            onOpFinished(asyncOp, bytesTransferred);
             pendingCompOps_.removeIndex(i);
 
             updatePendingOpsStats();
@@ -1505,12 +1504,12 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
     auto checkForCompletedOps = [&] {
         if (pendingOps_.isNotEmpty()) {
-            ttZone(gEnv->ctx, "(Core/FileSys) Process compelted ops");
+            ttZone(gEnv->ctx, "(Core/FileSys) Process completion ops");
 
             for (size_t i = 0; i < pendingOps_.size(); i++) {
                 uint32_t bytesTrans = 0;
                 if (pendingOps_[i].op.hasFinished(&bytesTrans)) {
-                    onOpFinsihed(pendingOps_[i], bytesTrans);
+                    onOpFinished(pendingOps_[i], bytesTrans);
                     pendingOps_.removeIndex(i);
 
                     updatePendingOpsStats();
@@ -1528,7 +1527,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
                 uint32_t bytesTrans;
                 X_ASSERT(delayedOp.op.hasFinished(&bytesTrans), "Delayed op should be always be finished")();
 
-                onOpFinsihed(delayedOp, bytesTrans);
+                onOpFinished(delayedOp, bytesTrans);
 
                 delayedOps_.pop();
             }
@@ -1551,9 +1550,9 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
             pRequest = popRequest();
         }
         else {
-            // we have pending requests, lets quickly enter a alertable state.
-            // then we will try get more requests, untill we get more requests
-            // we just stay in a alertable state, so that any pending requests can handled.
+            // we have pending requests, lets quickly enter a alterable state.
+            // then we will try get more requests, until we get more requests
+            // we just stay in a alterable state, so that any pending requests can handled.
             requestSignal_.wait(0, true);
 
             checkForCompletedOps();
@@ -1655,7 +1654,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
                         uint32_t bytesTrans = 0;
                         if (op.op.hasFinished(&bytesTrans)) {
-                            onOpFinsihed(op, bytesTrans);
+                            onOpFinished(op, bytesTrans);
                         }
                         else {
                             pendingOps_.emplace_back(std::move(op));
@@ -1742,7 +1741,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
                     uint32_t bytesTrans = 0;
                     if (op.op.hasFinished(&bytesTrans)) {
-                        onOpFinsihed(op, bytesTrans);
+                        onOpFinished(op, bytesTrans);
                     }
                     else {
                         pendingOps_.emplace_back(std::move(op));
@@ -1863,7 +1862,7 @@ bool xFileSys::openPak(const PathT& relPath)
     }
 
     if (hdr.size != hdr.inflatedSize) {
-        X_ERROR("FileSys", "Compressed Paks not currently supported");
+        X_ERROR("FileSys", "Compressed paks not currently supported");
         return false;
     }
 

@@ -111,7 +111,7 @@ namespace shader
         const auto& textures = pShader->getTextures();
 
         // for now every shader for a given type is compiled with same version.
-        // if diffrent shaders have diffrent versions this will ned changing.
+        // if different shaders have different versions this will ned changing.
         auto profileVersion = Util::getProfileVersionForType(pShader->getType());
 
         ShaderBinHeader hdr;
@@ -156,7 +156,7 @@ namespace shader
             core::Compression::Compressor<core::Compression::LZ4> comp;
 
             if (!comp.deflate(scratchArena_, byteCode, compressed, compLvl_)) {
-                X_ERROR("Shader", "Failed to defalte data");
+                X_ERROR("Shader", "Failed to deflate data");
                 return false;
             }
 
@@ -249,7 +249,7 @@ namespace shader
         // validate the profile version.
         auto profileVersion = Util::getProfileVersionForType(pShader->getType());
         if (profileVersion.first != hdr.profileMajorVersion || profileVersion.second != hdr.profileMinorVersion) {
-            X_WARNING("Shader", "bin shader is stale, compiled with diffrent shader mode: %" PRIu8 "_%" PRIu8 " requested: %" PRIu8 "_%" PRIu8,
+            X_WARNING("Shader", "bin shader is stale, compiled with different shader mode: %" PRIu8 "_%" PRIu8 " requested: %" PRIu8 "_%" PRIu8,
                 hdr.profileMajorVersion, hdr.profileMinorVersion, profileVersion.first, profileVersion.second);
             return false;
         }
@@ -322,7 +322,7 @@ namespace shader
         // type should already be set.
         // so we just use it as a sanity check.
         if (pShader->getType() != hdr.type) {
-            X_WARNING("Shader", "Shader type is diffrent to that of the cache file for: \"%s\"",
+            X_WARNING("Shader", "Shader type is different to that of the cache file for: \"%s\"",
                 pShader->getName());
         }
 
@@ -347,7 +347,7 @@ namespace shader
         auto it = cache_.find(path);
         if (it != cache_.end()) {
             if (it->second != sourceCrc32) {
-                // we have a cache file, but it was compiled with source that had diffrent crc.
+                // we have a cache file, but it was compiled with source that had different crc.
                 return true;
             }
         }

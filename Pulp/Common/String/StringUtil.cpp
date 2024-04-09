@@ -473,7 +473,7 @@ namespace strUtil
         return (*(const uint8_t*)str1 - *(const uint8_t*)str2) == 0;
     }
 
-    /// Returns whether two strings are equal, checks the length of both srings are equal.
+    // Returns whether two strings are equal, checks the length of both srings are equal.
     bool IsEqual(core::string_view str1, core::string_view str2)
     {
         return IsEqual(str1.begin(), str1.end(), str2.begin(), str2.end());
@@ -520,7 +520,7 @@ namespace strUtil
         return (*(const uint8_t*)str1 - *(const uint8_t*)str2) == 0;
     }
 
-    /// Returns whether two strings are equal, checks the length of the 1st range.
+    // Returns whether two strings are equal, checks the length of the 1st range.
     bool IsEqualCaseInsen(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2)
     {
         ptrdiff_t Len = endExclusiveS1 - startInclusiveS1;
@@ -552,8 +552,8 @@ namespace strUtil
         return false;
     }
 
-    /// \brief Finds the first character in a string that is not a certain character, and returns a pointer to it.
-    /// \remark Returns a \c nullptr if the character could not be found.
+    // Finds the first character in a string that is not a certain character, and returns a pointer to it.
+    // Returns a \c nullptr if the character could not be found.
     const char* FindNon(const char* startInclusive, const char* endExclusive, char what)
     {
         if (startInclusive >= endExclusive) {
@@ -572,8 +572,8 @@ namespace strUtil
         return result;
     }
 
-    /// \brief Finds a character in a string, and returns a pointer to the last occurrence of the character.
-    /// \remark Returns a \c nullptr if the character could not be found.
+    // Finds a character in a string, and returns a pointer to the last occurrence of the character.
+    // Returns a \c nullptr if the character could not be found.
     const char* FindLast(const char* startInclusive, const char* endExclusive, char what)
     {
         if (startInclusive >= endExclusive) {
@@ -617,8 +617,8 @@ namespace strUtil
         return pResult;
     }
 
-    /// \brief Finds the last character in a string that is not a certain character, and returns a pointer to it.
-    /// \remark Returns a \c nullptr if the character could not be found.
+    // Finds the last character in a string that is not a certain character, and returns a pointer to it.
+    // Returns a \c nullptr if the character could not be found.
     const char* FindLastNon(const char* startInclusive, const char* endExclusive, char what)
     {
         const char* result = endExclusive - 1;
@@ -637,8 +637,8 @@ namespace strUtil
         return result;
     }
 
-    /// \brief Finds the first whitespace character in a string, and returns a pointer to it.
-    /// \remark Returns a \c nullptr if no such character could not be found.
+    // Finds the first whitespace character in a string, and returns a pointer to it.
+    // Returns a \c nullptr if no such character could not be found.
     const char* FindWhitespace(const char* startInclusive, const char* endExclusive)
     {
         while (startInclusive < endExclusive) {
@@ -712,8 +712,8 @@ namespace strUtil
         return Find(startInclusive, startInclusive + strlen(startInclusive), what);
     }
 
-    /// \brief Finds a character in a string, and returns a pointer to the first occurrence of the character.
-    /// \remark Returns a \c nullptr if the character could not be found.
+    // Finds a character in a string, and returns a pointer to the first occurrence of the character.
+    // Returns a \c nullptr if the character could not be found.
     const char* Find(const char* startInclusive, const char* endExclusive, char what)
     {
         while (startInclusive < endExclusive) {

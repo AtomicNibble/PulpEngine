@@ -775,7 +775,7 @@ namespace
         RuntimeZone zones[NUM_ZONES];
     };
 
-    // This is padded to 64bit to make placing TraceThread data on it's own boundy more simple.
+    // This is padded to 64bit to make placing TraceThread data on it's own boundary more simple.
     TELEM_ALIGNED_SYMBOL(struct TraceContext, 64)
     {
         bool IsOpen(void) const {
@@ -800,7 +800,7 @@ namespace
 
         tt_int32 numPDBSync;
 
-        // -- Cace lane boundry --
+        // -- Cache lane boundary --
         // This lane is very hot and should have no writes expect tickerBuf flip.
 
         volatile tt_int32 activeTickBufIdx;
@@ -810,7 +810,7 @@ namespace
         tt_uint8 _lanePad1[20];
         X86_PAD(20)
 
-        // -- Cace lane boundry --
+        // -- Cache lane boundary --
 
         DWORD threadId_;
         HANDLE hThread_;
@@ -824,11 +824,11 @@ namespace
 
         X86_PAD(32)
 
-        // -- Cace lane boundry --
+        // -- Cache lane boundary --
 
         CriticalSection cs_;
 
-        // -- Cace lane boundry --
+        // -- Cache lane boundary --
 
         tt_uint64 lastFlipTick;
 
@@ -842,7 +842,7 @@ namespace
 
         X86_PAD(8)
 
-        // -- Cace lane boundry --
+        // -- Cache lane boundary --
 
         FileOpenFunc pFileOpen;
         FileCloseFunc pFileClose;
@@ -856,11 +856,11 @@ namespace
 //    constexpr size_t size1 = TELEM_OFFSETOF(TraceContext, pFileOpen);
 //    constexpr size_t size2 = TELEM_OFFSETOF(TraceContext, pFileOpen);
 
-    static_assert(TELEM_OFFSETOF(TraceContext, activeTickBufIdx) == 64, "Cold fields not on firstcache lane");
+    static_assert(TELEM_OFFSETOF(TraceContext, activeTickBufIdx) == 64, "Cold fields not on first cache lane");
     static_assert(TELEM_OFFSETOF(TraceContext, threadId_) == 128, "Cold fields not on next cache lane");
-    static_assert(TELEM_OFFSETOF(TraceContext, cs_) == 192, "cache lane boundry changed");
-    static_assert(TELEM_OFFSETOF(TraceContext, lastFlipTick) == 256, "cache lane boundry changed");
-    static_assert(TELEM_OFFSETOF(TraceContext, pFileOpen) == 320, "cache lane boundry changed");
+    static_assert(TELEM_OFFSETOF(TraceContext, cs_) == 192, "cache lane boundary changed");
+    static_assert(TELEM_OFFSETOF(TraceContext, lastFlipTick) == 256, "cache lane boundary changed");
+    static_assert(TELEM_OFFSETOF(TraceContext, pFileOpen) == 320, "cache lane boundary changed");
     static_assert(sizeof(TraceContext) == 384, "Size changed");
 
 
@@ -1080,7 +1080,7 @@ namespace
                 }
 
                 if (pHdr->dataSize > bufLengthInOut) {
-                    writeLog(pCtx, TtMsgFlagsSeverityError, "Client sent oversied packet of size %i...", static_cast<tt_int32>(pHdr->dataSize));
+                    writeLog(pCtx, TtMsgFlagsSeverityError, "Client sent oversized packet of size %i...", static_cast<tt_int32>(pHdr->dataSize));
                     return false;
                 }
 
@@ -1092,7 +1092,7 @@ namespace
                 return true;
             }
             else if (bytesRead > bufLength) {
-                writeLog(pCtx, TtMsgFlagsSeverityError, "Overread packet bytesRead: %d recvbuflen: %d", bytesRead, bufLength);
+                writeLog(pCtx, TtMsgFlagsSeverityError, "Overread packet bytesRead: %d recv buflen: %d", bytesRead, bufLength);
                 return false;
             }
         }
@@ -1901,7 +1901,7 @@ namespace
     static_assert(48 == sizeof(QueueDataMemFree));
     static_assert(136 == sizeof(QueueDataCallStack));
 #else
-    static_assert(40 == sizeof(QueueDataMemFree));
+    static_assert(32 == sizeof(QueueDataMemFree));
     static_assert(72 == sizeof(QueueDataCallStack));
 #endif
     static_assert(64 == GetSizeWithoutArgData<QueueDataMessage>());
@@ -1964,13 +1964,13 @@ namespace
 
             if (!stalled && !force)
             {
-                auto ellapsedTicks = nowTicks - pCtx->lastFlipTick;
-                auto ellapsedNano = ticksToNano(pCtx, ellapsedTicks);
+                auto elapsedTicks = nowTicks - pCtx->lastFlipTick;
+                auto elapsedNano = ticksToNano(pCtx, elapsedTicks);
 
                 constexpr tt_uint64 nanoPerMS = 1'000'000;
                 constexpr tt_uint64 nanoThreshold = nanoPerMS * 10;
 
-                if (ellapsedNano < nanoThreshold) {
+                if (elapsedNano < nanoThreshold) {
 
                     auto halfBufferCap = pCtx->tickBufCapacity / 2;
                     auto bufSize = getActiveTickBufferSize(pCtx);
@@ -1990,7 +1990,7 @@ namespace
         {
             // need to wait.
             // lets just take the lock, not ideal if lots of threads end up here.
-            // but got biggeer problems if that happening tbh.
+            // but got bigger problems if that happening tbh.
             ScopedLock lock(pCtx->cs_);
         }
     }
@@ -1999,7 +1999,7 @@ namespace
     TELEM_INLINE void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_int32 copySize, tt_int32 size);
 
     // This is just a helper to flip buffer than add the data.
-    // But keeps this logic outside the hot functio.n
+    // But keeps this logic outside the hot function
     TELEM_NO_INLINE void addToTickBufferFull(TraceContext* pCtx, const void* pPtr, tt_int32 copySize, tt_int32 size)
     {
         // We don't pass force so that if multiple threads end up in here
@@ -3290,13 +3290,13 @@ TtError TelemInitializeContext(TraceContexHandle* pOut, void* pArena, tt_size bu
     constexpr tt_size threadDataSize = sizeof(TraceThread) * MAX_ZONE_THREADS;
     constexpr tt_size writeZonesSize = sizeof(WriteZones);
     constexpr tt_size pdbZonesSize = sizeof(PDBZones);
-    constexpr tt_size minBufferSize = 1024 * 10; // 10kb.. enougth?
+    constexpr tt_size minBufferSize = 1024 * 10; // 10kb.. enough?
     constexpr tt_size internalSize = contexSize + threadDataSize + writeZonesSize + pdbZonesSize;
     if (bufLen < internalSize + minBufferSize) {
         return TtErrorArenaTooSmall;
     }
 
-    // i want to split this into two buffers both starting on 64bit boundry.
+    // i want to split this into two buffers both starting on 64bit boundary.
     // and both multiple of 64.
     // so if we have a number need to round down till it's a multiple of 128?
     const tt_size internalEndAligned = RoundUpToMultiple<tt_size>(internalSize, 64);

@@ -10,7 +10,7 @@ X_NAMESPACE_DECLARE(net, struct ISession);
 
 X_NAMESPACE_BEGIN(engine)
 
-class IPrimativeContext;
+class IPrimitiveContext;
 
 namespace gui
 {
@@ -34,7 +34,7 @@ namespace gui
         virtual ~IMenuHandler() = default;
 
         virtual bool isActive(void) const X_ABSTRACT;
-        virtual void update(MenuParams& params, core::FrameData& frame, IPrimativeContext* pDrawCon) X_ABSTRACT;
+        virtual void update(MenuParams& params, core::FrameData& frame, IPrimitiveContext* pDrawCon) X_ABSTRACT;
 
         virtual bool openMenu(core::string_view name) X_ABSTRACT;
         virtual void close(void) X_ABSTRACT;

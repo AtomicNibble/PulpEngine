@@ -1,6 +1,6 @@
 
 
-// ---------------------------------------------------------------------------------------------------------------------
+
 template<typename T>
 Assert& Assert::Variable(const char* const name, T* const var)
 {
@@ -8,7 +8,7 @@ Assert& Assert::Variable(const char* const name, T* const var)
     return *this;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+
 template<typename T>
 Assert& Assert::Variable(const char* const name, const T* const var)
 {
@@ -16,7 +16,7 @@ Assert& Assert::Variable(const char* const name, const T* const var)
     return *this;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+
 
 template<typename T, class>
 Assert& Assert::Variable(const char* const name, const T var)
@@ -25,11 +25,11 @@ Assert& Assert::Variable(const char* const name, const T var)
     return *this;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+
 template<typename T, class>
 Assert& Assert::Variable(const char* const name, const T&)
 {
-    Dispatch(sourceInfo_, name, "unhadled type");
+    Dispatch(sourceInfo_, name, "unhandled type");
     // empty implementation - users must provide a template specialization for their custom types
     return *this;
 }

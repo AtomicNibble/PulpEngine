@@ -11,7 +11,7 @@
 #include <Threading\JobSystem2.h>
 
 #include <Math\XWinding.h>
-#include "Drawing\PrimativeContext.h"
+#include "Drawing\PrimitiveContext.h"
 
 X_NAMESPACE_BEGIN(level)
 
@@ -179,7 +179,7 @@ bool Level::init(void)
 {
     // get a prim contex to draw all the level debug into :)
     // cast to impl type, for potential de virtulisation..
-    pPrimContex_ = static_cast<engine::PrimativeContext*>(engine::gEngEnv.p3DEngine_->getPrimContext(engine::PrimContext::MISC3D));
+    pPrimContex_ = static_cast<engine::PrimitiveContext*>(engine::gEngEnv.p3DEngine_->getPrimContext(engine::PrimContext::MISC3D));
 
     return true;
 }
@@ -215,7 +215,7 @@ void Level::free(void)
 
 bool Level::Load(const char* mapName)
 {
-    // does the other level file exsist?
+    // does the other level file exist?
     path_.set(mapName);
     path_.setExtension(level::LVL_FILE_EXTENSION);
 
@@ -365,7 +365,7 @@ bool Level::render(void)
 	DrawPortalStacks();
 	DrawStatsBlock();
 
-	clearVisableAreaFlags();
+	clearVisibleAreaFlags();
 
 	// if the camera is detached always draw the frustum of it.
 	if (s_var_detechCam_ > 0) 
@@ -598,7 +598,7 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 }
 #endif
 
-void Level::clearVisableAreaFlags()
+void Level::clearVisibleAreaFlags()
 {
     core::zero_object(visibleAreaFlags_);
 }

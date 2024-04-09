@@ -16,7 +16,7 @@ using namespace sound::Literals;
 X_NAMESPACE_BEGIN(game)
 
 Level::Level(physics::IScene* pScene, engine::IWorld3D* p3DWorld,
-    entity::EnititySystem& entSys, core::MemoryArenaBase* arena) :
+    entity::EntitySystem& entSys, core::MemoryArenaBase* arena) :
     arena_(arena),
     stringTable_(arena),
     entSys_(entSys),
@@ -421,16 +421,16 @@ void World::applySnapShot(const UserNetMappings& unm, const net::SnapShot& snap)
 
 void World::spawnPlayer(const UserNetMappings& unm, int32_t playerIdx, bool local)
 {
-    X_ASSERT(playerIdx < net::MAX_PLAYERS, "Invalide player id")(playerIdx, net::MAX_PLAYERS);
+    X_ASSERT(playerIdx < net::MAX_PLAYERS, "Invalid player id")(playerIdx, net::MAX_PLAYERS);
     X_ASSERT_NOT_NULL(pScene_);
 
     // we want to take the give ent and set it up as a player.
     // the ent may not have all the required components yet.
-    // we also want to support spawning diffrent types of players with various definitions.
+    // we also want to support spawning different types of players with various definitions.
     // maybe i should write some system for defining what each enity type has.
     // for now can be just in code, but setup in way that can be data driven.
     // which ia suspect should be handled by the enitiy system.
-    // so we allmost what a make ent type helper, that we can just call and it makes the ent a player.
+    // so we almost what a make ent type helper, that we can just call and it makes the ent a player.
     // then here we can do shit with the player.
     entity::EntityId id = static_cast<entity::EntityId>(playerIdx);
     auto pos = Vec3f(-80, -50.f + (playerIdx * 50.f), 10);
@@ -440,7 +440,7 @@ void World::spawnPlayer(const UserNetMappings& unm, int32_t playerIdx, bool loca
 
 void World::removePlayer(int32_t playerIdx)
 {
-    X_ASSERT(playerIdx < net::MAX_PLAYERS, "Invalide player id")(playerIdx, net::MAX_PLAYERS);
+    X_ASSERT(playerIdx < net::MAX_PLAYERS, "Invalid player id")(playerIdx, net::MAX_PLAYERS);
     X_ASSERT_NOT_NULL(pScene_);
 
     entity::EntityId id = static_cast<entity::EntityId>(playerIdx);

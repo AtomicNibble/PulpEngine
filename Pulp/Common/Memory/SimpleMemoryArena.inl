@@ -1,7 +1,7 @@
 
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class AllocationPolicy>
 SimpleMemoryArena<AllocationPolicy>::SimpleMemoryArena(AllocationPolicy* allocator, const char* name) :
     allocator_(allocator),
@@ -20,15 +20,15 @@ SimpleMemoryArena<AllocationPolicy>::SimpleMemoryArena(AllocationPolicy* allocat
 #endif
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class AllocationPolicy>
 SimpleMemoryArena<AllocationPolicy>::~SimpleMemoryArena(void)
 {
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class AllocationPolicy>
 void* SimpleMemoryArena<AllocationPolicy>::allocate(size_t size, size_t alignment, size_t offset X_MEM_HUMAN_IDS_CB(const char*) X_MEM_HUMAN_IDS_CB(const char*) X_SOURCE_INFO_MEM_CB(const SourceInfo&))
 {
@@ -42,8 +42,8 @@ void* SimpleMemoryArena<AllocationPolicy>::allocate(size_t size, size_t alignmen
     return memory;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class AllocationPolicy>
 void SimpleMemoryArena<AllocationPolicy>::free(void* ptr)
 {
@@ -54,8 +54,8 @@ void SimpleMemoryArena<AllocationPolicy>::free(void* ptr)
 #endif
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class AllocationPolicy>
 void SimpleMemoryArena<AllocationPolicy>::free(void* ptr, size_t size)
 {
@@ -66,24 +66,24 @@ void SimpleMemoryArena<AllocationPolicy>::free(void* ptr, size_t size)
 #endif
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class AllocationPolicy>
 size_t SimpleMemoryArena<AllocationPolicy>::getSize(void* ptr)
 {
     return allocator_->getSize(ptr);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class AllocationPolicy>
 size_t SimpleMemoryArena<AllocationPolicy>::usableSize(void* ptr) const
 {
     return allocator_->usableSize(ptr);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class AllocationPolicy>
 MemoryArenaStatistics SimpleMemoryArena<AllocationPolicy>::getStatistics(void) const
 {
@@ -104,8 +104,8 @@ MemoryArenaStatistics SimpleMemoryArena<AllocationPolicy>::getStatistics(void) c
 #endif
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class AllocationPolicy>
 MemoryAllocatorStatistics SimpleMemoryArena<AllocationPolicy>::getAllocatorStatistics(bool children) const
 {
@@ -130,8 +130,8 @@ MemoryAllocatorStatistics SimpleMemoryArena<AllocationPolicy>::getAllocatorStati
 #endif
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 
 template<class AllocationPolicy>
 bool SimpleMemoryArena<AllocationPolicy>::isThreadSafe(void) const
@@ -139,24 +139,24 @@ bool SimpleMemoryArena<AllocationPolicy>::isThreadSafe(void) const
     return false;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class AllocationPolicy>
 constexpr inline size_t SimpleMemoryArena<AllocationPolicy>::getMemoryRequirement(size_t size)
 {
     return size;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class AllocationPolicy>
 constexpr inline size_t SimpleMemoryArena<AllocationPolicy>::getMemoryAlignmentRequirement(size_t alignment)
 {
     return alignment;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class AllocationPolicy>
 constexpr inline size_t SimpleMemoryArena<AllocationPolicy>::getMemoryOffsetRequirement(void)
 {

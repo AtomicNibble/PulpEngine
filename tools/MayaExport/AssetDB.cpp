@@ -103,7 +103,7 @@ namespace
             default:
                 break;
         }
-        // you STUPID TWAT!
+
         X_ASSERT_UNREACHABLE();
         return ProtoBuf::AssetDB::ANIM;
     }
@@ -236,7 +236,7 @@ bool AssetDB::GetModInfo(int32_t id, Mod& modOut)
     return true;
 }
 
-MStatus AssetDB::AssetExsists(AssetType::Enum type, const MString& name, int32_t* pIdOut, int32_t* pModIdOut)
+MStatus AssetDB::AssetExists(AssetType::Enum type, const MString& name, int32_t* pIdOut, int32_t* pModIdOut)
 {
     X_ASSERT_NOT_NULL(pIdOut);
     X_ASSERT_NOT_NULL(pModIdOut);
@@ -245,7 +245,7 @@ MStatus AssetDB::AssetExsists(AssetType::Enum type, const MString& name, int32_t
     *pModIdOut = assetDb::INVALID_MOD_ID;
 
     if (!ensureConnected()) {
-        MayaUtil::MayaPrintError("Failed to 'AssetExsists' pipe is invalid");
+        MayaUtil::MayaPrintError("Failed to 'AssetExists' pipe is invalid");
         return MS::kFailure;
     }
 

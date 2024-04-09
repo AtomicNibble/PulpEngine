@@ -39,14 +39,14 @@ namespace lua
         TryAgain,
         None);
 
-    static_assert(CallResult::Ok == LUA_OK, "Enum mismtach");
-    static_assert(CallResult::Yield == LUA_YIELD, "Enum mismtach");
-    static_assert(CallResult::RunTime == LUA_ERRRUN, "Enum mismtach");
-    static_assert(CallResult::Syntax == LUA_ERRSYNTAX, "Enum mismtach");
-    static_assert(CallResult::Memory == LUA_ERRMEM, "Enum mismtach");
-    static_assert(CallResult::Handler == LUA_ERRERR, "Enum mismtach");
-    static_assert(CallResult::File == LUA_ERRFILE, "Enum mismtach");
-    static_assert(CallResult::TryAgain == LUA_EAGAIN, "Enum mismtach");
+    static_assert(CallResult::Ok == LUA_OK, "Enum mismatch");
+    static_assert(CallResult::Yield == LUA_YIELD, "Enum mismatch");
+    static_assert(CallResult::RunTime == LUA_ERRRUN, "Enum mismatch");
+    static_assert(CallResult::Syntax == LUA_ERRSYNTAX, "Enum mismatch");
+    static_assert(CallResult::Memory == LUA_ERRMEM, "Enum mismatch");
+    static_assert(CallResult::Handler == LUA_ERRERR, "Enum mismatch");
+    static_assert(CallResult::File == LUA_ERRFILE, "Enum mismatch");
+    static_assert(CallResult::TryAgain == LUA_EAGAIN, "Enum mismatch");
 
     X_DECLARE_ENUM(LoadResult)
     (
@@ -58,10 +58,10 @@ namespace lua
         _blank3,
         File);
 
-    static_assert(LoadResult::Ok == LUA_OK, "Enum mismtach");
-    static_assert(LoadResult::Syntax == LUA_ERRSYNTAX, "Enum mismtach");
-    static_assert(LoadResult::Memory == LUA_ERRMEM, "Enum mismtach");
-    static_assert(LoadResult::File == LUA_ERRFILE, "Enum mismtach");
+    static_assert(LoadResult::Ok == LUA_OK, "Enum mismatch");
+    static_assert(LoadResult::Syntax == LUA_ERRSYNTAX, "Enum mismatch");
+    static_assert(LoadResult::Memory == LUA_ERRMEM, "Enum mismatch");
+    static_assert(LoadResult::File == LUA_ERRFILE, "Enum mismatch");
 
     struct Ref
     {
@@ -72,15 +72,15 @@ namespace lua
         };
     };
 
-    static_assert(Type::Nil == LUA_TNIL, "Enum mismtach");
-    static_assert(Type::Pointer == LUA_TLIGHTUSERDATA, "Enum mismtach");
-    static_assert(Type::Boolean == LUA_TBOOLEAN, "Enum mismtach");
-    static_assert(Type::Number == LUA_TNUMBER, "Enum mismtach");
-    static_assert(Type::String == LUA_TSTRING, "Enum mismtach");
-    static_assert(Type::Table == LUA_TTABLE, "Enum mismtach");
-    static_assert(Type::Function == LUA_TFUNCTION, "Enum mismtach");
-    static_assert(Type::Userdata == LUA_TUSERDATA, "Enum mismtach");
-    // static_assert(Type::Handle == LUA_THANDLE, "Enum mismtach");
+    static_assert(Type::Nil == LUA_TNIL, "Enum mismatch");
+    static_assert(Type::Pointer == LUA_TLIGHTUSERDATA, "Enum mismatch");
+    static_assert(Type::Boolean == LUA_TBOOLEAN, "Enum mismatch");
+    static_assert(Type::Number == LUA_TNUMBER, "Enum mismatch");
+    static_assert(Type::String == LUA_TSTRING, "Enum mismatch");
+    static_assert(Type::Table == LUA_TTABLE, "Enum mismatch");
+    static_assert(Type::Function == LUA_TFUNCTION, "Enum mismatch");
+    static_assert(Type::Userdata == LUA_TUSERDATA, "Enum mismatch");
+    // static_assert(Type::Handle == LUA_THANDLE, "Enum mismatch");
 
     X_INLINE Type::Enum typeFormLua(int32_t luaType)
     {

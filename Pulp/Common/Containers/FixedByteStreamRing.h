@@ -68,7 +68,7 @@ public:
     inline void skip(size_type numBytes);
 
     // pads the bit stream until the stream length is equal to length.
-    // will not trucate.
+    // will not truncate.
     inline void zeroPadToLength(size_type numBytes);
 
     // clears the stream setting the cursor back to the start.

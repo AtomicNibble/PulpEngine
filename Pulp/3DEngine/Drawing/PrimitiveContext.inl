@@ -4,26 +4,26 @@ X_NAMESPACE_BEGIN(engine)
 
 // --------------------------------------------------------
 
-X_INLINE bool PrimativeContextSharedResources::InstancedPage::isVbValid(void) const
+X_INLINE bool PrimitiveContextSharedResources::InstancedPage::isVbValid(void) const
 {
     return instBufHandle != render::INVALID_BUF_HANLDE;
 }
 
 // --------------------------------------------------------
 
-X_INLINE Material* PrimativeContextSharedResources::getMaterial(MaterialSet::Enum set, PrimitiveType::Enum prim) const
+X_INLINE Material* PrimitiveContextSharedResources::getMaterial(MaterialSet::Enum set, PrimitiveType::Enum prim) const
 {
     return primMaterials_[set][prim];
 }
 
-X_INLINE const PrimativeContextSharedResources::Shape& PrimativeContextSharedResources::getShapeResources(ShapeType::Enum shape) const
+X_INLINE const PrimitiveContextSharedResources::Shape& PrimitiveContextSharedResources::getShapeResources(ShapeType::Enum shape) const
 {
     return shapes_[shape];
 }
 
 // --------------------------------------------------------
 
-X_INLINE PrimativeContext::PushBufferEntry::PushBufferEntry(uint16 numVertices, uint16 vertexOffs, int32_t pageIdx,
+X_INLINE PrimitiveContext::PushBufferEntry::PushBufferEntry(uint16 numVertices, uint16 vertexOffs, int32_t pageIdx,
     Material* pMaterial) :
     numVertices(numVertices),
     vertexOffs(vertexOffs),
@@ -34,17 +34,17 @@ X_INLINE PrimativeContext::PushBufferEntry::PushBufferEntry(uint16 numVertices, 
 
 // --------------------------------------------------------
 
-X_INLINE void PrimativeContext::VertexPage::reset(void)
+X_INLINE void PrimitiveContext::VertexPage::reset(void)
 {
     verts.clear();
 }
 
-X_INLINE bool PrimativeContext::VertexPage::isVbValid(void) const
+X_INLINE bool PrimitiveContext::VertexPage::isVbValid(void) const
 {
     return vertexBufHandle != render::INVALID_BUF_HANLDE;
 }
 
-X_INLINE const uint32_t PrimativeContext::VertexPage::getVertBufBytes(void) const
+X_INLINE const uint32_t PrimitiveContext::VertexPage::getVertBufBytes(void) const
 {
     uint32_t numVerts = safe_static_cast<uint32_t>(verts.size());
 
@@ -55,35 +55,35 @@ X_INLINE const uint32_t PrimativeContext::VertexPage::getVertBufBytes(void) cons
     return core::bitUtil::RoundUpToMultiple<uint32_t>(numVerts * sizeof(PrimVertex), 16u);
 }
 
-X_INLINE const uint32_t PrimativeContext::VertexPage::freeSpace(void) const
+X_INLINE const uint32_t PrimitiveContext::VertexPage::freeSpace(void) const
 {
     return NUMVERTS_PER_PAGE - safe_static_cast<uint32_t>(verts.size());
 }
 
 // --------------------------------------------------------
 
-X_INLINE void PrimativeContext::ShapeInstanceDataContainer::clear(void)
+X_INLINE void PrimitiveContext::ShapeInstanceDataContainer::clear(void)
 {
     data_.clear();
     core::zero_object(shapeCounts_);
 }
 
-X_INLINE bool PrimativeContext::ShapeInstanceDataContainer::isEmpty(void) const
+X_INLINE bool PrimitiveContext::ShapeInstanceDataContainer::isEmpty(void) const
 {
     return data_.isEmpty();
 }
 
-X_INLINE size_t PrimativeContext::ShapeInstanceDataContainer::size(void) const
+X_INLINE size_t PrimitiveContext::ShapeInstanceDataContainer::size(void) const
 {
     return data_.size();
 }
 
-X_INLINE const PrimativeContext::ShapeInstanceDataContainer::ShapeCountArr& PrimativeContext::ShapeInstanceDataContainer::getShapeCounts(void) const
+X_INLINE const PrimitiveContext::ShapeInstanceDataContainer::ShapeCountArr& PrimitiveContext::ShapeInstanceDataContainer::getShapeCounts(void) const
 {
     return shapeCounts_;
 }
 
-X_INLINE PrimativeContext::ShapeInstanceData* PrimativeContext::ShapeInstanceDataContainer::addShape(bool solid, int32_t lodIdx)
+X_INLINE PrimitiveContext::ShapeInstanceData* PrimitiveContext::ShapeInstanceDataContainer::addShape(bool solid, int32_t lodIdx)
 {
     // we count how many of each type we have in the buffer
     // this way we know the index ranges of each group post sort.
@@ -95,7 +95,7 @@ X_INLINE PrimativeContext::ShapeInstanceData* PrimativeContext::ShapeInstanceDat
     return pInstData;
 }
 
-X_INLINE const PrimativeContext::ShapeParamArr& PrimativeContext::ShapeInstanceDataContainer::getData(void) const
+X_INLINE const PrimitiveContext::ShapeParamArr& PrimitiveContext::ShapeInstanceDataContainer::getData(void) const
 {
     return data_;
 }

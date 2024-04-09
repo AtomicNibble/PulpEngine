@@ -19,7 +19,7 @@ struct Pak;
 
 Represents a file 'inside' a pak file.
 
-The behaviour of this is diffrent for the following cases:
+The behaviour of this is different for the following cases:
 
 1. pak fully in memory - asset uncompressed.
 	Reportedsize: uncompressed

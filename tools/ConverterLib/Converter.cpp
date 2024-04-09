@@ -103,7 +103,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 {
     X_LOG0("Converter", "Converting \"%s\" type: \"%s\"", name.c_str(), AssetType::ToString(assType));
 
-    // early out if we dont have the con lib for this ass type.
+    // early out if we don't have the con lib for this ass type.
     if (!EnsureLibLoaded(assType)) {
         X_ERROR("Converter", "Failed to convert, converter module missing for asset type.");
         return false;
@@ -303,8 +303,8 @@ bool Converter::CleanAll(const char* pMod)
     // optionally limit it to a mod.
     if (pMod) {
         assetDb::AssetDB::ModId modId;
-        if (!db_.ModExsists(core::string(pMod), &modId)) {
-            X_ERROR("Converter", "Can't clean mod \"%s\" does not exsist", pMod);
+        if (!db_.ModExists(core::string(pMod), &modId)) {
+            X_ERROR("Converter", "Can't clean mod \"%s\" does not exist", pMod);
             return false;
         }
 
@@ -823,7 +823,7 @@ bool Converter::IsAssetStale(assetDb::AssetId assetId, AssetType::Enum type, Dat
         return true;
     }
 
-    // if the precedence is same but hash diffrent stale.
+    // if the precedence is same but hash different stale.
     if (precedence == conversionProfiles_[type].precedence) {
         if (profileHash != conversionProfiles_[type].hash) {
             return true;
@@ -932,7 +932,7 @@ bool Converter::loadConversionProfiles(const core::string& profileName)
 
         X_ASSERT(type >= 0 && static_cast<uint32_t>(type) < assetDb::AssetType::ENUM_COUNT, "Invalid type")(type); 
 
-        // now we want to split this into a seperate doc.
+        // now we want to split this into a separate doc.
         core::json::StringBuffer s;
         core::json::Writer<core::json::StringBuffer> writer(s);
 
@@ -974,7 +974,7 @@ physics::IPhysLib* Converter::GetPhsicsLib(void)
 
     // ideally we should be requesting the physics interface by guid directly.
     // will need to make the core api support that.
-    bool result = gEnv->pCore->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "Physics", "Engine_PhysLib",
+    bool result = gEnv->pCore->InitializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "Physics", "Engine_PhysLib",
         &pPhysConverterMod_, &pConverterInstance);
 
     if (!result) {
@@ -1026,7 +1026,7 @@ bool Converter::IntializeConverterModule(AssetType::Enum assType, const char* pD
     IConverterModule* pConvertModuleOut = nullptr;
     IConverter* pConverterInstance = nullptr;
 
-    bool result = gEnv->pCore->IntializeLoadedConverterModule(pDllName, pModuleClassName, &pConvertModuleOut, &pConverterInstance);
+    bool result = gEnv->pCore->InitializeLoadedConverterModule(pDllName, pModuleClassName, &pConvertModuleOut, &pConverterInstance);
     if (!result) {
         return false;
     }
@@ -1042,9 +1042,9 @@ void Converter::UnloadConverters(void)
 {
     for (uint32_t i = 0; i < assetDb::AssetType::ENUM_COUNT; i++) {
         if (converters_[i]) {
-            X_ASSERT(converterModules_[i] != nullptr, "Have a converter interface without a corrisponding moduleInterface")(); 
+            X_ASSERT(converterModules_[i] != nullptr, "Have a converter interface without a corresponding moduleInterface")(); 
 
-            // con modules are ref counted so we can't free ourself.
+            // con modules are ref counted so we can't free ourselves.
             gEnv->pCore->FreeConverterModule(converterModules_[i]);
 
             converterModules_[i] = nullptr;

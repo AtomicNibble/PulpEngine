@@ -99,7 +99,7 @@ inline void ByteStream::write(const Type* pBuf, size_type numBytes)
 {
     ensureSpace(numBytes);
 
-    X_ASSERT(numBytes <= freeSpace(), "Not enougth space")(numBytes, freeSpace());
+    X_ASSERT(numBytes <= freeSpace(), "Not enough space")(numBytes, freeSpace());
 
     ::memcpy(write_, pBuf, numBytes);
     write_ += numBytes;

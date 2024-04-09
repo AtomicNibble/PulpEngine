@@ -22,7 +22,6 @@ namespace
             X_WARNING("AsyncFile", "Operation was aborted");
         }
 
-        // okay so we are sexy and kinky.
         // we need to run the callback.
         XOsFileAsyncOperation::AsyncOp* pOverlap = static_cast<XOsFileAsyncOperation::AsyncOp*>(lpOverlap);
         X_ASSERT(pOverlap->callback, "Callback not valid")();
@@ -168,7 +167,7 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length
         }
     }
 
-    // add to stats now, since I don't have a good way to collect once requet finishes.
+    // add to stats now, since I don't have a good way to collect once request finishes.
     // if do it in the XOsFileAsyncOperation, could double count values.
 #if X_ENABLE_FILE_STATS
     s_stats.NumBytesWrite += length;

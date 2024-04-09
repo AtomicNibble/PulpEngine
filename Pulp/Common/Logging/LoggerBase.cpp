@@ -18,7 +18,7 @@ void LoggerBase::SetParent(ILog* pLog)
     pLog_ = pLog;
 }
 
-/// ----------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 
 void LoggerBase::Log(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel,
     int verbosity, const char* format, va_list args)

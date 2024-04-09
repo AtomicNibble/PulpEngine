@@ -2,7 +2,7 @@
 
 namespace testTypes
 {
-    // init it to diffrent vlaues to make sure resetConConters is called.
+    // init it to different vlaues to make sure resetConConters is called.
     extern int CONSRUCTION_COUNT;
     extern int DECONSRUCTION_COUNT;
     extern int MOVE_COUNT;

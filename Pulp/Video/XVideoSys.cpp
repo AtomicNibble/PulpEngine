@@ -9,7 +9,7 @@
 #include <I3DEngine.h>
 
 X_NAMESPACE_DECLARE(engine,
-    class IPrimativeContext);
+    class IPrimitiveContext);
 
 X_NAMESPACE_BEGIN(video)
 
@@ -377,7 +377,7 @@ void XVideoSys::resumeAll(void)
 }
 
 
-Vec2f XVideoSys::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
+Vec2f XVideoSys::drawDebug(engine::IPrimitiveContext* pPrim, Vec2f pos) const
 {
     if (!vars_.drawDebug()) {
         return Vec2f();

@@ -89,7 +89,7 @@ void RemoteSystem::closeConnection(void)
 
     guid = UNASSIGNED_NET_GUID;
 
-    // we don't reset releiability layer, memory is kept.
+    // we don't reset reliability layer, memory is kept.
     // this is so buffers can be kept for new connection.
     // meaning new connections get warm buffers.
 }
@@ -388,7 +388,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketD
         socketThread.start(del);
     }
 
-    // set out local adress port as that of 1st bound socket.
+    // set out local address port as that of 1st bound socket.
     if (sockets_.isNotEmpty()) {
         auto port = sockets_.front().getBoundAdd().getPort();
         for (auto& ip : ipList_) {
@@ -401,7 +401,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketD
         NetGuidStr guidStr;
         X_LOG0("Net", "ProtoVersion: ^5%" PRIu8 ".%" PRIu8, PROTO_VERSION_MAJOR, PROTO_VERSION_MINOR);
         X_LOG0("Net", "Max peers: ^5%" PRIi32, maxPeers_);
-        X_LOG0("Net", "Max incomming connections: ^5%" PRIi32, maxIncommingConnections_);
+        X_LOG0("Net", "Max incoming connections: ^5%" PRIi32, maxIncommingConnections_);
         X_LOG0("Net", "GUID: ^5%s", guid_.toString(guidStr));
         {
             X_LOG0("Net", "Listening on ^5%" PRIuS " endpoints", sockets_.size());
@@ -504,7 +504,7 @@ void XPeer::shutdown(core::TimeVal blockDuration, OrderingChannel::Enum ordering
         }
     }
 
-    // cleans up all memory for reliabiliy layers and remoteSystems.
+    // cleans up all memory for reliability layers and remoteSystems.
     remoteSystems_.clear();
     activeRemoteSystems_.clear();
     remoteSystemLookup_.clear();
@@ -548,7 +548,7 @@ void XPeer::runUpdate(void)
         remoteReliabilityTick(updateBS, timeNow);
     }
     else {
-        // we can update all the peers in diffrent threads.
+        // we can update all the peers in different threads.
         core::Delegate<void(RemoteSystem**, uint32_t)> del;
         del.Bind<XPeer, &XPeer::Job_remoteReliabilityTick>(this);
 
@@ -736,7 +736,7 @@ void XPeer::cancelConnectionAttempt(const SystemAddress& target)
     IPStr addStr;
     sysAdd.toString(addStr);
 
-    X_LOG0_IF(vars_.debugEnabled(), "Net", "Canceling Connection request to host: \"%s\"", addStr.c_str());
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Cancelling Connection request to host: \"%s\"", addStr.c_str());
 
     removeConnectionRequest(sysAdd);
 }
@@ -825,7 +825,7 @@ void XPeer::notifyAndFlagForShutdown(RemoteSystem& rs, OrderingChannel::Enum ord
 
     core::TimeVal now = gEnv->pTimer->GetTimeNowReal();
 
-    rs.sendReliabile(
+    rs.sendReliable(
         bsOut,
         PacketPriority::Immediate,
         PacketReliability::ReliableOrdered,
@@ -1044,7 +1044,7 @@ void XPeer::freePacket(Packet* pPacket)
 
 BufferdCommand* XPeer::allocBufferdCmd(BufferdCommand::Cmd::Enum type, size_t lengthBits)
 {
-    BufferdCommand* pCmd = X_NEW(BufferdCommand, &poolArena_, "BufferdCmd");
+    BufferdCommand* pCmd = X_NEW(BufferdCommand, &poolArena_, "BufferedCmd");
     pCmd->cmd = type;
     pCmd->numberOfBitsToSend = safe_static_cast<BitSizeT>(lengthBits);
 
@@ -1127,11 +1127,11 @@ void XPeer::setMaximumIncomingConnections(uint16_t numberAllowed)
     maxIncommingConnections_ = numberAllowed;
 
     if (maxIncommingConnections_ > maxPeers_) {
-        X_ERROR("Net", "Tried to set max incomming connections(%" PRIu16 ") above max peers(%" PRIi32 "), capping", numberAllowed, maxPeers_);
+        X_ERROR("Net", "Tried to set max incoming connections(%" PRIu16 ") above max peers(%" PRIi32 "), capping", numberAllowed, maxPeers_);
         maxIncommingConnections_ = maxPeers_;
     }
 
-    X_LOG0_IF(vars_.debugEnabled() > 1, "Net", "Set maxIncomingconnections to: ^5%" PRIu16, numberAllowed);
+    X_LOG0_IF(vars_.debugEnabled() > 1, "Net", "Set maxIncomingConnections to: ^5%" PRIu16, numberAllowed);
 }
 
 uint16_t XPeer::numberOfConnections(void) const
@@ -1206,7 +1206,7 @@ void XPeer::sendPing(RemoteSystem& rs, PacketReliability::Enum rel)
     bsOut.write(MessageID::ConnectedPing);
     bsOut.write(now.GetValue());
 
-    rs.sendReliabile(
+    rs.sendReliable(
         bsOut,
         PacketPriority::Immediate,
         rel,
@@ -1455,7 +1455,7 @@ bool XPeer::getStatistics(const NetGUID guid, NetStatistics& stats)
     auto* pRemoteSys = getRemoteSystem(guid, false);
 
     if (!pRemoteSys) {
-        X_WARNING("Net", "Failed to find remote system for stat retrival");
+        X_WARNING("Net", "Failed to find remote system for stat retrieval");
         return false;
     }
 
@@ -1531,8 +1531,8 @@ void XPeer::listRemoteSystems(bool verbose) const
             X_LOG0("Net", "bytesSent: ^5%s", core::HumanSize::toString(sizeStr, stats.runningMetrics[NetStatistics::Metric::BytesSent]));
             X_LOG0("Net", "bytesResent: ^5%s", core::HumanSize::toString(sizeStr, stats.runningMetrics[NetStatistics::Metric::BytesResent]));
             X_LOG0("Net", "bytesPushed: ^5%s", core::HumanSize::toString(sizeStr, stats.runningMetrics[NetStatistics::Metric::BytesPushed]));
-            X_LOG0("Net", "bytesRecivedIngored: ^5%s", core::HumanSize::toString(sizeStr, stats.runningMetrics[NetStatistics::Metric::BytesRecivedIgnored]));
-            X_LOG0("Net", "bytesRecivedProccessed: ^5%s", core::HumanSize::toString(sizeStr, stats.runningMetrics[NetStatistics::Metric::BytesRecivedProcessed]));
+            X_LOG0("Net", "bytesReceivedIgnored: ^5%s", core::HumanSize::toString(sizeStr, stats.runningMetrics[NetStatistics::Metric::BytesReceivedIgnored]));
+            X_LOG0("Net", "bytesReceivedProcessed: ^5%s", core::HumanSize::toString(sizeStr, stats.runningMetrics[NetStatistics::Metric::BytesReceivedProcessed]));
             X_LOG0("Net", "actualBytesSent: ^5%s", core::HumanSize::toString(sizeStr, stats.runningMetrics[NetStatistics::Metric::ActualBytesSent]));
             X_LOG0("Net", "actualBytesReceived: ^5%s", core::HumanSize::toString(sizeStr, stats.runningMetrics[NetStatistics::Metric::ActualBytesReceived]));
         }
@@ -1541,7 +1541,6 @@ void XPeer::listRemoteSystems(bool verbose) const
 
 void XPeer::processConnectionRequests(UpdateBitStream& updateBS, core::TimeVal timeNow)
 {
-    // are we wanting to connect to some slutty peers?
     if (connectionReqs_.isEmpty()) {
         return;
     }
@@ -1551,7 +1550,7 @@ void XPeer::processConnectionRequests(UpdateBitStream& updateBS, core::TimeVal t
     for (auto it = connectionReqs_.begin(); it != connectionReqs_.end(); /* ++it */) {
         RequestConnection& cr = *(*it);
 
-        // time for a reuest?
+        // time for a request?
         if (cr.nextRequestTime > timeNow) {
             ++it;
             continue;
@@ -1655,7 +1654,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
                         continue;
                     }
 
-                    if (!pRemoteSystem->sendReliabile(
+                    if (!pRemoteSystem->sendReliable(
                             cmd.pData,
                             cmd.numberOfBitsToSend,
                             true,
@@ -1683,7 +1682,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
                     continue;
                 }
 
-                if (!pRemoteSystem->sendReliabile(
+                if (!pRemoteSystem->sendReliable(
                         cmd.pData,
                         cmd.numberOfBitsToSend,
                         true,
@@ -1734,7 +1733,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
             }
 
             if (!pRemoteSystem->isActive || pRemoteSystem->connectState != ConnectState::Connected) {
-                X_LOG0_IF(vars_.debugEnabled(), "Net", "Skipping closeConnection request, the remote is already disconneting/disconnected. state: \"%s\"",
+                X_LOG0_IF(vars_.debugEnabled(), "Net", "Skipping closeConnection request, the remote is already disconnecting/disconnected. state: \"%s\"",
                     ConnectState::ToString(pRemoteSystem->connectState));
                 freeBufferdCmd(pBufCmd);
                 continue;
@@ -1744,7 +1743,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
                 X_ASSERT(cmd.orderingChannel < MAX_ORDERED_STREAMS, "Invalid channel")(cmd.orderingChannel);
 
                 // don't disconnect yet.
-                // send notfitication and close after.
+                // send notification and close after.
                 notifyAndFlagForShutdown(*pRemoteSystem, cmd.orderingChannel, cmd.priority);
             }
             else {
@@ -1786,7 +1785,7 @@ void XPeer::Job_remoteReliabilityTick(RemoteSystem** pRemoteSystems, uint32_t co
 
 void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, core::TimeVal timeNow)
 {
-    X_ASSERT(rs.isActive, "System not ative")();
+    X_ASSERT(rs.isActive, "System not active")();
 
     rs.relLayer.update(updateBS, *rs.pNetSocket, rs.systemAddress, rs.MTUSize, timeNow);
 
@@ -1839,7 +1838,6 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
                 msgId = MessageID::ConnectionClosed;
             }
 
-            // ya cunt!
             pushPacket(msgId, rs);
         }
 
@@ -1854,7 +1852,7 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
 
     // do we have any packets?
     ReliabilityLayer::PacketData data(arena_);
-    while (rs.relLayer.recive(data)) {
+    while (rs.relLayer.receive(data)) {
         // okay we got a packet :D!
         // the first byte should be msgId.
         if (data.getNumbBits() < 8) {
@@ -1865,7 +1863,7 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
         MessageID::Enum msgId = stream.read<MessageID::Enum>();
 
         if (msgId < MessageID::ENUM_COUNT) {
-            X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived reliable messageId: \"%s\"", MessageID::ToString(msgId));
+            X_LOG0_IF(vars_.debugEnabled(), "Net", "Received reliable messageId: \"%s\"", MessageID::ToString(msgId));
         }
         else {
             // user packet data.
@@ -1936,7 +1934,6 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
     X_ASSERT(pData->bytesRead > 0, "RecvData with no data should not reach here")(pData, pData->bytesRead);
 
     if (isBanned(pData->systemAddress)) {
-        // you fucking twat!
         updateBS.write(MessageID::ConnectionBanned);
         updateBS.write(OFFLINE_MSG_ID);
         updateBS.write(guid_);
@@ -1971,7 +1968,7 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
     RemoteSystem* pRemoteSys = getRemoteSystem(pData->systemAddress, true);
     if (!pRemoteSys) {
         IPStr ipStr;
-        X_ERROR("Net", "Recived reliabile message for none connected client: \"%s\"", pData->systemAddress.toString(ipStr, true));
+        X_ERROR("Net", "Received reliable message for none connected client: \"%s\"", pData->systemAddress.toString(ipStr, true));
 
         // temp ban them.
         addToBanList(pData->systemAddress, core::TimeVal::fromMS(vars_.unexpectedMsgBanTime()));
@@ -1987,7 +1984,7 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
         pRemoteSys->MTUSize);
 
     if (!res) {
-        X_ERROR("Net", "Error processign recived packet");
+        X_ERROR("Net", "Error processing received packet");
     }
 }
 
@@ -2001,7 +1998,7 @@ void XPeer::processOfflineMsg(UpdateBitStream& updateBS, RecvData* pData,
     stream.skipBytes(OFFLINE_MSG_ID.size());
     X_ASSERT(msgId < MessageID::ENUM_COUNT, "Invalid msg id")(msgId);
 
-    X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived offline messageId: \"%s\"", MessageID::ToString(msgId));
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Received offline messageId: \"%s\"", MessageID::ToString(msgId));
 
     switch (msgId) {
         case MessageID::ProtcolVersionIncompatible:
@@ -2052,7 +2049,7 @@ void XPeer::handleConnectionFailure(UpdateBitStream& bsBuf, RecvData* pData, Rec
     NetGUID guid;
     bs.read(guid);
 
-    X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection failure: \"%s\"", MessageID::ToString(failureType));
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Received connection failure: \"%s\"", MessageID::ToString(failureType));
 
     Packet* pPacket = nullptr;
 
@@ -2094,7 +2091,7 @@ void XPeer::handleOpenConnectionRequest(UpdateBitStream& bsOut, RecvData* pData,
     X_UNUSED(revision);
 
     IPStr ipStr;
-    X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived open connection request from \"%s\" with proto version: ^5%" PRIu8 ".%" PRIu8,
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Received open connection request from \"%s\" with proto version: ^5%" PRIu8 ".%" PRIu8,
         pData->systemAddress.toString(ipStr), protoVersionMinor, protoVersionMajor);
 
     if (protoVersionMajor != PROTO_VERSION_MAJOR || protoVersionMinor != PROTO_VERSION_MINOR) {
@@ -2133,7 +2130,7 @@ void XPeer::handleOpenConnectionResponse(UpdateBitStream& bsOut, RecvData* pData
     bs.read(serverGuid);
     bs.read(mtu);
 
-    X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived open connection response");
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Received open connection response");
 
     // find this fuck.
     {
@@ -2159,7 +2156,7 @@ void XPeer::handleOpenConnectionResponse(UpdateBitStream& bsOut, RecvData* pData
 
     IPStr remoteStr;
     pData->systemAddress.toString(remoteStr);
-    X_ERROR("Net", "Recived connection response for remote system we are not trying to connect to: \"%s\"", remoteStr.c_str());
+    X_ERROR("Net", "Received connection response for remote system we are not trying to connect to: \"%s\"", remoteStr.c_str());
 }
 
 void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* pData, RecvBitStream& bs)
@@ -2172,7 +2169,7 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
     bindingAdd.fromBitStream(bs);
     bs.read(mtu);
 
-    X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived open connection request2");
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Received open connection request2");
 
     // right lets check the list.
     const RemoteSystem* pSys = getRemoteSystem(bindingAdd, true);
@@ -2186,7 +2183,6 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
     // false	   false	 	allow connection
 
     if (pSys || pSysGuid) {
-        // you stupid twat.
         bsOut.write(MessageID::AlreadyConnected);
         bsOut.write(OFFLINE_MSG_ID);
         bsOut.write(guid_);
@@ -2199,16 +2195,13 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
             bsOut.write(guid_);
         }
         else {
-            // is this peer a grade F twat?
             core::TimeVal lastConnectDelta;
             if (vars_.rlConnectionsPerIP() && isIpConnectSpamming(pData->systemAddress, &lastConnectDelta)) {
-                // you noob, can you even coun to 10?
-                // NO!
                 IPStr addStr;
-                X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection req from \"%s\" %gms ago, rate limiting",
+                X_LOG0_IF(vars_.debugEnabled(), "Net", "Received connection req from \"%s\" %gms ago, rate limiting",
                     pData->systemAddress.toString(addStr), lastConnectDelta.GetMilliSeconds());
 
-                // i don't care if this ratelimit is allmost over and you could technically connect again sooner.
+                // i don't care if this ratelimit is almost over and you could technically connect again sooner.
                 uint32_t timeMs = vars_.rlConnectionsPerIPBanTimeMS();
 
                 bsOut.write(MessageID::ConnectionRateLimited);
@@ -2226,7 +2219,7 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
                 pData->systemAddress.writeToBitStream(bsOut);
                 bsOut.write<uint16_t>(mtu);
 
-                // generate a nonce, for password if requried.
+                // generate a nonce, for password if required.
                 pRemoteSys->nonce = generateNonce();
 
                 bsOut.write(pRemoteSys->nonce);
@@ -2254,7 +2247,7 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
     bs.read(mtu);
     bs.read(nonce);
 
-    X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection response2");
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Received connection response2");
 
     // find it.
     {
@@ -2292,7 +2285,7 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
                     }
 
                     // send the request to the remote.
-                    pSys->sendReliabile(
+                    pSys->sendReliable(
                         bsOut,
                         PacketPriority::Immediate,
                         PacketReliability::Reliable,
@@ -2317,7 +2310,7 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
 
 void XPeer::handleUnConnectedPing(UpdateBitStream& bsOut, RecvData* pData, RecvBitStream& bs, bool openConnectionsRequired)
 {
-    X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived unConnectedPing");
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Received unConnectedPing");
 
     if (openConnectionsRequired && !accpetingIncomingConnections()) {
         X_LOG0_IF(vars_.debugEnabled(), "Net", "Ignoring ping, not accepting incoming connections");
@@ -2343,7 +2336,7 @@ void XPeer::handleUnConnectedPing(UpdateBitStream& bsOut, RecvData* pData, RecvB
 
 void XPeer::handleUnConnectedPong(UpdateBitStream& bsOut, RecvData* pData, RecvBitStream& bs)
 {
-    X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived unConnectedPong");
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Received unConnectedPong");
 
     int64_t timeStamp;
     NetGUID clientGuid;
@@ -2373,7 +2366,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 
     // must be a unverified sender trying to connect.
     if (rs.connectState != ConnectState::UnverifiedSender) {
-        X_ERROR("Net", "Recived unexpected connection request from client, ignoring.");
+        X_ERROR("Net", "Received unexpected connection request from client, ignoring.");
 
         addToBanList(rs.systemAddress, core::TimeVal::fromMS(vars_.unexpectedMsgBanTime()));
 
@@ -2392,7 +2385,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
         bs.readAligned(passwordDisget);
     }
 
-    X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request. timeStamp: %" PRId64, timeStamp);
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Received connection request. timeStamp: %" PRId64, timeStamp);
 
     // optional don't allow clients that give us a password when one not required.
     const bool clientMustNotSendPassword = false;
@@ -2410,7 +2403,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
             bsOut.write(MessageID::InvalidPassword);
             bsOut.write(guid_);
 
-            rs.sendReliabile(
+            rs.sendReliable(
                 bsOut,
                 PacketPriority::Immediate,
                 PacketReliability::Reliable,
@@ -2434,7 +2427,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
     bsOut.write(timeStamp);
     bsOut.write(timeNow.GetValue());
 
-    rs.sendReliabile(
+    rs.sendReliable(
         bsOut,
         PacketPriority::Immediate,
         PacketReliability::Reliable,
@@ -2444,10 +2437,10 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 
 void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs, core::TimeVal timeNow)
 {
-    X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request accepted");
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Received connection request accepted");
 
     if (rs.connectState != ConnectState::RequestedConnection) {
-        X_ERROR("Net", "Recived unexpected connection request accept, ignoring.");
+        X_ERROR("Net", "Received unexpected connection request accept, ignoring.");
         return;
     }
 
@@ -2483,7 +2476,7 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
     bsOut.write(sendPongTime);
     bsOut.write(timeNow.GetValue());
 
-    rs.sendReliabile(
+    rs.sendReliable(
         bsOut,
         PacketPriority::Immediate,
         PacketReliability::Reliable,
@@ -2498,10 +2491,10 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
 
 void XPeer::handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
 {
-    X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request handshake");
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Received connection request handshake");
 
     if (rs.connectState != ConnectState::HandlingConnectionRequest) {
-        X_ERROR("Net", "Recived unexpected connection request handshake, ignoring.");
+        X_ERROR("Net", "Received unexpected connection request handshake, ignoring.");
         return;
     }
 
@@ -2535,7 +2528,7 @@ void XPeer::handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStre
 
 void XPeer::handleConnectedPing(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs, core::TimeVal timeNow)
 {
-    X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived ping");
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Received ping");
 
     int64_t timeStamp;
     bs.read(timeStamp);
@@ -2545,7 +2538,7 @@ void XPeer::handleConnectedPing(UpdateBitStream& bsOut, RecvBitStream& bs, Remot
     bsOut.write(timeStamp);
     bsOut.write(timeNow);
 
-    rs.sendReliabile(
+    rs.sendReliable(
         bsOut,
         PacketPriority::Immediate,
         PacketReliability::UnReliable,
@@ -2555,7 +2548,7 @@ void XPeer::handleConnectedPing(UpdateBitStream& bsOut, RecvBitStream& bs, Remot
 
 void XPeer::handleConnectedPong(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
 {
-    X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived pong");
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Received pong");
 
     int64_t sendPingTime;
     int64_t sendPongTime;
@@ -2568,7 +2561,7 @@ void XPeer::handleConnectedPong(UpdateBitStream& bsOut, RecvBitStream& bs, Remot
 
 void XPeer::handleDisconnectNotification(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
 {
-    X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived Desconnect notification");
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Received disconnect notification");
 
     // if ack never sends disconnect.
     rs.connectState = ConnectState::DisconnectOnNoAck;
@@ -2576,7 +2569,7 @@ void XPeer::handleDisconnectNotification(UpdateBitStream& bsOut, RecvBitStream& 
 
 void XPeer::handleInvalidPassword(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
 {
-    X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived invalid password notification");
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Received invalid password notification");
 
     // tell the game.
     pushPacket(MessageID::InvalidPassword, rs);
@@ -2620,7 +2613,7 @@ RemoteSystem* XPeer::addRemoteSystem(const SystemAddressEx& sysAdd, NetGUID guid
             remoteSys.MTUSize = remoteMTU;
             remoteSys.connectState = state;
             remoteSys.pNetSocket = pSrcSocket;
-            remoteSys.isActive = true; // diverts all packets to reliabilty layer.
+            remoteSys.isActive = true; // diverts all packets to reliability layer.
 
             activeRemoteSystems_.push_back(&remoteSys);
 
@@ -2633,7 +2626,7 @@ RemoteSystem* XPeer::addRemoteSystem(const SystemAddressEx& sysAdd, NetGUID guid
 
             if (pSrcSocket->getBoundAdd() != bindingAdd) {
                 // print warning.
-                X_WARNING("Net", "Binding address is diffrent to source socket");
+                X_WARNING("Net", "Binding address is different to source socket");
             }
 
             return &remoteSys;
@@ -2650,12 +2643,12 @@ void XPeer::disconnectRemote(RemoteSystem& rs)
 
     {
         auto it = std::find(activeRemoteSystems_.begin(), activeRemoteSystems_.end(), &rs);
-        X_ASSERT(it != activeRemoteSystems_.end(), "Tried to remove resmote system that is not active")();
+        X_ASSERT(it != activeRemoteSystems_.end(), "Tried to remove remote system that is not active")();
         activeRemoteSystems_.erase(it);
     }
     {
         auto it = std::find_if(remoteSystemLookup_.begin(), remoteSystemLookup_.end(), [&rs](const RemoteSystemLookup& lu) { return lu.systemAddress == rs.systemAddress; });
-        X_ASSERT(it != remoteSystemLookup_.end(), "Tried to remove resmote system that is not active")();
+        X_ASSERT(it != remoteSystemLookup_.end(), "Tried to remove remote system that is not active")();
         remoteSystemLookup_.erase(it);
     }
 }
@@ -2705,7 +2698,7 @@ core::Thread::ReturnValue XPeer::socketRecvThreadProc(const core::Thread& thread
         }
         else if (res == RecvResult::ConnectionReset) {
             // okay so we know a socket has been closed we don't need to wait for timeout.
-            // we send buffered as we on diffrent thread.
+            // we send buffered as we on different thread.
             BufferdCommand* pCmd = allocBufferdCmd(BufferdCommand::Cmd::CloseConnection, 0);
             pCmd->systemHandle = INVALID_SYSTEM_HANDLE;
             pCmd->systemAddress = pData->systemAddress;

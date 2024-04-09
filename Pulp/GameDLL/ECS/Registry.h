@@ -466,7 +466,7 @@ namespace ecs
         template<typename S, typename Comp>
         void setDetroyCallback(S* pSystem)
         {
-            X_ASSERT(!destoryFuncs_[ident<Components...>.template get<Comp>()], "Destory functino already set for comp")();
+            X_ASSERT(!destoryFuncs_[ident<Components...>.template get<Comp>()], "Destroy function already set for comp")();
 
             destoryFuncs_[ident<Components...>.template get<Comp>()] = [=](void* pComp) {
                 pSystem->destroy(*reinterpret_cast<Comp*>(pComp));

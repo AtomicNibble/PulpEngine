@@ -8,6 +8,8 @@ namespace Compression
 {
     X_DISABLE_WARNING(4324) // padded for alignment.
 
+    // This class if for allocating any compression algo instance on the stack
+    // So you don't have to allocate dynamic memory if you don't know the which algo you need.
     class CompressorAlloc
     {
         typedef ICompressor ICompressor;

@@ -8,7 +8,7 @@
 #include <IGame.h>
 #include <INetwork.h>
 
-#include "Drawing\PrimativeContext.h"
+#include "Drawing\PrimitiveContext.h"
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -34,7 +34,7 @@ namespace gui
     } // namespace
 
 
-    GuiContex::Window::Window(PrimativeContext* pPrim, const char* pName) :
+    GuiContex::Window::Window(PrimitiveContext* pPrim, const char* pName) :
         pPrim(pPrim),
         name(pName),
         lastActiveFrame(0),
@@ -110,7 +110,7 @@ namespace gui
         pSpinner_ = pSpinner;
     }
 
-    void GuiContex::setPrimContet(PrimativeContext* pPrim)
+    void GuiContex::setPrimContet(PrimitiveContext* pPrim)
     {
         pPrim_ = pPrim;
     }

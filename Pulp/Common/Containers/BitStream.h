@@ -52,7 +52,7 @@ public:
     // write bits to stream
     void writeBits(const Type* pBuf, size_type numBits);
 
-    // pads the stream to byte boundry before writing.
+    // pads the stream to byte boundary before writing.
     void writeAligned(const Type* pBuf, size_type numBytes);
     void writeBitsAligned(const Type* pBuf, size_type numBits);
 
@@ -72,20 +72,20 @@ public:
     // read bits from stream
     void readBits(Type* pBuf, size_type numBits);
 
-    // pads the stream to byte boundry before read.
+    // pads the stream to byte boundary before read.
     void readAligned(Type* pBuf, size_type numBytes);
     void readBitsAligned(Type* pBuf, size_type numBits);
 
-    // moves forward to next byte boundry, data in remanings bits is undefined.
-    void alignWriteToByteBoundry(void);
-    void alignReadToByteBoundry(void);
+    // moves forward to next byte boundary, data in remaining bits is undefined.
+    void alignWriteToByteBoundary(void);
+    void alignReadToByteBoundary(void);
 
     // sets the absolute bit position in the stream.
     void skipBytes(size_type numBytes);
     void skipBits(size_type numBits);
 
     // pads the bit stream until the stream length is equal to length.
-    // will not trucate.
+    // will not truncate.
     void zeroPadToLength(size_type numBytes);
 
     // resizes the object to holx X bits

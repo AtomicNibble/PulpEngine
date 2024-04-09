@@ -31,7 +31,7 @@ using tt_size = unsigned int;
 
 #endif
 
-static_assert(sizeof(tt_uintptr) == sizeof(void*), "Size missmatch");
+static_assert(sizeof(tt_uintptr) == sizeof(void*), "Size mismatch");
 
 
 using TtFileHandle = tt_uintptr;

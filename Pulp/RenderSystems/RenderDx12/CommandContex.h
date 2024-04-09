@@ -78,7 +78,7 @@ class CommandContext
     X_NO_COPY(CommandContext);
     X_NO_ASSIGN(CommandContext);
 
-    // buffer some resource barries untill we perform a operation that needs them flushed or we reach this count.
+    // buffer some resource barries until we perform a operation that needs them flushed or we reach this count.
     static const size_t MAX_DISTRIPTOR_HEAP_TYPES = 2;
     static const size_t RESOURCE_BARRIER_BUF = 16;
     static const uint32_t VALID_COMPUTE_QUEUE_RESOURCE_STATES;

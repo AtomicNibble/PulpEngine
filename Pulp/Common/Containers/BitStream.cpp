@@ -303,7 +303,7 @@ void BitStream::zeroPadToLength(size_type numBytes)
 {
     if (sizeInBytes() < numBytes) {
         const size_t numBits = numBitsForBytes(numBytes);
-        alignWriteToByteBoundry();
+        alignWriteToByteBoundary();
         ensureSpace(numBits);
         std::memset(start_ + byteIndex(), 0, numBytes);
         bitIdx_ += numBits;

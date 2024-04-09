@@ -386,7 +386,7 @@ typename Fifo<T>::const_iterator Fifo<T>::end(void) const
     return const_iterator(start_, end_, write_, size());
 }
 
-/// ------------------------------------------------------c
+// ------------------------------------------------------c
 
 template<typename T>
 typename Fifo<T>::Reference Fifo<T>::front(void)
@@ -432,14 +432,13 @@ typename Fifo<T>::ConstReference Fifo<T>::back(void) const
     return *pTr;
 }
 
-/// ----------------------------
+// ----------------------------
 
 template<typename T>
 void Fifo<T>::expand(void)
 {
     X_ASSERT(write_ == read_, "This should only be called when we are full.")(write_, read_);
 
-    // we want to allocate a new aaray like a slut.
     // if first time jump to 16.
     if (capacity() == 0) {
         reserve(16);
@@ -481,7 +480,7 @@ T* Fifo<T>::Allocate(size_type num)
     return reinterpret_cast<T*>(X_NEW_ARRAY(uint8_t, num * sizeof(T), arena_, "Fifo<" X_PP_STRINGIZE(T) ">"));
 }
 
-/// ------------------------------------------------------c
+// ------------------------------------------------------c
 
 template<typename T>
 inline T& FifoIterator<T>::operator*(void)
@@ -527,7 +526,7 @@ inline bool FifoIterator<T>::operator!=(const FifoIterator& rhs) const
     return current_ != rhs.current_;
 }
 
-/// ------------------------------------------------------
+// ------------------------------------------------------
 
 template<typename T>
 inline const T& FifoConstIterator<T>::operator*(void)const

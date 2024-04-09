@@ -44,10 +44,10 @@ class XTelemSrvLib : public IEngineModule
 
         g_TelemSrvLibArena = X_NEW(TelemSrvLibArena, gEnv->pArena, "TelemetryServerLibArena")(&g_TelemSrvAlloc, "TelemetryServerLibArena");
 
-        if (!env.pCore->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "SqLite", "Engine_SqLite")) {
+        if (!env.pCore->InitializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "SqLite", "Engine_SqLite")) {
             return false;
         }
-        if (!env.pCore->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "TelemetrySymbols", "Engine_TelemetrySymLib")) {
+        if (!env.pCore->InitializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "TelemetrySymbols", "Engine_TelemetrySymLib")) {
             return false;
         }
 

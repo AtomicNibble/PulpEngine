@@ -36,7 +36,7 @@ public:
     typedef typename BaseType::const_iterator const_iterator;
     typedef typename BaseType::Node Node;
 
-    /// A constant defining the size of a single entry when stored in the hash map.
+    // A constant defining the size of a single entry when stored in the hash map.
     static const size_t PER_ENTRY_SIZE = BaseType::PER_ENTRY_SIZE;
 
 public:

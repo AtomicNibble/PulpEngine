@@ -164,17 +164,17 @@ public:
     inline ConstReference back(void) const;
 
 protected:
-    // used to make sure buffer is large enougth.
-    // if it grows exsisting values are copyied into new buffer.
+    // used to make sure buffer is large enough.
+    // if it grows existing values are copied into new buffer.
     void ensureSize(size_type size);
 
-    // for easy allocation custimisation.
+    // for easy allocation customisation.
     X_INLINE void DeleteArr(T* pArr);
     X_INLINE T* Allocate(size_type size);
 
 protected:
     T* list_;        // pointer to memory block
-    size_type num_;  // num elemets stored in the list
+    size_type num_;  // num elements stored in the list
     size_type size_; // the current allocated size
 
     Allocator allocator_;

@@ -23,21 +23,6 @@
 #define X_PP_TO_BOOL_15 1
 #define X_PP_TO_BOOL_16 1
 
-/// \def X_PP_TO_BOOL
-/// \ingroup Preprocessor
-/// \brief Converts a condition into either 1 if the condition is true, or 0 otherwise.
-/// \details The condition can either be a boolean value, or an integer.
-/// \code
-///   // boolean values
-///   X_PP_TO_BOOL(false)			outputs 0
-///   X_PP_TO_BOOL(true)			outputs 1
-///
-///   // integer values
-///   X_PP_TO_BOOL(0)				outputs 0
-///   X_PP_TO_BOOL(1)				outputs 1
-///   X_PP_TO_BOOL(2)				outputs 1
-///   X_PP_TO_BOOL(3)				outputs 1
-/// \endcode
 #define X_PP_TO_BOOL(x) X_PP_JOIN_2(X_PP_TO_BOOL_, x)
 
 #endif

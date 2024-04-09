@@ -186,7 +186,7 @@ namespace TGA
         uint32_t DataSize = hdr.Width * hdr.Height * (hdr.PixelDepth / 8);
 
         imgFile.setWidth(safe_static_cast<uint16_t, uint32_t>(hdr.Width));
-        imgFile.setHeigth(safe_static_cast<uint16_t, uint32_t>(hdr.Height));
+        imgFile.setHeight(safe_static_cast<uint16_t, uint32_t>(hdr.Height));
         imgFile.setNumFaces(1);
         imgFile.setDepth(1);
         imgFile.setNumMips(1);
@@ -276,7 +276,7 @@ namespace TGA
             // check all data is valid for the face.
             if (pCur != pEnd) {
                 const size_t bytesLeft = pEnd - pCur;
-                X_ERROR("TextureTGA", "Failed to correctly read rle incoded image. bytes left: %" PRIuS, bytesLeft);
+                X_ERROR("TextureTGA", "Failed to correctly read rle encoded image. bytes left: %" PRIuS, bytesLeft);
                 return false;
             }
         }
@@ -284,7 +284,7 @@ namespace TGA
             size_t bytesRead = file->read(imgFile.getFace(0), DataSize);
 
             if (bytesRead != DataSize) {
-                X_ERROR("TextureTGA", "failed to read image data from. requested: %i bytes recivied: %i bytes", DataSize, bytesRead);
+                X_ERROR("TextureTGA", "failed to read image data from. requested: %" PRIuS " bytes received : % " PRIuS " bytes", DataSize, bytesRead);
                 return false;
             }
         }
@@ -308,7 +308,7 @@ namespace TGA
         }
 
 #if X_DEBUG == 1
-        X_WARNING_IF(left > 0, "TextureTGA", "potential read fail, bytes left in file: %i", left);
+        X_WARNING_IF(left > 0, "TextureTGA", "potential read fail, bytes left in file: %" PRIu64, left);
 #endif // !X_DEBUG
 
         // flip it
@@ -378,7 +378,7 @@ namespace TGA
         }
 
         uint32_t dataSize = hdr.Width * hdr.Height * (hdr.PixelDepth / 8);
-        X_ASSERT(dataSize == imgFile.getFaceSize(), "Size missmatch")(dataSize, imgFile.getFaceSize());
+        X_ASSERT(dataSize == imgFile.getFaceSize(), "Size mismatch")(dataSize, imgFile.getFaceSize());
 
         if (Util::isBGR(imgFile.getFormat()) || imgFile.getFormat() == Texturefmt::A8)
         {
@@ -393,7 +393,7 @@ namespace TGA
             auto rowBytes = Util::rowBytes(imgFile.getWidth(), imgFile.getHeight(), imgFile.getFormat());
 
             X_ASSERT(hdr.PixelDepth >= 24, "Pixel depth less than 24")(hdr.PixelDepth);
-            X_ASSERT(rowBytes * imgFile.getHeight() == dataSize, "Size missmatch")(rowBytes * imgFile.getHeight(), dataSize);
+            X_ASSERT(rowBytes * imgFile.getHeight() == dataSize, "Size mismatch")(rowBytes * imgFile.getHeight(), dataSize);
 
             core::Array<uint8_t> row(swapArena, rowBytes);
 

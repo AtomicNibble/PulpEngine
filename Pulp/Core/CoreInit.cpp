@@ -141,7 +141,7 @@ core::Module::Handle XCore::LoadDLL(const char* pDllName)
 }
 #endif //#if !defined(X_LIB)
 
-bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName)
+bool XCore::InitializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName)
 {
     X_PROFILE_NO_HISTORY_BEGIN("EngModuleInit", core::profiler::SubSys::CORE);
 
@@ -187,7 +187,7 @@ bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModul
     return true;
 }
 
-bool XCore::IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName,
+bool XCore::InitializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName,
     IConverterModule** pConvertModuleOut, IConverter** pConverterInstance)
 {
     X_PROFILE_NO_HISTORY_BEGIN("ConModuleInit", core::profiler::SubSys::CORE);
@@ -698,7 +698,7 @@ bool XCore::Init(CoreInitParams& startupParams)
     }
 #endif // !X_ENABLE_PROFILER
 
-    if (startupParams.bEnableNetowrking) {
+    if (startupParams.bEnableNetworking) {
         // #------------------------- Networking -------------------------
         if (!InitNet(startupParams)) {
             return false;
@@ -1348,7 +1348,7 @@ void XCore::registerCmds(void)
 
 void XCore::RegisterAssertHandler(IAssertHandler* pErrorHandler)
 {
-    X_ASSERT(!env_.isRunning(), "Assert handlers must be registerd at statup")(env_.isRunning(), pErrorHandler);
+    X_ASSERT(!env_.isRunning(), "Assert handlers must be registered at statup")(env_.isRunning(), pErrorHandler);
 
     assertHandlers_.push_back(pErrorHandler);
 }

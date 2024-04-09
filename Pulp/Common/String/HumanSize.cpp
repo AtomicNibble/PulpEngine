@@ -11,7 +11,7 @@ namespace HumanSize
 
         // Kibi not Kilo
 
-        // i use each type untill there is 10,240 of them.
+        // i use each type until there is 10,240 of them.
         if (numBytes <= 10240) {
             str.setFmt("%" PRIu32 "bytes", numBytes);
         }
@@ -31,7 +31,7 @@ namespace HumanSize
 
         // Kibi not Kilo
 
-        // i use each type untill there is 10,240 of them.
+        // i use each type until there is 10,240 of them.
         if (numBytes <= 10240) {
             str.setFmt("%" PRIu32 "bytes", numBytes);
         }
@@ -52,7 +52,7 @@ namespace HumanSize
 
         // Kibi not Kilo
 
-        // i use each type untill there is 10,240 of them.
+        // i use each type until there is 10,240 of them.
         if (numBytes <= 10240) {
             str.setFmt("%" PRIu64 "bytes", numBytes);
         }
@@ -87,7 +87,7 @@ namespace HumanSize
             numBytes = -numBytes;
         }
 
-        // i use each type untill there is 10,240 of them.
+        // i use each type until there is 10,240 of them.
         if (numBytes <= 10240) {
             str.setFmt("%s%" PRIi64 "bytes", pSign, numBytes);
         }

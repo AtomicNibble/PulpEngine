@@ -9,7 +9,6 @@ class LoggerNoFilterPolicy
 {
 public:
     inline void Init(void);
-
     inline void Exit(void);
 
     inline void RegisterVars(void);

@@ -6,7 +6,7 @@
 //
 //	stores a convex pologon
 //
-//	used for stuff like turing 6 planes into a box.
+//	used for stuff like turning 6 planes into a box.
 //
 //
 //

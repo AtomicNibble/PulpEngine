@@ -132,31 +132,6 @@ op(62, data)
 #define X_PP_REPEAT_64(op, data) X_PP_REPEAT_63(op, data) \
 op(63, data)
 
-/// \def X_PP_REPEAT
-/// \ingroup Preprocessor
-/// \brief Expands the arguments so that a user-defined operation is called N number of times with user-defined data.
-/// \details This macro is useful for e.g. repeatedly calling a function with the same data, but a different index.
-///
-/// The operation to call must be a macro with two parameters:
-/// - The first parameter denotes how many times the operation has been called.
-/// - The second parameter is the user-defined data provided to the \ref X_PP_REPEAT macro.
-///
-/// Check the provided code example for example usage:
-/// \code
-///   // assume that there exists a function called GlobalFunction(unsigned int, T)
-///   // define our operation macro
-///   #define CALL_FUNCTION(index, data)					GlobalFunction(index, data);
-///
-///   ...
-///   X_PP_REPEAT(2, CALL_FUNCTION, myData);
-///   will expand into
-///   GlobalFunction(0, myData); GlobalFunction(1, myData);
-///
-///   ...
-///   X_PP_REPEAT(4, CALL_FUNCTION, myData);
-///   will expand into
-///   GlobalFunction(0, myData); GlobalFunction(1, myData); GlobalFunction(2, myData); GlobalFunction(3, myData);
-/// \endcode
 #define X_PP_REPEAT(count, op, data) X_PP_JOIN_2(X_PP_REPEAT_, count) \
 (op, data)
 

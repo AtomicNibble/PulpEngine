@@ -579,7 +579,7 @@ bool ImgLib::CreateThumb(IConverterHost& host, int32_t assetId, Vec2i targetDim)
     thumb.setNumFaces(1);
     thumb.setNumMips(1);
     thumb.setWidth(targetDim.x);
-    thumb.setHeigth(targetDim.y);
+    thumb.setHeight(targetDim.y);
     thumb.setType(TextureType::T2D);
     if (Util::hasAlpha(srcImg.getFormat())) {
         thumb.setFormat(Texturefmt::R8G8B8A8);

@@ -6,7 +6,7 @@
 #include "Vars\DrawVars.h"
 #include "Material\MaterialManager.h"
 #include "Model\ModelManager.h"
-#include "Drawing\PrimativeContext.h"
+#include "Drawing\PrimitiveContext.h"
 #include "Drawing\CBufferManager.h"
 #include "Model\RenderModel.h"
 #include "Particles\FxManager.h"
@@ -189,7 +189,7 @@ void World3D::AreaRefInfo::free(void)
 
 // --------------------------------
 
-World3D::World3D(DrawVars& vars, engine::PrimativeContext* pPrimContex, CBufferManager* pCBufMan,
+World3D::World3D(DrawVars& vars, engine::PrimitiveContext* pPrimContex, CBufferManager* pCBufMan,
     physics::IScene* pPhysScene, core::MemoryArenaBase* arena) :
     arena_(X_ASSERT_NOT_NULL(arena)),
     pPhysScene_(X_ASSERT_NOT_NULL(pPhysScene)),
@@ -321,7 +321,7 @@ void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>
     drawDebug();
 }
 
-void World3D::renderEmitters(core::FrameData& frame, IPrimativeContext* pContext)
+void World3D::renderEmitters(core::FrameData& frame, IPrimitiveContext* pContext)
 {
     auto delta = frame.timeInfo.deltas[core::Timer::GAME];
 
@@ -793,7 +793,6 @@ bool World3D::setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t nu
         return false;
     }
 
-    // you silly slut.
     if (pModel->getNumBones() != static_cast<int32_t>(num)) {
         X_ERROR("World", "Invalid matrices count for animated mesh");
         return false;
@@ -974,7 +973,7 @@ void World3D::boundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numAr
     // work out all the areas this bounds intersects with.
 
     do {
-        if (nodeNum < 0) // negative is a area.
+        if (nodeNum < 0) // negative is an area.
         {
             int32_t areaNum = -1 - nodeNum;
             size_t i;
@@ -1018,7 +1017,7 @@ void World3D::boundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numAr
 void World3D::pushFrustumIntoTree_r(RenderEnt* pEnt, int32_t nodeNum)
 {
     do {
-        if (nodeNum < 0) // negative is a area.
+        if (nodeNum < 0) // negative is an area.
         {
             int32_t areaNum = -1 - nodeNum;
             Area& area = areas_[areaNum];
@@ -1046,7 +1045,7 @@ void World3D::pushFrustumIntoTree_r(RenderEnt* pEnt, int32_t nodeNum)
             nodeNum = node.children[level::Side::BACK];
         }
         else {
-            if (node.children[level::Side::FRONT] != 0) // 0 is leaf without area since a area of -1 - -1 = 0;
+            if (node.children[level::Side::FRONT] != 0) // 0 is leaf without area since an area of -1 - -1 = 0;
             {
                 pushFrustumIntoTree_r(pEnt, node.children[level::Side::FRONT]);
             }
@@ -1148,7 +1147,7 @@ void World3D::findVisibleArea_job(core::V2::JobSystem& jobSys, size_t threadIdx,
             if (vars_.drawCurrentAreaOnly() != 1) {
                 // any portals in this area?
                 if (!areaHasPortals(camArea_)) {
-                    // should we exit the game, cus this is likley a box map :|
+                    // should we exit the game, cus this is likely a box map :|
                     return;
                 }
 
@@ -1445,7 +1444,7 @@ void World3D::setAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t areaNum, 
         area.visPortals[visPortalIdx].areaFrom = areaFrom;
 
         if (ps) {
-            // this is thread safe as each thread gets a diffrent idx.
+            // this is thread safe as each thread gets a different idx.
             area.visPortals[visPortalIdx].planes = ps->portalPlanes;
         }
     }
@@ -1678,7 +1677,7 @@ void World3D::drawVisibleStaticModels_job(core::V2::JobSystem& jobSys, size_t th
 
         if (visEnts.isNotEmpty()) {
             auto* pJobs = jobSys.parallel_for_member_child<World3D>(pJob, del, visEnts.data(), safe_static_cast<uint32_t>(visEnts.size()),
-                core::V2::CountSplitter32(16) // will likley need tweaking, props even made a var.
+                core::V2::CountSplitter32(16) // will likely need tweaking, props even made a var.
                 JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 
             jobSys.Run(pJobs);
@@ -1718,15 +1717,15 @@ void World3D::drawStaticModels(const uint32_t* pModelIds, uint32_t num)
 
         // is this a good place todo the bucketing?
         // like placing the model in multiple buckets
-        // seams like a good palce since we are fully parralel here.
+        // seams like a good place since we are fully parallel here.
         // should we also handle lod logic here?
         // how to handle instancing?
         // since if we have 10 models that are the same we want to draw them as a batch.
         // for static models we can work out models that are the same so for a visible area we have the info about what can be instanced.
-        // i think per area batching should work well enougth in practice tho.
-        // then that would need processing / culling a little diffrent so that i end up with list of ents for instanced drawing
+        // i think per area batching should work well enough in practice tho.
+        // then that would need processing / culling a little different so that i end up with list of ents for instanced drawing
         // which can then have buffers made with all the instanced info and populate each frame and draw.
-        // i don't think pre making the instanced buffers per a area is worth it as it will make culling harder.
+        // i don't think pre making the instanced buffers per an area is worth it as it will make culling harder.
         // so for now we just handle the rendering of a model.
         size_t lodIdx = 0;
 
@@ -1741,7 +1740,7 @@ void World3D::drawStaticModels(const uint32_t* pModelIds, uint32_t num)
 
             if (!pModel->canRenderLod(lodIdx)) {
                 // lets try pick another lod.
-                // higer or lower?
+                // higher or lower?
                 while (lodIdx > 0 && !pModel->canRenderLod(lodIdx)) {
                     --lodIdx;
                 }
@@ -1878,7 +1877,7 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
 
     // we want to remove vertex buffer handles we don't need.
     // but can we do that on a perm mesh bases?
-    // since with have diffrent materials
+    // since with have different materials
     // so it's the requirement of the material as to what buffers it needs.
     const core::StrHash tech("unlit");
 
@@ -1982,7 +1981,7 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
                     std::memcpy(pAuxData, cpuData.data(), cpuData.size());
                 }
                 else {
-                    // this will be a instance from the shader perm, so unlikley to contain any useful data.
+                    // this will be a instance from the shader perm, so unlikely to contain any useful data.
                 }
 
                 // now patch in any other params.
@@ -2005,7 +2004,7 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
                         case shader::UpdateFreq::SKINDATA:
                         case shader::UpdateFreq::UNKNOWN:
                             X_ASSERT_NOT_IMPLEMENTED();
-                            // ya fooking wut. NO!
+                            // ya wut. NO!
                             continue;
 
                         case shader::UpdateFreq::INSTANCE:
@@ -2154,7 +2153,7 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
                     std::memcpy(pAuxData, cpuData.data(), cpuData.size());
                 }
                 else {
-                    // this will be a instance from the shader perm, so unlikley to contain any useful data.
+                    // this will be a instance from the shader perm, so unlikely to contain any useful data.
                 }
 
                 // now patch in any other params.
@@ -2169,7 +2168,7 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
                         case shader::UpdateFreq::MATERIAL:
                             continue;
                         case shader::UpdateFreq::FRAME:
-                            // ask the cbuffer man to fill us? ;)
+                            // ask the cbuffer man to fill
                             pCBufMan_->setParamValue(p, reinterpret_cast<uint8_t*>(pAuxData), reinterpret_cast<uint8_t*>(pAuxData) + size);
                             continue;
 
@@ -2177,7 +2176,7 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
                         case shader::UpdateFreq::SKINDATA:
                         case shader::UpdateFreq::UNKNOWN:
                             X_ASSERT_NOT_IMPLEMENTED();
-                            // ya fooking wut. NO!
+                            // ya wut. NO!
                             continue;
 
                         case shader::UpdateFreq::INSTANCE:

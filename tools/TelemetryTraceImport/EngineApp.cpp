@@ -78,7 +78,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
 
     LinkModule(pICore_, "TelemetryTraceImport");
 
-    if (!pICore_->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "TelemetryServerLib", "Engine_TelemetryServerLib")) {
+    if (!pICore_->InitializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "TelemetryServerLib", "Engine_TelemetryServerLib")) {
         return false;
     }
 

@@ -52,7 +52,7 @@ private:
 
 private:
     static core::AtomicInt regCount_;
-    static core::AtomicInt classRegisterd_;
+    static core::AtomicInt classRegistered_;
 };
 
 X_NAMESPACE_END

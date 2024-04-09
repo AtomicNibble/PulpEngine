@@ -22,7 +22,7 @@ class Window
     X_NO_ASSIGN(Window);
 
 public:
-    /// Types for position size etc.
+    // Types for position size etc.
     typedef AlignmentFlags AlignmentFlags;
     typedef Vec2i Position;
     typedef Recti Rect;

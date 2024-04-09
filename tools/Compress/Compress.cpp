@@ -108,7 +108,7 @@ namespace
         core::Path<> inFile, outFile;
 
         Algo::Enum algo = Algo::LZ4;
-        bool defalte = true;
+        bool deflate = true;
         CompressLevel::Enum lvl = CompressLevel::NORMAL;
 
         // args
@@ -121,7 +121,7 @@ namespace
 
                     outFile.set(inFile.begin(), inFile.end());
                     outFile += ".out";
-                    defalte = false;
+                    deflate = false;
                 }
                 else {
                     X_ERROR("Compress", "Missing required arg -if");
@@ -136,7 +136,7 @@ namespace
             auto modeStr = gEnv->pCore->GetCommandLineArg("mode"_sv);
             if (modeStr) {
                 if (core::strUtil::IsEqualCaseInsen(modeStr, "inflate"_sv)) {
-                    defalte = false;
+                    deflate = false;
                 }
             }
 
@@ -188,7 +188,7 @@ namespace
             }
         }
 
-        if (!defalte && outFile.isEmpty()) {
+        if (!deflate && outFile.isEmpty()) {
             X_ERROR("Compress", "Output file name missing.");
             return 1;
         }
@@ -206,8 +206,8 @@ namespace
         const float loadTime = timer.GetMilliSeconds();
         X_LOG0("Compress", "loadTime: ^2%fms", loadTime);
 
-        // if infalting get algo from buf.
-        if (!defalte) {
+        // if inflating get algo from buf.
+        if (!deflate) {
             if (!ICompressor::validBuffer(inFileData)) {
                 X_ERROR("Compress", "Input file is not a compressed buffer");
                 return 1;
@@ -222,7 +222,7 @@ namespace
         core::Compression::CompressorAlloc compressor(algo);
 
         // auto out file name.
-        if (defalte && outFile.isEmpty()) {
+        if (deflate && outFile.isEmpty()) {
             switch (algo) {
                 case Algo::LZ4:
                     outFile = inFile + ".lz4";
@@ -255,7 +255,7 @@ namespace
 
         timer.Start();
 
-        if (defalte) {
+        if (deflate) {
             res = compressor->deflate(&arena, inFileData, outfileData, lvl);
         }
         else {
@@ -265,10 +265,10 @@ namespace
         const float compressTime = timer.GetMilliSeconds();
 
         core::HumanDuration::Str durStr;
-        X_LOG0("Compress", "%s: ^2%s", defalte ? "deflateTime" : "inflateTime", core::HumanDuration::toString(durStr, compressTime));
+        X_LOG0("Compress", "%s: ^2%s", deflate ? "deflateTime" : "inflateTime", core::HumanDuration::toString(durStr, compressTime));
 
         if (!res) {
-            X_ERROR("Compress", "%s failed.", defalte ? "deflation" : "inflation");
+            X_ERROR("Compress", "%s failed.", deflate ? "deflation" : "inflation");
             return 1;
         }
 
@@ -337,7 +337,7 @@ namespace
             X_LOG0("Train", "Gathering files for training");
 
             core::FindFirstScoped find;
-            if (find.findfirst(path)) {
+            if (find.findFirst(path)) {
                 do {
                     const auto& fd = find.fileData();
                     if (fd.attrib.IsSet(core::FindData::AttrFlag::DIRECTORY)) {
@@ -450,7 +450,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // args:
     // in: file in
     // out: file out
-    // mode: defalte infalte
+    // mode: deflate infalte
     // algo: lz4, lzma, zlib
     // lvl: 1-3
 

@@ -8,7 +8,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // MatrixAffine2
-//! Represents a two dimensional affine transformation
+// Represents a two dimensional affine transformation
 template<typename T>
 class MatrixAffine2
 {
@@ -93,11 +93,11 @@ public:
     const MatrixAffine2<T> operator+(const MatrixAffine2<T>& rhs) const;
     const MatrixAffine2<T> operator-(const MatrixAffine2<T>& rhs) const;
 
-    //! post-multiplies column vector [rhs.x rhs.y 1]
+    // post-multiplies column vector [rhs.x rhs.y 1]
     Vec2<T> transformPoint(const Vec2<T>& rhs) const;
-    //! post-multiplies column vector [rhs.x rhs.y 1]
+    // post-multiplies column vector [rhs.x rhs.y 1]
     const Vec2<T> operator*(const Vec2<T>& rhs) const;
-    //! post-multiplies column vector [rhs.x rhs.y 0]
+    // post-multiplies column vector [rhs.x rhs.y 0]
     Vec2<T> transformVec(const Vec2<T>& v) const;
 
     const MatrixAffine2<T> operator*(T rhs) const;
@@ -134,25 +134,25 @@ public:
     void getRows(Vec3<T>* r0, Vec3<T>* r1, Vec3<T>* r2) const;
     void setRows(const Vec3<T>& r0, const Vec3<T>& r1, const Vec3<T>& r2);
 
-    //! Sets the matrix to all zeros
+    // Sets the matrix to all zeros
     void setToNull();
-    //! Sets the matrix to the identity matrix.
+    // Sets the matrix to the identity matrix.
     void setToIdentity();
 
-    //! Returns whether the matrix is singular (and consequently not invertible) or not
+    // Returns whether the matrix is singular (and consequently not invertible) or not
     bool isSingular() const;
 
-    //! Returns a copy of the matrix inverted. \a epsilon specifies the tolerance for testing for singularity.
+    // Returns a copy of the matrix inverted. epsilon specifies the tolerance for testing for singularity.
     void invert(T epsilon = EPSILON)
     {
         *this = invertCopy(epsilon);
     }
-    //! Returns a copy of the matrix inverted. \a epsilon specifies the tolerance for testing for singularity.
+    // Returns a copy of the matrix inverted. epsilon specifies the tolerance for testing for singularity.
     MatrixAffine2<T> invertCopy(T epsilon = EPSILON) const;
 
-    //! concatenate translation by \a v (conceptually, translate is before 'this')
+    // concatenate translation by v (conceptually, translate is before 'this')
     void translate(const Vec2<T>& v);
-    //! Returns a copy of the matrix translated by \a v
+    // Returns a copy of the matrix translated by v
     MatrixAffine2 translateCopy(const Vec2<T>& v) const
     {
         MatrixAffine2 result = *this;
@@ -160,24 +160,24 @@ public:
         return result;
     }
 
-    //! concatenate rotation by \a radians (conceptually, rotate is before 'this')
+    // concatenate rotation by radians (conceptually, rotate is before 'this')
     void rotate(T radians)
     {
         *this *= MatrixAffine2<T>::makeRotate(radians);
     }
-    //! concatenate rotation by \a radians around the point \a pt (conceptually, rotate is before 'this')
+    // concatenate rotation by radians around the point pt (conceptually, rotate is before 'this')
     void rotate(T radians, const Vec2<T>& pt)
     {
         *this *= MatrixAffine2<T>::makeRotate(radians, pt);
     }
-    //! Returns a copy of the matrix rotate by \a radians
+    // Returns a copy of the matrix rotate by radians
     MatrixAffine2 rotateCopy(const Vec2<T>& v) const
     {
         MatrixAffine2 result = *this;
         result.rotate(v);
         return result;
     }
-    //! Returns a copy of the matrix rotate by \a radians around the point \a pt
+    // Returns a copy of the matrix rotate by radians around the point pt
     MatrixAffine2 rotateCopy(const Vec2<T>& v, const Vec2<T>& pt) const
     {
         MatrixAffine2 result = *this;
@@ -185,18 +185,18 @@ public:
         return result;
     }
 
-    //! concatenate scale (conceptually, scale is before 'this')
+    // concatenate scale (conceptually, scale is before 'this')
     void scale(T s);
-    //! concatenate scale (conceptually, scale is before 'this')
+    // concatenate scale (conceptually, scale is before 'this')
     void scale(const Vec2<T>& v);
-    //! Returns a copy of the matrix scaled by \a s
+    // Returns a copy of the matrix scaled by s
     MatrixAffine2 scaleCopy(T s) const
     {
         MatrixAffine2 result = *this;
         result.scale(s);
         return result;
     }
-    //! Returns a copy of the matrix scaled by \a v
+    // Returns a copy of the matrix scaled by v
     MatrixAffine2 scaleCopy(const Vec2<T>& v) const
     {
         MatrixAffine2 result = *this;
@@ -223,9 +223,9 @@ public:
     // creates translation matrix
     static MatrixAffine2<T> makeTranslate(const Vec2<T>& v);
 
-    // creates rotation matrix by \a radians
+    // creates rotation matrix by radians
     static MatrixAffine2<T> makeRotate(T radians);
-    // creates rotation matrix by \a radians around the point \a pt
+    // creates rotation matrix by radians around the point pt
     static MatrixAffine2<T> makeRotate(T radians, const Vec2<T>& pt);
 
     // creates scale matrix

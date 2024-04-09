@@ -119,30 +119,30 @@ inline void FixedBitStreamBase::write(const Type* pBuf, size_type numBytes)
     writeBits(pBuf, numBitsForBytes(numBytes));
 }
 
-// pads the stream to byte boundry before read.
+// pads the stream to byte boundary before read.
 template<typename T>
 inline void FixedBitStreamBase::writeAligned(const T& val)
 {
-    alignWriteToByteBoundry();
+    alignWriteToByteBoundary();
     write<T>(val);
 }
 
 template<typename T>
 inline void FixedBitStreamBase::writeAligned(const T* pVal, size_type num)
 {
-    alignWriteToByteBoundry();
+    alignWriteToByteBoundary();
     write<T>(pVal, num);
 }
 
 inline void FixedBitStreamBase::writeAligned(const Type* pBuf, size_type numBytes)
 {
-    alignWriteToByteBoundry();
+    alignWriteToByteBoundary();
     write(pBuf, numBytes);
 }
 
 inline void FixedBitStreamBase::writeBitsAligned(const Type* pBuf, size_type numBits)
 {
-    alignWriteToByteBoundry();
+    alignWriteToByteBoundary();
     writeBits(pBuf, numBits);
 }
 
@@ -207,42 +207,42 @@ inline void FixedBitStreamBase::read(Type* pBuf, size_type numBytes)
     readBits(pBuf, numBitsForBytes(numBytes));
 }
 
-// pads the stream to byte boundry before read.
-// pads the stream to byte boundry before read.
+// pads the stream to byte boundary before read.
+// pads the stream to byte boundary before read.
 template<typename T>
 inline void FixedBitStreamBase::readAligned(T& val)
 {
-    alignReadToByteBoundry();
+    alignReadToByteBoundary();
     read<T>(val);
 }
 
 template<typename T>
 inline void FixedBitStreamBase::readAligned(T* pVal, size_type num)
 {
-    alignReadToByteBoundry();
+    alignReadToByteBoundary();
     read<T>(pVal, num);
 }
 
 inline void FixedBitStreamBase::readAligned(Type* pBuf, size_type numBytes)
 {
-    alignReadToByteBoundry();
+    alignReadToByteBoundary();
     read(pBuf, numBytes);
 }
 
 inline void FixedBitStreamBase::readBitsAligned(Type* pBuf, size_type numBits)
 {
-    alignReadToByteBoundry();
+    alignReadToByteBoundary();
     readBits(pBuf, numBits);
 }
 
 // -------------------------------
 
-inline void FixedBitStreamBase::alignWriteToByteBoundry(void)
+inline void FixedBitStreamBase::alignWriteToByteBoundary(void)
 {
     bitIdx_ = core::bitUtil::RoundUpToMultiple(bitIdx_, 8_sz);
 }
 
-inline void FixedBitStreamBase::alignReadToByteBoundry(void)
+inline void FixedBitStreamBase::alignReadToByteBoundary(void)
 {
     readBitIdx_ = core::bitUtil::RoundUpToMultiple(readBitIdx_, 8_sz);
 }
@@ -262,7 +262,7 @@ inline void FixedBitStreamBase::skipBits(size_type numBits)
 inline void FixedBitStreamBase::zeroPadToLength(size_type numBytes)
 {
     if (sizeInBytes() < numBytes) {
-        alignWriteToByteBoundry();
+        alignWriteToByteBoundary();
         // careful we must handle readbitIdx > 0
         size_t bytesToAdd = numBytes - sizeInBytes();
 

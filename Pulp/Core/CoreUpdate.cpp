@@ -221,7 +221,7 @@ void XCore::RenderEnd(core::FrameData& frameData)
             env_.pPhysics->onTickPostRender(frameData.timeInfo.deltas[core::ITimer::Timer::GAME]);
         }
 
-        engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
+        engine::IPrimitiveContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
 
         const float padding = 10;
         const float yOffset = 30;

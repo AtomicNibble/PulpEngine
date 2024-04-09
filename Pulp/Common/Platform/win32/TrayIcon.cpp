@@ -32,7 +32,7 @@ namespace
 
 uint32_t TrayIcon::CREATED_MSG = 0;
 core::AtomicInt TrayIcon::regCount_;
-core::AtomicInt TrayIcon::classRegisterd_;
+core::AtomicInt TrayIcon::classRegistered_;
 
 TrayIcon::TrayIcon() :
     showIconPending_(false),
@@ -141,7 +141,7 @@ void TrayIcon::RemoveIcon(void)
 
 void TrayIcon::RegisterClass(void)
 {
-    if (regCount_ > 0 || classRegisterd_ > 0) {
+    if (regCount_ > 0 || classRegistered_ > 0) {
         return;
     }
 
@@ -167,7 +167,7 @@ void TrayIcon::RegisterClass(void)
     }
     else {
         ++regCount_;
-        classRegisterd_ = 1;
+        classRegistered_ = 1;
     }
 }
 
@@ -175,7 +175,7 @@ void TrayIcon::UnRegisterClass(void)
 {
     --regCount_;
 
-    if (regCount_ > 0 || classRegisterd_ == 0) {
+    if (regCount_ > 0 || classRegistered_ == 0) {
         return;
     }
 
@@ -184,7 +184,7 @@ void TrayIcon::UnRegisterClass(void)
         X_ERROR("TrayIcon", "Failed to unregister class. Err: %s", core::lastError::ToString(Dsc));
     }
 
-    classRegisterd_ = 0;
+    classRegistered_ = 0;
 }
 
 uint32_t TrayIcon::GetCallbackMessage(void) const

@@ -532,7 +532,7 @@ namespace shader
             each hardware shader holds a pointer to it's shader source.
             so we could just iterate all hardware shaders and invalid any using it.
 
-            might want todo something diffrent if end up with loads of shaders
+            might want todo something different if end up with loads of shaders
             like storing refrence lists on the shaders.
             */
 

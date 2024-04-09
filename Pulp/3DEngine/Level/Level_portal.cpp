@@ -12,7 +12,7 @@
 #include <Math\XWinding.h>
 
 #include "Material\MaterialManager.h"
-#include "Drawing\PrimativeContext.h"
+#include "Drawing\PrimitiveContext.h"
 #include "Drawing\CBufferManager.h"
 
 #include <CmdBucket.h>
@@ -77,7 +77,7 @@ void Level::FindVisibleArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
             if (vars_.drawCurrentAreaOnly() != 1) {
                 // any portals in this area?
                 if (!AreaHasPortals(camArea_)) {
-                    // should we exit the game, cus this is likley a box map :|
+                    // should we exit the game, cus this is likely a box map :|
                     return;
                 }
 
@@ -358,7 +358,7 @@ void Level::SetAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t areaNum, in
         area.visPortals[visPortalIdx].areaFrom = areaFrom;
 
         if (ps) {
-            // this is thread safe as each thread gets a diffrent idx.
+            // this is thread safe as each thread gets a different idx.
             area.visPortals[visPortalIdx].planes = ps->portalPlanes;
         }
     }
@@ -583,7 +583,7 @@ void Level::DrawVisibleStaticModels_job(core::V2::JobSystem& jobSys, size_t thre
         const auto& visEnts = pArea->areaVisibleEnts;
 
         auto* pJobs = jobSys.parallel_for_member_child<Level>(pJob, del, visEnts.data(), safe_static_cast<uint32_t>(visEnts.size()),
-            core::V2::CountSplitter32(16) // will likley need tweaking, props even made a var.
+            core::V2::CountSplitter32(16) // will likely need tweaking, props even made a var.
             JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 
         jobSys.Run(pJobs);
@@ -623,8 +623,8 @@ void Level::DrawStaticModels(const uint32_t* pEntIds, uint32_t num)
         // how to handle instancing?
         // since if we have 10 models that are the same we want to draw them as a batch.
         // for static models we can work out models that are the same so for a visible area we have the info about what can be instanced.
-        // i think per area batching should work well enougth in practice tho.
-        // then that would need processing / culling a little diffrent so that i end up with list of ents for instanced drawing
+        // i think per area batching should work well enough in practice tho.
+        // then that would need processing / culling a little different so that i end up with list of ents for instanced drawing
         // which can then have buffers made with all the instanced info and populate each frame and draw.
         // i don't think pre making the instanced buffers per a area is worth it as it will make culling harder.
         // so for now we just handle the rendering of a model.
@@ -668,7 +668,7 @@ void Level::addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderM
 
     // we want to remove vertex buffer handles we don't need.
     // but can we do that on a perm mesh bases?
-    // since with have diffrent materials
+    // since with have different materials
     // so it's the requirement of the material as to what buffers it needs.
     const core::StrHash tech("unlit");
 

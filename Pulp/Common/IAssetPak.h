@@ -19,12 +19,12 @@ X_NAMESPACE_BEGIN(AssetPak)
 //	Info:
 //
 //	The asset package is like a packed directory.
-//	it can contain many diffrent assets.
-//  there is a table at the top gving information about all the assets.
+//	it can contain many different assets.
+//  there is a table at the top giving information about all the assets.
 //  so that we only have to read the start to get all the names of the assets for caching.
 //
 //  each table entry will provide a offset for seeking to the asset.
-//  so that a asset can be loaded.
+//  so that an asset can be loaded.
 //
 //  asset specific headers are stored at the start of the asset.
 //
@@ -40,7 +40,7 @@ X_NAMESPACE_BEGIN(AssetPak)
 //  the pool is 16byte padded null terminated strings.
 //  meaning the full tables can be loaded as a single block.
 //
-//  assests have there strings names replaced with uin16_t which can be used for lookup.
+//  assets have there strings names replaced with uin16_t which can be used for lookup.
 //  example:
 //		int16_t idx = 536;
 //		const char* str = StrPoolGet(idx);
@@ -50,10 +50,10 @@ X_NAMESPACE_BEGIN(AssetPak)
 //	j_chicken.....
 //
 //	FastUpdate:
-//		the pak supports fast upates. we leave room for additional entryies and strings.
+//		the pak supports fast updates. we leave room for additional entries and strings.
 //		so that new files can be added on the end without a full rebuild.
 //
-//		Update of exsiting asset:
+//		Update of existing asset:
 //			If the asset is smaller than the current, it's updated in place
 //			otherwise it is appended on the end.
 //			the table entry is updated to point to the new appended data.
@@ -63,11 +63,11 @@ X_NAMESPACE_BEGIN(AssetPak)
 //			adding a new entry into the table, as well as adding any new
 //			strings into the string pool.
 //
-//			The following precoditions must be met:
+//			The following preconditions must be met:
 //			* Any new strings must fit in the string pool
 //			* we have a free asset slot.
 //
-//		the amout of space left in the string pool is not fixed.
+//		the amount of space left in the string pool is not fixed.
 //      the following constants are used when writing a fastUpdate enabled pak.
 //
 //		*Note: the actual reverse written may be smaller to fit inside the formats limits.
@@ -106,7 +106,7 @@ static const uint32_t PAK_FU_STRING_POOL_RESERVER = 2048;
 static const uint32_t PAK_FU_SPARE_ASSET_SLOTS = 128;
 
 // string pool
-static const uint32_t PAK_STR_POOL_BLOCK_SIZE = 16; // smaller = less waste / larger = more capaciy.
+static const uint32_t PAK_STR_POOL_BLOCK_SIZE = 16; // smaller = less waste / larger = more capacity.
 
 X_ENSURE_GE(PAK_STR_POOL_BLOCK_SIZE, 8, "padding must be greater or equal to 8");
 
@@ -133,7 +133,7 @@ private:
 
 X_DECLARE_FLAGS8(APakFlag)
 (
-    SHARED_DICTS,           // Pack contains shared dictonaries.
+    SHARED_DICTS,           // Pack contains shared dictionaries.
     HINT_MEMORY             // A hint that this pak should be kept in memory     
 );
 

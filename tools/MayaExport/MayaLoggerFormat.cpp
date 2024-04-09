@@ -3,17 +3,17 @@
 
 X_NAMESPACE_BEGIN(maya)
 
-/// Empty implementation.
+// Empty implementation.
 void LoggerMayaFormatPolicy::Init(void)
 {
 }
 
-/// Empty implementation.
+// Empty implementation.
 void LoggerMayaFormatPolicy::Exit(void)
 {
 }
 
-/// Formats the given message.
+// Formats the given message.
 uint32_t LoggerMayaFormatPolicy::Format(core::LoggerBase::Line& line, const char* indentation,
     core::LogType::Enum type, X_SOURCE_INFO_LOG_CA(const SourceInfo&) const char* channel, size_t verbosity, const char* format, va_list args)
 {

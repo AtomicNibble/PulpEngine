@@ -170,7 +170,7 @@ void KDop::addTriangles(const TriangleInfo& triInfo)
 
 void KDop::build(void)
 {
-    // infate a bit.
+    // inflate a bit.
     //for (auto& d : maxDist_) {
         // d += 0.1f;
     //}

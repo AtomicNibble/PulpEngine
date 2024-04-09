@@ -6,7 +6,7 @@
 
 X_NAMESPACE_BEGIN(core)
 
-/// \brief The data stored for each allocation.
+// The data stored for each allocation.
 ExtendedMemoryTracking::AllocationData::AllocationData(size_t originalSize, size_t internalSize X_MEM_HUMAN_IDS_CB(const char* ID) X_MEM_HUMAN_IDS_CB(const char* typeName) X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), const char* memoryArenaName) :
 
     originalSize_(originalSize),
@@ -85,7 +85,7 @@ ExtendedMemoryTracking::~ExtendedMemoryTracking(void)
     X_ASSERT(numAllocations_ == 0, "Memory leaks detected. Num: %d", numAllocations_)();
 }
 
-/// Stores the allocation along with additional data in a hash map.
+// Stores the allocation along with additional data in a hash map.
 void ExtendedMemoryTracking::OnAllocation(void* memory, size_t originalSize, size_t internalSize,
     size_t alignment, size_t offset X_MEM_HUMAN_IDS_CB(const char* ID) X_MEM_HUMAN_IDS_CB(const char* typeName) X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), const char* memoryArenaName)
 {
@@ -98,7 +98,7 @@ void ExtendedMemoryTracking::OnAllocation(void* memory, size_t originalSize, siz
             memoryArenaName)));
 }
 
-/// Removes the allocation data from a hash map.
+// Removes the allocation data from a hash map.
 void ExtendedMemoryTracking::OnDeallocation(void* memory)
 {
     numAllocations_--;

@@ -167,7 +167,6 @@ bool XGlyphCache::SetBakedData(core::span<const GlyphHdr> bakedGlyphs, core::spa
     return true;
 }
 
-
 void XGlyphCache::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
 {
     if (pWidth) {
@@ -181,7 +180,7 @@ void XGlyphCache::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
 
 bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 {
-    X_ASSERT(cacheTable_.find(cChar) == cacheTable_.end(), "Precache caleed when already in cache")();
+    X_ASSERT(cacheTable_.find(cChar) == cacheTable_.end(), "Precache called when already in cache")();
 
     // get the Least recently used Slot
     XGlyph* pSlot = GetLRUSlot();
@@ -287,8 +286,6 @@ bool XGlyphCache::GlyphCached(wchar_t cChar)
     return (cacheTable_.find(cChar) != cacheTable_.end());
 }
 
-//-------------------------------------------------------------------------------------------------
-
 XGlyph* XGlyphCache::GetLRUSlot(void)
 {
     const auto it = std::min_element(slotList_.begin(), slotList_.end(), [](const XGlyph& s1, const XGlyph& s2) {
@@ -299,8 +296,6 @@ XGlyph* XGlyphCache::GetLRUSlot(void)
     return &slot;
 }
 
-//-------------------------------------------------------------------------------------------------
-
 XGlyph* XGlyphCache::GetMRUSlot(void)
 {
     const auto it = std::max_element(slotList_.begin(), slotList_.end(), [](const XGlyph& s1, const XGlyph& s2) {
@@ -310,8 +305,6 @@ XGlyph* XGlyphCache::GetMRUSlot(void)
     auto& slot = *it;
     return &slot;
 }
-
-//-------------------------------------------------------------------------------------------------
 
 const XGlyph* XGlyphCache::GetGlyph(wchar_t cChar)
 {
@@ -336,8 +329,6 @@ const XGlyph* XGlyphCache::GetGlyph(wchar_t cChar)
     return pGlyph;
 }
 
-//-------------------------------------------------------------------------------------------------
-
 bool XGlyphCache::CreateSlotList(size_t listSize)
 {
     slotList_.reserve(listSize);
@@ -350,8 +341,6 @@ bool XGlyphCache::CreateSlotList(size_t listSize)
 
     return true;
 }
-
-//-------------------------------------------------------------------------------------------------
 
 void XGlyphCache::ReleaseSlotList(void)
 {

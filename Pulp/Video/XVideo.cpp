@@ -21,7 +21,7 @@
 #include <ISound.h>
 
 #include <IFont.h>
-#include <IPrimativeContext.h>
+#include <IPrimitiveContext.h>
 
 #include <Time\StopWatch.h>
 
@@ -128,8 +128,8 @@ Video::~Video()
 {
     stop();
 
-    // TODO: work out way to unregister this safly.
-    // since if we delte a sound object, then get a event for it, we crash :(
+    // TODO: work out way to unregister this safely.
+    // since if we delete a sound object, then get a event for it, we crash :(
     if (audio_.sndObj != sound::INVALID_OBJECT_ID) {
         gEnv->pSound->unRegisterObject(audio_.sndObj);
     }
@@ -140,7 +140,7 @@ Video::~Video()
 
     auto err = vpx_codec_destroy(&vid_.codec);
     if (err != VPX_CODEC_OK) {
-        X_ERROR("Video", "Failed to destory decoder: %s", vpx_codec_err_to_string(err));
+        X_ERROR("Video", "Failed to destroy decoder: %s", vpx_codec_err_to_string(err));
     }
 
     vorbis_block_clear(&audio_.vorbisBlock);
@@ -177,11 +177,11 @@ void Video::stop(void)
     if (state_ == State::Buffering || state_ == State::Playing)
     {
         if (io_.requestPending) {
-            // shieeeeeeeeet.
+            
 
         }
 
-        // we need to fix io eventes for objects gone!
+        // we need to fix io events for objects gone!
         if (audio_.sndPlayingId != sound::INVALID_PLAYING_ID) {
             gEnv->pSound->stopVideoAudio(audio_.sndPlayingId);
             audio_.sndPlayingId = sound::INVALID_PLAYING_ID;
@@ -196,7 +196,6 @@ void Video::stop(void)
             }
         }
 
-        // we need to stop the pickle in the nickle!
         auto* pJobSys = gEnv->pJobSys;
 
         if (vid_.pDecodeJob) {
@@ -376,7 +375,7 @@ void Video::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
     }
 
     if (vars_.debug()) {
-        X_LOG0("Video", "Frame display delta: %" PRIi32 " ellapsed: %" PRIi32, delta, ellapsed);
+        X_LOG0("Video", "Frame display delta: %" PRIi32 " elapsed: %" PRIi32, delta, ellapsed);
     }
 
     // we want to submit a draw
@@ -461,7 +460,7 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
     size_t audioHdrSize = hdr.audio.deflatedHdrSize;
 
     if (audioHdrSize > cursor.numBytesRemaning()) {
-        // sad face we don't have enougth data for the audio header yet.
+        // sad face we don't have enough data for the audio header yet.
         // TODO: copy what we have into the file buffer and process it once we do.
         X_ASSERT_NOT_IMPLEMENTED();
     }
@@ -474,9 +473,9 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
         DataVec inflated(g_VideoArena);
         inflated.resize(hdr.audio.inflatedHdrSize);
 
-        // infalte directly into ogg buffer. :)
+        // inflate directly into ogg buffer. :)
         if (!core::Compression::LZ4::inflate(pSrc, hdr.audio.deflatedHdrSize, inflated.data(), hdr.audio.inflatedHdrSize)) {
-            X_ERROR("Video", "Failed to infalte audio data");
+            X_ERROR("Video", "Failed to inflate audio data");
             return false;
         }
 
@@ -668,9 +667,6 @@ sound::BufferResult::Enum Video::audioDataRequest(sound::AudioBuffer& ab)
         }
     }
 
-    // What sweet song do you have for me today?
-    // -> When I gape for you! MY nipples start twitching..
-    // Not that kinda song.. O.O
     for (int32_t i = 0; i < ab.numChannels(); i++)
     {
         auto* pChannelDest = ab.getChannel(i);
@@ -762,7 +758,7 @@ void Video::validateQueues(void)
 #if X_ENABLE_ASSERTIONS
     core::CriticalSection::ScopedLock lock(io_.cs);
 
-    // make sure none of the queues have been seeked past.
+    // make sure none of the queues have been seek past.
     for (size_t i = 0; i < io_.trackQueues.size(); i++) {
         auto& queue = io_.trackQueues[i];
 
@@ -810,7 +806,7 @@ void Video::popProcessed(TrackType::Enum type)
 
         skippableBytes = safe_static_cast<int32_t>(offset);
         if (skippableBytes == 0) {
-            // unprossed item right at start.
+            // unprocessed item right at start.
             return;
         }
     }
@@ -827,8 +823,8 @@ void Video::popProcessed(TrackType::Enum type)
 
         int32_t skipSize = sizeof(hdr) + hdr.blockSize;
 
-        // if skippableBytes is set this is how many bytes till a unprocssed block.
-        // otherwise we have processed eything up untill ioBufferReadOffset_ of same type.
+        // if skippableBytes is set this is how many bytes till a unprocessed block.
+        // otherwise we have processed everything up until ioBufferReadOffset_ of same type.
 
         if (skippableBytes > 0)
         {
@@ -1031,7 +1027,7 @@ bool Video::decodeVideo(void)
         return true;
     };
 
-    X_ASSERT(vid_.availFrames.freeSpace() > 0, "decode frame called, when no avalible frame buffers")(vid_.availFrames.size(), vid_.availFrames.capacity());
+    X_ASSERT(vid_.availFrames.freeSpace() > 0, "decode frame called, when no available frame buffers")(vid_.availFrames.size(), vid_.availFrames.capacity());
 
     // any left over frames?
     if (!vid_.vpxFrameIter) {
@@ -1131,7 +1127,7 @@ void Video::decodeVideo_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
     vid_.pDecodeJob = nullptr;
 }
 
-Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
+Vec2f Video::drawDebug(engine::IPrimitiveContext* pPrim, Vec2f pos) const
 {
 #if !X_ENABLE_VIDEO_DEBUG
     X_UNUSED(pPrim, pos);
@@ -1156,7 +1152,7 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
     stats_.audioBufferSize.push_back(safe_static_cast<int32_t>(audio_.audioRingBuffers.front().size()));
     stats_.ioBufferSize.push_back(safe_static_cast<int32_t>(io_.ringBuffer.size()));
 
-    // build linera array
+    // build linear array
     typedef core::FixedArray<float, FRAME_HISTORY_SIZE> PlotData;
 
     PlotData queueSizeData[TrackType::ENUM_COUNT];

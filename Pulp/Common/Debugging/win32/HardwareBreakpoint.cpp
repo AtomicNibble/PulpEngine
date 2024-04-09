@@ -45,7 +45,7 @@ namespace hardwareBP
             {
             };
 
-            /// Template specialization for 64bit
+            // Template specialization for 64bit
             template<>
             struct Implementation<8u>
             {
@@ -128,7 +128,7 @@ namespace hardwareBP
 #endif // !_WIN64
             };
 
-            /// Template specialization for 32bit
+            // Template specialization for 32bit
             template<>
             struct Implementation<4u>
             {

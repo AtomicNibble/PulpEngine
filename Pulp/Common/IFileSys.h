@@ -68,7 +68,7 @@ struct X_NO_DISCARD XFileAsync
 
     virtual void cancelAll(void) const X_ABSTRACT;
 
-    /// Waits until the asynchronous operation has finished, and returns the number of transferred bytes.
+    // Waits until the asynchronous operation has finished, and returns the number of transferred bytes.
     virtual size_t waitUntilFinished(const XFileAsyncOperation& operation) X_ABSTRACT;
 
     virtual uint64_t fileSize(void) const X_ABSTRACT;
@@ -627,7 +627,7 @@ typedef uint32_t RequestHandle;
 static const RequestHandle INVALID_IO_REQ_HANDLE = 0;
 
 // I want to pass these into filesystem with one function call.
-// but support diffrent types.
+// but support different types.
 // so many i should have a base type that contains the mode
 // and we copy it into a internal buffer
 
@@ -839,7 +839,7 @@ struct IFileSys
     // Find util
     virtual FindPair findFirst(const PathT& path, FindData& findinfo) X_ABSTRACT;
     virtual FindPair findFirstOS(const PathWT& osPath, FindData& findinfo) X_ABSTRACT;
-    virtual bool findnext(findhandle handle, FindData& findinfo) X_ABSTRACT;
+    virtual bool findNext(findhandle handle, FindData& findinfo) X_ABSTRACT;
     virtual void findClose(findhandle handle) X_ABSTRACT;
 
     // Delete
@@ -854,7 +854,7 @@ struct IFileSys
     virtual bool createDirectoryTreeOS(const PathWT& osPath) const X_ABSTRACT;
     virtual bool createDirectoryTreeOS(const PathT& osPath) const X_ABSTRACT;
 
-    // exsists.
+    // exists.
     virtual bool fileExists(const PathT& relPath) const X_ABSTRACT;
     virtual bool fileExists(const PathT& relPath, VirtualDirectory::Enum dir) const X_ABSTRACT;
     virtual bool fileExistsOS(const PathWT& osPath) const X_ABSTRACT;
@@ -863,7 +863,7 @@ struct IFileSys
     virtual bool directoryExists(const PathT& relPath, VirtualDirectory::Enum dir) const X_ABSTRACT;
     virtual bool directoryExistsOS(const PathWT& osPath) const X_ABSTRACT;
 
-    // does not error, when it's a file or not exsist.
+    // does not error, when it's a file or not exist.
     virtual bool isDirectory(const PathT& relPath, VirtualDirectory::Enum dir) const X_ABSTRACT;
     virtual bool isDirectoryOS(const PathWT& osPath) const X_ABSTRACT;
 
@@ -1284,7 +1284,7 @@ public:
         }
     }
 
-    X_INLINE bool findfirst(const IFileSys::PathT& path)
+    X_INLINE bool findFirst(const IFileSys::PathT& path)
     {
         fp_ = pFileSys_->findFirst(path, fd_);
         return fp_.handle != core::IFileSys::INVALID_FIND_HANDLE;
@@ -1293,7 +1293,7 @@ public:
     X_INLINE bool findNext(void)
     {
         X_ASSERT(fp_.handle != core::IFileSys::INVALID_FIND_HANDLE, "handle is invalid")();
-        return pFileSys_->findnext(fp_.handle, fd_);
+        return pFileSys_->findNext(fp_.handle, fd_);
     }
 
     X_INLINE core::IFileSys::FindData& fileData(void)

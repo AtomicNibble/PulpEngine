@@ -305,7 +305,7 @@ X_INLINE void XTextureFile::setWidth(const uint16_t width)
     size_.x = width;
 }
 
-X_INLINE void XTextureFile::setHeigth(const uint16_t height)
+X_INLINE void XTextureFile::setHeight(const uint16_t height)
 {
     size_.y = height;
 }

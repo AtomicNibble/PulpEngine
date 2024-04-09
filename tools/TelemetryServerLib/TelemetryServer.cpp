@@ -130,12 +130,12 @@ void ClientConnection::processNetPacketJob(core::V2::JobSystem& jobSys, size_t t
             }
 
             if (hdr.dataSize > MAX_PACKET_SIZE) {
-                X_ERROR("TelemSrv", "Client sent oversied packet of size %i...", static_cast<int32_t>(hdr.dataSize));
+                X_ERROR("TelemSrv", "Client sent oversized packet of size %i...", static_cast<int32_t>(hdr.dataSize));
                 break;
             }
 
             if (hdr.dataSize > ringSize) {
-                // we don't have enougth data to process yet.
+                // we don't have enough data to process yet.
                 io_.pJob_ = nullptr;
 
                 if (io_.closed) {
@@ -334,7 +334,7 @@ bool ClientConnection::handleConnectionRequest(uint8_t* pData)
     trace.dbPath = dbPath;
     trace.hostName.assign(host_.begin(), host_.end());
 
-    // open a trace stream for the conneciton.
+    // open a trace stream for the connection.
     auto& strm = traceBuilder_;
     if (!strm.createDB(dbPath)) {
         return false;
@@ -572,7 +572,7 @@ void ClientConnection::registerPDB(const DataPacketPDBInfo* pInfo)
     });
 
     if (it != pdbData_.end()) {
-        X_ERROR("TelemSrv", "Recived multiple PDB info blocks for module at addr: %" PRIx64, pInfo->modAddr);
+        X_ERROR("TelemSrv", "Received multiple PDB info blocks for module at addr: %" PRIx64, pInfo->modAddr);
         return;
     }
 
@@ -618,9 +618,9 @@ void ClientConnection::requestMissingPDB(const DataPacketCallStack* pData)
         // Okay so now we see if we can just resolve the PDB.
         // which means checking the PDB paths and maybe even checking a server?
         // then finally we ask the client to send it us.
-        // now this will invole IO operations so maybe something that should
+        // now this will invoke IO operations so maybe something that should
         // be done in the background.
-        // but one problem is that if we don't ask the client soon enougth it might go away.
+        // but one problem is that if we don't ask the client soon enough it might go away.
         // rip.
         core::Path<> path("symbols/");
         path.append(pdb.path.fileName());
@@ -628,7 +628,7 @@ void ClientConnection::requestMissingPDB(const DataPacketCallStack* pData)
         path.append(pdb.path.fileName());
 
         if (gEnv->pFileSys->fileExists(path)) {
-            pdb.status = PDBData::Status::Exsists;
+            pdb.status = PDBData::Status::Exists;
             continue;
         }
 
@@ -657,7 +657,7 @@ void ClientConnection::requestMissingPDB(const DataPacketCallStack* pData)
 int32_t ClientConnection::handleDataPacketPDB(const DataPacketPDB* pData)
 {
     if (!core::bitUtil::IsBitFlagSet(traceBuilder_.traceInfo.connFlags, TtConnectionFlagStreamPDB)) {
-        X_ERROR("TelemSrv", "Recived PDB data while PDB streaming is not active");
+        X_ERROR("TelemSrv", "Received PDB data while PDB streaming is not active");
     }
 
     auto it = std::find_if(pdbData_.begin(), pdbData_.end(), [pData](const PDBData& pdb) {
@@ -665,7 +665,7 @@ int32_t ClientConnection::handleDataPacketPDB(const DataPacketPDB* pData)
     });
 
     if (it == pdbData_.end()) {
-        X_ERROR("TelemSrv", "Recived unexpected PDB for modAddr: %" PRIx64, pData->modAddr);
+        X_ERROR("TelemSrv", "Received unexpected PDB for modAddr: %" PRIx64, pData->modAddr);
         X_ASSERT_UNREACHABLE();
         return sizeof(*pData);
     }
@@ -705,7 +705,7 @@ int32_t ClientConnection::handleDataPacketPDB(const DataPacketPDB* pData)
 int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pData)
 {
     if (!core::bitUtil::IsBitFlagSet(traceBuilder_.traceInfo.connFlags, TtConnectionFlagStreamPDB)) {
-        X_ERROR("TelemSrv", "Recived PDB block while PDB streaming is not active");
+        X_ERROR("TelemSrv", "Received PDB block while PDB streaming is not active");
     }
 
     const int32_t totalSize = sizeof(*pData) + pData->blockSize;
@@ -715,7 +715,7 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
     });
 
     if (it == pdbData_.end()) {
-        X_ERROR("TelemSrv", "Recived unexpected PDB data for modAddr: %" PRIx64, pData->modAddr);
+        X_ERROR("TelemSrv", "Received unexpected PDB data for modAddr: %" PRIx64, pData->modAddr);
         X_ASSERT_UNREACHABLE();
         return totalSize;
     }
@@ -725,7 +725,7 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
     if (pData->blockSize == 0) {
         // There was a issue in the runtime reading the data.
         // TODO: cleanup..
-        X_ERROR("TelemSrv", "Recived empty block");
+        X_ERROR("TelemSrv", "Received empty block");
         return totalSize;
     }
 
@@ -755,7 +755,7 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
     }
 
     if (bytesWrriten >= pdb.fileSize) {
-        X_ASSERT(bytesWrriten == pdb.fileSize, "Recived too many bytes")(bytesWrriten, pdb.fileSize);
+        X_ASSERT(bytesWrriten == pdb.fileSize, "Received too many bytes")(bytesWrriten, pdb.fileSize);
         X_ASSERT(pdb.op.has_value(), "Async op has no value")(pdb.op.has_value());
 
         const bool valid = bytesWrriten == pdb.fileSize;
@@ -806,7 +806,7 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
                 X_ERROR("TelemSrv", "Failed to cleanup tmp PDB folder. Path: %s", oldFolder.c_str());
             }
 
-            pdb.status = PDBData::Status::Exsists;
+            pdb.status = PDBData::Status::Exists;
         }
         else {
             pdb.status = PDBData::Status::Error;
@@ -820,7 +820,7 @@ int32_t ClientConnection::handleDataPacketPDBBlock(const DataPacketPDBBlock* pDa
 int32_t ClientConnection::handleDataPacketPDBError(const DataPacketPDBError* pData)
 {
     if (!core::bitUtil::IsBitFlagSet(traceBuilder_.traceInfo.connFlags, TtConnectionFlagStreamPDB)) {
-        X_ERROR("TelemSrv", "Recived PDB error while PDB streaming is not active");
+        X_ERROR("TelemSrv", "Received PDB error while PDB streaming is not active");
     }
 
     auto it = std::find_if(pdbData_.begin(), pdbData_.end(), [pData](const PDBData& pdb) {
@@ -828,14 +828,14 @@ int32_t ClientConnection::handleDataPacketPDBError(const DataPacketPDBError* pDa
     });
 
     if (it == pdbData_.end()) {
-        X_ERROR("TelemSrv", "Recived unexpected PDB error for modAddr: %" PRIx64, pData->modAddr);
+        X_ERROR("TelemSrv", "Received unexpected PDB error for modAddr: %" PRIx64, pData->modAddr);
         X_ASSERT_UNREACHABLE();
         return sizeof(*pData);
     }
 
     auto& pdb = *it;
 
-    X_ERROR("TelemSrv", "Client rumtine encounterd a error while sending PDB for modAddr: %" PRIx64, pData->modAddr);
+    X_ERROR("TelemSrv", "Client runtime encountered a error while sending PDB for modAddr: %" PRIx64, pData->modAddr);
 
     // cancel it..
     if (pdb.op) {
@@ -942,7 +942,7 @@ bool ClientConnection::handleOpenTrace(uint8_t* pData)
     }
 
     core::Guid::GuidStr guidStr;
-    X_LOG0("TelemSrv", "Recived trace open request for: \"%s\"", pHdr->guid.toString(guidStr));
+    X_LOG0("TelemSrv", "Received trace open request for: \"%s\"", pHdr->guid.toString(guidStr));
 
     OpenTraceResp otr;
     otr.dataSize = sizeof(otr);
@@ -2235,7 +2235,7 @@ bool TraceDB::getStats(sql::SqlLiteDb& db, TraceStats& stats)
 
 
     {
-        // simular performance.
+        // similar performance.
         // SELECT * FROM zones WHERE _rowid_ = (SELECT MAX(_rowid_) FROM zones);
         // SELECT * FROM zones ORDER BY Id DESC LIMIT 1;
         //sql::SqlLiteQuery qry(db, "SELECT * FROM zones WHERE _rowid_ = (SELECT MAX(_rowid_) FROM zones)");
@@ -2729,7 +2729,7 @@ int32_t TraceBuilder::handleDataPacketStringTableAdd(const DataPacketStringTable
     core::string_view str(pString, pData->length);
 
     // Ah we have a problem in that if you don't have string pooling on.
-    // we end up with matching strings here that have diffrent pData->id.
+    // we end up with matching strings here that have different pData->id.
     // so we just need to make the other instances point at first one
 
     auto it = stringMap.find(str);
@@ -2742,7 +2742,7 @@ int32_t TraceBuilder::handleDataPacketStringTableAdd(const DataPacketStringTable
         indexMap[pData->id] = { idx, core::string(str.begin(), str.length()) };
 
         // log warning.
-        X_WARNING_EVERY_N(10, "TelemSrv", "Recived duplicate string \"%.*s\" check string pooling is on", str.length(), str.data());
+        X_WARNING_EVERY_N(10, "TelemSrv", "Received duplicate string \"%.*s\" check string pooling is on", str.length(), str.data());
     }
 
     return packetSize;
@@ -3189,7 +3189,7 @@ bool Server::loadApps()
             continue;
         }
 
-    } while (pFileSys->findnext(findPair.handle, fd));
+    } while (pFileSys->findNext(findPair.handle, fd));
 
     pFileSys->findClose(findPair.handle);
     return true;
@@ -3261,7 +3261,7 @@ bool Server::loadAppTraces(core::string_view appName, const core::Path<>& dir)
 
         app.traces.append(trace);
 
-    } while (pFileSys->findnext(findPair.handle, fd));
+    } while (pFileSys->findNext(findPair.handle, fd));
 
     pFileSys->findClose(findPair.handle);
 
@@ -3495,7 +3495,7 @@ void Server::readfromIOCPJob(core::V2::JobSystem& jobSys, size_t threadIdx, core
             // a thread needs to process it.
             // ideally it's a job so that N threads can handle X clients.
             // maybe we just make a job if not one already?
-            // how to prvent a race tho.
+            // how to prevent a race tho.
 
             size_t freeSpace = 0;
 
@@ -3641,7 +3641,7 @@ bool Server::sendAppList(ClientConnection& client)
 void Server::handleQueryTraceInfo(ClientConnection& client, const QueryTraceInfo* pHdr)
 {
     core::Guid::GuidStr guidStr;
-    X_LOG0("TelemSrv", "Recived trace info request for: \"%s\"", pHdr->guid.toString(guidStr));
+    X_LOG0("TelemSrv", "Received trace info request for: \"%s\"", pHdr->guid.toString(guidStr));
 
     core::CriticalSection::ScopedLock lock(cs_);
 

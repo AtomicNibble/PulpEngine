@@ -273,16 +273,16 @@ namespace V2
     X_INLINE void JobSystem::AddContinuation(Job* ancestor, Job* continuation, bool runInline)
     {
         const int32_t count = (atomic::Increment(&ancestor->continuationCount) - 1);
-        X_ASSERT(count < Job::MAX_CONTINUATIONS, "Can't add conitnation, list is full")(Job::MAX_CONTINUATIONS, count);
+        X_ASSERT(count < Job::MAX_CONTINUATIONS, "Can't add continuation, list is full")(Job::MAX_CONTINUATIONS, count);
 
-        X_ASSERT(continuation->pParent != ancestor, "Contination can't have ancestor as parent")();
+        X_ASSERT(continuation->pParent != ancestor, "continuation can't have ancestor as parent")();
 
 #if X_ENABLE_JOBSYS_PARENT_CHECK
         // lets check all the way up to see if continuation is a child.
         {
             auto* pParent = continuation->pParent;
             while (pParent) {
-                X_ASSERT(pParent != ancestor, "Contination can't have ancestor as parent")();
+                X_ASSERT(pParent != ancestor, "continuation can't have ancestor as parent")();
                 pParent = pParent->pParent;
             }
         }
@@ -318,9 +318,9 @@ namespace V2
         return CreateJob(EmptyJob, nullptr JOB_SYS_SUB_PASS(subSystem));
     }
 
-    X_INLINE Job* JobSystem::CreateEmtpyJobAsChild(Job* pPaerent JOB_SYS_SUB_PARAM)
+    X_INLINE Job* JobSystem::CreateEmtpyJobAsChild(Job* pParent JOB_SYS_SUB_PARAM)
     {
-        return CreateJobAsChild(pPaerent, EmptyJob, nullptr JOB_SYS_SUB_PASS(subSystem));
+        return CreateJobAsChild(pParent, EmptyJob, nullptr JOB_SYS_SUB_PASS(subSystem));
     }
 
     X_INLINE void JobSystem::RunAndWait(Job* pJob)

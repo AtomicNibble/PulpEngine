@@ -303,7 +303,6 @@ bool Linker::AddAssetList(core::Path<char>& inputFile)
     auto& dirs = assetList.getDirList();
     for (const auto& dir : dirs)
     {
-        // want to just add load of fooking files!
         assetDb::AssetDB::Mod mod;
         if (!db_.GetModInfo(db_.GetCurrentModId(), mod)) {
             X_ERROR("Linker", "Failed to get mod info");
@@ -379,7 +378,7 @@ bool Linker::AddAssetDir(const DirEntry& dir, const core::Path<>& relPath, const
 
         ++numAdded;
 
-    } while (pFileSys->findnext(findPair.handle, fd));
+    } while (pFileSys->findNext(findPair.handle, fd));
 
     pFileSys->findClose(findPair.handle);
     return true;

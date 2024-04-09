@@ -194,7 +194,7 @@ namespace shader
         }
 
         if (customDefines_.isNotEmpty()) {
-            // need to split them into defins.
+            // need to split them into defines.
             core::StringRange<char> token(nullptr, nullptr);
             core::StringTokenizer<char> tokens(customDefines_.begin(), customDefines_.end(), ',');
             while (tokens.extractToken(token)) {
@@ -276,7 +276,7 @@ namespace shader
             hr = D3DStripShader(
                 blob->GetBufferPointer(),
                 blob->GetBufferSize(),
-                D3DCOMPILER_STRIP_ROOT_SIGNATURE | // you silly slut.
+                D3DCOMPILER_STRIP_ROOT_SIGNATURE |
                 D3DCOMPILER_STRIP_REFLECTION_DATA | D3DCOMPILER_STRIP_TEST_BLOBS,
                 &strippedBlob);
 

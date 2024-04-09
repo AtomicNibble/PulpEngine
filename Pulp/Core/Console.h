@@ -28,7 +28,7 @@ X_ENABLE_WARNING(4702)
 #include <Memory\AllocationPolicies\PoolAllocator.h>
 
 X_NAMESPACE_DECLARE(engine,
-                    class IPrimativeContext);
+                    class IPrimitiveContext);
 
 X_NAMESPACE_BEGIN(core)
 
@@ -211,7 +211,7 @@ public:
     int32_t getLineCount(void) const X_FINAL;
 
     X_INLINE void showConsole(consoleState::Enum state);
-    X_INLINE bool isVisable(void) const;
+    X_INLINE bool isVisible(void) const;
     X_INLINE bool isExpanded(void) const;
     X_INLINE void toggleConsole(bool expand);
 
@@ -354,7 +354,7 @@ private:
     ICore* pCore_;
     font::IFont* pFont_;
     render::IRender* pRender_;
-    engine::IPrimativeContext* pPrimContext_;
+    engine::IPrimitiveContext* pPrimContext_;
 
     Cursor cursor_;
 

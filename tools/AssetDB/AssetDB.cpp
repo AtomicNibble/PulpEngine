@@ -123,10 +123,10 @@ bool AssetDB::OpenDB(void)
 
     dbPath.append(DB_NAME);
 
-    const bool dbExsists = gEnv->pFileSys->fileExists(dbPath, virDir);
+    const bool dbExists = gEnv->pFileSys->fileExists(dbPath, virDir);
 
-    if (!dbExsists) {
-        X_WARNING("AssetDB", "Failed to find exsisting asset_db creating a new one");
+    if (!dbExists) {
+        X_WARNING("AssetDB", "Failed to find existing asset_db creating a new one");
     }
 
     // I need multi threaded mode when asset db is inside AssetManager
@@ -136,7 +136,7 @@ bool AssetDB::OpenDB(void)
         return false;
     }
 
-    if (dbExsists) {
+    if (dbExists) {
         if (!getDBVersion(dbVersion_)) {
             return false;
         }
@@ -225,7 +225,7 @@ bool AssetDB::CreateTables(void)
 
     if (!db_.execute("CREATE TABLE IF NOT EXISTS file_ids ("
                      "file_id INTEGER PRIMARY KEY,"
-                     "name TEXT COLLATE NOCASE NOT NULL," // names are not unique since we allow same name for diffrent type.
+                     "name TEXT COLLATE NOCASE NOT NULL," // names are not unique since we allow same name for different type.
                      "nameHash INTEGER NOT NULL,"
                      "type INTEGER NOT NULL,"
                      "args TEXT,"
@@ -315,10 +315,10 @@ bool AssetDB::AddDefaultMods(void)
     core::string core("core");
     core::string base("base");
 
-    if (!ModExsists(core)) {
+    if (!ModExists(core)) {
         AddMod(core, core::Path<char>("core_assets"));
     }
-    if (!ModExsists(base)) {
+    if (!ModExists(base)) {
         AddMod(base, core::Path<char>("base"));
     }
 
@@ -330,7 +330,7 @@ bool AssetDB::AddDefaultProfiles(void)
     core::string dev("dev");
     core::string release("release");
 
-    if (!ProfileExsists(dev)) {
+    if (!ProfileExists(dev)) {
         AddProfile(dev, core::string(R"(
 {
     "img": {
@@ -340,7 +340,7 @@ bool AssetDB::AddDefaultProfiles(void)
 )"), 0);
     }
 
-    if (!ProfileExsists(release)) {
+    if (!ProfileExists(release)) {
         AddProfile(release, core::string(R"(
 {
     "img": {
@@ -369,7 +369,7 @@ bool AssetDB::PerformMigrations(void)
     }
 
     if (dbVersion_ < 1) {
-        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 1", dbVersion_);
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to version 1", dbVersion_);
         // perform upgrades from 0 to 1.
         // must iterate all raw files and rename on disk.
         // there is no DB updates required.
@@ -413,7 +413,7 @@ bool AssetDB::PerformMigrations(void)
     }
 
     if (dbVersion_ < 2) {
-        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 2", dbVersion_);
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to version 2", dbVersion_);
 
         using core::Compression::Algo;
 
@@ -490,7 +490,7 @@ bool AssetDB::PerformMigrations(void)
     }
 
     if (dbVersion_ < 3) {
-        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 3", dbVersion_);
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to version 3", dbVersion_);
 
         sql::SqlLiteQuery qry(db_, "SELECT file_id FROM raw_files");
 
@@ -608,7 +608,7 @@ bool AssetDB::PerformMigrations(void)
     }
 
     if (dbVersion_ < 4) {
-        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 4", dbVersion_);
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to version 4", dbVersion_);
 
         // for each thumb load the file caclculate new hash update db and move file on disk.
         sql::SqlLiteQuery qry(db_, "SELECT thumb_id, hash FROM thumbs");
@@ -704,7 +704,7 @@ bool AssetDB::PerformMigrations(void)
     }
 
     if (dbVersion_ < 5) {
-        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 5", dbVersion_);
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to version 5", dbVersion_);
 
         if (!db_.execute("PRAGMA foreign_keys = OFF;")) {
             X_ERROR("AssetDB", "Failed to disable foreign_keys for migrations");
@@ -767,7 +767,7 @@ bool AssetDB::PerformMigrations(void)
     }
 
     if (dbVersion_ < 6) {
-        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 6", dbVersion_);
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to version 6", dbVersion_);
 
         // update all the raw_file data hashes.
         {
@@ -889,7 +889,7 @@ bool AssetDB::PerformMigrations(void)
     }
 
     if (dbVersion_ < 7) {
-        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 7", dbVersion_);
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to version 7", dbVersion_);
 
         if (!db_.execute("PRAGMA foreign_keys = OFF;")) {
             X_ERROR("AssetDB", "Failed to disable foreign_keys for migrations");
@@ -934,7 +934,7 @@ bool AssetDB::PerformMigrations(void)
     }
 
     if (dbVersion_ < 8) {
-        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 8", dbVersion_);
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to version 8", dbVersion_);
 
         if (!db_.execute("PRAGMA foreign_keys = OFF;")) {
             X_ERROR("AssetDB", "Failed to disable foreign_keys for migrations");
@@ -997,13 +997,13 @@ bool AssetDB::PerformMigrations(void)
     }
 
     if (dbVersion_ < 9) {
-        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 9", dbVersion_);
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to version 9", dbVersion_);
 
         // just code changes.
     }
 
     if (dbVersion_ < 10) {
-        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 10", dbVersion_);
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to version 10", dbVersion_);
 
         if (!db_.execute("PRAGMA foreign_keys = OFF;")) {
             X_ERROR("AssetDB", "Failed to disable foreign_keys for migrations");
@@ -1042,7 +1042,7 @@ bool AssetDB::PerformMigrations(void)
     }
 
     if (dbVersion_ < 11) {
-        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 11", dbVersion_);
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to version 11", dbVersion_);
 
         if (!db_.execute("PRAGMA foreign_keys = OFF;")) {
             X_ERROR("AssetDB", "Failed to disable foreign_keys for migrations");
@@ -1079,7 +1079,7 @@ bool AssetDB::PerformMigrations(void)
 
     if (dbVersion_ < 12)
     {
-        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 12", dbVersion_);
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to version 12", dbVersion_);
 
         if (!db_.execute("PRAGMA foreign_keys = OFF;")) {
             X_ERROR("AssetDB", "Failed to disable foreign_keys for migrations");
@@ -1152,7 +1152,7 @@ bool AssetDB::PerformMigrations(void)
     }
 
     if (dbVersion_ < 13) {
-        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 13", dbVersion_);
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to version 13", dbVersion_);
 
         sql::SqlLiteTransaction trans(db_);
         sql::SqlLiteQuery qry(db_, "SELECT id, path FROM raw_files");
@@ -1716,7 +1716,7 @@ AssetDB::Result::Enum AssetDB::AddProfile(const core::string& name, const core::
         return Result::ERROR;
     }
 
-    if (ProfileExsists(name)) {
+    if (ProfileExists(name)) {
         X_ERROR("AssetDB", "Profile with name \"%s\" already exists", name.c_str());
         return Result::NAME_TAKEN;
     }
@@ -1736,7 +1736,7 @@ AssetDB::Result::Enum AssetDB::AddProfile(const core::string& name, const core::
     return Result::OK;
 }
 
-bool AssetDB::ProfileExsists(const core::string& name, ProfileId* pProfileId)
+bool AssetDB::ProfileExists(const core::string& name, ProfileId* pProfileId)
 {
     sql::SqlLiteQuery qry(db_, "SELECT profile_id FROM conversion_profiles WHERE name = ?");
     qry.bind(1, name.data(), name.length());
@@ -1755,8 +1755,8 @@ bool AssetDB::ProfileExsists(const core::string& name, ProfileId* pProfileId)
 
 bool AssetDB::SetProfileData(const core::string& name, const core::string& data)
 {
-    if (!ProfileExsists(name)) {
-        X_ERROR("AssetDB", "Failed to set profile data, profile \"%s\" don't exsist", name.c_str());
+    if (!ProfileExists(name)) {
+        X_ERROR("AssetDB", "Failed to set profile data, profile \"%s\" don't exist", name.c_str());
         return false;
     }
 
@@ -1789,7 +1789,7 @@ bool AssetDB::GetProfileData(const core::string& name, core::string& dataOut, in
         return true;
     }
 
-    X_ERROR("AssetDB", "Failed to get profile data, profile \"%s\" don't exsist", name.c_str());
+    X_ERROR("AssetDB", "Failed to get profile data, profile \"%s\" don't exist", name.c_str());
     return false;
 }
 
@@ -1806,7 +1806,7 @@ AssetDB::Result::Enum AssetDB::AddMod(const core::string& name, const core::Path
         return Result::ERROR;
     }
 
-    if (ModExsists(name)) {
+    if (ModExists(name)) {
         X_ERROR("AssetDB", "Mod with name \"%s\" already exists", name.c_str());
         return Result::NAME_TAKEN;
     }
@@ -1844,7 +1844,7 @@ bool AssetDB::SetMod(const core::string& name)
         return true;
     }
 
-    X_ERROR("AssetDB", "Failed to set mod no mod called \"%s\" exsists", name.c_str());
+    X_ERROR("AssetDB", "Failed to set mod no mod called \"%s\" exists", name.c_str());
     return false;
 }
 
@@ -1867,7 +1867,7 @@ bool AssetDB::SetMod(ModId id)
     return false;
 }
 
-bool AssetDB::ModExsists(const core::string& name, ModId* pModId)
+bool AssetDB::ModExists(const core::string& name, ModId* pModId)
 {
     sql::SqlLiteQuery qry(db_, "SELECT mod_id FROM mods WHERE name = ?");
     qry.bind(1, name.data(), name.length());
@@ -1887,8 +1887,8 @@ bool AssetDB::ModExsists(const core::string& name, ModId* pModId)
 bool AssetDB::SetModPath(const core::string& name, const core::Path<char>& outDir)
 {
     ModId id;
-    if (!ModExsists(name, &id)) {
-        X_ERROR("AssetDB", "Failed to set mod id, mod \"%s\" don't exsist", name.c_str());
+    if (!ModExists(name, &id)) {
+        X_ERROR("AssetDB", "Failed to set mod id, mod \"%s\" don't exist", name.c_str());
         return false;
     }
 
@@ -1915,7 +1915,7 @@ AssetDB::ModId AssetDB::GetModId(const core::string& name)
 {
     ModId id;
 
-    if (!ModExsists(name, &id)) {
+    if (!ModExists(name, &id)) {
         // tut tut!
         X_ERROR("AssetDB", "Mod \"%s\" is not a valid mod name", name.c_str());
         return INVALID_MOD_ID;
@@ -2288,7 +2288,7 @@ AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, Mo
         return Result::ERROR;
     }
 
-    // previously I would not check if asset already exsist, and let the unique constraint fail.
+    // previously I would not check if asset already exist, and let the unique constraint fail.
     // but I error for that, in my sql. so this is more cleaner.
     if (AssetExists(type, name)) {
         return Result::NAME_TAKEN;
@@ -2531,11 +2531,11 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
     if (!AssetExists(type, name, &assetId)) {
         // add it?
         if (AddAsset(type, name, &assetId) != Result::OK) {
-            X_ERROR("AssetDB", "Failed to add assert when trying to update a asset that did not exsists.");
+            X_ERROR("AssetDB", "Failed to add assert when trying to update a asset that did not exists.");
             return Result::NOT_FOUND;
         }
 
-        X_WARNING("AssetDB", "Added asset to db as it didnt exists when trying to update the asset");
+        X_WARNING("AssetDB", "Added asset to db as it didn't exists when trying to update the asset");
     }
 
     X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")(); 
@@ -2610,7 +2610,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 
     DataArr compressed(data.getArena());
     if (!compressor->deflate(data.getArena(), data, compressed, lvl)) {
-        X_ERROR("AssetDB", "Failed to defalte raw file data");
+        X_ERROR("AssetDB", "Failed to deflate raw file data");
         return Result::ERROR;
     }
     else {
@@ -2619,7 +2619,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 
         core::HumanSize::Str sizeStr, sizeStr2;
         core::HumanDuration::Str durStr;
-        X_LOG2("AssetDB", "Defalated raw file %s -> %s(%.2f%%) ^6%s",
+        X_LOG2("AssetDB", "Deflated raw file %s -> %s(%.2f%%) ^6%s",
             core::HumanSize::toString(sizeStr, data.size()),
             core::HumanSize::toString(sizeStr2, compressed.size()),
             percentageSize,
@@ -2658,11 +2658,11 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
     if (!AssetExists(type, name, &assetId)) {
         // add it?
         if (AddAsset(type, name, &assetId) != Result::OK) {
-            X_ERROR("AssetDB", "Failed to add assert when trying to update a asset that did not exsists.");
+            X_ERROR("AssetDB", "Failed to add assert when trying to update a asset that did not exists.");
             return Result::NOT_FOUND;
         }
 
-        X_WARNING("AssetDB", "Added asset to db as it didnt exists when trying to update the asset");
+        X_WARNING("AssetDB", "Added asset to db as it didn't exists when trying to update the asset");
     }
 
     X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")(); 
@@ -2852,7 +2852,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
     core::StopWatch timer;
 
     if (!DeflateBuffer(g_AssetDBArena, data, compressed, algo, lvl)) {
-        X_ERROR("AssetDB", "Failed to defalte thumb data");
+        X_ERROR("AssetDB", "Failed to deflate thumb data");
         return Result::ERROR;
     }
 
@@ -2862,7 +2862,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
     core::HumanSize::Str sizeStr, sizeStr2;
     core::HumanDuration::Str durStr;
 
-    X_LOG2("AssetDB", "Defalated thumb %s -> %s(%.2f%%) %gms",
+    X_LOG2("AssetDB", "Deflated thumb %s -> %s(%.2f%%) %gms",
         core::HumanSize::toString(sizeStr, data.size()),
         core::HumanSize::toString(sizeStr2, compressed.size()),
         percentageSize,
@@ -2926,7 +2926,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
         filePath.toLower();
         filePath /= hash.ToString(strBuf);
 
-        // if a thumb with same md5 exsists don't update.
+        // if a thumb with same md5 exists don't update.
         // now we wait for a collsion, (that we notice) before this code needs updating :D
         if (!gEnv->pFileSys->fileExists(filePath, virDir)) {
             if (!gEnv->pFileSys->createDirectoryTree(filePath, virDir)) {
@@ -3670,7 +3670,7 @@ AssetDB::Result::Enum AssetDB::SetAssetParent(AssetId assetId, AssetId parentAss
         }
 
         if (type != parentType) {
-            X_ERROR("AssetDB", "Failed to set asset %" PRIi32 " parent, the parent is a diffrent asset type: %s -> %s",
+            X_ERROR("AssetDB", "Failed to set asset %" PRIi32 " parent, the parent is a different asset type: %s -> %s",
                 assetId, AssetType::ToString(type), AssetType::ToString(parentType));
             return Result::ERROR;
         }

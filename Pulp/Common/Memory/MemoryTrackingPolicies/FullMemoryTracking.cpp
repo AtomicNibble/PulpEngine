@@ -110,7 +110,7 @@ FullMemoryTracking::~FullMemoryTracking(void)
     }
 }
 
-/// Stores the allocation along with additional data and a call stack in a hash map.
+// Stores the allocation along with additional data and a call stack in a hash map.
 void FullMemoryTracking::OnAllocation(void* memory, size_t originalSize, size_t internalSize,
     size_t alignment, size_t offset X_MEM_HUMAN_IDS_CB(const char* ID) X_MEM_HUMAN_IDS_CB(const char* typeName) X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), const char* memoryArenaName)
 {
@@ -128,7 +128,7 @@ void FullMemoryTracking::OnAllocation(void* memory, size_t originalSize, size_t 
             CallStack(1))));
 }
 
-/// Removes the allocation data from a hash map.
+// Removes the allocation data from a hash map.
 void FullMemoryTracking::OnDeallocation(void* memory)
 {
     numAllocations_--;

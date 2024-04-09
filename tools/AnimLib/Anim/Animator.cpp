@@ -2,7 +2,7 @@
 #include "Animator.h"
 
 #include <Time\TimeLiterals.h>
-#include <IPrimativeContext.h>
+#include <IPrimitiveContext.h>
 #include <IFont.h>
 
 #include "Anim.h"
@@ -579,7 +579,7 @@ bool Animator::getBoneTransform(model::BoneHandle handle, core::TimeVal currentT
     return true;
 }
 
-void Animator::renderInfo(core::TimeVal currentTime, const Vec3f& pos, const Matrix33f& mat, engine::IPrimativeContext* pPrimContex) const
+void Animator::renderInfo(core::TimeVal currentTime, const Vec3f& pos, const Matrix33f& mat, engine::IPrimitiveContext* pPrimContex) const
 {
     core::StackString512 txt;
 

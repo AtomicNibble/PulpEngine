@@ -45,7 +45,7 @@ protected:
 };
 
 // a compressed time stamp.
-// can store time time with 2 second percision
+// can store time time with 2 second precision
 // hour:min:second
 // 24:60:32
 // bits: | hour(5) |  min(6) | sec(5) | = 16

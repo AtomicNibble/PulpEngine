@@ -361,7 +361,7 @@ X_INLINE void Quat<T>::set(const Matrix33<T>& m)
 template<typename T>
 X_INLINE void Quat<T>::set(const Matrix34<T>& m)
 {
-    /// same as above
+    // same as above
     T trace = m.trace();
     if (trace > (T)0.0) {
         T s = math<T>::sqrt(trace + (T)1.0);

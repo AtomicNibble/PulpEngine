@@ -68,13 +68,6 @@
 #define X_PP_DECREMENT_62 61
 #define X_PP_DECREMENT_63 62
 
-/// \def X_PP_DECREMENT
-/// \ingroup Preprocessor
-/// \brief Decrements the given argument by one.
-/// \code
-///   // outputs 49
-///   X_PP_DECREMENT(50)
-/// \endcode
 #define X_PP_DECREMENT(n) X_PP_JOIN_2(X_PP_DECREMENT_, n)
 
 #endif // X_PREPROCESSORDECREMENT_H_

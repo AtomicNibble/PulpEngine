@@ -21,10 +21,10 @@ X_NAMESPACE_BEGIN(anim)
 //	for the tag with a name at index 5 it's data is at index 5 of the tag data.
 //
 //	Animation data is relative to bone positions.
-//	So requires the default pose skelton to compile against.
+//	So requires the default pose skeleton to compile against.
 //
 //	Tag Data:
-//		The amount of frames we have data for is diffrent for pos / angle.
+//		The amount of frames we have data for is different for pos / angle.
 //		Meaning a tag can have full frame position data but part frame angles data
 //		If we have data for every frame, we don't store frame indexs.
 //		Angle data comes first then position data.
@@ -36,7 +36,7 @@ X_NAMESPACE_BEGIN(anim)
 //	Angles:
 //		Angles are compressed Quatanions with the w dropped.
 //		So angles become 3 16bit ints.
-//		Optionaly a tag can be defined as having only z rotation.
+//		Optionally a tag can be defined as having only z rotation.
 //		Meaning for that tag there is only one 16bit int per angle.
 //
 //	Positions:
@@ -64,7 +64,7 @@ static const uint32_t ANIM_MIN_FPS = 1;
 static const uint32_t ANIM_MAX_FPS = 90;
 static const uint32_t ANIM_MAX_NOTES = 255;
 static const uint32_t ANIM_MAX_NOTES_PER_FRAME = 8;
-static const uint32_t ANIM_MAX_NOTE_NAME_LENGTH = 48; // the max lengt of each notes name
+static const uint32_t ANIM_MAX_NOTE_NAME_LENGTH = 48; // the max length of each notes name
 static const uint32_t ANIM_MAX_NAME_LENGTH = 60;
 static const char* ANIM_FILE_EXTENSION = "anim";
 static const wchar_t* ANIM_FILE_EXTENSION_W = L"anim";
@@ -73,7 +73,7 @@ static const uint32_t ANIM_MAX_LOADED = 1 << 10;
 
 // Intermidiate format stuff.
 // this is used for saving out animation data that is not relative.
-// It's then later processed against a skelton to creat a anim.
+// It's then later processed against a skeleton to creat a anim.
 // This also allows other tools to export anims since the inter format is text based.
 static const uint32_t ANIM_INTER_VERSION = 2;
 static const char* ANIM_INTER_FILE_EXTENSION = "anim_inter";

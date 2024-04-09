@@ -66,7 +66,7 @@ const char* DelayLoadHook::getPhysxName(const char* pRequestedName)
     const char* pNameEnd = pRequestedName + core::strUtil::strlen(pRequestedName);
 
     // the order of these is important.
-    // anything that is a substring of anotehr should come later.
+    // anything that is a substring of another should come later.
     if (core::strUtil::Find(pRequestedName, pNameEnd, "PhysXCharacterKinematic") == pRequestedName) {
         return createNameForConfig("PhysXCharacterKinematic", dllNames_[NameBuffer::PhysxCharacterKinematic]);
     }
@@ -87,7 +87,7 @@ const char* DelayLoadHook::getPhysxName(const char* pRequestedName)
 
 const char* DelayLoadHook::createNameForConfig(const char* pPrefix, core::Path<char>& buffer)
 {
-    X_ASSERT(config_ != Config::Normal, "Create config name should only be called when overiding")();
+    X_ASSERT(config_ != Config::Normal, "Create config name should only be called when overriding")();
 
     buffer.clear();
     buffer.append(pPrefix);

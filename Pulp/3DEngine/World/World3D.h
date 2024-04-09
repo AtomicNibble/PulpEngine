@@ -21,8 +21,8 @@ namespace fx
     class Emitter;
 } // namespace fx
 
-class IPrimativeContext;
-class PrimativeContext;
+class IPrimitiveContext;
+class PrimitiveContext;
 
 class DrawVars;
 
@@ -213,12 +213,12 @@ class World3D : public IWorld3D
     };
 
 public:
-    World3D(DrawVars& vars, engine::PrimativeContext* pPrimContex, CBufferManager* pCBufMan,
+    World3D(DrawVars& vars, engine::PrimitiveContext* pPrimContex, CBufferManager* pCBufMan,
         physics::IScene* pPhysScene, core::MemoryArenaBase* arena);
     virtual ~World3D() X_FINAL;
 
     void renderView(core::FrameData& frame, render::CommandBucket<uint32_t>& bucket);
-    void renderEmitters(core::FrameData& frame, IPrimativeContext* pContext);
+    void renderEmitters(core::FrameData& frame, IPrimitiveContext* pContext);
 
     bool loadNodes(const level::FileHeader& fileHdr, level::StringTable& strTable, uint8_t* pData) X_FINAL;
     IRenderEnt* addRenderEnt(const RenderEntDesc& ent) X_FINAL;
@@ -305,7 +305,7 @@ private:
 private:
     core::MemoryArenaBase* arena_;
     physics::IScene* pPhysScene_;
-    engine::PrimativeContext* pPrimContex_;
+    engine::PrimitiveContext* pPrimContex_;
     CBufferManager* pCBufMan_;
 
     DrawVars& vars_;

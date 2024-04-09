@@ -40,7 +40,7 @@ public:
     // write bits to stream
     void writeBits(const Type* pBuf, size_type numBits);
 
-    // pads the stream to byte boundry before writing.
+    // pads the stream to byte boundary before writing.
     template<typename T>
     void writeAligned(const T& val);
     template<typename T>
@@ -67,7 +67,7 @@ public:
     // read bits from stream
     void readBits(Type* pBuf, size_type numBits);
 
-    // pads the stream to byte boundry before read.
+    // pads the stream to byte boundary before read.
     template<typename T>
     void readAligned(T& val);
     template<typename T>
@@ -76,15 +76,15 @@ public:
     void readAligned(Type* pBuf, size_type numBytes);
     void readBitsAligned(Type* pBuf, size_type numBits);
 
-    void alignWriteToByteBoundry(void);
-    void alignReadToByteBoundry(void);
+    void alignWriteToByteBoundary(void);
+    void alignReadToByteBoundary(void);
 
     // skips forwward in read pointer.
     void skipBytes(size_type numBytes);
     void skipBits(size_type numBits);
 
     // pads the bit stream until the stream length is equal to length.
-    // will not trucate.
+    // will not truncate.
     void zeroPadToLength(size_type numBytes);
 
     // clears the stream setting the cursor back to the start.

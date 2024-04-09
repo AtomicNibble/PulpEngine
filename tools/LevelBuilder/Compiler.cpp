@@ -290,7 +290,7 @@ bool Compiler::processWorldModel(LvlEntsArr& ents, LvlEntity& ent)
 
 bool Compiler::createAreasForPrimativates(LvlEntity& ent)
 {
-    X_LOG0("Lvl", "^5addEntsPrimativesToAreas");
+    X_LOG0("Lvl", "^5addEntsPrimitivesToAreas");
 
     if (ent.numAreas < 1) {
         X_ERROR("Lvl", "Ent has no areas");
@@ -306,7 +306,7 @@ bool Compiler::createAreasForPrimativates(LvlEntity& ent)
 
     for (size_t i = 0; i < ent.brushes.size(); i++) {
         LvlBrush& brush = ent.brushes[i];
-        // for each side that's visable.
+        // for each side that's visible.
 
         for (size_t j = 0; j < brush.sides.size(); j++) {
             LvlBrushSide& side = brush.sides[j];
@@ -320,7 +320,7 @@ bool Compiler::createAreasForPrimativates(LvlEntity& ent)
                 continue;
             }
 
-            // skip none visable materials.
+            // skip none visible materials.
             if (!pMaterial->isDrawn()) {
                 X_LOG1("Lvl", "Skipping visible face, material not drawn: \"%s\"", side.matInfo.name.c_str());
                 continue;

@@ -10,7 +10,7 @@
 
 #include <IFrameData.h>
 #include <I3DEngine.h>
-#include <IPrimativeContext.h>
+#include <IPrimitiveContext.h>
 #include <IFont.h>
 #include <IConsole.h>
 #include <IMaterial.h>
@@ -409,7 +409,7 @@ namespace profiler
 #endif // !X_ENABLE_JOBSYS_PROFILER
     }
 
-    Vec2f XProfileSys::Render(engine::IPrimativeContext* pPrim, Vec2f pos, 
+    Vec2f XProfileSys::Render(engine::IPrimitiveContext* pPrim, Vec2f pos, 
         const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys)
     {
         int32_t drawFlags = vars_.getProlfilerDrawFlags();
@@ -515,7 +515,7 @@ namespace profiler
         return pos;
     }
 
-    size_t RenderArenaTree_r(engine::IPrimativeContext* pPrim, font::TextDrawContext& ctx, Vec2f pos,
+    size_t RenderArenaTree_r(engine::IPrimitiveContext* pPrim, font::TextDrawContext& ctx, Vec2f pos,
         int32_t treeIndent, core::MemoryArenaBase* arena)
     {
         auto arenaStats = arena->getStatistics();
@@ -567,7 +567,7 @@ namespace profiler
 #endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
     };
 
-    Vec2f XProfileSys::RenderArenaTree(engine::IPrimativeContext* pPrim, Vec2f pos, core::MemoryArenaBase* arena)
+    Vec2f XProfileSys::RenderArenaTree(engine::IPrimitiveContext* pPrim, Vec2f pos, core::MemoryArenaBase* arena)
     {
         const float padding = 10;
         //	const float treeIndent = 10.f;
@@ -620,7 +620,7 @@ namespace profiler
         return Vec2f(0.f, 0.f);
     }
 
-    Vec2f XProfileSys::RenderStartupData(engine::IPrimativeContext* pPrim, Vec2f pos)
+    Vec2f XProfileSys::RenderStartupData(engine::IPrimitiveContext* pPrim, Vec2f pos)
     {
         size_t maxNickNameWidth = 0;
         for (size_t i = 0; i < profilerData_.size(); ++i) {
@@ -721,7 +721,7 @@ namespace profiler
         return Vec2f(width, height);
     }
 
-    Vec2f XProfileSys::RenderStr(engine::IPrimativeContext* pPrim, Vec2f pos, core::string_view title, const core::StackString512& str)
+    Vec2f XProfileSys::RenderStr(engine::IPrimitiveContext* pPrim, Vec2f pos, core::string_view title, const core::StackString512& str)
     {
         font::TextDrawContext ctx;
         ctx.pFont = pFont_;
@@ -774,7 +774,7 @@ namespace profiler
 
 #if X_ENABLE_JOBSYS_PROFILER
 
-    Vec2f XProfileSys::RenderJobSystem(engine::IPrimativeContext* pPrim, Vec2f pos, 
+    Vec2f XProfileSys::RenderJobSystem(engine::IPrimitiveContext* pPrim, Vec2f pos, 
         const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys, int32_t profileIdx)
     {
         X_UNUSED(pJobSys);
@@ -963,7 +963,7 @@ namespace profiler
         return Vec2f(width, height);
     }
 
-    void XProfileSys::DrawSubsysInfo(engine::IPrimativeContext* pPrim, float xStart, float yStart, float width, float height,
+    void XProfileSys::DrawSubsysInfo(engine::IPrimitiveContext* pPrim, float xStart, float yStart, float width, float height,
         const SubSystemTimeArr& subTimes)
     {
         // for a given width i want to split it up into subsystem percentages.
@@ -989,7 +989,7 @@ namespace profiler
     }
 
     void XProfileSys::DrawThreadInfo(const FrameTimeData& frameTimeInfo,
-        engine::IPrimativeContext* pPrim, float xStart, float yStart, float width, float height,
+        engine::IPrimitiveContext* pPrim, float xStart, float yStart, float width, float height,
         const core::V2::JobQueueHistory::FrameHistory& history, SubSystemTimeArr& subTimesOut)
     {
         pPrim->drawQuad(xStart, yStart, width, height, Color(0.05f, 0.05f, 0.05f, 0.1f));
@@ -1043,7 +1043,7 @@ namespace profiler
 
 #if X_ENABLE_PROFILER_WARNINGS
 
-    void XProfileSys::drawWarnings(engine::IPrimativeContext* pPrim)
+    void XProfileSys::drawWarnings(engine::IPrimitiveContext* pPrim)
     {
         if (warningList_.isEmpty()) {
             return;

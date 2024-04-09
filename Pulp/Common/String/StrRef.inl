@@ -812,7 +812,7 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::insert(size_type nIndex, cons
 
 // =============================================================================
 
-//! delete count characters starting at zero-based index
+// delete count characters starting at zero-based index
 template<typename CharT>
 typename StringRef<CharT>::StrT& StringRef<CharT>::erase(size_type nIndex, size_type count)
 {
@@ -1162,7 +1162,7 @@ inline bool operator!=(const typename StringRef<T>::value_type* s1, const String
     return !s2.compare(s1);
 }
 
-//! compare helpers
+// compare helpers
 
 template<class T>
 inline bool operator<(const StringRef<T>& s1, const StringRef<T>& s2)

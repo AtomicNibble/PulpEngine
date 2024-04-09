@@ -54,11 +54,11 @@ void ModelSkeleton::dumpToLog(void) const
         posStr.appendFmt("(^6%8.3f,%8.3f,%8.3f ^7)", pos.x, pos.y, pos.z);
         angStr.appendFmt("(^6%6.3f,%6.3f,%6.3f - %6.3f^7)", ang.v.x, ang.v.y, ang.v.z, ang.w);
 
-        X_LOG0("Skelton", "%s pos: %s ang: %s parent: ^6%" PRIuS, boneName.c_str(), posStr.c_str(), angStr.c_str(), parent);
+        X_LOG0("Skeleton", "%s pos: %s ang: %s parent: ^6%" PRIuS, boneName.c_str(), posStr.c_str(), angStr.c_str(), parent);
     }
 }
 
-bool ModelSkeleton::LoadCompiledSkelton(const core::Path<char>& filePath)
+bool ModelSkeleton::LoadCompiledSkeleton(const core::Path<char>& filePath)
 {
     if (filePath.isEmpty()) {
         return false;
@@ -73,7 +73,7 @@ bool ModelSkeleton::LoadCompiledSkelton(const core::Path<char>& filePath)
 
     core::XFileScoped file;
     if (!file.openFile(path, mode)) {
-        X_ERROR("Model", "Failed to open model for skelton load");
+        X_ERROR("Model", "Failed to open model for skeleton load");
         return false;
     }
 
@@ -91,7 +91,7 @@ bool ModelSkeleton::LoadCompiledSkelton(const core::Path<char>& filePath)
     }
 
     if (!hdr.flags.IsSet(ModelFlags::LOOSE)) {
-        X_ERROR("Model", "can't load model skelton from none loose model");
+        X_ERROR("Model", "can't load model skeleton from none loose model");
         return false;
     }
 
@@ -170,7 +170,7 @@ bool ModelSkeleton::LoadCompiledSkelton(const core::Path<char>& filePath)
     return true;
 }
 
-bool ModelSkeleton::LoadRawModelSkelton(const core::Path<char>& filePath)
+bool ModelSkeleton::LoadRawModelSkeleton(const core::Path<char>& filePath)
 {
     if (filePath.isEmpty()) {
         return false;
@@ -184,7 +184,7 @@ bool ModelSkeleton::LoadRawModelSkelton(const core::Path<char>& filePath)
 
     core::XFileScoped file;
     if (!file.openFile(path, mode)) {
-        X_ERROR("Model", "Failed to open raw model for skelton load");
+        X_ERROR("Model", "Failed to open raw model for skeleton load");
         return false;
     }
 
@@ -206,20 +206,20 @@ bool ModelSkeleton::LoadRawModelSkelton(const core::Path<char>& filePath)
 
     core::XLexer lex(fileData.begin(), fileData.end());
 
-    return LoadRawModelSkelton_int(lex);
+    return LoadRawModelSkeleton_int(lex);
 }
 
-bool ModelSkeleton::LoadRawModelSkelton(const core::Array<uint8_t>& data)
+bool ModelSkeleton::LoadRawModelSkeleton(const core::Array<uint8_t>& data)
 {
     const char* pBegin = reinterpret_cast<const char*>(data.begin());
     const char* pEnd = reinterpret_cast<const char*>(data.end());
 
     core::XLexer lex(pBegin, pEnd);
 
-    return LoadRawModelSkelton_int(lex);
+    return LoadRawModelSkeleton_int(lex);
 }
 
-bool ModelSkeleton::LoadRawModelSkelton_int(core::XLexer& lex)
+bool ModelSkeleton::LoadRawModelSkeleton_int(core::XLexer& lex)
 {
     int32_t version, numLods, numBones;
 

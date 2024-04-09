@@ -3,7 +3,7 @@
 X_NAMESPACE_BEGIN(core)
 
 // This is a type safe string format helper.
-// It's used for format spcifiers loaded from disk.
+// It's used for format specifiers loaded from disk.
 // instead of '%' '{}' must be used.
 // Example:
 //

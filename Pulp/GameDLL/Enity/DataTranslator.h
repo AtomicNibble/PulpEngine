@@ -108,8 +108,7 @@ namespace entity
     template<typename T>
     void DataTranslator<T>::initializeFromString(const char* pName, StringTypeCallBack fn)
     {
-        // so we will have a function that has diffrent return type :(
-        // can i generalize this slut?
+        // so we will have a function that has different return type :(
         core::StrHash hash(pName);
         
         fields_.emplace_back(pName, hash, std::move(fn));

@@ -9,10 +9,10 @@ X_NAMESPACE_BEGIN(core)
 
 namespace debugging
 {
-    /// Enables/disables debugger breakpoints.
+    // Enables/disables debugger breakpoints.
     void EnableBreakpoints(bool enable);
 
-    /// Returns whether breakpoints are enabled in the runtime settings.
+    // Returns whether breakpoints are enabled in the runtime settings.
     bool AreBreakpointsEnabled(void);
 } // namespace debugging
 

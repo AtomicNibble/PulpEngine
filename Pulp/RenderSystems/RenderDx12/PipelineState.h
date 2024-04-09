@@ -45,7 +45,7 @@ public:
         DXGI_FORMAT DSVFormat, uint32_t MsaaCount = 1, uint32_t MsaaQuality = 0);
     X_INLINE void setPrimitiveRestart(D3D12_INDEX_BUFFER_STRIP_CUT_VALUE IBProps);
 
-    // you must ensure this memory remains valid untill finalize is called.
+    // you must ensure this memory remains valid until finalize is called.
     // this is becuase pretty much all these will come from the IL cache which is built on startup.
     void setInputLayout(size_t numElements, const D3D12_INPUT_ELEMENT_DESC* pInputElementDescs);
 

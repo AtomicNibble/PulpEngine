@@ -224,7 +224,7 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
 
     // simple binds?
     if (bindCounts[0] == verts.size()) {
-        // set bind info to zero, single binds in that are diffrent to simple binds.
+        // set bind info to zero, single binds in that are different to simple binds.
         bindCounts.fill(0);
         bindInfo_.set(bindCounts);
 
@@ -517,7 +517,7 @@ bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker, b
             }
         }
         else {
-            // we pack the raw data here, so writing out the convext mesh data once compiled is the same
+            // we pack the raw data here, so writing out the convex mesh data once compiled is the same
             // if it's baked or not.
             const size_t requiredBytes = (sizeof(Vec3f) * verts_.size()) + (sizeof(uint16_t) * faces_.size());
 
@@ -1076,7 +1076,7 @@ bool ModelCompiler::saveModel(core::XFile* pFile)
     core::FixedByteStreamOwning physDataStream(arena_, header.physDataSize);
     core::FixedByteStreamOwning hitboxDataStream(arena_, header.hitboxDataBlocks * 64);
 
-    // this seams kinda wrong.
+    // this seams kind of wrong.
     size_t meshHeadOffsets = sizeof(model::ModelHeader);
     meshHeadOffsets += header.boneDataSize;
     for (auto& bone : bones_) {
@@ -1195,7 +1195,7 @@ bool ModelCompiler::saveModel(core::XFile* pFile)
         }
     }
 
-    // col data. (currently we only allow col data on lod0 so makes more sense to be seperate from lodinfo.
+    // col data. (currently we only allow col data on lod0 so makes more sense to be separate from lodinfo.
     if (header.flags.IsSet(model::ModelFlags::PHYS_DATA)) {
         static_assert(std::is_trivially_constructible<CollisionInfoHdr>::value, "Potentially not safe to zero_object");
 
@@ -1209,7 +1209,7 @@ bool ModelCompiler::saveModel(core::XFile* pFile)
             if (header.flags.IsSet(model::ModelFlags::PHYS_BAKED)) {
                 static_assert(MODEL_MESH_COL_MAX_COOKED_SIZE <= std::numeric_limits<uint16_t>::max(), "Can't represent cooked convex mesh");
 
-                // we enforce a 65k byte limit on cooked data, which should be more than enougth..
+                // we enforce a 65k byte limit on cooked data, which should be more than enough..
                 convexHdr.dataSize = safe_static_cast<uint16_t>(data.size());
             }
             else {
@@ -1490,7 +1490,7 @@ bool ModelCompiler::saveModel(core::XFile* pFile)
 
     // now we write Vert + faces + bindData
     // we convert them now to the real format.
-    // as processing the data in the commpressed state is slower.
+    // as processing the data in the compressed state is slower.
     size_t meshDataNumPadBytes = 0;
 
     for (size_t i = 0; i < compiledLods_.size(); i++) {
@@ -1647,7 +1647,7 @@ bool ModelCompiler::saveModel(core::XFile* pFile)
             return false;
         }
 
-        // make sure this stream starts on a aligned boundry.
+        // make sure this stream starts on a aligned boundary.
         const size_t curFileSize = safe_static_cast<size_t>(pFile->tell());
         const size_t padSize = curFileSize % MODEL_STREAM_ALIGN == 0 ? 0 : (MODEL_STREAM_ALIGN - (curFileSize % MODEL_STREAM_ALIGN));
 
@@ -1833,7 +1833,7 @@ bool ModelCompiler::ProcessModel(void)
     // 4. merge verts
     // 5. sort the verts by bind counts.
     //		sort the faces
-    //		if not a animated model sort verts for linera access?
+    //		if not a animated model sort verts for linear access?
     // 6. create bind data
     // 7. scale the model.
     //  - check for collision meshes and move them.
@@ -2072,7 +2072,7 @@ bool ModelCompiler::ValidateLodDistances(void)
     float lastDistance = compiledLods_[0].distance_;
     for (size_t i = 1; i < compiledLods_.size(); i++) {
         if (compiledLods_[i].distance_ <= lastDistance) {
-            X_ERROR("Model", "LOD%" PRIuS " has a distance less or euqal to LOD%" PRIuS, i, i - 1);
+            X_ERROR("Model", "LOD%" PRIuS " has a distance less or equal to LOD%" PRIuS, i, i - 1);
             return false;
         }
 

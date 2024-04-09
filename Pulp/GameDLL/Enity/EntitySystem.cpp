@@ -32,7 +32,7 @@ namespace entity
 {
     // -----------------------------------------------------------
 
-    EnititySystem::EnititySystem(GameVars& vars, net::SessionInfo& sessionInfo, game::weapon::WeaponDefManager& weaponDefs,
+    EntitySystem::EntitySystem(GameVars& vars, net::SessionInfo& sessionInfo, game::weapon::WeaponDefManager& weaponDefs,
         Multiplayer* pMultiplayer, core::MemoryArenaBase* arena) :
         arena_(arena),
         reg_(&ecsArena_),
@@ -63,7 +63,7 @@ namespace entity
         entIdMap_.fill(INVALID_ENT_ID);
     }
 
-    bool EnititySystem::init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld)
+    bool EntitySystem::init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld)
     {
         static_assert(decltype(reg_)::NUM_COMP == 19, "More components? add a sensible reserve call");
 
@@ -91,18 +91,18 @@ namespace entity
         reg_.compReserve<EntName>(16);
         reg_.compReserve<Player>(net::MAX_PLAYERS);
 
-        reg_.setDetroyCallback<EnititySystem, Mesh>(this);
-        reg_.setDetroyCallback<EnititySystem, MeshRenderer>(this);
-        reg_.setDetroyCallback<EnititySystem, MeshCollider>(this);
-        reg_.setDetroyCallback<EnititySystem, DynamicObject>(this);
-        reg_.setDetroyCallback<EnititySystem, Weapon>(this);
-        reg_.setDetroyCallback<EnititySystem, Emitter>(this);
-        reg_.setDetroyCallback<EnititySystem, Light>(this);
-        reg_.setDetroyCallback<EnititySystem, Animator>(this);
-        reg_.setDetroyCallback<EnititySystem, CharacterController>(this);
-        reg_.setDetroyCallback<EnititySystem, Player>(this);
+        reg_.setDetroyCallback<EntitySystem, Mesh>(this);
+        reg_.setDetroyCallback<EntitySystem, MeshRenderer>(this);
+        reg_.setDetroyCallback<EntitySystem, MeshCollider>(this);
+        reg_.setDetroyCallback<EntitySystem, DynamicObject>(this);
+        reg_.setDetroyCallback<EntitySystem, Weapon>(this);
+        reg_.setDetroyCallback<EntitySystem, Emitter>(this);
+        reg_.setDetroyCallback<EntitySystem, Light>(this);
+        reg_.setDetroyCallback<EntitySystem, Animator>(this);
+        reg_.setDetroyCallback<EntitySystem, CharacterController>(this);
+        reg_.setDetroyCallback<EntitySystem, Player>(this);
 
-        reg_.registerHandler<EnititySystem, MsgPlayerDied>(this);
+        reg_.registerHandler<EntitySystem, MsgPlayerDied>(this);
 
 
         pPhysics_ = X_ASSERT_NOT_NULL(pPhysics);
@@ -176,7 +176,7 @@ namespace entity
         return true;
     }
 
-    void EnititySystem::shutdown(void)
+    void EntitySystem::shutdown(void)
     {
         arena_->removeChildArena(&ecsArena_);
 
@@ -188,7 +188,7 @@ namespace entity
         }
     }
 
-    bool EnititySystem::createTranslatours(void)
+    bool EntitySystem::createTranslatours(void)
     {
         // translators.
         ADD_TRANS_MEMBER(dtHealth_, hp);
@@ -230,12 +230,12 @@ namespace entity
         return true;
     }
 
-    void EnititySystem::runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& cmd, EntityId playerId)
+    void EntitySystem::runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& cmd, EntityId playerId)
     {
         playerSys_.runUserCmdForPlayer(dt, reg_, weaponDefs_, pModelManager_, p3DWorld_, cmd, playerId);
     }
 
-    void EnititySystem::update(core::FrameData& frame, net::UserCmdMan& userCmdMan, 
+    void EntitySystem::update(core::FrameData& frame, net::UserCmdMan& userCmdMan, 
         const NetInterpolationState& netInterpolState, EntityId localPlayerId)
     {
         X_UNUSED(userCmdMan);
@@ -281,7 +281,7 @@ namespace entity
         reg_.cleanupPendingDestroy();
     }
 
-    void EnititySystem::createSnapShot(net::SnapShot& snap)
+    void EntitySystem::createSnapShot(net::SnapShot& snap)
     {
         physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Read);
 
@@ -311,7 +311,7 @@ namespace entity
         }
     }
 
-    void EnititySystem::applySnapShot(const UserNetMappings& unm, const net::SnapShot& snap)
+    void EntitySystem::applySnapShot(const UserNetMappings& unm, const net::SnapShot& snap)
     {
         // TODO: perf - maybe gather up physics changes and do them in a batch.
         physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
@@ -333,8 +333,8 @@ namespace entity
 
             if (bs.isEos())
             {
-                // the remotemap should give us a valid ent if we are been told to delete it.
-                X_ASSERT(reg_.isValid(entityId), "Enitity id is not valid")(entityId);
+                // the remote map should give us a valid ent if we are been told to delete it.
+                X_ASSERT(reg_.isValid(entityId), "Entity id is not valid")(entityId);
 
                 if (entityId < net::MAX_PLAYERS)
                 {
@@ -375,7 +375,7 @@ namespace entity
                 entIdMap_[remoteEntityId] = entityId;
             }
 
-            X_ASSERT(reg_.isValid(entityId), "Enitity id is not valid")(entityId);
+            X_ASSERT(reg_.isValid(entityId), "Entity id is not valid")(entityId);
 
             auto localMask = reg_.getComponentMask(entityId);
             decltype(localMask) mask;
@@ -451,17 +451,17 @@ namespace entity
 
     // ----------------------------------------------------------
 
-    void EnititySystem::destroy(Mesh& comp)
+    void EntitySystem::destroy(Mesh& comp)
     {
         pModelManager_->releaseModel(comp.pModel);
     }
 
-    void EnititySystem::destroy(MeshRenderer& comp)
+    void EntitySystem::destroy(MeshRenderer& comp)
     {
         p3DWorld_->freeRenderEnt(comp.pRenderEnt);
     }
 
-    void EnititySystem::destroy(MeshCollider& comp)
+    void EntitySystem::destroy(MeshCollider& comp)
     {
         // is this for static collision only?
         X_ERROR("Ent", "A ent with static collision was removed, collision will remain.");
@@ -473,7 +473,7 @@ namespace entity
         comp.actor = physics::INVALID_HANLDE;
     }
 
-    void EnititySystem::destroy(DynamicObject& comp)
+    void EntitySystem::destroy(DynamicObject& comp)
     {
         if (comp.actor == physics::INVALID_HANLDE) {
             return;
@@ -487,12 +487,12 @@ namespace entity
         comp.actor = physics::INVALID_HANLDE;
     }
 
-    void EnititySystem::destroy(Weapon& comp)
+    void EntitySystem::destroy(Weapon& comp)
     {
         weaponDefs_.releaseWeaponDef(comp.pWeaponDef);
     }
 
-    void EnititySystem::destroy(Emitter& comp)
+    void EntitySystem::destroy(Emitter& comp)
     {
         if (!comp.pEmitter) {
             return;
@@ -501,7 +501,7 @@ namespace entity
         p3DWorld_->freeEmitter(comp.pEmitter);
     }
 
-    void EnititySystem::destroy(Light& comp)
+    void EntitySystem::destroy(Light& comp)
     {
         if (!comp.pLight) {
             return;
@@ -510,14 +510,14 @@ namespace entity
         p3DWorld_->freeLight(comp.pLight);
     }
 
-    void EnititySystem::destroy(Animator& comp)
+    void EntitySystem::destroy(Animator& comp)
     {
         if (comp.pAnimator) {
             X_DELETE(comp.pAnimator, g_gameArena);
         }
     }
 
-    void EnititySystem::destroy(CharacterController& comp)
+    void EntitySystem::destroy(CharacterController& comp)
     {
         X_ASSERT_NOT_NULL(comp.pController);
 
@@ -525,7 +525,7 @@ namespace entity
         pPhysScene_->releaseCharacterController(comp.pController);
     }
 
-    void EnititySystem::destroy(Player& comp)
+    void EntitySystem::destroy(Player& comp)
     {
         if (comp.armsEnt != entity::INVALID_ID) {
             destroyEnt(comp.armsEnt);
@@ -538,7 +538,7 @@ namespace entity
 
     // ----------------------------------------------------------
 
-    void EnititySystem::onMsg(ECS& reg, const MsgPlayerDied& msg)
+    void EntitySystem::onMsg(ECS& reg, const MsgPlayerDied& msg)
     {
         X_UNUSED(reg, msg);
 
@@ -557,25 +557,25 @@ namespace entity
 
     // ----------------------------------------------------------
 
-    EntityId EnititySystem::createEnt(void)
+    EntityId EntitySystem::createEnt(void)
     {
         auto ent = reg_.create<TransForm>();
 
         return ent;
     }
 
-    void EnititySystem::destroyEnt(EntityId id)
+    void EntitySystem::destroyEnt(EntityId id)
     {
         reg_.destroy(id);
     }
 
-    void EnititySystem::removePlayer(EntityId id)
+    void EntitySystem::removePlayer(EntityId id)
     {
-        // We must reset for players instead of destroy as the enity slots need to remain reserved.
+        // We must reset for players instead of destroy as the entity slots need to remain reserved.
         reg_.reset(id);
     }
 
-    EntityId EnititySystem::createWeapon(EntityId playerId)
+    EntityId EntitySystem::createWeapon(EntityId playerId)
     {
         auto& ply = reg_.get<Player>(playerId);
         auto& inv = reg_.get<Inventory>(playerId);
@@ -677,7 +677,7 @@ namespace entity
         return ent;
     }
 
-    void EnititySystem::spawnPlayer(const UserNetMappings& unm, int32_t clientIdx, const Vec3f& pos, bool local)
+    void EntitySystem::spawnPlayer(const UserNetMappings& unm, int32_t clientIdx, const Vec3f& pos, bool local)
     {
         X_UNUSED(unm);
 
@@ -747,7 +747,7 @@ namespace entity
         }
     }
 
-    bool EnititySystem::addController(EntityId id)
+    bool EntitySystem::addController(EntityId id)
     {
         auto& trans = reg_.get<TransForm>(id);
         
@@ -775,7 +775,7 @@ namespace entity
         return true;
     }
 
-    bool EnititySystem::loadEntites(const char* pJsonBegin, const char* pJsonEnd)
+    bool EntitySystem::loadEntites(const char* pJsonBegin, const char* pJsonEnd)
     {
         // TODO: bother checking we clear? 
         ttZone(gEnv->ctx, "(Game) LoadEntites");
@@ -795,7 +795,7 @@ namespace entity
         return true;
     }
 
-    bool EnititySystem::parseEntites(const char* pJsonBegin, const char* pJsonEnd)
+    bool EntitySystem::parseEntites(const char* pJsonBegin, const char* pJsonEnd)
     {
         core::json::MemoryStream ms(pJsonBegin, union_cast<ptrdiff_t>(pJsonEnd - pJsonBegin));
         core::json::EncodedInputStream<core::json::UTF8<>, core::json::MemoryStream> is(ms);
@@ -843,7 +843,7 @@ namespace entity
         return true;
     }
 
-    bool EnititySystem::postLoad(void)
+    bool EntitySystem::postLoad(void)
     {
         ttZone(gEnv->ctx, "(Game) EntSys postload");
 
@@ -855,7 +855,7 @@ namespace entity
     }
 
     template<typename CompnentT>
-    bool EnititySystem::parseComponent(DataTranslator<CompnentT>& translator, CompnentT& comp, const core::json::Value& compDesc)
+    bool EntitySystem::parseComponent(DataTranslator<CompnentT>& translator, CompnentT& comp, const core::json::Value& compDesc)
     {
         if (compDesc.GetType() != core::json::Type::kObjectType) {
             X_ERROR("Ents", "Component description must be a object");
@@ -920,7 +920,7 @@ namespace entity
         return true;
     }
 
-    bool EnititySystem::parseColor(const core::json::Value& value, Color8u& col)
+    bool EntitySystem::parseColor(const core::json::Value& value, Color8u& col)
     {
         if (!value.HasMember("color")) {
             return false;
@@ -946,7 +946,7 @@ namespace entity
         return true;
     }
 
-    bool EnititySystem::parseVec(const core::json::Value& value, Vec3f& vec)
+    bool EntitySystem::parseVec(const core::json::Value& value, Vec3f& vec)
     {
         if (!value.IsObject()) {
             return false;
@@ -962,7 +962,7 @@ namespace entity
         return true;
     }
 
-    bool EnititySystem::parseEntDesc(core::json::Value& entDesc)
+    bool EntitySystem::parseEntDesc(core::json::Value& entDesc)
     {
         if (entDesc.GetType() != core::json::Type::kObjectType) {
             X_ERROR("Ents", "Ent description must be a object");

@@ -104,13 +104,11 @@
     <ClInclude Include="Core\Version.h" />
     <ClInclude Include="Debugging\AbortHandler.h" />
     <ClInclude Include="Debugging\Assert.h" />
-    <ClInclude Include="Debugging\AssertionHandler.h" />
     <ClInclude Include="Debugging\AssertMacros.h" />
     <ClInclude Include="Debugging\CallStack.h" />
     <ClInclude Include="Debugging\DebuggerBreakpoint.h" />
     <ClInclude Include="Debugging\DebuggerBreakpointMacros.h" />
     <ClInclude Include="Debugging\DebuggerConnection.h" />
-    <ClInclude Include="Debugging\DefaultAssertionHandler.h" />
     <ClInclude Include="Debugging\ExceptionHandler.h" />
     <ClInclude Include="Debugging\HardwareBreakpoint.h" />
     <ClInclude Include="Debugging\InvalidParameterHandler.h" />
@@ -317,7 +315,7 @@
     <ClInclude Include="Prepro\PreproStringize.h" />
     <ClInclude Include="Prepro\PreproToBool.h" />
     <ClInclude Include="Prepro\PreproUniqueName.h" />
-    <ClInclude Include="IPrimativeContext.h" />
+    <ClInclude Include="IPrimitiveContext.h" />
     <ClInclude Include="Prepro\PreproWiden.h" />
     <ClInclude Include="Profile\ProfilerTypes.h" />
     <ClInclude Include="Profile\Telem.h" />
@@ -719,7 +717,7 @@
     <None Include="MetaTable.inl" />
     <None Include="Platform\win32\Console.inl" />
     <None Include="Platform\win32\Window.inl" />
-    <None Include="IPrimativeContext.inl" />
+    <None Include="IPrimitiveContext.inl" />
     <None Include="Random\MultiplyWithCarry.inl" />
     <None Include="Random\XorShift.inl" />
     <ClInclude Include="String\CmdArgs.inl">
@@ -819,7 +817,7 @@
     <ClCompile Include="Platform\win32\Pipe.cpp" />
     <ClCompile Include="Platform\win32\SystemInfo.cpp" />
     <ClCompile Include="Platform\win32\TrayIcon.cpp" />
-    <ClCompile Include="IPrimativeContext.cpp" />
+    <ClCompile Include="IPrimitiveContext.cpp" />
     <ClCompile Include="Sorting\RadixSort.cpp" />
     <ClCompile Include="String\HumanDuration.cpp" />
     <ClCompile Include="SystemAddress.cpp" />

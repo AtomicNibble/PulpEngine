@@ -130,7 +130,7 @@ public:
     (
         OK,
         NOT_FOUND,
-        NAME_TAKEN, // should maybe call this 'exsists' ?
+        NAME_TAKEN, // should maybe call this 'exists' ?
         UNCHANGED,
         HAS_REFS,
         ERROR);
@@ -172,15 +172,15 @@ public:
     // Conversion Profile api.
     Result::Enum AddProfile(const core::string& name, int32_t precedence);
     Result::Enum AddProfile(const core::string& name, const core::string& data, int32_t precedence);
-    bool ProfileExsists(const core::string& name, ProfileId* pProfileId = nullptr);
+    bool ProfileExists(const core::string& name, ProfileId* pProfileId = nullptr);
     bool SetProfileData(const core::string& name, const core::string& data);
     bool GetProfileData(const core::string& name, core::string& dataOut, int32_t& precedenceOut);
 
     // Mod api
     Result::Enum AddMod(const core::string& name, const core::Path<char>& outDir);
-    bool SetMod(const core::string& name); // must exsists.
+    bool SetMod(const core::string& name); // must exists.
     bool SetMod(ModId id);
-    bool ModExsists(const core::string& name, ModId* pModId = nullptr);
+    bool ModExists(const core::string& name, ModId* pModId = nullptr);
     bool SetModPath(const core::string& name, const core::Path<char>& outDir);
     bool SetModPath(ModId modId, const core::Path<char>& outDir);
     ModId GetModId(const core::string& name);

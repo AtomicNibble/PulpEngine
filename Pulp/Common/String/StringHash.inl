@@ -79,7 +79,7 @@ X_INLINE constexpr StrHash::StrHash(Type hash) :
 {
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
+
 
 X_INLINE constexpr StrHash::operator Type(void) const
 {

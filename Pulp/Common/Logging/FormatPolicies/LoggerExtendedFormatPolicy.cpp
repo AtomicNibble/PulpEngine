@@ -6,17 +6,17 @@
 
 X_NAMESPACE_BEGIN(core)
 
-/// Empty implementation.
+// Empty implementation.
 void LoggerExtendedFormatPolicy::Init(void)
 {
 }
 
-/// Empty implementation.
+// Empty implementation.
 void LoggerExtendedFormatPolicy::Exit(void)
 {
 }
 
-/// Formats the given message.
+// Formats the given message.
 uint32_t LoggerExtendedFormatPolicy::Format(LoggerBase::Line& line, const char* indentation,
     LogType::Enum type, X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, size_t verbosity, const char* format, va_list args)
 {

@@ -6,7 +6,7 @@ X_NAMESPACE_BEGIN(net)
 
 TEST(net, SequencedPacketsTest)
 {
-    // test that sending on diffrent streams works correct.
+    // test that sending on different streams works correct.
     net::INet* pNet = gEnv->pNet;
     net::IPeer* pServer = pNet->createPeer();
     net::IPeer* pPeer = pNet->createPeer();
@@ -55,9 +55,9 @@ TEST(net, SequencedPacketsTest)
     core::TimeVal testTime = core::TimeVal::fromMS(5000);
     core::TimeVal endTime = timer.GetTimeVal() + testTime;
 
-    std::array<int32_t, MAX_ORDERED_STREAMS> streamsCnts, recivedStreamCnts;
+    std::array<int32_t, MAX_ORDERED_STREAMS> streamsCnts, receivedStreamCnts;
     streamsCnts.fill(0);
-    recivedStreamCnts.fill(0);
+    receivedStreamCnts.fill(0);
 
     core::Array<uint8_t> data(g_arena);
     data.resize(1024 * 64);
@@ -104,7 +104,7 @@ TEST(net, SequencedPacketsTest)
             core::Thread::sleep(1);
         }
         else if (curState == State::Sending) {
-            // sends packets on diffrent streams.
+            // sends packets on different streams.
             uint32_t numStream = gEnv->xorShift.randRange(1u, 10u);
             for (uint32_t x = 0; x < numStream; x++) {
                 size_t stream = gEnv->xorShift.randIndex(MAX_ORDERED_STREAMS);
@@ -154,7 +154,7 @@ TEST(net, SequencedPacketsTest)
             for (pPacket = pServer->receive(); pPacket; pServer->freePacket(pPacket), pPacket = pServer->receive()) {
                 if (pPacket->getID() == PACKET_ID) {
                     // we got the packet data, check it's correct.
-                    X_LOG0("SeqTest", "Recived packet. length: %" PRIu32, pPacket->bitLength);
+                    X_LOG0("SeqTest", "Received packet. length: %" PRIu32, pPacket->bitLength);
 
                     int32_t packetNumber;
                     int32_t streamIdx;
@@ -164,11 +164,11 @@ TEST(net, SequencedPacketsTest)
                     bs.read(streamIdx);
 
                     // skipped any?
-                    if (packetNumber > recivedStreamCnts[streamIdx]) {
+                    if (packetNumber > receivedStreamCnts[streamIdx]) {
                         X_WARNING("SeqTest", "Skipped %" PRIi32 " packets. got packet: ^5%" PRIi32 "^7 on channel ^5%" PRIi32,
-                            packetNumber - recivedStreamCnts[streamIdx], packetNumber, streamIdx);
+                            packetNumber - receivedStreamCnts[streamIdx], packetNumber, streamIdx);
                     }
-                    else if (packetNumber < recivedStreamCnts[streamIdx]) {
+                    else if (packetNumber < receivedStreamCnts[streamIdx]) {
                         // out of order.
                         X_ASSERT_UNREACHABLE();
                     }
@@ -177,7 +177,7 @@ TEST(net, SequencedPacketsTest)
                             packetNumber, streamIdx);
                     }
 
-                    recivedStreamCnts[streamIdx] = packetNumber + 1;
+                    receivedStreamCnts[streamIdx] = packetNumber + 1;
 
                     if (timer.GetTimeVal() >= endTime) {
                         curState = State::Complete;

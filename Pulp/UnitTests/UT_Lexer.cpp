@@ -546,7 +546,7 @@ bool XMapFile::Parse(core::XFile* file)
 
         lexer.setFlags(LexFlag::NOSTRINGCONCAT | LexFlag::NOSTRINGESCAPECHARS | LexFlag::ALLOWPATHNAMES);
 
-        // we need to parse up untill the first brace.
+        // we need to parse up until the first brace.
         while (lexer.ReadToken(token)) {
             if (token.isEqual("{")) {
                 lexer.UnreadToken(token);

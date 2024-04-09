@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "PrimativeContext.h"
+#include "PrimitiveContext.h"
 
 #include "Math\VertexFormats.h"
 
@@ -15,7 +15,7 @@
 
 X_NAMESPACE_BEGIN(engine)
 
-void PrimativeContextSharedResources::CreateSphere(VertArr& vb, IndexArr& ib,
+void PrimitiveContextSharedResources::CreateSphere(VertArr& vb, IndexArr& ib,
     float radius, uint32_t rings, uint32_t sections)
 {
     // calc required number of vertices/indices/triangles to build a sphere for the given parameters
@@ -83,7 +83,7 @@ void PrimativeContextSharedResources::CreateSphere(VertArr& vb, IndexArr& ib,
     }
 }
 
-void PrimativeContextSharedResources::CreateCone(VertArr& vb, IndexArr& ib,
+void PrimitiveContextSharedResources::CreateCone(VertArr& vb, IndexArr& ib,
     float radius, float height, uint32_t sections)
 {
     // calc required number of vertices/indices/triangles to build a cone for the given parameters
@@ -155,7 +155,7 @@ void PrimativeContextSharedResources::CreateCone(VertArr& vb, IndexArr& ib,
     }
 }
 
-void PrimativeContextSharedResources::CreateCylinder(VertArr& vb, IndexArr& ib,
+void PrimitiveContextSharedResources::CreateCylinder(VertArr& vb, IndexArr& ib,
     float radius, float height, uint32_t sections)
 {
     // calc required number of vertices/indices/triangles to build a cylinder for the given parameters
@@ -264,7 +264,7 @@ void PrimativeContextSharedResources::CreateCylinder(VertArr& vb, IndexArr& ib,
 
 // ---------------------------------------------------------------------------
 
-PrimativeContextSharedResources::ShapeLod::ShapeLod()
+PrimitiveContextSharedResources::ShapeLod::ShapeLod()
 {
     indexCount = 0;
     startIndex = 0;
@@ -273,7 +273,7 @@ PrimativeContextSharedResources::ShapeLod::ShapeLod()
 
 // ---------------------------------------------------------------------------
 
-PrimativeContextSharedResources::Shape::Shape()
+PrimitiveContextSharedResources::Shape::Shape()
 {
     vertexBuf = render::INVALID_BUF_HANLDE;
     indexbuf = render::INVALID_BUF_HANLDE;
@@ -281,23 +281,23 @@ PrimativeContextSharedResources::Shape::Shape()
 
 // ---------------------------------------------------------------------------
 
-PrimativeContextSharedResources::InstancedPage::InstancedPage() :
+PrimitiveContextSharedResources::InstancedPage::InstancedPage() :
     instBufHandle(render::INVALID_BUF_HANLDE)
 {
 }
 
-void PrimativeContextSharedResources::InstancedPage::createVB(render::IRender* pRender)
+void PrimitiveContextSharedResources::InstancedPage::createVB(render::IRender* pRender)
 {
     X_ASSERT(instBufHandle == render::INVALID_BUF_HANLDE, "Instanced buffer already valid")();
 
     instBufHandle = pRender->createVertexBuffer(
-        sizeof(IPrimativeContext::ShapeInstanceData),
+        sizeof(IPrimitiveContext::ShapeInstanceData),
         NUM_INSTANCE_PER_PAGE,
         render::BufUsage::PER_FRAME,
         render::CpuAccess::WRITE);
 }
 
-void PrimativeContextSharedResources::InstancedPage::destoryVB(render::IRender* pRender)
+void PrimitiveContextSharedResources::InstancedPage::destoryVB(render::IRender* pRender)
 {
     if (isVbValid()) {
         pRender->destoryVertexBuffer(instBufHandle);
@@ -306,13 +306,13 @@ void PrimativeContextSharedResources::InstancedPage::destoryVB(render::IRender* 
 
 // ---------------------------------------------------------------------------
 
-PrimativeContextSharedResources::PrimativeContextSharedResources() :
+PrimitiveContextSharedResources::PrimitiveContextSharedResources() :
     currentInstacePageIdx_(0)
 {
     core::zero_object(primMaterials_);
 }
 
-bool PrimativeContextSharedResources::init(render::IRender* pRender, XMaterialManager* pMatMan)
+bool PrimitiveContextSharedResources::init(render::IRender* pRender, XMaterialManager* pMatMan)
 {
     X_PROFILE_NO_HISTORY_BEGIN("PrimRes", core::profiler::SubSys::ENGINE3D);
 
@@ -328,12 +328,12 @@ bool PrimativeContextSharedResources::init(render::IRender* pRender, XMaterialMa
     return true;
 }
 
-PrimativeContextSharedResources::InstancedPageArr& PrimativeContextSharedResources::getInstancePages(void)
+PrimitiveContextSharedResources::InstancedPageArr& PrimitiveContextSharedResources::getInstancePages(void)
 {
     return shapeInstancePages_;
 }
 
-bool PrimativeContextSharedResources::loadMaterials(XMaterialManager* pMatMan)
+bool PrimitiveContextSharedResources::loadMaterials(XMaterialManager* pMatMan)
 {
     auto loadMaterials = [pMatMan](PrimMaterialArr& primMaterials, const char* pSuffix) -> bool {
         core::StackString<assetDb::ASSET_NAME_MAX_LENGTH, char> matName;
@@ -351,7 +351,7 @@ bool PrimativeContextSharedResources::loadMaterials(XMaterialManager* pMatMan)
             primMaterials[primType] = pMat;
 
             if (pMat->isDefault()) {
-                X_ERROR("Prim", "Error loading one of primative materials");
+                X_ERROR("Prim", "Error loading one of primitive materials");
                 return false;
             }
         }
@@ -371,7 +371,7 @@ bool PrimativeContextSharedResources::loadMaterials(XMaterialManager* pMatMan)
     return true;
 }
 
-bool PrimativeContextSharedResources::createShapeBuffers(render::IRender* pRender)
+bool PrimitiveContextSharedResources::createShapeBuffers(render::IRender* pRender)
 {
     VertArr vertArr(g_3dEngineArena);
     IndexArr indexArr(g_3dEngineArena);
@@ -445,7 +445,7 @@ bool PrimativeContextSharedResources::createShapeBuffers(render::IRender* pRende
     return true;
 }
 
-void PrimativeContextSharedResources::releaseResources(render::IRender* pRender, XMaterialManager* pMatMan)
+void PrimitiveContextSharedResources::releaseResources(render::IRender* pRender, XMaterialManager* pMatMan)
 {
     // shapes.
     for (auto& shape : shapes_) {
@@ -487,25 +487,25 @@ void PrimativeContextSharedResources::releaseResources(render::IRender* pRender,
 
 // ---------------------------------------------------------------------------
 
-PrimativeContext::VertexPage::VertexPage(core::MemoryArenaBase* arena) :
+PrimitiveContext::VertexPage::VertexPage(core::MemoryArenaBase* arena) :
     vertexBufHandle(render::INVALID_BUF_HANLDE),
     verts(arena)
 {
     verts.setGranularity(1024 * 4);
 }
 
-void PrimativeContext::VertexPage::createVB(render::IRender* pRender)
+void PrimitiveContext::VertexPage::createVB(render::IRender* pRender)
 {
     X_ASSERT(vertexBufHandle == render::INVALID_BUF_HANLDE, "Vertex buffer already valid")();
 
     vertexBufHandle = pRender->createVertexBuffer(
-        sizeof(IPrimativeContext::PrimVertex),
+        sizeof(IPrimitiveContext::PrimVertex),
         NUMVERTS_PER_PAGE,
         render::BufUsage::PER_FRAME,
         render::CpuAccess::WRITE);
 }
 
-void PrimativeContext::VertexPage::destoryVB(render::IRender* pRender)
+void PrimitiveContext::VertexPage::destoryVB(render::IRender* pRender)
 {
     // allow to be called if invalid
     if (isVbValid()) {
@@ -515,7 +515,7 @@ void PrimativeContext::VertexPage::destoryVB(render::IRender* pRender)
 
 // ---------------------------------------------------------------------------
 
-PrimativeContext::ShapeInstanceDataContainer::ShapeInstanceDataContainer(core::MemoryArenaBase* arena) :
+PrimitiveContext::ShapeInstanceDataContainer::ShapeInstanceDataContainer(core::MemoryArenaBase* arena) :
     data_(arena)
 {
     data_.setGranularity(128);
@@ -523,7 +523,7 @@ PrimativeContext::ShapeInstanceDataContainer::ShapeInstanceDataContainer(core::M
     core::zero_object(shapeCounts_);
 }
 
-void PrimativeContext::ShapeInstanceDataContainer::sort(void)
+void PrimitiveContext::ShapeInstanceDataContainer::sort(void)
 {
     std::sort(data_.begin(), data_.end(), [](const ShapeInstanceData& a, const ShapeInstanceData& b) {
         return a.solid < b.solid && a.lodIdx < b.lodIdx;
@@ -532,7 +532,7 @@ void PrimativeContext::ShapeInstanceDataContainer::sort(void)
 
 // ---------------------------------------------------------------------------
 
-PrimativeContext::PrimativeContext(PrimativeContextSharedResources& sharedRes, Mode mode, MaterialSet::Enum set, core::MemoryArenaBase* arena) :
+PrimitiveContext::PrimitiveContext(PrimitiveContextSharedResources& sharedRes, Mode mode, MaterialSet::Enum set, core::MemoryArenaBase* arena) :
     pushBufferArr_(arena),
     vertexPages_(arena, MAX_PAGES, arena),
     set_(set),
@@ -554,11 +554,11 @@ PrimativeContext::PrimativeContext(PrimativeContextSharedResources& sharedRes, M
     // that way we grow fast but if not rendering much we stay small.
 }
 
-PrimativeContext::~PrimativeContext()
+PrimitiveContext::~PrimitiveContext()
 {
 }
 
-bool PrimativeContext::freePages(render::IRender* pRender)
+bool PrimitiveContext::freePages(render::IRender* pRender)
 {
     for (auto& vp : vertexPages_) {
         vp.destoryVB(pRender);
@@ -567,7 +567,7 @@ bool PrimativeContext::freePages(render::IRender* pRender)
     return true;
 }
 
-void PrimativeContext::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const
+void PrimitiveContext::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const
 {
     // any pages that have verts we update the gpu buffers.
     for (const auto& vp : vertexPages_) {
@@ -599,17 +599,17 @@ void PrimativeContext::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucke
 #endif // X_DEBUG
 }
 
-size_t PrimativeContext::maxVertsPerPrim(void) const
+size_t PrimitiveContext::maxVertsPerPrim(void) const
 {
     return NUMVERTS_PER_PAGE;
 }
 
-PrimativeContext::Mode PrimativeContext::getMode(void) const
+PrimitiveContext::Mode PrimitiveContext::getMode(void) const
 {
     return mode_;
 }
 
-void PrimativeContext::reset(void)
+void PrimitiveContext::reset(void)
 {
     pushBufferArr_.clear();
 
@@ -626,7 +626,7 @@ void PrimativeContext::reset(void)
     }
 }
 
-void PrimativeContext::setDepthTest(bool enabled)
+void PrimitiveContext::setDepthTest(bool enabled)
 {
     if (enabled) {
         set_ = MaterialSet::DEPTH;
@@ -636,7 +636,7 @@ void PrimativeContext::setDepthTest(bool enabled)
     }
 }
 
-bool PrimativeContext::isEmpty(void) const
+bool PrimitiveContext::isEmpty(void) const
 {
     if (pushBufferArr_.isNotEmpty()) {
         return false;
@@ -645,7 +645,7 @@ bool PrimativeContext::isEmpty(void) const
     return !hasShapeData();
 }
 
-bool PrimativeContext::hasShapeData(void) const
+bool PrimitiveContext::hasShapeData(void) const
 {
     for (const auto& shapeDataCon : shapeLodArrays_) {
         if (!shapeDataCon.isEmpty()) {
@@ -656,22 +656,22 @@ bool PrimativeContext::hasShapeData(void) const
     return false;
 }
 
-const PrimativeContext::PushBufferArr& PrimativeContext::getUnsortedBuffer(void) const
+const PrimitiveContext::PushBufferArr& PrimitiveContext::getUnsortedBuffer(void) const
 {
     return pushBufferArr_;
 }
 
-const PrimativeContext::ShapeParamLodTypeArr& PrimativeContext::getShapeArrayBuffers(void) const
+const PrimitiveContext::ShapeParamLodTypeArr& PrimitiveContext::getShapeArrayBuffers(void) const
 {
     return shapeLodArrays_;
 }
 
-PrimativeContext::ShapeParamLodTypeArr& PrimativeContext::getShapeArrayBuffers(void)
+PrimitiveContext::ShapeParamLodTypeArr& PrimitiveContext::getShapeArrayBuffers(void)
 {
     return shapeLodArrays_;
 }
 
-PrimativeContext::VertexPageHandlesArr PrimativeContext::getVertBufHandles(void) const
+PrimitiveContext::VertexPageHandlesArr PrimitiveContext::getVertBufHandles(void) const
 {
     VertexPageHandlesArr handles;
 
@@ -684,29 +684,29 @@ PrimativeContext::VertexPageHandlesArr PrimativeContext::getVertBufHandles(void)
     return handles;
 }
 
-const PrimativeContextSharedResources::Shape& PrimativeContext::getShapeResources(ShapeType::Enum shape) const
+const PrimitiveContextSharedResources::Shape& PrimitiveContext::getShapeResources(ShapeType::Enum shape) const
 {
     return sharedRes_.getShapeResources(shape);
 }
 
-void PrimativeContext::drawText(const Vec3f& pos, const Matrix33f& ang, const font::TextDrawContext& ctx, const char* pText, const char* pEnd)
+void PrimitiveContext::drawText(const Vec3f& pos, const Matrix33f& ang, const font::TextDrawContext& ctx, const char* pText, const char* pEnd)
 {
     X_ASSERT_NOT_NULL(ctx.pFont);
     ctx.pFont->DrawString(this, pos, ang, ctx, pText, pEnd);
 }
 
-void PrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& ctx, const char* pBegin, const char* pEnd)
+void PrimitiveContext::drawText(const Vec3f& pos, const font::TextDrawContext& ctx, const char* pBegin, const char* pEnd)
 {
     // so we need todo the cpu side font rendering task here.
     // so we need the font to create all the verts for us.
     // and we need a texture id to draw with.
     X_ASSERT_NOT_NULL(ctx.pFont);
 
-    // we just send outself to the fonts render function that way the font can add what primatives it wishes.
+    // we just send our self to the fonts render function that way the font can add what primitives it wishes.
     ctx.pFont->DrawString(this, pos, ctx, pBegin, pEnd);
 }
 
-PrimativeContext::VertexPage& PrimativeContext::getPage(size_t requiredVerts)
+PrimitiveContext::VertexPage& PrimitiveContext::getPage(size_t requiredVerts)
 {
     if (currentPage_ >= 0 && vertexPages_[currentPage_].freeSpace() > requiredVerts) {
         return vertexPages_[currentPage_];
@@ -719,10 +719,10 @@ PrimativeContext::VertexPage& PrimativeContext::getPage(size_t requiredVerts)
         X_ERROR("Prim", "Exceeded max pages for context.");
         // instead of crashing we just go back one page and reset it.
         // reason i don't go back to first page is because this is going to cause rendering artifacts.
-        // but stuff in the later pages is less likley to be noticible.
+        // but stuff in the later pages is less likely to be noticeable.
         // * If this ever happens you are drawing far too much prim shit.
         //	 if you reall want to draw that much should just create multiple prim contexts ^^.
-        //	 as each has a seperate set of pages.
+        //	 as each has a separate set of pages.
         --currentPage_;
         vertexPages_[currentPage_].reset();
     }
@@ -730,14 +730,14 @@ PrimativeContext::VertexPage& PrimativeContext::getPage(size_t requiredVerts)
     auto& newPage = vertexPages_[currentPage_];
     if (!newPage.isVbValid()) {
         // virgin page, need a good slapping..
-        // renderSys support creating vertexBuffers in parralel from multiple threads so this is fine.
+        // renderSys support creating vertexBuffers in parallel from multiple threads so this is fine.
         newPage.createVB(gEnv->pRender);
     }
 
     return newPage;
 }
 
-PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType,
+PrimitiveContext::PrimVertex* PrimitiveContext::addPrimitive(uint32_t numVertices, PrimitiveType::Enum primType,
     Material* pMaterial)
 {
     X_ASSERT_ALIGNMENT(pMaterial, 8, 0); // we require 3 lsb bits for flags.
@@ -776,14 +776,14 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
     return &vertexArr[oldVBSize];
 }
 
-PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType)
+PrimitiveContext::PrimVertex* PrimitiveContext::addPrimitive(uint32_t numVertices, PrimitiveType::Enum primType)
 {
     auto* pMat = sharedRes_.getMaterial(set_, primType);
 
-    return addPrimative(numVertices, primType, pMat);
+    return addPrimitive(numVertices, primType, pMat);
 }
 
-PrimativeContext::ShapeInstanceData* PrimativeContext::addShape(ShapeType::Enum type, bool solid, int32_t lodIdx)
+PrimitiveContext::ShapeInstanceData* PrimitiveContext::addShape(ShapeType::Enum type, bool solid, int32_t lodIdx)
 {
     ShapeInstanceDataContainer& con = shapeLodArrays_[type];
     return con.addShape(solid, lodIdx);

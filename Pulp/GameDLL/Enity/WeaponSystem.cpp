@@ -10,7 +10,7 @@
 #include <Time\TimeLiterals.h>
 #include <Hashing\Fnva1Hash.h>
 
-#include <IPrimativeContext.h>
+#include <IPrimitiveContext.h>
 #include <IFont.h>
 #include <IEffect.h>
 #include <IPhysics.h>

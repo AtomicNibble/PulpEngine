@@ -15,7 +15,7 @@ struct ISessionCallbacks
 
     virtual void onLostConnectionToHost(LobbyType::Enum type) X_ABSTRACT;
 
-    virtual void onReciveSnapShot(SnapShot&& snap) X_ABSTRACT;
+    virtual void onReceiveSnapShot(SnapShot&& snap) X_ABSTRACT;
 
     virtual void connectAndMoveToLobby(LobbyType::Enum type, SystemAddress sa) X_ABSTRACT;
     virtual void peerJoinedLobby(LobbyType::Enum type, SystemHandle systemHandle) X_ABSTRACT;

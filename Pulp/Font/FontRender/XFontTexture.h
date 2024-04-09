@@ -74,9 +74,9 @@ struct XCharCords
 };
 
 // This FontTexture creates a texter of width x height and then creates a LRU slot cache across the buffer
-// initially the cache is completly empty.
+// initially the cache is completely empty.
 //
-// The cache is then updated via calls to PreCacheString, which then copyies rendered Glyph's into our
+// The cache is then updated via calls to PreCacheString, which then copies rendered Glyph's into our
 // cpu texture buffer and updates the LRU slot info.
 //
 class XFontTexture

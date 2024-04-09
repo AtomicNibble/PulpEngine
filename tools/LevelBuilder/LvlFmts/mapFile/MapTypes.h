@@ -191,7 +191,7 @@ namespace mapFile
     class XMapEntity
     {
     public:
-        typedef core::Array<XMapPrimitive*> PrimativeArry;
+        typedef core::Array<XMapPrimitive*> PrimitiveArry;
         typedef KeyPair PairMap;
         typedef KeyPair::PairIt PairIt;
         typedef std::array<size_t, PrimType::ENUM_COUNT> PrimTypeNumArr;
@@ -216,7 +216,7 @@ namespace mapFile
         core::MemoryArenaBase* arena_;
         core::MemoryArenaBase* primArena_;
         PrimTypeNumArr primCounts_;
-        PrimativeArry primitives_;
+        PrimitiveArry primitives_;
     };
 
     struct Layer

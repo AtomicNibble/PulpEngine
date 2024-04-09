@@ -3,7 +3,7 @@
 
 #include <IFont.h>
 
-#include "Drawing\PrimativeContext.h"
+#include "Drawing\PrimitiveContext.h"
 
 X_NAMESPACE_BEGIN(model)
 
@@ -44,7 +44,7 @@ bool RenderModel::canRenderLod(size_t idx) const
     return render.canRender();
 }
 
-void RenderModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col) const
+void RenderModel::RenderBones(engine::PrimitiveContext* pPrimContex, const Matrix44f& modelMat, const Color8u col) const
 {
     const int32_t num = getNumBones();
     if (!num) {
@@ -73,7 +73,7 @@ void RenderModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matri
     }
 }
 
-void RenderModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col,
+void RenderModel::RenderBones(engine::PrimitiveContext* pPrimContex, const Matrix44f& modelMat, const Color8u col,
     const Matrix44f* pBoneMatrix, size_t num) const
 {
     if (getNumBones() != static_cast<int32_t>(num)) {
@@ -105,7 +105,7 @@ void RenderModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matri
     }
 }
 
-void RenderModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
+void RenderModel::RenderBoneNames(engine::PrimitiveContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
     Vec3f offset, float textSize, const Color8u col) const
 {
     const int32_t num = getNumBones();
@@ -129,7 +129,7 @@ void RenderModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const M
     }
 }
 
-void RenderModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
+void RenderModel::RenderBoneNames(engine::PrimitiveContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
     Vec3f offset, float textSize, const Color8u col, const Matrix44f* pBoneMatrix, size_t num) const
 {
     if (getNumBones() != static_cast<int32_t>(num)) {

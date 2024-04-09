@@ -87,7 +87,7 @@ namespace
 
             net::Packet* pPacket = nullptr;
             for (pPacket = pPeer->receive(); pPacket; pPeer->freePacket(pPacket), pPacket = pPeer->receive()) {
-                X_LOG0("ServerTest", "Recived packet: bitLength: %" PRIu32, pPacket->bitLength);
+                X_LOG0("ServerTest", "Received packet: bitLength: %" PRIu32, pPacket->bitLength);
             }
 
             // sleep, as other thread will handle incoming requests and buffer then for us.

@@ -1,6 +1,6 @@
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 X_INLINE size_t GrowingMicroAllocator::getSize(void* ptr) const
 {
     if (poolAllocator8_.containsAllocation(ptr))
@@ -20,8 +20,8 @@ X_INLINE size_t GrowingMicroAllocator::getSize(void* ptr) const
     return 0;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 X_INLINE size_t GrowingMicroAllocator::usableSize(void* ptr) const
 {
     if (poolAllocator8_.containsAllocation(ptr))
@@ -41,15 +41,15 @@ X_INLINE size_t GrowingMicroAllocator::usableSize(void* ptr) const
     return 0;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 X_INLINE bool GrowingMicroAllocator::containsAllocation(void* ptr) const
 {
     return (poolAllocator8_.containsAllocation(ptr) || poolAllocator16_.containsAllocation(ptr) || poolAllocator32_.containsAllocation(ptr) || poolAllocator64_.containsAllocation(ptr) || poolAllocator128_.containsAllocation(ptr) || poolAllocator256_.containsAllocation(ptr));
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 X_INLINE bool GrowingMicroAllocator::containsAllocation(void* ptr, size_t size) const
 {
     X_UNUSED(ptr);
@@ -62,8 +62,8 @@ X_INLINE bool GrowingMicroAllocator::containsAllocation(void* ptr, size_t size) 
 
     return size <= MAX_ALLOCATION_SIZE;
 }
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 X_INLINE bool GrowingMicroAllocator::containsAllocation(void* ptr, size_t* pSizeOut) const
 {
     if (poolAllocator8_.containsAllocation(ptr)) {

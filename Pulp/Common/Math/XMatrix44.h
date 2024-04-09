@@ -194,11 +194,11 @@ public:
     Vec3<T> postMultiplyW(const Vec3<T>& v) const;
 
 
-    //! Computes inverse; assumes the matrix is affine, i.e. the bottom row is [0 0 0 1]
+    // Computes inverse; assumes the matrix is affine, i.e. the bottom row is [0 0 0 1]
     void affineInvert();
     Matrix44<T> affineInverted() const;
 
-    //! Computes inverse; assumes the matrix is orthonormal
+    // Computes inverse; assumes the matrix is orthonormal
     void orthonormalInvert();
     Matrix44<T> orthonormalInverted() const;
 

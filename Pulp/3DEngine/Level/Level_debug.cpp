@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Level.h"
 
-#include "Drawing\PrimativeContext.h"
+#include "Drawing\PrimitiveContext.h"
 
 #include <Math\XWinding.h>
 

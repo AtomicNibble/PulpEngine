@@ -1,16 +1,9 @@
-==== Potato Engine Style Guide v0.1 ====
-
-LeadDev: WinCat
-CodeBitch: Tom Crowley
-
-Doc Status: INCOMPLETE
-
+==== Engine Style Guide v0.1 ====
 
 Intro:
 
 This document is for me to write down how I'm currently 'doing things' in regards to style.
 My personal style guide changes all the time but I always try to be consistent within a project.
-By writing it down it's in black and white I'm less likley to drift over the years.
 
 Updating Code:
 
@@ -31,7 +24,7 @@ Source Naming:
 
 Header File Guards:
 
-    EVery header file should contain a #pragma once and a #ifndef guard.
+    Every header file should contain a #pragma once and a #ifndef guard.
 
 Forward declarations:
 
@@ -57,7 +50,7 @@ Classes
 
     Constructors:
 
-        No heay work should be performed in constructors.
+        No heavy work should be performed in constructors.
 
     Layout:
 

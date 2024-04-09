@@ -8,7 +8,7 @@ X_NAMESPACE_DECLARE(core,
                     struct FrameTimeData;)
 
 X_NAMESPACE_DECLARE(engine,
-        class IPrimativeContext);
+        class IPrimitiveContext);
 
 X_NAMESPACE_BEGIN(video)
 
@@ -42,7 +42,7 @@ struct IVideoSys : public core::IEngineSysBase
 
     virtual ~IVideoSys() = default;
 
-    virtual Vec2f drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const X_ABSTRACT;
+    virtual Vec2f drawDebug(engine::IPrimitiveContext* pPrim, Vec2f pos) const X_ABSTRACT;
 
     virtual void update(const core::FrameTimeData& frameTimeInfo) X_ABSTRACT;
     virtual void unlockBuffers(void) X_ABSTRACT;

@@ -8,19 +8,19 @@
 
 X_NAMESPACE_BEGIN(core)
 
-/// \ingroup String
-/// \class StrTable
-/// \brief A class that stores strings with low memory indentifiers.
-/// \details this class stores a collection of strings in congious memory and returns a indentifier for that string
-/// this identifyier can be used to get the string in O(1) but has the advantage of been much smaller than a pointer
-/// so storing them takes much less space.
-/// the table also makes use of blocking so the max string data than can be store is min(255,(blockSize * numeric_limits<T>::max()))
-/// this means a 16 bit interger can refrence upto 65535 strings if every string & header was to fit inside a single block.
-/// and up to 1mb of data.
-///
-/// Large block size don't increase the maximum potential strings a type can hold, but make a string more likley to use less blocks.
-/// Allowing more strings to fit in.
-/// but is more prone to waste due to the block alignment.
+
+// A class that stores strings with low memory identifiers.
+// 
+// This class stores a collection of strings in conscious memory and returns a identifier for that string
+// this identifier can be used to get the string in O(1) but has the advantage of been much smaller than a pointer
+// so storing them takes much less space.
+// the table also makes use of blocking so the max string data than can be store is min(255,(blockSize * numeric_limits<T>::max()))
+// this means a 16 bit integer can reference upto 65535 strings if every string & header was to fit inside a single block.
+// and up to 1mb of data.
+//
+// Large block size don't increase the maximum potential strings a type can hold, but make a string more likely to use less blocks.
+// Allowing more strings to fit in.
+// but is more prone to waste due to the block alignment.
 template<int NumBlocks, int BlockSize, int Alignment, typename IdType>
 class StringTable
 {
@@ -61,17 +61,16 @@ protected:
     uint8_t buffer_[NumBlocks * BlockSize];
 };
 
-/// \ingroup String
-/// \class StringTableUnique
-/// \brief A class that stores strings with low memory indentifiers, prevents duplicates
-/// \details Extends the default StringTable but pools strings, if a string already exsists
-/// in the table it will return the id to that string instead of appending it.
-///
-/// Very useful for joint names since there will be many models with simular bone names.
-///
-/// Typically used in tools, at runtime duplicated should of already been removed.
-///
-/// InsertUnique() is O(log n)
+// A class that stores strings with low memory identifiers, prevents duplicates
+//
+// Extends the default StringTable but pools strings, if a string already exists
+// in the table it will return the id to that string instead of appending it.
+//
+// Very useful for joint names since there will be many models / animations with similar bone names.
+//
+// Typically used in tools, at runtime duplicated should of already been removed.
+//
+// InsertUnique() is O(log n)
 template<int NumBlocks, int BlockSize, int Alignment, typename IdType>
 class StringTableUnique : public StringTable<NumBlocks, BlockSize, Alignment, IdType>
 {

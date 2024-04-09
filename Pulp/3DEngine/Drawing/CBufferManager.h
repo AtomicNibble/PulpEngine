@@ -34,7 +34,7 @@ X_NAMESPACE_BEGIN(engine)
 //  I guess as long as it's limited or somthing.. humm..
 //
 //	I also want to maybe merge const buffers.
-//	If a const buffer for two diffrent shaders is the same and is bound is same locations and everything.
+//	If a const buffer for two different shaders is the same and is bound is same locations and everything.
 //	they can both use the same gpu memory and we only have to update one.
 //
 

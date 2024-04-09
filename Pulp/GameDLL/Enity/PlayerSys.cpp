@@ -277,17 +277,17 @@ namespace entity
 
             Vec3f displacement;
 
-            if (userCmd.moveForwrd != 0) {
-                displacement.y += userCmd.moveForwrd * timeDelta * speed;
+            if (userCmd.moveForward != 0) {
+                displacement.y += userCmd.moveForward * timeDelta * speed;
             }
             if (userCmd.moveRight != 0) {
                 displacement.x += userCmd.moveRight * timeDelta * speed;
             }
 
-            if (userCmd.moveForwrd || userCmd.moveRight) {
+            if (userCmd.moveForward || userCmd.moveRight) {
                 static int frames = 0;
 
-                // HACK: untill have animations playing and can que it from notrtracks in anim.
+                // HACK: until have animations playing and can que it from notrtracks in anim.
                 ++frames;
                 if (frames == 15) {
                     frames = 0;
@@ -336,7 +336,7 @@ namespace entity
                 if (flags.IsSet(physics::CharacterColFlag::DOWN)) {
                     state.Set(Player::State::OnGround);
 
-                    // TEMP: don't allow another jump untill atleast 0.2 seconds have passed.
+                    // TEMP: don't allow another jump until atleast 0.2 seconds have passed.
                     if (player.jumpTime > core::TimeVal(0.2f)) {
                         state.Remove(Player::State::Jump);
                     }
@@ -384,7 +384,7 @@ namespace entity
                 // need to holster the weapon, then switch to new one.
                 // ugh.
                 
-                // first find a weapon we can swith to.
+                // first find a weapon we can switch to.
                 auto& inv = reg.get<Inventory>(playerId);
                 auto wpnIdx = player.targetWpn;
 
@@ -420,7 +420,7 @@ namespace entity
                         continue;
                     }
 
-                    // gimmy the fooking weapon!
+                    // gimmy the weapon!
                     auto* pWpnDef = weaponDefs.findWeaponDef(wpnIdx);
                     if (!pWpnDef) {
                         continue;
@@ -545,7 +545,7 @@ namespace entity
         Vec3f vel = velocity - (velocity * gravity) * gravity;
         float xyspeed = vel.length();
 
-        if (!userCmd.moveForwrd && !userCmd.moveRight || (xyspeed < 5.f)) {
+        if (!userCmd.moveForward && !userCmd.moveRight || (xyspeed < 5.f)) {
             // reset.
             player.bobCycle = 0;
             player.bobfracsin = 0;

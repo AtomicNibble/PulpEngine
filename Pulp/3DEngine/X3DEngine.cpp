@@ -49,13 +49,13 @@ X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
     pCBufMan_(nullptr),
     pVariableStateMan_(nullptr),
     primContexts_{
-        {primResources_, PrimativeContext::Mode::Mode3D, PrimativeContext::MaterialSet::BASE, arena}, // sound
-        {primResources_, PrimativeContext::Mode::Mode3D, PrimativeContext::MaterialSet::BASE, arena}, // physics
-        {primResources_, PrimativeContext::Mode::Mode3D, PrimativeContext::MaterialSet::BASE, arena}, // misc3d
-        {primResources_, PrimativeContext::Mode::Mode3D, PrimativeContext::MaterialSet::BASE, arena}, // persistent
-        {primResources_, PrimativeContext::Mode::Mode2D, PrimativeContext::MaterialSet::BASE_2D, arena}, // gui
-        {primResources_, PrimativeContext::Mode::Mode2D, PrimativeContext::MaterialSet::BASE_2D, arena}, // profile
-        {primResources_, PrimativeContext::Mode::Mode2D, PrimativeContext::MaterialSet::BASE_2D, arena}  // console
+        {primResources_, PrimitiveContext::Mode::Mode3D, PrimitiveContext::MaterialSet::BASE, arena}, // sound
+        {primResources_, PrimitiveContext::Mode::Mode3D, PrimitiveContext::MaterialSet::BASE, arena}, // physics
+        {primResources_, PrimitiveContext::Mode::Mode3D, PrimitiveContext::MaterialSet::BASE, arena}, // misc3d
+        {primResources_, PrimitiveContext::Mode::Mode3D, PrimitiveContext::MaterialSet::BASE, arena}, // persistent
+        {primResources_, PrimitiveContext::Mode::Mode2D, PrimitiveContext::MaterialSet::BASE_2D, arena}, // gui
+        {primResources_, PrimitiveContext::Mode::Mode2D, PrimitiveContext::MaterialSet::BASE_2D, arena}, // profile
+        {primResources_, PrimitiveContext::Mode::Mode2D, PrimitiveContext::MaterialSet::BASE_2D, arena}  // console
     },
     clearPersistent_(false),
     coreEventReg_(false),
@@ -64,13 +64,13 @@ X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
     pixelBufffers_.fill(nullptr);
 
     // check if the enum order was changed in a way that resulted in incorrect modes.
-    X_ASSERT(primContexts_[PrimContext::SOUND].getMode() == IPrimativeContext::Mode::Mode3D, "Incorrect mode")();
-    X_ASSERT(primContexts_[PrimContext::PHYSICS].getMode() == IPrimativeContext::Mode::Mode3D, "Incorrect mode")();
-    X_ASSERT(primContexts_[PrimContext::MISC3D].getMode() == IPrimativeContext::Mode::Mode3D, "Incorrect mode")();
-    X_ASSERT(primContexts_[PrimContext::PERSISTENT].getMode() == IPrimativeContext::Mode::Mode3D, "Incorrect mode")();
-    X_ASSERT(primContexts_[PrimContext::GUI].getMode() == IPrimativeContext::Mode::Mode2D, "Incorrect mode")();
-    X_ASSERT(primContexts_[PrimContext::PROFILE].getMode() == IPrimativeContext::Mode::Mode2D, "Incorrect mode")();
-    X_ASSERT(primContexts_[PrimContext::CONSOLE].getMode() == IPrimativeContext::Mode::Mode2D, "Incorrect mode")();
+    X_ASSERT(primContexts_[PrimContext::SOUND].getMode() == IPrimitiveContext::Mode::Mode3D, "Incorrect mode")();
+    X_ASSERT(primContexts_[PrimContext::PHYSICS].getMode() == IPrimitiveContext::Mode::Mode3D, "Incorrect mode")();
+    X_ASSERT(primContexts_[PrimContext::MISC3D].getMode() == IPrimitiveContext::Mode::Mode3D, "Incorrect mode")();
+    X_ASSERT(primContexts_[PrimContext::PERSISTENT].getMode() == IPrimitiveContext::Mode::Mode3D, "Incorrect mode")();
+    X_ASSERT(primContexts_[PrimContext::GUI].getMode() == IPrimitiveContext::Mode::Mode2D, "Incorrect mode")();
+    X_ASSERT(primContexts_[PrimContext::PROFILE].getMode() == IPrimitiveContext::Mode::Mode2D, "Incorrect mode")();
+    X_ASSERT(primContexts_[PrimContext::CONSOLE].getMode() == IPrimitiveContext::Mode::Mode2D, "Incorrect mode")();
 }
 
 X3DEngine::~X3DEngine()
@@ -85,7 +85,7 @@ void X3DEngine::registerVars(void)
 void X3DEngine::registerCmds(void)
 {
     ADD_COMMAND_MEMBER("rClearPersistent", this, X3DEngine, &X3DEngine::Command_ClearPersistent,
-        core::VarFlag::SYSTEM, "Clears persistent primatives");
+        core::VarFlag::SYSTEM, "Clears persistent primitives");
 
     ADD_COMMAND_MEMBER("rWriteBufferToFile", this, X3DEngine, &X3DEngine::Command_WriteBufferToFile,
         core::VarFlag::SYSTEM, "Write a frame buffer to file <2d,3d>");
@@ -362,7 +362,7 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
         viewPort.set(pixelBufffers_[PixelBuf::COL_3D]->getDimensions());
 
         render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, 8096 * 12);
-        cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
+        cmdBucketAllocator.createAllocatorsForThreads(*gEnv->pJobSys);
         render::CommandBucket<uint32_t> geoBucket(g_3dEngineArena, cmdBucketAllocator, 8096 * 5, viewPort);
 
         geoBucket.appendRenderTarget(pixelBufffers_[PixelBuf::COL_3D], render::RenderTargetFlag::CLEAR);
@@ -422,9 +422,9 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
     }
 
     {
-        PrimativeContextArr prims;
+        PrimitiveContextArr prims;
 
-        getPrimsWithData(prims, IPrimativeContext::Mode::Mode3D);
+        getPrimsWithData(prims, IPrimitiveContext::Mode::Mode3D);
         if (!prims.isEmpty()) 
         {
             size_t totalElems = getTotalElems(prims);
@@ -434,13 +434,13 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
             viewPort.set(pixelBufffers_[PixelBuf::COL_3D]->getDimensions());
 
             render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, totalElems * 1024);
-            cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
+            cmdBucketAllocator.createAllocatorsForThreads(*gEnv->pJobSys);
             render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems * 4, viewPort);
 
             primBucket.appendRenderTarget(pixelBufffers_[PixelBuf::COL_3D]);
             primBucket.setDepthStencil(pixelBufffers_[PixelBuf::DEPTH_STENCIL], render::DepthBindFlag::WRITE);
 
-            addPrimsToBucket(frame, primBucket, IPrimativeContext::Mode::Mode3D, core::make_span(prims.begin(), prims.end()));
+            addPrimsToBucket(frame, primBucket, IPrimitiveContext::Mode::Mode3D, core::make_span(prims.begin(), prims.end()));
 
             // sort + draw
             primBucket.sort();
@@ -451,7 +451,7 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
     }
 
     // draw 2d!
-    renderPrimContex2D(frame, IPrimativeContext::Mode::Mode2D);
+    renderPrimContex2D(frame, IPrimitiveContext::Mode::Mode2D);
 
     // draw the textures int oframe buffer.
     // sometimes i might want to just build a bucket in single threaded mode.
@@ -462,7 +462,7 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
         viewPort.set(pRender->getDisplayRes());
 
         render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, 2048);
-        cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
+        cmdBucketAllocator.createAllocatorsForThreads(*gEnv->pJobSys);
         render::CommandBucket<uint32_t> bucket(g_3dEngineArena, cmdBucketAllocator, 16, viewPort);
 
         bucket.appendRenderTarget(pRender->getCurBackBuffer());
@@ -551,11 +551,11 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
     }
 }
 
-void X3DEngine::renderPrimContex2D(core::FrameData& frame, IPrimativeContext::Mode mode)
+void X3DEngine::renderPrimContex2D(core::FrameData& frame, IPrimitiveContext::Mode mode)
 {
     ttZone(gEnv->ctx, "(3dEngine) Render PrimContext2D");
 
-    PrimativeContextArr prims;
+    PrimitiveContextArr prims;
 
     getPrimsWithData(prims, mode);
 
@@ -588,7 +588,7 @@ void X3DEngine::renderPrimContex2D(core::FrameData& frame, IPrimativeContext::Mo
     }
 
     render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, totalElems * 2048);
-    cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
+    cmdBucketAllocator.createAllocatorsForThreads(*gEnv->pJobSys);
     render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems * 4, viewPort);
 
     primBucket.appendRenderTarget(pixelBufffers_[PixelBuf::COL_2D]);
@@ -604,11 +604,11 @@ void X3DEngine::renderPrimContex2D(core::FrameData& frame, IPrimativeContext::Mo
 }
 
 void X3DEngine::addPrimsToBucket(core::FrameData& frame, render::CommandBucket<uint32_t>& primBucket,
-    IPrimativeContext::Mode mode, core::span<PrimativeContext*> prims)
+    IPrimitiveContext::Mode mode, core::span<PrimitiveContext*> prims)
 {
     ttZone(gEnv->ctx, "(3dEngine) addPrimsToBucket");
 
-    const auto is2D = mode == IPrimativeContext::Mode::Mode2D;
+    const auto is2D = mode == IPrimitiveContext::Mode::Mode2D;
 
     auto* pRender = gEnv->pRender;
 
@@ -640,7 +640,7 @@ void X3DEngine::addPrimsToBucket(core::FrameData& frame, render::CommandBucket<u
 
             const core::StrHash tech("unlit");
 
-            const auto* pTech = pMaterialManager_->getTechForMaterial(pMat, tech, IPrimativeContext::VERTEX_FMT);
+            const auto* pTech = pMaterialManager_->getTechForMaterial(pMat, tech, IPrimitiveContext::VERTEX_FMT);
 
             const auto* pPerm = pTech->pPerm;
             const auto stateHandle = pPerm->stateHandle;
@@ -670,15 +670,15 @@ void X3DEngine::addPrimsToBucket(core::FrameData& frame, render::CommandBucket<u
         }
 
         // shapeData
-        //	this code is a little elabrate, but makes drawing primative shapes pretty cheap.
-        //	it copyies all the instance data for all shapes for all lod's to a series of instance data pages.
+        //	this code is a little elaborate, but makes drawing primitive shapes pretty cheap.
+        //	it copies all the instance data for all shapes for all lod's to a series of instance data pages.
         //	all the buffer copying is done before any drawing to give gpu some time to copy instance data
-        //	then all the shapes are drawn with instance calls, meaning drawing 1000 spheres of variang sizes and color
-        //	will result in about 4 page data copyies followed by 4 draw calls.
-        //  which is kinda nice as the first draw call can begin before the instance data for the other 3 have finished
+        //	then all the shapes are drawn with instance calls, meaning drawing 1000 spheres of varying sizes and color
+        //	will result in about 4 page data copies followed by 4 draw calls.
+        //  which is kind of nice as the first draw call can begin before the instance data for the other 3 have finished
         {
             // what material to draw with?
-            Material* pMat = primResources_.getMaterial(PrimativeContext::MaterialSet::BASE, render::TopoType::TRIANGLELIST);
+            Material* pMat = primResources_.getMaterial(PrimitiveContext::MaterialSet::BASE, render::TopoType::TRIANGLELIST);
 
             auto& objShapeLodBufs = context.getShapeArrayBuffers();
 
@@ -688,13 +688,13 @@ void X3DEngine::addPrimsToBucket(core::FrameData& frame, render::CommandBucket<u
             }
 
             auto& instPages = primResources_.getInstancePages();
-            const uint32_t maxPerPage = PrimativeContextSharedResources::NUM_INSTANCE_PER_PAGE;
+            const uint32_t maxPerPage = PrimitiveContextSharedResources::NUM_INSTANCE_PER_PAGE;
 
             render::Commands::CopyVertexBufferData* pBufUpdateCommand = nullptr;
 
             // buffer copy commands.
             {
-                // we need to keep trac of space left, so we can merge all shapes into single inst pages.
+                // we need to keep track of space left, so we can merge all shapes into single inst pages.
                 uint32_t curPageSpace = maxPerPage;
                 size_t curInstPage = 0;
 
@@ -703,7 +703,7 @@ void X3DEngine::addPrimsToBucket(core::FrameData& frame, render::CommandBucket<u
                 }
 
                 for (size_t x = 0; x < objShapeLodBufs.size(); x++) {
-                    PrimativeContext::ShapeType::Enum shapeType = static_cast<PrimativeContext::ShapeType::Enum>(x);
+                    PrimitiveContext::ShapeType::Enum shapeType = static_cast<PrimitiveContext::ShapeType::Enum>(x);
                     auto& shapeBuf = objShapeLodBufs[x];
 
                     if (shapeBuf.isEmpty()) {
@@ -749,8 +749,8 @@ void X3DEngine::addPrimsToBucket(core::FrameData& frame, render::CommandBucket<u
                         }
                         pUpdateBuf->vertexBuffer = instPage.instBufHandle;
                         pUpdateBuf->pData = pInstData;
-                        pUpdateBuf->size = batchSize * sizeof(IPrimativeContext::ShapeInstanceData);
-                        pUpdateBuf->dstOffset = batchOffset * sizeof(IPrimativeContext::ShapeInstanceData);
+                        pUpdateBuf->size = batchSize * sizeof(IPrimitiveContext::ShapeInstanceData);
+                        pUpdateBuf->dstOffset = batchOffset * sizeof(IPrimitiveContext::ShapeInstanceData);
 
                         // chain them
                         pBufUpdateCommand = pUpdateBuf;
@@ -760,8 +760,8 @@ void X3DEngine::addPrimsToBucket(core::FrameData& frame, render::CommandBucket<u
 
                     // can we draw them all?
                     if (numInstLeft > 0) {
-                        X_WARNING("Engine", "Not enougth pages to draw all primative %s's. total: %" PRIuS " dropped: %" PRIu32,
-                            IPrimativeContext::ShapeType::ToString(shapeType), instData.size(), numInstLeft);
+                        X_WARNING("Engine", "Not enough pages to draw all primitive %s's. total: %" PRIuS " dropped: %" PRIu32,
+                            IPrimitiveContext::ShapeType::ToString(shapeType), instData.size(), numInstLeft);
                     }
                 }
             }
@@ -772,7 +772,7 @@ void X3DEngine::addPrimsToBucket(core::FrameData& frame, render::CommandBucket<u
                 size_t curInstPage = 0;
 
                 for (size_t x = 0; x < objShapeLodBufs.size(); x++) {
-                    PrimativeContext::ShapeType::Enum shapeType = static_cast<PrimativeContext::ShapeType::Enum>(x);
+                    PrimitiveContext::ShapeType::Enum shapeType = static_cast<PrimitiveContext::ShapeType::Enum>(x);
                     const auto& shapeRes = context.getShapeResources(shapeType);
                     auto& shapeBuf = objShapeLodBufs[x];
                     auto& shapeCnts = shapeBuf.getShapeCounts();
@@ -784,7 +784,7 @@ void X3DEngine::addPrimsToBucket(core::FrameData& frame, render::CommandBucket<u
                         const auto* pTech = pMaterialManager_->getTechForMaterial(
                             pMat,
                             tech,
-                            IPrimativeContext::VERTEX_FMT,
+                            IPrimitiveContext::VERTEX_FMT,
                             PermatationFlags::Instanced);
 
                         const auto* pPerm = pTech->pPerm;
@@ -851,7 +851,7 @@ void X3DEngine::addPrimsToBucket(core::FrameData& frame, render::CommandBucket<u
     }
 }
 
-void X3DEngine::getPrimsWithData(PrimativeContextArr& prims, IPrimativeContext::Mode mode)
+void X3DEngine::getPrimsWithData(PrimitiveContextArr& prims, IPrimitiveContext::Mode mode)
 {
     for (uint32_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++) {
         auto& context = primContexts_[i];
@@ -867,9 +867,9 @@ void X3DEngine::getPrimsWithData(PrimativeContextArr& prims, IPrimativeContext::
     }
 }
 
-size_t X3DEngine::getTotalElems(const PrimativeContextArr& prims)
+size_t X3DEngine::getTotalElems(const PrimitiveContextArr& prims)
 {
-    size_t totalElems = core::accumulate(prims.begin(), prims.end(), 0_sz, [](PrimativeContext* pPrim) {
+    size_t totalElems = core::accumulate(prims.begin(), prims.end(), 0_sz, [](PrimitiveContext* pPrim) {
         const auto& elems = pPrim->getUnsortedBuffer();
         const auto& objBufs = pPrim->getShapeArrayBuffers();
 
@@ -884,7 +884,7 @@ size_t X3DEngine::getTotalElems(const PrimativeContextArr& prims)
     return totalElems;
 }
 
-IPrimativeContext* X3DEngine::getPrimContext(PrimContext::Enum user)
+IPrimitiveContext* X3DEngine::getPrimContext(PrimContext::Enum user)
 {
     return &primContexts_[user];
 }
@@ -923,7 +923,7 @@ IWorld3D* X3DEngine::create3DWorld(physics::IScene* pPhysScene)
 
 void X3DEngine::release3DWorld(IWorld3D* pWorld)
 {
-    X_ASSERT(worlds_.find(pWorld) == WorldArr::invalid_index, "World is still ative")(pWorld);
+    X_ASSERT(worlds_.find(pWorld) == WorldArr::invalid_index, "World is still active")(pWorld);
     X_DELETE(pWorld, g_3dEngineArena);
 }
 

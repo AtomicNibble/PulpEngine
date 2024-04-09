@@ -17,7 +17,7 @@
 #include <ICore.h>
 #include <IFileSys.h>
 #include <IFrameData.h>
-#include <IPrimativeContext.h>
+#include <IPrimitiveContext.h>
 #include <IFont.h>
 #include <I3DEngine.h>
 #include <IConfig.h>
@@ -411,7 +411,7 @@ void XConsole::registerVars(void)
     ADD_CVAR_REF_NO_NAME(console_buffer_size, 1000, 1, 10000, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
         "Size of the log buffer");
     ADD_CVAR_REF_NO_NAME(console_output_draw_channel, 1, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
-        "Draw the channel in a diffrent color. 0=disabled 1=enabled");
+        "Draw the channel in a different color. 0=disabled 1=enabled");
     ADD_CVAR_REF_NO_NAME(console_cursor_skip_color_codes, 1, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
         "Skips over the color codes when moving cursor.");
     ADD_CVAR_REF_NO_NAME(console_disable_mouse, 2, 0, 2, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
@@ -574,7 +574,7 @@ void XConsole::freeRenderResources(void)
 void XConsole::saveChangedVars(void)
 {
     if (varMap_.isEmpty()) {
-        X_WARNING("Console", "Skipping saving of modified vars. no registerd vars.");
+        X_WARNING("Console", "Skipping saving of modified vars. no registered vars.");
         return;
     }
 
@@ -586,9 +586,9 @@ void XConsole::saveChangedVars(void)
     userConfigPath.append(USER_CFG_FILE_NAME);
 
     // we need to handle the case where a modified var is in the config
-    // but we are shutting down before that var has been registerd again.
+    // but we are shutting down before that var has been registered again.
     // so it won't get saved out into the new one.
-    // so i'm going to parse the exsisting config and keep any var sets that are for vars that don't currently exsist.
+    // so i'm going to parse the existing config and keep any var sets that are for vars that don't currently exist.
 
     core::Array<char> buf(arena_);
     core::ArrayGrowMultiply<core::StringRange<char>> keep(arena_);
@@ -680,7 +680,7 @@ void XConsole::dispatchRepeateInputEvents(core::FrameTimeData& time)
 {
     // we must be open to accept input.
     // cancel any repeat events when we close.
-    if (!isVisable()) {
+    if (!isVisible()) {
         repeatEvent_.keyId = input::KeyId::UNKNOWN;
         return;
     }
@@ -882,7 +882,7 @@ void XConsole::registerCommand(core::string_view name, ConsoleCmdFunc func, VarF
     cmd.func = func;
 
     if (cmdMap_.find(cmd.name) != cmdMap_.end()) {
-        X_ERROR("Console", "command already exsists: \"%.*s", name.length(), name.data());
+        X_ERROR("Console", "command already exists: \"%.*s", name.length(), name.data());
         return;
     }
 
@@ -1020,7 +1020,7 @@ ICVar* XConsole::getCVarForRegistration(core::string_view name)
 {
     if (auto it = varMap_.find(name); it != varMap_.end()) {
         // if you get this warning you need to fix it.
-        X_ERROR("Console", "var(%.*s) is already registerd", name.length(), name.data());
+        X_ERROR("Console", "var(%.*s) is already registered", name.length(), name.data());
         return it->second;
     }
 
@@ -1168,7 +1168,7 @@ void XConsole::executeStringInternal(const ExecCommand& cmd)
         }
 
         // if this was from config, add it to list.
-        // so vars not yet registerd can get the value
+        // so vars not yet registered can get the value
         if (cmd.source == ExecSource::CONFIG && pPos) {
             value.set(pPos + 1, range.getEnd());
             value.trim();
@@ -1318,7 +1318,7 @@ bool XConsole::handleInput(const input::InputEvent& event)
         if (event.keyId == input::KeyId::OEM_8)
         {
             bool expand = event.modifiers.IsSet(input::ModifiersMasks::Shift);
-            bool visable = isVisable();
+            bool visible = isVisible();
 
             // clear states.
             gEnv->pInput->clearKeyState();
@@ -1330,14 +1330,14 @@ bool XConsole::handleInput(const input::InputEvent& event)
                 toggleConsole(false); // toggle it.
             }
 
-            // don't clear if already visable, as we are just expanding.
-            if (!visable) {
+            // don't clear if already visible, as we are just expanding.
+            if (!visible) {
                 clearInputBuffer();
             }
 
             return true;
         }
-        else if (event.keyId == input::KeyId::ESCAPE && isVisable())
+        else if (event.keyId == input::KeyId::ESCAPE && isVisible())
         {
             clearInputBuffer();
             showConsole(consoleState::CLOSED);
@@ -1383,7 +1383,7 @@ bool XConsole::handleInput(const input::InputEvent& event)
     }
 #endif
 
-    if (!isVisable()) {
+    if (!isVisible()) {
         return false;
     }
 
@@ -1395,7 +1395,7 @@ bool XConsole::handleInput(const input::InputEvent& event)
     if (event.action != input::InputState::PRESSED) 
     {
         if (event.deviceType == input::InputDeviceType::KEYBOARD) {
-            return isVisable();
+            return isVisible();
         }
 
         // eat mouse move?
@@ -1407,7 +1407,7 @@ bool XConsole::handleInput(const input::InputEvent& event)
                     return isExpanded();
                 }
                 if (console_disable_mouse == 2) {
-                    return isVisable();
+                    return isVisible();
                 }
 
                 return false;
@@ -1431,7 +1431,7 @@ bool XConsole::handleInput(const input::InputEvent& event)
 
             scaled /= 20;
 
-            // enuse scaled didnt remove all scrolling
+            // enuse scaled didn't remove all scrolling
             if (positive && scaled < 1) {
                 scaled = 1;
             }
@@ -1462,7 +1462,7 @@ bool XConsole::handleInput(const input::InputEvent& event)
 
 bool XConsole::handleInputChar(const input::InputEvent& event)
 {
-    if (!isVisable()) {
+    if (!isVisible()) {
         return false;
     }
 
@@ -1475,7 +1475,7 @@ bool XConsole::handleInputChar(const input::InputEvent& event)
 
 bool XConsole::processInput(const input::InputEvent& event)
 {
-    X_ASSERT(isVisable(), "ProcessInput called when not visible")(isVisable());
+    X_ASSERT(isVisible(), "ProcessInput called when not visible")(isVisible());
 
     // consume char input.
     if (event.action == input::InputState::CHAR) {
@@ -1706,7 +1706,7 @@ void XConsole::historyIoRequestCallback(core::IFileSys& fileSys, const core::IoR
     X_UNUSED(fileSys, bytesTransferred);
 
     // history file loaded.
-    X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")(pRequest->getType());
+    X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Received unexpected request type")(pRequest->getType());
     const core::IoRequestOpenRead* pOpenRead = static_cast<const IoRequestOpenRead*>(pRequest);
 
     {
@@ -1913,7 +1913,7 @@ int32_t XConsole::maxVisibleLogLines(void) const
     return static_cast<int32_t>(height / lineSize);
 }
 
-/// ------------------------------------------------------
+// ------------------------------------------------------
 
 
 void XConsole::drawBuffer(void)
@@ -2119,7 +2119,7 @@ void XConsole::drawInputTxt(const Vec2f& start)
             }
 
             // TODO: make results take string_view
-            X_ASSERT(*name.end() == '\0', "Name needs to be nullterm untill this is code is updated")();
+            X_ASSERT(*name.end() == '\0', "Name needs to be nullterm until this is code is updated")();
 
             // we search same length.
             if (pComparison(name.data(), name.data() + inputLen, inputBegin, inputEnd)) {

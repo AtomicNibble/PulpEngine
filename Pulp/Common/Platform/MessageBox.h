@@ -7,8 +7,6 @@ X_NAMESPACE_BEGIN(core)
 
 namespace msgbox
 {
-    // not using engine enums as i don't think i'll ever want ToString for these.
-
     X_DECLARE_FLAGS(Style)
     (
         Info,

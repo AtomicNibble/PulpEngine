@@ -65,8 +65,8 @@ private:
     static constexpr size_t allocSize(int8_t numTexStates, int8_t numSamp, int8_t numCBs, int8_t numBuf);
 
 private:
-    // do i want linera allocator which i think would work well or a pool.
-    // down side of lineraalocator is i can't free them so for now we pool.
+    // do i want linear allocator which i think would work well or a pool.
+    // down side of linearalocator is i can't free them so for now we pool.
     // could create multiple pools to help reduce wastage.
     core::HeapArea statePoolHeap_;
     core::PoolAllocator statePoolAllocator_;

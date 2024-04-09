@@ -65,7 +65,7 @@ X_INLINE CommandPacket::Packet CmdPacketAllocator::create(size_t threadIdx, size
 {
     static_assert(core::compileTime::IsPOD<CommandT>::Value, "Command packet type must be POD");
 
-    // we have linera allocators for each thread.
+    // we have linear allocators for each thread.
     ThreadAllocator& allocator = *allocators_[threadIdx];
 
     return X_NEW_ARRAY(uint8_t, CommandPacket::getPacketSize<CommandT>(auxMemorySize), &allocator.arena_, "CmdPacket");
@@ -75,7 +75,7 @@ X_INLINE uint8_t* CmdPacketAllocator::auxAlloc(size_t size)
 {
     static_assert(core::compileTime::IsPOD<DynamicBufferDesc>::Value, "Command packet type must be POD");
 
-    // we have linera allocators for each thread.
+    // we have linear allocators for each thread.
     ThreadAllocator& allocator = *allocators_[getThreadIdx()];
 
     return X_NEW_ARRAY(uint8_t, size, &allocator.arena_, "Auxb");

@@ -56,7 +56,7 @@ public:
     // Returns the flags' value as integer.
     inline constexpr uint32_t ToInt(void) const;
 
-    /// human-readable string, and returns a pointer to the description string.
+    // human-readable string, and returns a pointer to the description string.
     const char* ToString(Description& description) const;
 
 private:
@@ -118,7 +118,7 @@ public:
 
     inline constexpr uint8_t ToInt(void) const;
 
-    /// human-readable string, and returns a pointer to the description string.
+    // human-readable string, and returns a pointer to the description string.
     const char* ToString(Description& description) const;
 
 private:

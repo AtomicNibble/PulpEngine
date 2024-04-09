@@ -13,7 +13,7 @@ TEST(net, LargePacketTest)
     net::IPeer* pServer = pNet->createPeer();
     net::IPeer* pPeer = pNet->createPeer();
 
-    // create a server and a peer and send diffrent size msg's
+    // create a server and a peer and send different size msg's
     // some bigger than MTU.
 
     net::SocketDescriptor sd(SERVER_PORT_BASE);
@@ -67,8 +67,8 @@ TEST(net, LargePacketTest)
 
     data[0] = PACKET_ID;
 
-    // we verify the recived data is same with sha1.
-    core::Hash::SHA1Digest sendDigest, reciveDigest;
+    // we verify the received data is same with sha1.
+    core::Hash::SHA1Digest sendDigest, receivedigest;
     core::Hash::SHA1 sha1;
 
     sha1.update(data.data(), data.size());
@@ -132,7 +132,7 @@ TEST(net, LargePacketTest)
             for (pPacket = pServer->receive(); pPacket; pServer->freePacket(pPacket), pPacket = pServer->receive()) {
                 if (pPacket->getID() == PACKET_ID) {
                     // we got the packet data, check it's correct.
-                    X_LOG0("ServerTest", "Recived packet. length: %" PRIu32, pPacket->bitLength);
+                    X_LOG0("ServerTest", "Received packet. length: %" PRIu32, pPacket->bitLength);
 
                     ASSERT_EQ(core::bitUtil::bytesToBits(PACKET_SIZE), pPacket->bitLength);
 
@@ -141,9 +141,9 @@ TEST(net, LargePacketTest)
                     // calculate sha1 of it.
                     sha1.reset();
                     sha1.update(data.data(), data.size());
-                    reciveDigest = sha1.finalize();
+                    receivedigest = sha1.finalize();
 
-                    EXPECT_EQ(sendDigest, reciveDigest);
+                    EXPECT_EQ(sendDigest, receivedigest);
 
                     curState = State::Complete;
                 }

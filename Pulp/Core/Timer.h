@@ -42,7 +42,7 @@ private:
     int64_t baseTime_;                           // time we started / reset
     int64_t lastFrameStartTime_;                 // start time relative to base time
     int64_t currentTime_;                        // relative to base.
-    int64_t accumalatedTime_[Timer::ENUM_COUNT]; // accumalted scaled time
+    int64_t accumulatedTime_[Timer::ENUM_COUNT]; // accumulated scaled time
 
     float32_t timeScale_[Timer::ENUM_COUNT];
     int64_t ticksPerSec_;

@@ -65,7 +65,7 @@ public:
     typedef traits::Function<ReturnValue(const Thread&)> Function;
 
     Thread(void);  // no thread is created.
-    ~Thread(void); /// Calls Destroy() to stop and join the thread.
+    ~Thread(void); // Calls Destroy() to stop and join the thread.
 
     void create(const char* pName, uint32_t stackSize = 0);
 

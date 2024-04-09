@@ -18,9 +18,9 @@
 //
 //	A plane 3 points in 3d space.
 //  we need 3 points so that the orientation(pitch, yaw, roll)
-//  can be determinied.
+//  can be determined.
 //
-// We store it as a normal and ditance as describied in Methord 3
+// We store it as a normal and distance as described in Method 3
 // http://en.wikipedia.org/wiki/Plane_(geometry)
 //
 //
@@ -63,13 +63,13 @@ public:
     X_INLINE Plane(const Vec3<T>& normal, const T distance);
     X_INLINE Plane(T a, T b, T c, T d); // sets plane values directly.
 
-    //! Defines a plane using 3 points.
+    // Defines a plane using 3 points.
     X_INLINE void set(const Vec3<T>& v1, const Vec3<T>& v2, const Vec3<T>& v3);
-    //! Defines a plane using a normal vector and a point.
+    // Defines a plane using a normal vector and a point.
     X_INLINE void set(const Vec3<T>& point, const Vec3<T>& normal);
-    //! Defines a plane using a normal and distance
+    // Defines a plane using a normal and distance
     X_INLINE void set(const Vec3<T>& normal, const T distance);
-    //! Defines a plane using 4 coefficients.
+    // Defines a plane using 4 coefficients.
     X_INLINE void set(T a, T b, T c, T d);
 
     X_INLINE T operator[](size_t idx) const;

@@ -9,7 +9,7 @@
 #include <IModel.h>
 #include <IRenderMesh.h>
 
-#include "Drawing\PrimativeContext.h"
+#include "Drawing\PrimitiveContext.h"
 
 X_NAMESPACE_DECLARE(core,
                     struct IConsoleCmdArgs)
@@ -34,7 +34,7 @@ class X3DEngine : public I3DEngine
 {
     typedef core::Array<IWorld3D*> WorldArr;
 
-    typedef core::FixedArray<PrimativeContext*, PrimContext::ENUM_COUNT> PrimativeContextArr;
+    typedef core::FixedArray<PrimitiveContext*, PrimContext::ENUM_COUNT> PrimitiveContextArr;
 
     X_DECLARE_ENUM(PixelBuf)(
         DEPTH_STENCIL,
@@ -61,7 +61,7 @@ public:
     void update(core::FrameData& frame) X_FINAL;
     void onFrameBegin(core::FrameData& frame) X_FINAL;
 
-    IPrimativeContext* getPrimContext(PrimContext::Enum user) X_FINAL;
+    IPrimitiveContext* getPrimContext(PrimContext::Enum user) X_FINAL;
     IMaterialManager* getMaterialManager(void) X_FINAL;
     model::IModelManager* getModelManager(void) X_FINAL;
     anim::IAnimManager* getAnimManager(void) X_FINAL;
@@ -74,12 +74,12 @@ public:
     void removeWorldFromActiveList(IWorld3D* pWorld) X_FINAL;
 
 private:
-    void renderPrimContex2D(core::FrameData& frame, IPrimativeContext::Mode mode);
+    void renderPrimContex2D(core::FrameData& frame, IPrimitiveContext::Mode mode);
     void addPrimsToBucket(core::FrameData& frame, render::CommandBucket<uint32_t>& primBucket,
-        IPrimativeContext::Mode mode, core::span<PrimativeContext*> prims);
+        IPrimitiveContext::Mode mode, core::span<PrimitiveContext*> prims);
 
-    void getPrimsWithData(PrimativeContextArr& prims, IPrimativeContext::Mode mode);
-    static size_t getTotalElems(const PrimativeContextArr& prims);
+    void getPrimsWithData(PrimitiveContextArr& prims, IPrimitiveContext::Mode mode);
+    static size_t getTotalElems(const PrimitiveContextArr& prims);
 
 private:
     void OnCoreEvent(const CoreEventData& ed) X_FINAL;
@@ -101,8 +101,8 @@ private:
     VariableStateManager* pVariableStateMan_;
 
     // ---
-    PrimativeContextSharedResources primResources_;
-    PrimativeContext primContexts_[PrimContext::ENUM_COUNT];
+    PrimitiveContextSharedResources primResources_;
+    PrimitiveContext primContexts_[PrimContext::ENUM_COUNT];
 
     PixelBufferArr pixelBufffers_;
 

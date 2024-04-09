@@ -16,7 +16,7 @@ UseCase: Lots of small allocations per frame.
 Cleanup: Automatic
 
 Details:
-	The linera allocator allocates 'pages' of memory and sub allocates the block
+	The linear allocator allocates 'pages' of memory and sub allocates the block
 	returning DynAlloc.
 
 	You can't make a single allocation bigger than size of a single page.
@@ -76,7 +76,7 @@ public:
     static const uint64_t GPU_ALLOCATOION_PAGE_SIZE = 1024 * 64;       // 64K
     static const uint64_t CPU_ALLOCATOION_PAGE_SIZE = 1024 * 1024 * 2; // 2MB
 
-    typedef core::Array<LinearAllocationPage*> LineraAllocationPageArr;
+    typedef core::Array<LinearAllocationPage*> LinearAllocationPageArr;
     typedef core::PriorityQueue<std::pair<uint64_t, LinearAllocationPage*>> AllocationFencePageQueue;
     typedef core::Fifo<LinearAllocationPage*> AllocationPageQueue;
 
@@ -87,8 +87,8 @@ public:
 
     LinearAllocationPage* requestPage(void);
     LinearAllocationPage* allocatePage(size_t sizeInBytes);
-    void discardPages(uint64_t fenceID, const LineraAllocationPageArr& pages);
-    void freePages(uint64_t fenceID, const LineraAllocationPageArr& pages);
+    void discardPages(uint64_t fenceID, const LinearAllocationPageArr& pages);
+    void freePages(uint64_t fenceID, const LinearAllocationPageArr& pages);
     void destroy(void);
 
 private:
@@ -101,7 +101,7 @@ private:
     core::CriticalSection cs_;
 
     const LinearAllocatorType::Enum allocationType_;
-    LineraAllocationPageArr pagePool_;
+    LinearAllocationPageArr pagePool_;
     AllocationFencePageQueue deletedPages_;
     AllocationFencePageQueue retiredPages_;
     AllocationPageQueue availablePages_;
@@ -110,7 +110,7 @@ private:
 class LinearAllocatorManager
 {
     typedef std::array<LinearAllocatorPageManager, LinearAllocatorType::ENUM_COUNT> AllocationPageManagerArr;
-    typedef core::Array<LinearAllocationPage*> LineraAllocationPageArr;
+    typedef core::Array<LinearAllocationPage*> LinearAllocationPageArr;
 
 public:
     LinearAllocatorManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice,
@@ -118,8 +118,8 @@ public:
 
     X_INLINE LinearAllocationPage* requestPage(LinearAllocatorType::Enum type);
     X_INLINE LinearAllocationPage* allocatePage(LinearAllocatorType::Enum type, size_t sizeInBytes);
-    X_INLINE void discardPages(LinearAllocatorType::Enum type, uint64_t fenceID, const LineraAllocationPageArr& pages);
-    X_INLINE void freePages(LinearAllocatorType::Enum type, uint64_t fenceID, const LineraAllocationPageArr& pages);
+    X_INLINE void discardPages(LinearAllocatorType::Enum type, uint64_t fenceID, const LinearAllocationPageArr& pages);
+    X_INLINE void freePages(LinearAllocatorType::Enum type, uint64_t fenceID, const LinearAllocationPageArr& pages);
     void destroy(void);
 
 private:
@@ -131,7 +131,7 @@ class LinearAllocator
 public:
     static const size_t DEFAULT_ALIGN = 256;
 
-    typedef core::Array<LinearAllocationPage*> LineraAllocationPageArr;
+    typedef core::Array<LinearAllocationPage*> LinearAllocationPageArr;
 
 public:
     LinearAllocator(core::MemoryArenaBase* arena, LinearAllocatorManager& manager, LinearAllocatorType::Enum Type);
@@ -149,8 +149,8 @@ private:
     const size_t pageSize_;
     size_t curOffset_;
     LinearAllocationPage* pCurPage_;
-    LineraAllocationPageArr retiredPages_;
-    LineraAllocationPageArr largePages_;
+    LinearAllocationPageArr retiredPages_;
+    LinearAllocationPageArr largePages_;
 };
 
 X_NAMESPACE_END

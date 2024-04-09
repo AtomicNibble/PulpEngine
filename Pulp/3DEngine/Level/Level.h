@@ -23,7 +23,7 @@ X_NAMESPACE_DECLARE(core,
     })
 
 X_NAMESPACE_DECLARE(engine,
-                    class PrimativeContext;)
+                    class PrimitiveContext;)
 
 X_NAMESPACE_BEGIN(level)
 
@@ -265,7 +265,7 @@ private:
     int32_t CommonChildrenArea_r(AreaNode* pAreaNode);
 
 private:
-    void clearVisableAreaFlags(void);
+    void clearVisibleAreaFlags(void);
     void SetAreaVisible(int32_t area);
     //	void SetAreaVisible(int32_t areaNum, const PortalStack* ps);
 
@@ -318,7 +318,7 @@ private:
     core::ITimer* pTimer_;
     core::IFileSys* pFileSys_;
     core::V2::JobSystem* pJobSys_;
-    engine::PrimativeContext* pPrimContex_;
+    engine::PrimitiveContext* pPrimContex_;
     physics::IScene* pScene_; // the scene for this level.
 
 private:

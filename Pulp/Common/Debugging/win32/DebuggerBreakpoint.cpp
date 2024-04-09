@@ -9,13 +9,13 @@ namespace debugging
         bool g_enableBreakpoints = true;
     }
 
-    /// Enables/disables debugger breakpoints.
+    // Enables/disables debugger breakpoints.
     void EnableBreakpoints(bool enable)
     {
         g_enableBreakpoints = enable;
     }
 
-    /// Returns whether breakpoints are enabled in the runtime settings.
+    // Returns whether breakpoints are enabled in the runtime settings.
     bool AreBreakpointsEnabled(void)
     {
         return g_enableBreakpoints;

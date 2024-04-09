@@ -86,7 +86,7 @@ TYPED_TEST(FixedStackTest, DefaultTypes)
 
     EXPECT_EQ(16, stack.size());
     EXPECT_EQ(16, stack.top());
-    EXPECT_EQ(16, stack.size()); // make sure top didnt remvoe a item.
+    EXPECT_EQ(16, stack.size()); // make sure top didn't remvoe a item.
 
     for (int i = 16; i > 10; i--) {
         EXPECT_EQ(i, stack.top());

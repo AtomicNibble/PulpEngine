@@ -10,7 +10,7 @@ RangeList<T>::RangeList(core::MemoryArenaBase* arena) :
 template<typename T>
 size_t RangeList<T>::writeToBitStream(core::FixedBitStreamBase& bs, BitSizeT maxBits, bool removeAdded)
 {
-    bs.alignWriteToByteBoundry(); // make sure we write on boundry.
+    bs.alignWriteToByteBoundary(); // make sure we write on boundary.
 
     // make sure we won't end up negative.
     if (maxBits < bs.size() + sizeof(uint16_t)) {

@@ -65,7 +65,7 @@ struct UserCmd
     int32_t clientGameTimeMS;
     int32_t serverGameTimeMS;
 
-    int16_t moveForwrd;
+    int16_t moveForward;
     int16_t moveRight;
 
     Buttons buttons;

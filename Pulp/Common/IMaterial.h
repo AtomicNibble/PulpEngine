@@ -71,8 +71,8 @@ struct RegisterCtx
 
 X_DECLARE_FLAGS(MaterialFlag)
 (
-    NODRAW,         // not visable
-    EDITOR_VISABLE, // makes nodraw visable in editor modes.
+    NODRAW,         // not visible
+    EDITOR_VISIBLE, // makes nodraw visible in editor modes.
 
     SOLID, // eye/view can't be in a solid
 

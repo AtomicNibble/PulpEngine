@@ -3,7 +3,7 @@
 #ifndef _X_MATH_AABB_H_
 #define _X_MATH_AABB_H_
 
-//	AABB - Axis Aligned Boinding Box
+//	AABB - Axis Aligned Bounding Box
 //
 
 #include "XSphere.h"
@@ -35,8 +35,8 @@ public:
     void set(const OBB& oth);
 
     X_INLINE void clear(void);
-    X_INLINE bool IsInfinate(void) const; // returns if it's infinate: the value it's made after clear.
-    X_INLINE bool isEmpty(void) const;    // retruns if the box contains anyspace
+    X_INLINE bool IsInfinate(void) const; // returns if it's infinite: the value it's made after clear.
+    X_INLINE bool isEmpty(void) const;    // returns false if the box contains anyspace
     X_INLINE Vec3f center(void) const;    // the center point of the box
     X_INLINE Vec3f size(void) const;      // the size of the box.
     X_INLINE Vec3f halfVec(void) const;   // the size of the box / 2

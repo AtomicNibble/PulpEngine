@@ -213,7 +213,7 @@ namespace mapFile
     X_INLINE const XMapEntity::PrimTypeNumArr& XMapEntity::getPrimCounts(void) const
     {
         X_ASSERT(core::accumulate(primCounts_.begin(), primCounts_.end(), 0_sz) == primitives_.size(),
-            "Primatives size and counts don't match")
+            "Primitives size and counts don't match")
         ();
 
         return primCounts_;

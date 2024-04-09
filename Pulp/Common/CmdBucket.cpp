@@ -27,7 +27,7 @@ CmdPacketAllocator::~CmdPacketAllocator()
     }
 }
 
-void CmdPacketAllocator::createAllocaotrsForThreads(core::V2::JobSystem& jobSys)
+void CmdPacketAllocator::createAllocatorsForThreads(core::V2::JobSystem& jobSys)
 {
     core::V2::JobSystem::ThreadIdArray threadIds = jobSys.getThreadIds();
 
@@ -42,7 +42,7 @@ void CmdPacketAllocator::createAllocaotrsForThreads(core::V2::JobSystem& jobSys)
     const size_t numAllocators = threadIdToIndex_.size();
     const size_t totalBufSize = numAllocators * threadAllocatorSize_;
 
-    pBuf_ = X_NEW_ARRAY_ALIGNED(uint8_t, totalBufSize, arena_, "CmdPcketAllocatorBuf", 16);
+    pBuf_ = X_NEW_ARRAY_ALIGNED(uint8_t, totalBufSize, arena_, "CmdPacketAllocatorBuf", 16);
 
     for (size_t i = 0; i < numAllocators; i++) {
         uint8_t* pAllocatorBuf = pBuf_ + (threadAllocatorSize_ * i);
@@ -122,7 +122,7 @@ void CommandBucket<KeyT>::sort(void)
                     continue;
                 }
 
-                // we need to handle complete slots inbetween.
+                // we need to handle complete slots in between.
                 {
                     X_ASSERT(i > 0, "index must be greater than zero")(); // currently we can't reach here without i been >0
 

@@ -92,7 +92,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
 
     LinkModule(pICore_, "UnitTest");
 
-    if (!pICore_->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "ImgLib", "Engine_ImgLib")) {
+    if (!pICore_->InitializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "ImgLib", "Engine_ImgLib")) {
         Error("Failed to init imgLib"_sv);
         return false;
     }

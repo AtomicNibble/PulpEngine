@@ -8,7 +8,7 @@
 
 X_NAMESPACE_DECLARE(model, class XModel)
 
-X_NAMESPACE_DECLARE(engine, class IPrimativeContext)
+X_NAMESPACE_DECLARE(engine, class IPrimitiveContext)
 
 X_NAMESPACE_BEGIN(anim)
 
@@ -128,7 +128,7 @@ public:
     ANIMLIB_EXPORT model::BoneHandle getBoneHandle(const char* pName) const;
     ANIMLIB_EXPORT bool getBoneTransform(model::BoneHandle handle, core::TimeVal currentTime, Vec3f& pos, Matrix33f& axis);
 
-    ANIMLIB_EXPORT void renderInfo(core::TimeVal currentTime, const Vec3f& pos, const Matrix33f& mat, engine::IPrimativeContext* pPrimContex) const;
+    ANIMLIB_EXPORT void renderInfo(core::TimeVal currentTime, const Vec3f& pos, const Matrix33f& mat, engine::IPrimitiveContext* pPrimContex) const;
 
 private:
     void pushAnims(core::TimeVal currentTime, core::TimeVal blendTime);

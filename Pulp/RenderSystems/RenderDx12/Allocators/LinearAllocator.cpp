@@ -86,7 +86,7 @@ LinearAllocationPage* LinearAllocatorPageManager::allocatePage(size_t sizeInByte
     return createNewPage(sizeInBytes);
 }
 
-void LinearAllocatorPageManager::discardPages(uint64_t fenceID, const LineraAllocationPageArr& pages)
+void LinearAllocatorPageManager::discardPages(uint64_t fenceID, const LinearAllocationPageArr& pages)
 {
     core::CriticalSection::ScopedLock lock(cs_);
 
@@ -95,7 +95,7 @@ void LinearAllocatorPageManager::discardPages(uint64_t fenceID, const LineraAllo
     }
 }
 
-void LinearAllocatorPageManager::freePages(uint64_t fenceID, const LineraAllocationPageArr& pages)
+void LinearAllocatorPageManager::freePages(uint64_t fenceID, const LinearAllocationPageArr& pages)
 {
     core::CriticalSection::ScopedLock lock(cs_);
 

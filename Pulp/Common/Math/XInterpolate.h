@@ -15,19 +15,19 @@ public:
         const type& startValue, const type& endValue);
     void SetStartTime(int time)
     {
-        this->startTime_ = time;
+        startTime_ = time;
     }
     void SetDuration(int duration)
     {
-        this->duration_ = duration;
+        duration_ = duration;
     }
     void SetStartValue(const type& startValue)
     {
-        this->startValue_ = startValue;
+        startValue_ = startValue;
     }
     void SetEndValue(const type& endValue)
     {
-        this->endValue_ = endValue;
+        endValue_ = endValue;
     }
 
     type GetCurrentValue(int time) const;
@@ -153,12 +153,12 @@ public:
     }
     void SetStartValue(const type& startValue)
     {
-        this->startValue_ = startValue;
+        startValue_ = startValue;
         Invalidate();
     }
     void SetEndValue(const type& endValue)
     {
-        this->endValue_ = endValue;
+        endValue_ = endValue;
         Invalidate();
     }
 

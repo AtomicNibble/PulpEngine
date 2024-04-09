@@ -74,7 +74,7 @@ inline void FixedByteStreamRingBase::write(const T* pVal, size_type num)
 
 inline void FixedByteStreamRingBase::write(const Type* pBuf, size_type numBytes)
 {
-    X_ASSERT(numBytes <= freeSpace(), "Tried to write more bytes than avalible space")(numBytes, size(), freeSpace(), isEos());
+    X_ASSERT(numBytes <= freeSpace(), "Tried to write more bytes than available space")(numBytes, size(), freeSpace(), isEos());
 
     // so we need to handle wrap around :Z
     // which basically means we might need two copy.
@@ -116,7 +116,7 @@ inline void FixedByteStreamRingBase::read(T* pVal, size_type num)
 
 inline void FixedByteStreamRingBase::read(Type* pBuf, size_type numBytes)
 {
-    X_ASSERT(numBytes <= size(), "Tried to read more bytes than avalible")(numBytes, size(), freeSpace(), isEos());
+    X_ASSERT(numBytes <= size(), "Tried to read more bytes than available")(numBytes, size(), freeSpace(), isEos());
 
     size_type readIdx = readByteIdx_ & mask_;
     size_type bytesToCopy = core::Min(numBytes, numBytes_ - readIdx);
@@ -142,7 +142,7 @@ inline void FixedByteStreamRingBase::peek(size_type offset, T* pVal, size_type n
 
 inline void FixedByteStreamRingBase::peek(size_type offset, Type* pBuf, size_type numBytes) const
 {
-    X_ASSERT(numBytes + offset <= size(), "Tried to read more bytes than avalible")(numBytes + offset, numBytes, offset, size(), freeSpace(), isEos());
+    X_ASSERT(numBytes + offset <= size(), "Tried to read more bytes than available")(numBytes + offset, numBytes, offset, size(), freeSpace(), isEos());
 
     size_type readIdx = (readByteIdx_ + offset) & mask_;
     size_type bytesToCopy = core::Min(numBytes, numBytes_ - readIdx);
@@ -161,7 +161,7 @@ template<typename T>
 inline typename std::enable_if<std::is_trivially_copyable<T>::value && !std::is_reference<T>::value, T>::type
     FixedByteStreamRingBase::peek(void) const
 {
-    X_ASSERT(sizeof(T) <= size(), "Tried to peek a type bigger than avalible bytes")(sizeof(T), size(), freeSpace(), isEos());
+    X_ASSERT(sizeof(T) <= size(), "Tried to peek a type bigger than available bytes")(sizeof(T), size(), freeSpace(), isEos());
 
     size_type readIdx = readByteIdx_ & mask_;
     size_type bytesToCopy = core::Min(sizeof(T), numBytes_ - readIdx);
@@ -186,7 +186,7 @@ template<typename T>
 inline typename std::enable_if<std::is_trivially_copyable<T>::value && !std::is_reference<T>::value, T>::type
 FixedByteStreamRingBase::peek(size_type offset) const
 {
-    X_ASSERT((sizeof(T) + offset) <= size(), "Tried to peek a type bigger than avalible bytes")(sizeof(T), size(), offset, freeSpace(), isEos());
+    X_ASSERT((sizeof(T) + offset) <= size(), "Tried to peek a type bigger than available bytes")(sizeof(T), size(), offset, freeSpace(), isEos());
 
     size_type readIdx = (readByteIdx_ + offset) & mask_;
     size_type bytesToCopy = core::Min(sizeof(T), numBytes_ - readIdx);
@@ -229,7 +229,7 @@ inline FixedByteStreamRingBase::size_type FixedByteStreamRingBase::absoluteToRel
 
 inline void FixedByteStreamRingBase::skip(size_type numBytes)
 {
-    X_ASSERT(numBytes <= size(), "Tried to skip more bytes than avalible")(numBytes, size(), freeSpace(), isEos());
+    X_ASSERT(numBytes <= size(), "Tried to skip more bytes than available")(numBytes, size(), freeSpace(), isEos());
 
     readByteIdx_ += numBytes;
 
@@ -239,7 +239,7 @@ inline void FixedByteStreamRingBase::skip(size_type numBytes)
 inline void FixedByteStreamRingBase::zeroPadToLength(size_type numBytes)
 {
     if (size() < numBytes) {
-        X_ASSERT(numBytes <= capacity(), "Tried to pad more than avalible space")(numBytes, size(), freeSpace(), capacity());
+        X_ASSERT(numBytes <= capacity(), "Tried to pad more than available space")(numBytes, size(), freeSpace(), capacity());
 
         const size_t diff = numBytes - size();
 

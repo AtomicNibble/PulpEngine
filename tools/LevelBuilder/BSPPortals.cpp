@@ -228,7 +228,7 @@ const LvlBrushSide* bspPortal::FindAreaPortalSide(void) const
             for (size_t j = 0; j < pOrigBrush->sides.size(); j++) {
                 LvlBrushSide& side = pOrigBrush->sides[j];
 
-                // must be visable.
+                // must be visible.
                 if (!side.pVisibleHull) {
                     continue;
                 }

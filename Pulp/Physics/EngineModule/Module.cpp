@@ -51,7 +51,6 @@ class XEngineModule_Physics : public IEngineModule
             return nullptr;
         }
 
-        // kinky shit.
         g_PhysicsArena = X_NEW(PhysicsArena, gEnv->pArena, "PhysicsArena")(&g_PhysicsAlloc, "PhysicsArena");
         pPhysics = X_NEW(physics::XPhysics, g_PhysicsArena, "PhysicisSys")(8, env.pJobSys, g_PhysicsArena);
 

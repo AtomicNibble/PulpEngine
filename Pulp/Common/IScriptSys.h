@@ -524,7 +524,7 @@ public:
     X_INLINE operator IScriptTable*() const;
     X_INLINE operator bool() const;
 
-    // Boolean comparasions.
+    // Boolean comparisons.
     X_INLINE bool operator!() const;
     X_INLINE bool operator==(const IScriptTable* p2) const;
     X_INLINE bool operator==(IScriptTable* p2) const;

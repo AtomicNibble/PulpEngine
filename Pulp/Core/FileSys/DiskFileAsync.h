@@ -15,7 +15,7 @@ public:
     XDiskFileAsync(const core::Path<wchar_t>& path, IFileSys::FileFlags mode, core::MemoryArenaBase* asyncOpArena);
     ~XDiskFileAsync() X_FINAL;
 
-    /// Returns whether the disk file is valid.
+    // Returns whether the disk file is valid.
     X_INLINE bool valid(void) const;
 
     Type::Enum getType(void) const X_FINAL;

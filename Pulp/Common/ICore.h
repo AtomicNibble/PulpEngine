@@ -183,7 +183,7 @@ struct CoreInitParams
     bool bCoreOnly;
     bool bEnableBasicConsole; // when in core only mode, optional enable a basic console.
     bool bEnableJobSystem;
-    bool bEnableNetowrking;
+    bool bEnableNetworking;
     bool bEnableVideo;
     bool bLoadSymbols;
     bool bFileSysWorkingDir;
@@ -247,7 +247,7 @@ struct CoreInitParams
         bCoreOnly(false),
         bEnableBasicConsole(false),
         bEnableJobSystem(true),
-        bEnableNetowrking(false),
+        bEnableNetworking(false),
         bEnableVideo(false),
         bLoadSymbols(true),
         bFileSysWorkingDir(false),
@@ -274,7 +274,7 @@ struct CoreInitParams
     }
 };
 
-struct CoreGlobals // obbject is zerod on start.
+struct CoreGlobals // object is zeroed on start.
 {
     X_DECLARE_ENUM8(State)
     (
@@ -418,8 +418,8 @@ struct ICore
     // cmd-line util
     virtual core::string_view GetCommandLineArg(core::string_view name) const X_ABSTRACT;
 
-    virtual bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_ABSTRACT;
-    virtual bool IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName,
+    virtual bool InitializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_ABSTRACT;
+    virtual bool InitializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName,
         IConverterModule** pConvertModuleOut = nullptr, IConverter** pConverterInstance = nullptr) X_ABSTRACT;
     virtual bool FreeConverterModule(IConverterModule* pConvertModule) X_ABSTRACT;
 

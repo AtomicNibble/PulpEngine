@@ -30,7 +30,7 @@ namespace
     static Thread::ReturnValue ThreadAtomic_add(const Thread& thread)
     {
         for (unsigned int i = 0; i < LOOP_COUNT; ++i) {
-            // makes it very likley valeus will override.
+            // makes it very likely valeus will override.
             {
                 int local = g_nonAtomicInt;
                 local += 64;
@@ -46,7 +46,7 @@ namespace
     static Thread::ReturnValue ThreadAtomic_decrement(const Thread& thread)
     {
         for (unsigned int i = 0; i < LOOP_COUNT; ++i) {
-            // makes it very likley valeus will override.
+            // makes it very likely valeus will override.
             {
                 int local = g_nonAtomicInt;
                 --local;
@@ -62,7 +62,7 @@ namespace
     static Thread::ReturnValue ThreadAtomic_increment(const Thread& thread)
     {
         for (unsigned int i = 0; i < LOOP_COUNT; ++i) {
-            // makes it very likley valeus will override.
+            // makes it very likely valeus will override.
             {
                 int local = g_nonAtomicInt;
                 ++local;

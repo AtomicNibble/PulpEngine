@@ -22,7 +22,7 @@ namespace mapFile
         core::NoMemoryTracking,
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
         core::NoMemoryTagging>
-        PrimativePoolArena;
+        PrimitivePoolArena;
 
     class XMapFile
     {
@@ -48,7 +48,7 @@ namespace mapFile
         void ListLayers(void) const;
 
     private:
-        GrowingPool<PrimativePoolArena> pool_;
+        GrowingPool<PrimitivePoolArena> pool_;
 
         core::MemoryArenaBase* arena_;
 

@@ -5,10 +5,10 @@
 
 X_NAMESPACE_BEGIN(core)
 
-/// \ingroup Debugging
+
 namespace debugging
 {
-    /// Returns whether a debugger is connected.
+    // Returns whether a debugger is connected.
     bool IsDebuggerConnected(void);
 } // namespace debugging
 

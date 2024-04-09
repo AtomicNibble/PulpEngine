@@ -12,7 +12,7 @@ X_DISABLE_WARNING(4522) // multiple assignment operators specified
 class AtomicInt
 {
 public:
-    /// Constructs an AtomicInt from an integer.
+    // Constructs an AtomicInt from an integer.
     X_INLINE AtomicInt();
     X_INLINE explicit AtomicInt(int32_t value);
 

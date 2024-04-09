@@ -124,13 +124,13 @@ void UserCmdMan::readUserCmdFromBs(core::FixedBitStreamBase& bs, int32_t playerI
     // meow.
     int32_t num = bs.read<int16_t>();
     if (num == 0) {
-        X_ERROR("Net", "Recived 0 user cmds for player %" PRIi32 " ignoring", playerIndex);
+        X_ERROR("Net", "Received 0 user cmds for player %" PRIi32 " ignoring", playerIndex);
         return;
     }
 
     // just ignore the bad client!
     if (num > net::MAX_USERCMD_SEND) {
-        X_ERROR("Net", "Recived too many user cmds for player %" PRIi32 " ignoring", playerIndex);
+        X_ERROR("Net", "Received too many user cmds for player %" PRIi32 " ignoring", playerIndex);
         return;
     }
 
@@ -153,18 +153,18 @@ void UserCmdMan::readUserCmdFromBs(core::FixedBitStreamBase& bs, int32_t playerI
         }
         else if (cmd.clientGameTimeMS == 0)
         {
-            X_WARNING("Net", "Recived user cmd with game time of zero");
+            X_WARNING("Net", "Received user cmd with game time of zero");
         }
     }
 
     if (userCmds.isEmpty()) {
-        X_WARNING("Net", "Recived no new user cmds for player %" PRIi32, playerIndex);
+        X_WARNING("Net", "Received no new user cmds for player %" PRIi32, playerIndex);
     }
 
 #if 0
     if (vars_.userCmdDebug())
     {
-        X_LOG0("Net", "Recived %" PRIuS " new usrCmds from player %" PRIi32, userCmds.size(), playerIndex);
+        X_LOG0("Net", "Received %" PRIuS " new usrCmds from player %" PRIi32, userCmds.size(), playerIndex);
     }
 #endif
 

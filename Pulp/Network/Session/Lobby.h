@@ -232,7 +232,7 @@ public:
 
     bool tryPopChatMsg(ChatMsg& msg) X_FINAL;
 
-    Vec2f drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const;
+    Vec2f drawDebug(Vec2f base, engine::IPrimitiveContext* pPrim) const;
 
 private:
     void setState(LobbyState::Enum state);
@@ -309,7 +309,7 @@ private:
 
     bool isHost_;
     bool startLoading_;
-    bool finishedLoading_; // loaded the map yet slut?
+    bool finishedLoading_; // loaded the map yet?
     SystemAddress hostAddress_;
 
     int32_t hostIdx_;

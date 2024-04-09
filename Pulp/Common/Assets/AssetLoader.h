@@ -131,7 +131,7 @@ private:
     core::CriticalSection loadReqLock_;
     core::ConditionVariable loadCond_;
 
-    AssetQueue requestQueue_;             // requests not yet currenty dispatched
+    AssetQueue requestQueue_;             // requests not yet curranty dispatched
     AssetLoadRequestArr pendingRequests_; // active requests.
     AssetLoadRequestArr pendingReloads_;
 

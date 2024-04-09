@@ -213,7 +213,7 @@ bool XPhysics::init(const ToleranceScale& scale)
                     gDelayLoadHook.forceConfig(DelayLoadHook::Config::Release);
                     break;
                 default:
-                    X_WARNING("Physics", "Invalid dll ovverride value: \"%s\"", pDllOverrideStr);
+                    X_WARNING("Physics", "Invalid dll override value: \"%s\"", pDllOverrideStr);
                     break;
             }
         }
@@ -225,14 +225,14 @@ bool XPhysics::init(const ToleranceScale& scale)
     // so we get unresolved procs, we would need to compile release with them in to support it, which is possible..
     if (gDelayLoadHook.getConfig() == DelayLoadHook::Config::Profile || gDelayLoadHook.getConfig() == DelayLoadHook::Config::Release) {
         gDelayLoadHook.forceConfig(DelayLoadHook::Config::Checked);
-        X_WARNING("Physics", "Can't load profile or release phyiscs in debug builds, loading checked instead");
+        X_WARNING("Physics", "Can't load profile or release physics in debug builds, loading checked instead");
     }
 
 #elif X_RELEASE || X_SUPER
 
     if (gDelayLoadHook.getConfig() == DelayLoadHook::Config::Debug || gDelayLoadHook.getConfig() == DelayLoadHook::Config::Checked) {
         gDelayLoadHook.forceConfig(DelayLoadHook::Config::Profile);
-        X_WARNING("Physics", "Can't load debug or checked phyiscs in release builds, loading profile instead");
+        X_WARNING("Physics", "Can't load debug or checked physics in release builds, loading profile instead");
     }
 
 #endif //
@@ -631,13 +631,13 @@ IJoint* XPhysics::createJoint(JointType::Enum type, ActorHandle actor0, ActorHan
     const physx::PxTransform& trans0 = PxTransFromQuatTrans(localFrame0);
     const physx::PxTransform& trans1 = PxTransFromQuatTrans(localFrame1);
 
-    // i want to make a api for creating all the diffrent joint types.
+    // i want to make a api for creating all the different joint types.
     // the problem is how to make it sexy yet functional.
     // i think i will want to update joint info post creation
     // so exposing a api seams like the most sensible thing todo.
     // so lets define some interfaces 1st.
     //
-    // ok so i have interfaces for all the diffrent joint types
+    // ok so i have interfaces for all the different joint types
     // just need to make impl's for the interfaces now so that we can return them.
     static_assert(JointType::ENUM_COUNT == 5, "Added additional JointTypes? this code needs updating.");
 
@@ -1253,9 +1253,9 @@ void XPhysics::onObjectOutOfBounds(physx::PxShape& shape, physx::PxActor& actor)
     // shape	Shape that left the broad - phase bounds
     // actor	Owner actor
 
-    // for now we just log that somthing left the physx world.
+    // for now we just log that something left the physx world.
     // dunno what shit to log.
-    X_ERROR("Phys", "Obbject out of bounds. Name: \"%s\"", actor.getName());
+    X_ERROR("Phys", "Object out of bounds. Name: \"%s\"", actor.getName());
 
 #if PHYSX_SCENE_REQUIRES_LOCK
     core::ScopedLock<decltype(outofBoundsCS_)> lock(outofBoundsCS_);
@@ -1305,7 +1305,7 @@ void XPhysics::PvdSetup(void)
 
     pPVD->addHandler(*this);
 
-    // attemp to connect now.
+    // attempt to connect now.
     togglePvdConnection();
 }
 

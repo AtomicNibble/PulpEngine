@@ -9,14 +9,14 @@ static const char* CI_FILE_EXTENSION = "ci";
 static const uint32_t CI_FOURCC = X_TAG('c', 'i', 'm', 'g');
 static const uint8_t CI_VERSION = 3;
 // these are format limits.
-// global limtis must still be respected when loading.
+// global limits must still be respected when loading.
 static const uint32_t CI_MAX_DIMENSIONS = UINT16_MAX;
 static const uint32_t CI_MAX_MIPS = UINT8_MAX;
 static const uint32_t CI_MAX_FACES = UINT8_MAX;
 
-struct CITexureHeader
+struct CITextureHeader
 {
-    CITexureHeader()
+    CITextureHeader()
     {
         core::zero_this(this);
     }
@@ -55,7 +55,7 @@ struct CITexureHeader
     }
 };
 
-X_ENSURE_SIZE(CITexureHeader, 36);
+X_ENSURE_SIZE(CITextureHeader, 36);
 
 X_NAMESPACE_END
 

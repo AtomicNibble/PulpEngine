@@ -35,7 +35,7 @@ namespace strUtil
     inline constexpr uint8_t HexCharToInt(char character);
     inline constexpr uint8_t HexChar(char high, char low);
 
-    /// Returns whether or not the given character is a whitespace.
+    // Returns whether or not the given character is a whitespace.
     inline constexpr bool IsWhitespace(const char character);
     inline constexpr bool IsWhitespace(const wchar_t character);
 
@@ -47,7 +47,7 @@ namespace strUtil
     inline constexpr bool IsAlpha(const char str);
     inline constexpr bool IsAlpha(const uint8_t str);
 
-    /// Returns whether or not the given character is a digit.
+    // Returns whether or not the given character is a digit.
     inline constexpr bool IsDigit(const char character);
     inline constexpr bool IsDigit(const uint8_t character);
     inline constexpr bool IsDigit(const wchar_t character);
@@ -78,7 +78,7 @@ namespace strUtil
     bool IsLower(const wchar_t* startInclusive);
     bool IsLower(const wchar_t* startInclusive, const wchar_t* endExclusive);
 
-    /// Converts a wide-character string into a single-byte character string, and returns the converted string.
+    // Converts a wide-character string into a single-byte character string, and returns the converted string.
     template<size_t N>
     inline const char* Convert(const wchar_t* input, char (&output)[N]);
 
@@ -100,101 +100,101 @@ namespace strUtil
     template<size_t N>
     inline const wchar_t* Convert(core::string_view input, wchar_t(&output)[N]);
 
-    /// Converts a wide-character string into a single-byte character string, and returns the converted string.
+    // Converts a wide-character string into a single-byte character string, and returns the converted string.
     inline const char* Convert(const wchar_t* startInclusive, const wchar_t* endExclusive, char* output, size_t outputBytes);
     const char* Convert(const wchar_t* startInclusive, const wchar_t* endExclusive, char* output, size_t outputBytes, size_t& lengthOut);
 
-    /// Converts a single-byte string into a wide-character string, and returns the converted string.
+    // Converts a single-byte string into a wide-character string, and returns the converted string.
     inline const wchar_t* Convert(const char* startInclusive, const char* endExclusive, wchar_t* output, size_t outputBytes);
     const wchar_t* Convert(const char* startInclusive, const char* endExclusive, wchar_t* output, size_t outputBytes, size_t& lengthOut);
 
-    /// Returns the number of occurrences of a character in a string in the given range.
+    // Returns the number of occurrences of a character in a string in the given range.
     unsigned int Count(const char* startInclusive, const char* endExclusive, char what);
     unsigned int Count(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what);
 
     int Compare(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2, const char* endExclusiveS2);
     int Compare(const wchar_t* startInclusiveS1, const wchar_t* endExclusiveS1, const wchar_t* startInclusiveS2, const wchar_t* endExclusiveS2);
 
-    /// Returns whether two strings are equal.
+    // Returns whether two strings are equal.
     bool IsEqual(core::string_view str1, core::string_view str2);
     bool IsEqual(const char* str1, const char* str2);
     bool IsEqual(const wchar_t* str1, const wchar_t* str2);
 
-    /// Returns whether two strings are equal, checks the length of both srings are equal.
+    // Returns whether two strings are equal, checks the length of both srings are equal.
     bool IsEqual(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2);
     bool IsEqual(const wchar_t* startInclusiveS1, const wchar_t* endExclusiveS1, const wchar_t* startInclusiveS2);
 
-    /// Returns whether two strings in their respective ranges are equal.
+    // Returns whether two strings in their respective ranges are equal.
     bool IsEqual(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2, const char* endExclusiveS2);
     bool IsEqual(const wchar_t* startInclusiveS1, const wchar_t* endExclusiveS1, const wchar_t* startInclusiveS2, const wchar_t* endExclusiveS2);
 
-    /// Returns whether two strings are equal. case-insensitive
+    // Returns whether two strings are equal. case-insensitive
     bool IsEqualCaseInsen(core::string_view str1, core::string_view str2);
     bool IsEqualCaseInsen(const char* str1, const char* str2);
     bool IsEqualCaseInsen(const wchar_t* str1, const wchar_t* str2);
-    /// Returns whether two strings are equal, checks the length of the 1sr range.
+    // Returns whether two strings are equal, checks the length of the 1sr range.
     bool IsEqualCaseInsen(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2);
     bool IsEqualCaseInsen(const wchar_t* startInclusiveS1, const wchar_t* endExclusiveS1, const wchar_t* startInclusiveS2);
-    /// Returns whether two strings in their respective ranges are equal.
+    // Returns whether two strings in their respective ranges are equal.
     bool IsEqualCaseInsen(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2, const char* endExclusiveS2);
     bool IsEqualCaseInsen(const wchar_t* startInclusiveS1, const wchar_t* endExclusiveS1, const wchar_t* startInclusiveS2, const wchar_t* endExclusiveS2);
 
     const char* Find(const char* startInclusive, char what);
     const wchar_t* Find(const wchar_t* startInclusive, wchar_t what);
 
-    /// \brief Finds a character in a string, and returns a pointer to the first occurrence of the character.
-    /// \remark Returns a \c nullptr if the character could not be found.
+    // Finds a character in a string, and returns a pointer to the first occurrence of the character.
+    // Returns a \c nullptr if the character could not be found.
     const char* Find(const char* startInclusive, const char* endExclusive, char what);
     const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what);
 
-    /// \brief Finds a string inside a string, and returns a pointer to it.
-    /// \remark Returns a \c nullptr if the string could not be found.
+    // Finds a string inside a string, and returns a pointer to it.
+    // Returns a \c nullptr if the string could not be found.
     const char* Find(const char* startInclusive, const char* what);
     const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* what);
 
-    /// \brief Finds a string inside a string, and returns a pointer to it.
-    /// \remark Returns a \c nullptr if the string could not be found.
+    // Finds a string inside a string, and returns a pointer to it.
+    // Returns a \c nullptr if the string could not be found.
     const char* Find(const char* startInclusive, const char* endExclusive, const char* what);
     const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* what);
 
-    /// \brief Finds a string inside a string, and returns a pointer to it.
-    /// \remark Returns a \c nullptr if the string could not be found.
+    // Finds a string inside a string, and returns a pointer to it.
+    // Returns a \c nullptr if the string could not be found.
     const char* Find(const char* startInclusive, const char* endExclusive, const char* what, size_t whatLength);
     const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* what, size_t whatLength);
 
-    /// \brief Finds a string inside a string, and returns a pointer to it.
-    /// \remark Returns a \c nullptr if the string could not be found.
+    // Finds a string inside a string, and returns a pointer to it.
+    // Returns a \c nullptr if the string could not be found.
     const char* Find(const char* startInclusive, const char* endExclusive, const char* whatStart, const char* whatEnd);
     const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* whatStart, const wchar_t* whatEnd);
 
-    /// \brief Finds the first character in a string that is not a certain character, and returns a pointer to it.
-    /// \remark Returns a \c nullptr if the character could not be found.
+    // Finds the first character in a string that is not a certain character, and returns a pointer to it.
+    // Returns a \c nullptr if the character could not be found.
     const char* FindNon(const char* startInclusive, const char* endExclusive, char what);
     const wchar_t* FindNon(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what);
 
-    /// \brief Finds a character in a string, and returns a pointer to the last occurrence of the character.
-    /// \remark Returns a \c nullptr if the character could not be found.
+    // Finds a character in a string, and returns a pointer to the last occurrence of the character.
+    // Returns a \c nullptr if the character could not be found.
     const char* FindLast(const char* startInclusive, const char* endExclusive, char what);
     const wchar_t* FindLast(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what);
 
     const char* FindLast(const char* startInclusive, const char* endExclusive, const char* whatStart, const char* whatEnd);
     const wchar_t* FindLast(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* whatStart, const wchar_t* whatEnd);
 
-    /// \brief Finds the last character in a string that is not a certain character, and returns a pointer to it.
-    /// \remark Returns a \c nullptr if the character could not be found.
+    // Finds the last character in a string that is not a certain character, and returns a pointer to it.
+    // Returns a \c nullptr if the character could not be found.
     const char* FindLastNon(const char* startInclusive, const char* endExclusive, char what);
     const wchar_t* FindLastNon(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what);
 
-    /// \brief Finds a string inside a string using a case-insensitive search, and returns a pointer to it.
-    /// \remark Returns a \c nullptr if the string could not be found.
+    // Finds a string inside a string using a case-insensitive search, and returns a pointer to it.
+    // Returns a \c nullptr if the string could not be found.
     const char* FindCaseInsensitive(const char* startInclusive, const char* endExclusive, const char* what);
     const wchar_t* FindCaseInsensitive(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* what);
 
     const char* FindCaseInsensitive(const char* startInclusive, const char* endExclusive, const char* whatStart, const char* whatEnd);
     const wchar_t* FindCaseInsensitive(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* whatStart, const wchar_t* whatEnd);
 
-    /// \brief Finds a string inside a string using a case-insensitive search, and returns a pointer to it.
-    /// \remark Returns a \c nullptr if the string could not be found.
+    // Finds a string inside a string using a case-insensitive search, and returns a pointer to it.
+    // Returns a \c nullptr if the string could not be found.
     const char* FindCaseInsensitive(const char* startInclusive, const char* endExclusive, const char* what, size_t whatLength);
     const wchar_t* FindCaseInsensitive(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* what, size_t whatLength);
 
@@ -207,28 +207,28 @@ namespace strUtil
     const char* FindCaseInsensitive(const char* startInclusive, const char* endExclusive, char what);
     const wchar_t* FindCaseInsensitive(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what);
 
-    /// \brief Finds the first whitespace character in a string, and returns a pointer to it.
-    /// \remark Returns a \c nullptr if no such character could not be found.
+    // Finds the first whitespace character in a string, and returns a pointer to it.
+    // Returns a \c nullptr if no such character could not be found.
     const char* FindWhitespace(const char* startInclusive, const char* endExclusive);
     const wchar_t* FindWhitespace(const wchar_t* startInclusive, const wchar_t* endExclusive);
 
-    /// \brief Finds the last whitespace character in a string, and returns a pointer to it.
-    /// \remark Returns a \c nullptr if no such character could not be found.
+    // Finds the last whitespace character in a string, and returns a pointer to it.
+    // Returns a \c nullptr if no such character could not be found.
     const char* FindLastWhitespace(const char* startInclusive, const char* endExclusive);
     const wchar_t* FindLastWhitespace(const wchar_t* startInclusive, const wchar_t* endExclusive);
 
-    /// \brief Finds the first character in a string that is not a whitespace, and returns a pointer to it.
-    /// \remark Returns a \c nullptr if no such character could not be found.
+    // Finds the first character in a string that is not a whitespace, and returns a pointer to it.
+    // Returns a \c nullptr if no such character could not be found.
     const char* FindNonWhitespace(const char* startInclusive, const char* endExclusive);
     const wchar_t* FindNonWhitespace(const wchar_t* startInclusive, const wchar_t* endExclusive);
 
-    /// \brief Finds the last character in a string that is not a whitespace, and returns a pointer to it.
-    /// \remark Returns a \c nullptr if no such character could not be found.
+    // Finds the last character in a string that is not a whitespace, and returns a pointer to it.
+    // Returns a \c nullptr if no such character could not be found.
     const char* FindLastNonWhitespace(const char* startInclusive, const char* endExclusive);
     const wchar_t* FindLastNonWhitespace(const wchar_t* startInclusive, const wchar_t* endExclusive);
 
-    /// \brief Converts a string into any integer type.
-    /// \remark Returns 0 if the string does not represent a valid integer value.
+    // Converts a string into any integer type.
+    // Returns 0 if the string does not represent a valid integer value.
     template<typename T>
     inline T StringToInt(const char* str);
     template<typename T>
@@ -252,8 +252,8 @@ namespace strUtil
     template<typename T>
     inline T StringToInt(const char* startInclusive, const char* endExclusive, const char** pEndPtr, int32_t base);
 
-    /// \brief Converts a string into any floating-point type.
-    /// \remark Returns 0 if the string does not represent a valid floating-point value.
+    // Converts a string into any floating-point type.
+    // Returns 0 if the string does not represent a valid floating-point value.
     float StringToFloat(const char* str);
     float StringToFloat(const char* str, const char** pEndPtr);
     float StringToFloat(const char* startInclusive, const char* endExclusive);
@@ -282,7 +282,7 @@ namespace strUtil
     const char* FileName(const char* startInclusive, const char* endExclusive);
     const wchar_t* FileName(const wchar_t* startInclusive, const wchar_t* endExclusive);
 
-    // retrusn true if the wild card search patten matches the string.
+    // returns true if the wild card search pattern matches the string.
     bool WildCompare(core::string_view wild, core::string_view string);
     bool WildCompare(const char* wild, const char* string);
     bool WildCompare(const wchar_t* wild, const wchar_t* string);

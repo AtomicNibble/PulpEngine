@@ -167,7 +167,6 @@ void XGlyphBitmap::Clear(void)
     }
 }
 
-//-------------------------------------------------------------------------------------------------
 bool XGlyphBitmap::BlitScaledTo8(DataVec& destBuffer,
     int32_t srcX, int32_t srcY,
     int32_t srcWidth, int32_t srcHeight,
@@ -236,7 +235,6 @@ bool XGlyphBitmap::BlitScaledTo8(DataVec& destBuffer,
     return true;
 }
 
-//-------------------------------------------------------------------------------------------------
 bool XGlyphBitmap::BlitScaledTo32(DataVec& destBuffer,
     int32_t srcX, int32_t srcY,
     int32_t srcWidth, int32_t srcHeight,

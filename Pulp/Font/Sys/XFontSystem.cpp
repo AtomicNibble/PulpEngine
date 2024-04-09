@@ -275,7 +275,7 @@ void XFontSystem::Cmd_DumpForName(core::IConsoleCmdArgs* pCmd)
         }
     }
     else {
-        X_ERROR("FontSys", "failed to dump font, no font exsists for name: %.*s", name.length(), name.data());
+        X_ERROR("FontSys", "failed to dump font, no font exists for name: %.*s", name.length(), name.data());
     }
 }
 

@@ -53,7 +53,7 @@ public:
 
     X_INLINE void setSize(const Vec2<uint16_t> size);
     X_INLINE void setWidth(const uint16_t width);
-    X_INLINE void setHeigth(const uint16_t height);
+    X_INLINE void setHeight(const uint16_t height);
     X_INLINE void setFlags(TextureFlags flags);
     X_INLINE void setType(TextureType::Enum type);
     X_INLINE void setFormat(Texturefmt::Enum format);

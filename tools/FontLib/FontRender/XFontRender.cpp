@@ -124,7 +124,7 @@ bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, wchar_t char
 
     // does the bitmap fit into the dest are the requested offset?
     if (dstGlyphWidth < pGlyph->bitmap.width || dstGlyphHeight < pGlyph->bitmap.rows) {
-        X_WARNING("Font", "Glyph for char '%lc' does not fit in dest bimap clipping.", charCode);
+        X_WARNING("Font", "Glyph for char '%lc' does not fit in dest bitmap clipping.", charCode);
     }
 
     // i want to center the bitmap.
@@ -224,7 +224,7 @@ void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height, float sizeRa
     metrics_.maxAdvance = pFace_->size->metrics.max_advance / 64;
 
     if (err) {
-        X_ERROR("Font", "failed to set pixel size(%i,%i). Error(%" PRIi32 "): \"%s\"", width, height, err, errToStr(err));
+        X_ERROR("Font", "failed to set pixel size(%" PRIi32 ",%" PRIi32 "). Error(%" PRIi32 "): \"%s\"", width, height, err, errToStr(err));
     }
 }
 
@@ -344,7 +344,6 @@ void XFontRender::makeDistanceMapd(DoubleArr& data, uint32_t width, uint32_t hei
     inside_.clear();
 }
 
-//-------------------------------------------------------------------------------------------------
 
 const char* XFontRender::errToStr(FT_Error err)
 {

@@ -33,12 +33,12 @@ namespace V2
         A job is added to the queue of the calling thread, so it's better to not submit all jobs from one thread.
         as all the other threads will have to steal.
 
-        One way to achive this is to use the splitting functionality. that splits one job into many for you.
-        typially resulting in jobs fanning out across the threads.
+        One way to achieve this is to use the splitting functionality. that splits one job into many for you.
+        typically resulting in jobs fanning out across the threads.
     
         The goal of the design is high throughput and low overhead, allowing for lower job granularity.
-        The system is currently tuned to assume more work will be added very soon if none currenly.
-        Making it a bit wastefull if you have a 'burst' of work todo rather than constant stream.
+        The system is currently tuned to assume more work will be added very soon if none currently.
+        Making it a bit wasteful if you have a 'burst' of work todo rather than constant stream.
 
     */
 

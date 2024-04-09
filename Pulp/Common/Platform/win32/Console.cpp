@@ -105,7 +105,7 @@ Console::Console(core::string_view title) :
     setTitle(title);
 }
 
-/// Frees all resources.
+// Frees all resources.
 Console::~Console(void)
 {
     lastError::Description Dsc;
@@ -128,7 +128,7 @@ Console::~Console(void)
     }
 }
 
-/// Sets the console title.
+// Sets the console title.
 void Console::setTitle(core::string_view title)
 {
     core::StackStringW256 str(title.begin(), title.end());
@@ -136,7 +136,7 @@ void Console::setTitle(core::string_view title)
     ::SetConsoleTitleW(str.c_str());
 }
 
-/// \brief Sets the console window size and number of lines stored internally, in character units.
+// Sets the console window size and number of lines stored internally, in character units.
 void Console::setSize(uint32_t windowWidth, uint32_t windowHeight, uint32_t numLines)
 {
     lastError::Description Dsc;

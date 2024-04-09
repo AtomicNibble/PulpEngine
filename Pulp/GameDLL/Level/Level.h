@@ -33,7 +33,7 @@ class GameVars;
 
 namespace entity
 {
-    class EnititySystem;
+    class EntitySystem;
 
 } // namespace entity
 
@@ -43,7 +43,7 @@ public:
     typedef core::StackString<assetDb::ASSET_NAME_MAX_LENGTH> MapNameStr;
 
 public:
-    Level(physics::IScene* pScene, engine::IWorld3D* p3DWorld, entity::EnititySystem& entSys, core::MemoryArenaBase* arena);
+    Level(physics::IScene* pScene, engine::IWorld3D* p3DWorld, entity::EntitySystem& entSys, core::MemoryArenaBase* arena);
     ~Level();
 
     void update(core::FrameData& frame);
@@ -69,7 +69,7 @@ private:
     core::MemoryArenaBase* arena_;
     core::V2::JobSystem* pJobSys_;
     core::IFileSys* pFileSys_;
-    entity::EnititySystem& entSys_;
+    entity::EntitySystem& entSys_;
 
     bool loaded_;
     bool _pad[3];
@@ -124,7 +124,7 @@ private:
     physics::IScene* pScene_;
     engine::IWorld3D* p3DWorld_;
 
-    entity::EnititySystem ents_;
+    entity::EntitySystem ents_;
     core::UniquePointer<Level> level_;
 };
 

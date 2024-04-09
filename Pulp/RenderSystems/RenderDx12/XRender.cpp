@@ -120,7 +120,7 @@ void XRender::registerCmds(void)
 
 bool XRender::init(PLATFORM_HWND hWnd, texture::Texturefmt::Enum depthFmt, bool reverseZ)
 {
-    X_ASSERT(vars_.varsRegisterd(), "Vars must be init before calling XRender::Init()")(vars_.varsRegisterd());
+    X_ASSERT(vars_.varsRegistered(), "Vars must be init before calling XRender::Init()")(vars_.varsRegistered());
     X_PROFILE_NO_HISTORY_BEGIN("RenderInit", core::profiler::SubSys::RENDER);
     ttZone(gEnv->ctx, "(Render) Init");
 
@@ -201,13 +201,13 @@ bool XRender::init(PLATFORM_HWND hWnd, texture::Texturefmt::Enum depthFmt, bool 
             }
 
             if (DXGI_ERROR_NOT_FOUND == dxgiFactory->EnumAdapters1(static_cast<uint32_t>(i), &adapter)) {
-                X_FATAL("Dx12", "Adapater lookup failure");
+                X_FATAL("Dx12", "Adapter lookup failure");
                 continue;
             }
 
             hr = D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice_));
             if (FAILED(hr)) {
-                X_WARNING("Dx12", "Failed to create device for adpater: \"%s\" res: %s", a.deviceName.c_str(), Error::ToString(hr, Dsc));
+                X_WARNING("Dx12", "Failed to create device for adapter: \"%s\" res: %s", a.deviceName.c_str(), Error::ToString(hr, Dsc));
                 continue;
             }
 
@@ -959,7 +959,7 @@ bool XRender::getBufferData(IPixelBuffer* pSource, texture::XTextureFile& imgOut
     pContext->finishAndFree(true);
 
     imgOut.setWidth(pSource->getWidth());
-    imgOut.setHeigth(pSource->getHeight());
+    imgOut.setHeight(pSource->getHeight());
     imgOut.setFormat(pSource->getFormat());
     imgOut.setDepth(pSource->getDepth());
     imgOut.setNumMips(pSource->getNumMips());
@@ -998,7 +998,7 @@ X_INLINE void XRender::createVBView(GraphicsContext& context, const VertexHandle
 
             viewsOut[i] = buffer.vertexBufferView();
 
-            // it's total that need to be passed to device, which inclde
+            // it's total that need to be passed to device, which include
             // any null ones in between.
             numVertexStreams = i + 1;
         }
@@ -1021,9 +1021,9 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
         ++curState.numStatesChanges;
 #endif // !RENDER_STATS
 
-        // the render system should not have to check ever state is valid, the 3dengine should check at creation time.
+        // the render system should not have to check every state is valid, the 3dengine should check at creation time.
         // so it's a one off cost not a cost we pay for every fucking state change.
-        X_ASSERT(handle != INVALID_STATE_HANLDE, "Don't pass me invalid states you cunt")(handle, INVALID_STATE_HANLDE);
+        X_ASSERT(handle != INVALID_STATE_HANLDE, "Don't pass me invalid states")(handle, INVALID_STATE_HANLDE);
 
         curState.handle = handle;
 
@@ -1059,10 +1059,10 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
 
     // got a variable state?
     // i want some nice texture and vertex stream state checks.
-    // since we allow variable size now it's not so simple as to juust memcmp
+    // since we allow variable size now it's not so simple as to just memcmp
     // we would need either a hash or something else.
     // for vertex buffers it might just be better to not make it variable.
-    // as most of time alot will be set.
+    // as most of time a lot will be set.
     // and it solves the slot problem.
     // maybe if we have some sort of index flags.
     // so the state stores the indexes that are set.
@@ -1113,7 +1113,7 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
                         "Invalid handle")(pTex->getName().c_str(), textureSRVS[t].ptr, pTex->getSRV().ptr);
                 }
 
-                // for now assume all slots are linera and no gaps.
+                // for now assume all slots are linear and no gaps.
                 const auto count = resourceState.getNumTextStates();
                 context.setDynamicDescriptors(newState.texRootIdxBase, 0, count, textureSRVS);
 
@@ -1485,13 +1485,13 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 
     const PassState* pPassState = reinterpret_cast<const PassState*>(passHandle);
 
-    // permatations are currently compiled on creation.
+    // permutations are currently compiled on creation.
     const shader::ShaderPermatation& perm = *static_cast<const shader::ShaderPermatation*>(pPerm);
 
     if (!perm.isCompiled()) {
 #if X_ENABLE_RENDER_SHADER_RELOAD
-        // this could of happend if we hot reloaded the shader.
-        X_WARNING("Dx12", "Compining perm in state creation, shader was likley reloaded");
+        // this could of happened if we hot reloaded the shader.
+        X_WARNING("Dx12", "Compiling perm in state creation, shader was likely reloaded");
 
         if (!pShaderMan_->compilePermatation(const_cast<shader::IShaderPermatation*>(pPerm))) {
             return INVALID_STATE_HANLDE;
@@ -1506,8 +1506,8 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
             shader::InputLayoutFormat::ToString(perm.getILFmt()),
             shader::InputLayoutFormat::ToString(shader::Util::ILfromVertexFormat(desc.vertexFmt)));
 
-        // this is user error, trying to use a permatation with a diffrent vertex fmt than it was compiled for.
-        // or maybe we have some permatation selection logic issues..
+        // this is user error, trying to use a permutation with a different vertex fmt than it was compiled for.
+        // or maybe we have some permutation selection logic issues..
         return INVALID_STATE_HANLDE;
     }
 
@@ -1520,8 +1520,8 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 			shader::InputLayoutFormat::ToString(hwTech.IlFmt),
 			shader::InputLayoutFormat::ToString(shader::Util::ILfromVertexFormat(desc.vertexFmt)));
 
-		// this is user error, trying to use a permatation with a diffrent vertex fmt than it was compiled for.
-		// or maybe we have some permatation selection logic issues..
+		// this is user error, trying to use a permutation with a different vertex fmt than it was compiled for.
+		// or maybe we have some permutation selection logic issues..
 		return INVALID_STATE_HANLDE;
 	}
 #endif
@@ -1580,7 +1580,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 void XRender::destoryState(StateHandle handle)
 {
     // this implies you are not checking they are valid when creating, which you should!
-    X_ASSERT(handle != INVALID_STATE_HANLDE, "Destoring invalid states is not allowed")(handle, INVALID_STATE_HANLDE);
+    X_ASSERT(handle != INVALID_STATE_HANLDE, "Destroying invalid states is not allowed")(handle, INVALID_STATE_HANLDE);
 
     DeviceState* pState = reinterpret_cast<DeviceState*>(handle);
 
@@ -1939,7 +1939,7 @@ void XRender::initILDescriptions(void)
             layout.emplace_back(elem_uv3232);
             elem_uv3232.SemanticIndex = 0;
 
-            // byte offset is zero since diffrent stream.
+            // byte offset is zero since different stream.
             elem_col8888.AlignedByteOffset = 28;
             layout.emplace_back(elem_col8888);
 
@@ -1988,7 +1988,7 @@ void XRender::initILDescriptions(void)
 
         // col
         if (i == shader::VertexFormat::P3F_T2S_C4B || i == shader::VertexFormat::P3F_T2S_C4B_N3F || i == shader::VertexFormat::P3F_T2S_C4B_N3F_TB3F || i == shader::VertexFormat::P3F_T2S_C4B_N10 || i == shader::VertexFormat::P3F_T2S_C4B_N10_TB10) {
-            // seperate stream
+            // separate stream
             elem_col8888.AlignedByteOffset = 0;
             elem_col8888.InputSlot = 1;
             layout.emplace_back(elem_col8888);
@@ -2052,7 +2052,7 @@ void XRender::initILDescriptions(void)
             layout.emplace_back(elem_uv3232);
             elem_uv3232.SemanticIndex = 0;
 
-            // byte offset is zero since diffrent stream.
+            // byte offset is zero since different stream.
             elem_col8888.AlignedByteOffset = 0;
             elem_col8888.InputSlot = 1;
             layout.emplace_back(elem_col8888);
@@ -2303,7 +2303,7 @@ bool XRender::deviceIsSupported(void) const
     X_ASSERT(features_.init, "Feature info must be init before checking if device meets requirements")();
 
     // check the device supports like max dimensions we support.
-    // if this is ever a problem the engine just needs to support dropping higer dimensions at runtime.
+    // if this is ever a problem the engine just needs to support dropping higher dimensions at runtime.
     // that might get built in anyway as part of quality options.
     {
         if (features_.maxTextureWidth < texture::TEX_MAX_DIMENSIONS) {

@@ -31,10 +31,10 @@ public:
 
     void releaseRenderBuffers(render::IRender* pRend);
 
-    // creates the device buffer for a given stream if don't already exsist
+    // creates the device buffer for a given stream if don't already exist
     bool ensureRenderStream(render::IRender* pRend, const MeshHeader& mesh, VertexFormat::Enum vertexFmt, VertexStream::Enum stream);
 
-    // release a single stream, used to free up vram if a stream is unlikley to be used soon.
+    // release a single stream, used to free up vram if a stream is unlikely to be used soon.
     void releaseVertexBuffer(render::IRender* pRend, VertexStream::Enum stream);
     void releaseIndexBuffer(render::IRender* pRend);
 

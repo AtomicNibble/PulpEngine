@@ -16,8 +16,6 @@ X_NAMESPACE_BEGIN(net)
 
 namespace
 {
-    // move to bit util maybe :)
-
     X_DECLARE_FLAGS(DatagramFlag)
     (
         Ack,
@@ -40,14 +38,14 @@ namespace
     {
         bs.write(number);
         bs.write(flags);
-        bs.alignWriteToByteBoundry();
+        bs.alignWriteToByteBoundary();
     }
 
     void DatagramHdr::fromBitStream(core::FixedBitStreamBase& bs)
     {
         bs.read(number);
         bs.read(flags);
-        bs.alignReadToByteBoundry();
+        bs.alignReadToByteBoundary();
     }
 
 } // namespace
@@ -56,7 +54,7 @@ namespace
 
 SplitPacketChannel::SplitPacketChannel(core::MemoryArenaBase* arena) :
     splitId(0),
-    packetsRecived(0),
+    packetsReceived(0),
     packets(arena)
 {
 }
@@ -70,7 +68,7 @@ bool SplitPacketChannel::hasFirstPacket(void) const
 bool SplitPacketChannel::haveAllPackets(void) const
 {
     X_ASSERT(packets.isNotEmpty(), "Should not be empty")(packets.size(), packets.capacity());
-    return hasFirstPacket() && packets[0]->splitPacketCount == packetsRecived;
+    return hasFirstPacket() && packets[0]->splitPacketCount == packetsReceived;
 }
 
 // ----------------------------------------------------------
@@ -104,7 +102,6 @@ ReliablePacket::~ReliablePacket()
 
 void ReliablePacket::freeData(void)
 {
-    // MEOW.
     if (dataType == DataType::Normal) {
         if (pData) {
             X_DELETE_ARRAY(pData, arena);
@@ -347,7 +344,7 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
     else {
         splitPacketCount = 0;
 
-        // only the count is used to know if split, so set valeus on these to try detect incorrect usage.
+        // only the count is used to know if split, so set values on these to try detect incorrect usage.
 #if X_DEBUG
         splitPacketId = std::numeric_limits<decltype(splitPacketId)>::max();
         splitPacketIndex = std::numeric_limits<decltype(splitPacketIndex)>::max();
@@ -429,11 +426,11 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars,
     MTUSize_(0),
     orderingQueues_{{X_PP_REPEAT_COMMA_SEP(8, arena)}},
     outGoingPackets_(arena),
-    recivedPackets_(arena),
+    receivedPackets_(arena),
     dataGramHistory_(arena),
     dataGramHistoryPopCnt_(0),
-    recivedPacketBaseIdx_(0),
-    recivedPacketQueue_(arena),
+    receivedPacketBaseIdx_(0),
+    receivedPacketQueue_(arena),
     incomingAcks_(arena),
     naks_(arena),
     acks_(arena),
@@ -452,7 +449,7 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars,
     delayedPackets_(arena)
 {
     outGoingPackets_.reserve(128);
-    recivedPackets_.reserve(128);
+    receivedPackets_.reserve(128);
 
     // fifo doubles in size, so if we allocate one more than size we limit to.
     // it won't waste memory.
@@ -474,7 +471,7 @@ void ReliabilityLayer::free(void)
     reset(MTUSize_);
 
     outGoingPackets_.free();
-    recivedPackets_.free();
+    receivedPackets_.free();
     dataGramHistory_.free();
 
     incomingAcks_.free();
@@ -517,10 +514,10 @@ void ReliabilityLayer::reset(int32_t MTUSize)
     }
 
     outGoingPackets_.clear();
-    recivedPackets_.clear();
+    receivedPackets_.clear();
     dataGramHistory_.clear();
     dataGramHistoryPopCnt_ = 0;
-    recivedPacketBaseIdx_ = 0;
+    receivedPacketBaseIdx_ = 0;
 
     incomingAcks_.clear();
     naks_.clear();
@@ -565,9 +562,9 @@ void ReliabilityLayer::clearPacketQueues(void)
         outGoingPackets_.pop();
     }
 
-    while (recivedPackets_.isNotEmpty()) {
-        freePacket(recivedPackets_.peek());
-        recivedPackets_.pop();
+    while (receivedPackets_.isNotEmpty()) {
+        freePacket(receivedPackets_.peek());
+        receivedPackets_.pop();
     }
 }
 
@@ -577,7 +574,7 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
     ttZone(gEnv->ctx, "(Net) reliability send");
 
     X_ASSERT_NOT_NULL(pData);
-    X_ASSERT(lengthBits > 0, "Must call with alreast some bits")();
+    X_ASSERT(lengthBits > 0, "lengthBits must be none zero")();
 
     auto lengthBytes = core::bitUtil::bitsToBytes(lengthBits);
 
@@ -610,7 +607,7 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
     }
 
     if (splitRequired) {
-        // upgrade reliability as we gonna be sending in diffrent datagrams.
+        // upgrade reliability as we gonna be sending in different datagrams.
         if (reliability == PacketReliability::UnReliable) {
             pPacket->reliability = PacketReliability::Reliable;
         }
@@ -668,7 +665,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 {
     ttZone(gEnv->ctx, "(Net) reliability recv");
 
-    X_LOG0_IF(vars_.debugDatagramEnabled(), "NetRel", "Recived datagram size: ^5%" PRIuS "^7 numbits: ^5%" PRIuS, length, core::bitUtil::bytesToBits(length));
+    X_LOG0_IF(vars_.debugDatagramEnabled(), "NetRel", "Received datagram size: ^5%" PRIuS "^7 numbits: ^5%" PRIuS, length, core::bitUtil::bytesToBits(length));
 
     // last time we got data.
     timeLastDatagramArrived_ = gEnv->pTimer->GetTimeNowReal();
@@ -690,12 +687,12 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
         incomingAcks_.clear();
 
         if (!incomingAcks_.fromBitStream(bs)) {
-            X_ERROR("NetRel", "Failed to process incomming ack's");
+            X_ERROR("NetRel", "Failed to process incoming ack's");
             return false;
         }
 
         for (auto& ackRange : incomingAcks_) {
-            // we want to mark all these messages as recived so we don't resend like a pleb.
+            // we want to mark all these messages as received so we don't resend like a pleb.
             X_LOG0_IF(vars_.debugAckEnabled(), "NetRel", "Act Range: ^5%" PRIu16 " ^7-^5 % " PRIu16, ackRange.min, ackRange.max);
 
             for (DataGramSequenceNumber dataGramIdx = ackRange.min;
@@ -732,17 +729,17 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
             core::NoMemoryTagging>
             StackArena;
 
-        // we don't get many of these sluts.
+        // we don't get many of these.
         StackArena arena(&allocator, "NackArena");
         DataGramNumberRangeList incomingNacks(&arena);
 
         if (!incomingNacks.fromBitStream(bs)) {
-            X_ERROR("NetRel", "Failed to process incomming nacks's");
+            X_ERROR("NetRel", "Failed to process incoming nacks's");
             return false;
         }
 
         for (auto& nackRange : incomingNacks) {
-            // mark all the msg's for resend immediatly.
+            // mark all the msg's for resend immediately.
             X_LOG0_IF(vars_.debugNackEnabled(), "NetRel", "Nact Range: ^5%" PRIu16 " ^7-^5 % " PRIu16, nackRange.min, nackRange.max);
 
             for (DataGramSequenceNumber dataGramIdx = nackRange.min; dataGramIdx <= nackRange.max; dataGramIdx++) {
@@ -772,11 +769,11 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
     }
     else {
         // I GOT IT !
-        // we ack for unreliable also, but never resend if no ack recived,
+        // we ack for unreliable also, but never resend if no ack received,
         addAck(dgh.number);
 
         // we can have multiple goat packets in a single MTU.
-        // so we keep processing the bitStream untill it's empty.
+        // so we keep processing the bitStream until it's empty.
 
         ReliablePacket* pPacket = packetFromBS(bs, time);
         while (pPacket) {
@@ -784,7 +781,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
             if (result == ProcessResult::Ok) {
                 // do nothing..
                 // it was either pushed to the que for us
-                // OR is been buffred untill it's in order.
+                // OR is been buffered until it's in order.
             }
             else if (result == ProcessResult::Ignored) {
                 ignorePacket(pPacket, time);
@@ -795,7 +792,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 
             // trailing bits.
             if (bs.size() < 8) {
-                bs.alignReadToByteBoundry();
+                bs.alignReadToByteBoundary();
                 break;
             }
 
@@ -818,77 +815,77 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
     if (pPacket->isOrderedOrSequenced()) {
         if (pPacket->orderingChannel >= MAX_ORDERED_STREAMS) {
             // bitch who you think you are.
-            X_ERROR("NetRel", "Recived packet with invalid channel: %" PRIu16 " ignoring.", pPacket->orderingChannel);
+            X_ERROR("NetRel", "Received packet with invalid channel: %" PRIu16 " ignoring.", pPacket->orderingChannel);
             return ProcessResult::Ignored;
         }
     }
 
     if (pPacket->isReliable()) {
         // intentional unsigned overflow.
-        DataGramSequenceNumber holeSize = static_cast<DataGramSequenceNumber>(pPacket->reliableMessageNumber - recivedPacketBaseIdx_);
+        DataGramSequenceNumber holeSize = static_cast<DataGramSequenceNumber>(pPacket->reliableMessageNumber - receivedPacketBaseIdx_);
 
         if (holeSize == 0) {
             // we expected this packet.
-            ++recivedPacketBaseIdx_;
+            ++receivedPacketBaseIdx_;
             // if we had a hole at start it's now filled.
-            if (recivedPacketQueue_.isNotEmpty()) {
-                recivedPacketQueue_.pop();
+            if (receivedPacketQueue_.isNotEmpty()) {
+                receivedPacketQueue_.pop();
             }
         }
         else if (holeSize > std::numeric_limits<decltype(holeSize)>::max() / 2) // is negative?
         {
             // duplicate packet.
-            X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Recived duplicate packet. (hole neg)");
+            X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Received duplicate packet. (hole neg)");
             return ProcessResult::Ignored;
         }
-        else if (holeSize < recivedPacketQueue_.size()) // reviced a packet that is higer than base, but lower than highest packet we seen.
+        else if (holeSize < receivedPacketQueue_.size()) // received a packet that is higher than base, but lower than highest packet we seen.
         {
-            if (recivedPacketQueue_[holeSize]) {
+            if (receivedPacketQueue_[holeSize]) {
                 // this hole is already filled so it's duplicate.
-                X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Recived duplicate packet. (hole fill)");
+                X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Received duplicate packet. (hole fill)");
                 return ProcessResult::Ignored;
             }
 
-            recivedPacketQueue_[holeSize] = true;
+            receivedPacketQueue_[holeSize] = true;
         }
         else {
-            // we got a packet higer than base and higer than we seen before.
+            // we got a packet higher than base and higher than we seen before.
             // impose some sort of limit on max hole, otherwise memory for hole logic grow quite large.
-            if (holeSize > REL_MAX_RECIVE_HOLE) {
-                X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Recived packet that has a message number greater than recive hole");
+            if (holeSize > REL_MAX_RECEIVE_HOLE) {
+                X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Received packet that has a message number greater than receive hole");
                 return ProcessResult::Ignored;
             }
 
             // need to example the que so it's the size of new hole.
             // marking new ones as holes.
-            while (holeSize > recivedPacketQueue_.size()) {
-                recivedPacketQueue_.push(false);
+            while (holeSize > receivedPacketQueue_.size()) {
+                receivedPacketQueue_.push(false);
             }
 
             // mark last one as got aka this packet.
-            recivedPacketQueue_.push(true);
+            receivedPacketQueue_.push(true);
 
-            X_ASSERT(recivedPacketQueue_.size() < std::numeric_limits<decltype(holeSize)>::max(), "Que is bigger than type range")();
+            X_ASSERT(receivedPacketQueue_.size() < std::numeric_limits<decltype(holeSize)>::max(), "Que is bigger than type range")();
         }
 
         // pop any complete ones from base, moving base index up.
-        while (recivedPacketQueue_.isNotEmpty() && recivedPacketQueue_.peek()) {
-            recivedPacketQueue_.pop();
-            ++recivedPacketBaseIdx_;
+        while (receivedPacketQueue_.isNotEmpty() && receivedPacketQueue_.peek()) {
+            receivedPacketQueue_.pop();
+            ++receivedPacketBaseIdx_;
         }
 
-        if (recivedPacketQueue_.capacity() > REL_RECIVE_HOLE_SHRINK_THRESHOLD) {
+        if (receivedPacketQueue_.capacity() > REL_RECEIVE_HOLE_SHRINK_THRESHOLD) {
             // regain some memory if we've just come out of a large hole.
-            const auto unusedSpace = recivedPacketQueue_.capacity() - recivedPacketQueue_.size();
-            if (unusedSpace > recivedPacketQueue_.size() * 4) {
+            const auto unusedSpace = receivedPacketQueue_.capacity() - receivedPacketQueue_.size();
+            if (unusedSpace > receivedPacketQueue_.size() * 4) {
                 X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Shrinking packet queue");
-                recivedPacketQueue_.shrinkToFit();
+                receivedPacketQueue_.shrinkToFit();
             }
         }
     }
 
     if (pPacket->hasSplitPacket()) {
-        // we need to keep track of these untill we have all the packets
+        // we need to keep track of these until we have all the packets
         pPacket = addIncomingSplitPacket(pPacket, time);
         if (!pPacket) {
             // still more packets.
@@ -896,7 +893,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
         }
 
         // if here we have a split packets that's been rebuilt into original packet.
-        // all split packets should of been cleaned up and data copyied into this new packet.
+        // all split packets should of been cleaned up and data copied into this new packet.
 
         // we can't return here, otherwise sequenced or ordered packets that where split
         // won't get handled correct.
@@ -913,7 +910,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
             if (pPacket->isSequenced()) {
                 // we ignore any packets that are older than we have seen.
                 if (isOlderPacket(pPacket->sequencingIndex, highestSequencedReadIndex_[channel])) {
-                    X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Recived duplicate packet. (older sequenced)");
+                    X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Received duplicate packet. (older sequenced)");
                     return ProcessResult::Ignored;
                 }
 
@@ -922,7 +919,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
             else // ordered.
             {
                 // this packet is allowed to be sent to user.
-                addPacketToRecivedQueue(pPacket, time);
+                addPacketToReceivedQueue(pPacket, time);
 
                 ++orderedReadIndex_[channel];
                 highestSequencedReadIndex_[channel] = 0; // when we move ordering index, sequenced is reset.
@@ -939,7 +936,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
                         ++orderedReadIndex_[channel];
                     }
 
-                    addPacketToRecivedQueue(pBufferedPacket, time);
+                    addPacketToReceivedQueue(pBufferedPacket, time);
                 }
 
                 // done...
@@ -948,8 +945,8 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
         }
         else if (!isOlderPacket(pPacket->orderingIndex, orderedReadIndex_[channel])) {
             // this packet comes later than the one we want next.
-            // so store it untill we can post them in order.
-            X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Recived out of order order/sequenced packet.");
+            // so store it until we can post them in order.
+            X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Received out of order order/sequenced packet.");
 
             auto& orderedQueue = orderingQueues_[channel];
             if (orderedQueue.isEmpty()) {
@@ -977,31 +974,31 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
         else {
             // this packet is older than what we expecting
             // we can ignore it.
-            X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Recived duplicate packet. (ordered older)");
+            X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Received duplicate packet. (ordered older)");
             return ProcessResult::Ignored;
         }
     }
 
-    addPacketToRecivedQueue(pPacket, time);
+    addPacketToReceivedQueue(pPacket, time);
     return ProcessResult::Ok;
 }
 
 void ReliabilityLayer::ignorePacket(ReliablePacket* pPacket, core::TimeVal time)
 {
     const size_t packetDataByteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
-    bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
+    bps_[NetStatistics::Metric::BytesReceivedIgnored].add(time, packetDataByteLength);
 
     X_WARNING_IF(vars_.debugIgnoredEnabled(), "NetRel", "Packet ignored");
 
     freePacket(pPacket);
 }
 
-void ReliabilityLayer::addPacketToRecivedQueue(ReliablePacket* pPacket, core::TimeVal time)
+void ReliabilityLayer::addPacketToReceivedQueue(ReliablePacket* pPacket, core::TimeVal time)
 {
     const size_t byteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
-    bps_[NetStatistics::Metric::BytesRecivedProcessed].add(time, byteLength);
+    bps_[NetStatistics::Metric::BytesReceivedProcessed].add(time, byteLength);
 
-    recivedPackets_.push(pPacket);
+    receivedPackets_.push(pPacket);
 }
 
 void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, SystemAddressEx& systemAddress, int32_t MTUSize,
@@ -1009,7 +1006,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 {
     ttZone(gEnv->ctx, "(Net) reliability update");
 
-    // delay list, these are packets that have already been sent, but are having artifical latency added.
+    // delay list, these are packets that have already been sent, but are having artificial latency added.
     if (delayedPackets_.isNotEmpty()) {
         while (delayedPackets_.isNotEmpty() && delayedPackets_.peek().sendTime < time) {
             // sendy wendy.
@@ -1062,7 +1059,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
     if (!isResendListEmpty()) {
         while (1) {
             // look at all the packets in resend list.
-            // and build dataGrams untill we reach a packet who's nextaction time has not yet been reached.
+            // and build dataGrams until we reach a packet who's next action time has not yet been reached.
             size_t packetCntBase = packetsThisFrame_.size();
             size_t currentDataGramSizeBits = 0;
             const size_t maxDataGramSizeBits = maxDataGramSizeExcHdrBits();
@@ -1225,7 +1222,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 
         // we create dataGram history even for dataGrams not containing reliable packets.
         // so that the datagram indexes match up.
-        // if we are sending alot of unreliable packets it may be best to change logic of ack
+        // if we are sending a lot of unreliable packets it may be best to change logic of ack
         // to support datagram history with gaps.
         DataGramHistory* pHistory = createDataGramHistory(dgh.number, time);
 
@@ -1257,21 +1254,21 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
     packetsThisFrameBoundaries_.clear();
 }
 
-// called from peer to get recived packets back from ReliabilityLayer.
-bool ReliabilityLayer::recive(PacketData& dataOut)
+// called from peer to get received packets back from ReliabilityLayer.
+bool ReliabilityLayer::receive(PacketData& dataOut)
 {
-    if (recivedPackets_.isEmpty()) {
+    if (receivedPackets_.isEmpty()) {
         return false;
     }
 
-    ReliablePacket* pPacket = recivedPackets_.peek();
+    ReliablePacket* pPacket = receivedPackets_.peek();
     dataOut.setdata(pPacket->pData, pPacket->dataBitLength, pPacket->getArena());
-    recivedPackets_.pop();
+    receivedPackets_.pop();
 
     // release ownership...
     pPacket->pData = nullptr;
     pPacket->dataBitLength = 0;
-    X_ASSERT(pPacket->dataType != ReliablePacket::DataType::Ref, "Should not have refrenced data for recived packets")();
+    X_ASSERT(pPacket->dataType != ReliablePacket::DataType::Ref, "Should not have referenced data for received packets")();
 
     freePacket(pPacket);
     return true;
@@ -1301,7 +1298,7 @@ void ReliabilityLayer::sendACKs(NetSocket& socket, core::FixedBitStreamBase& bs,
         dgh.flags.Set(DatagramFlag::Ack);
         dgh.writeToBitStream(bs);
 
-        // return instead of infinate loop, but if this happens dunno how we'd recover :Z
+        // return instead of infinite loop, but if this happens dunno how we'd recover :Z
         // but it never 'should' happen.
         if (acks_.writeToBitStream(bs, maxPacketBits, true) == 0) {
             X_ERROR("NetRel", "Failed to write any ack's to stream");
@@ -1477,7 +1474,7 @@ bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
         size_t offset = packetIdx * maxDataSizeBytes;
         size_t packetSizeBytes = core::Min(maxDataSizeBytes, lengthBytes - offset);
 
-        // this packet refrences the data.
+        // this packet references the data.
         pSplitPacket->dataType = ReliablePacket::DataType::Ref;
         pSplitPacket->pData = pPacket->pData + offset;
         pSplitPacket->pRefData = pRefData;
@@ -1506,13 +1503,13 @@ bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
         bytesInSendBuffers_[priority] += core::bitUtil::bitsToBytes(pSplitPacket->dataBitLength);
     }
 
-    X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Splitpacket took: ^5%gms", timer.GetMilliSeconds());
+    X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Split packet took: ^5%gms", timer.GetMilliSeconds());
 
-    // don't free it's refrenced by the split packets.
+    // don't free it's referenced by the split packets.
     pPacket->pData = nullptr;
     pPacket->dataBitLength = 0;
 
-    // we don't need this packt anymore.
+    // we don't need this packet anymore.
     freePacket(pPacket);
     return true;
 }
@@ -1551,7 +1548,7 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
     X_ASSERT(pChannel->packets[pPacket->splitPacketIndex] == nullptr, "Index is already occupied.")(pPacket->splitPacketIndex);
 
     // meow.
-    ++pChannel->packetsRecived;
+    ++pChannel->packetsReceived;
     pChannel->lastUpdate = time;
     pChannel->packets[pPacket->splitPacketIndex] = pPacket;
 
@@ -1584,7 +1581,7 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
 
         freeSplitPacketChannel(pChannel);
 
-        X_ASSERT(channelIt != splitPacketChannels_.end(), "Should not be merging split packs on frist packet")(channelIt);
+        X_ASSERT(channelIt != splitPacketChannels_.end(), "Should not be merging split packs on first packet")(channelIt);
         splitPacketChannels_.erase(channelIt);
         return pRebuiltPacket;
     }
@@ -1615,9 +1612,9 @@ DataGramHistory* ReliabilityLayer::getDataGramHistory(DataGramSequenceNumber num
 {
     // so we have a sliding window for this.
     // in that we only have history for last sent datagram - REL_DATAGRAM_HISTORY_LENGTH
-    // so if we recive a msg thats more than lastDataGram index - REL_DATAGRAM_HISTORY_LENGTH we have
+    // so if we receive a msg thats more than lastDataGram index - REL_DATAGRAM_HISTORY_LENGTH we have
     // to ignore the ack, and it will get resent.
-    // these message indexs can also wrap around.
+    // these message indexes can also wrap around.
 
     if (number != dataGramHistoryPopCnt_) {
         // work out if lower that popcnt taking into account overflow.
@@ -1635,7 +1632,7 @@ DataGramHistory* ReliabilityLayer::getDataGramHistory(DataGramSequenceNumber num
 
     DataGramHistory* pHistory = &dataGramHistory_[offset];
 #if X_DEBUG
-    X_ASSERT(pHistory->magic == 0x12345678, "MAgic not match, corrupt item?")();
+    X_ASSERT(pHistory->magic == 0x12345678, "Magic not match, corrupt item?")();
 #endif // X_DEBUG
     return pHistory;
 }
@@ -1699,7 +1696,7 @@ void ReliabilityLayer::removePacketFromResendList(MessageNumber msgNum)
             pAckPacket->pData[0] = MessageID::SndReceiptAcked;
             std::memcpy(&pAckPacket->pData[1], &pPacket->sendReceipt, sizeof(pPacket->sendReceipt));
 
-            recivedPackets_.emplace(pAckPacket);
+            receivedPackets_.emplace(pAckPacket);
         }
 
         // now we need to remove.
@@ -1730,9 +1727,9 @@ size_t ReliabilityLayer::calculateMemoryUsage(void) const
 
     size += sizeof(*this);
     size += outGoingPackets_.capacity() * sizeof(decltype(outGoingPackets_)::Type);
-    size += recivedPackets_.capacity() * sizeof(decltype(recivedPackets_)::Type);
+    size += receivedPackets_.capacity() * sizeof(decltype(receivedPackets_)::Type);
     size += dataGramHistory_.capacity() * sizeof(decltype(dataGramHistory_)::Type);
-    size += recivedPacketQueue_.capacity() * sizeof(decltype(recivedPacketQueue_)::Type);
+    size += receivedPacketQueue_.capacity() * sizeof(decltype(receivedPacketQueue_)::Type);
 
     size += incomingAcks_.capacity() * sizeof(decltype(incomingAcks_)::RangeNodeType);
     size += naks_.capacity() * sizeof(decltype(naks_)::RangeNodeType);

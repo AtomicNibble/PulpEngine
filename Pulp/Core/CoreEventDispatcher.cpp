@@ -15,7 +15,7 @@ XCoreEventDispatcher::XCoreEventDispatcher(CoreVars& coreVars, core::MemoryArena
 
 XCoreEventDispatcher::~XCoreEventDispatcher()
 {
-    X_ASSERT(listners_.isEmpty(), "Core listners are still registerd")(listners_.size());
+    X_ASSERT(listners_.isEmpty(), "Core listners are still registered")(listners_.size());
 
     listners_.clear();
 }

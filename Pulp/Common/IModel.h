@@ -96,7 +96,7 @@ X_NAMESPACE_BEGIN(model)
 //
 //	Version 13:
 //		Align all the vertex streams to 16byte offsets, so that when we map the file to memory.
-//		As long as the base memory location of the buffer is 16byte alinged all the stream starts will be also.
+//		As long as the base memory location of the buffer is 16byte aligned all the stream starts will be also.
 //		This then allows SIMD memcpy on the streams in the render system, when uploading.
 //
 //	Version 14:
@@ -130,8 +130,8 @@ X_NAMESPACE_BEGIN(model)
 //			OBB[colHdr.numOBB]
 //
 //	Version 16:
-//		Remvoe blank bones and name it rootBones.
-//		I still save postions / rotation for root bones even tho it should always be zero, asthe file is memory mapped.
+//		Remove blank bones and name it rootBones.
+//		I still save positions / rotation for root bones even tho it should always be zero, as the file is memory mapped.
 //
 //		Write relative bone positions.
 //
@@ -549,7 +549,7 @@ struct HitBoxHdr
 };
 
 // SubMeshHeader is part of a single mesh.
-// each SubMeshHeader typically has a diffrent material.
+// each SubMeshHeader typically has a different material.
 // the submesh provides vertex / index Offsets, for the verts.
 // in the meshes IB / VB
 struct SubMeshHeader
@@ -569,14 +569,14 @@ struct SubMeshHeader
     uint16_t numVerts;
     uint16_t numFaces;
     uint16_t numBinds;              // used for solid binds.
-    Flags8<StreamType> streamsFlag; // this is just a dublicate of the meshheaders value, never diffrent.
+    Flags8<StreamType> streamsFlag; // this is just a duplicate of the meshheaders value, never different.
     uint8_t numColMesh;             // 8
 
     // offset into the mesh's streames.
     uint32_t startVertex;
     uint32_t startIndex; // 8
 
-    // needs to be void, since we have diffrent vertex formats.
+    // needs to be void, since we have different vertex formats.
     core::Pointer64<void> streams[VertexStream::ENUM_COUNT - VERT_RUNTIME_STREAM_COUNT]; // 8
     core::Pointer64<Index> indexes;                                                      // 8
 
@@ -604,7 +604,7 @@ struct SubMeshHeader
 // a mesh is a single Vb / IB
 // It can have many sub-meshes.
 // for 3D Models it's limits are above.
-// level models have diffrent limits. <IBsp.h>
+// level models have different limits. <IBsp.h>
 // respect both when changing type sizes.
 struct MeshHeader
 {
@@ -620,12 +620,12 @@ struct MeshHeader
 
     // 4
     uint16_t numSubMeshes;       // levels support 65k sub meshes
-    StreamTypeFlags streamsFlag; // flags for what streams are avalible
+    StreamTypeFlags streamsFlag; // flags for what streams are available
     uint8_t _blank;
 
     // 8 total of all sub-meshes.
-    // sub meshes can have upto 65k verts, this is the cumlative count
-    // we allow 65k sub meshes, so 32bits is enoungth to fit 65k*65k
+    // sub meshes can have upto 65k verts, this is the cumulative count
+    // we allow 65k sub meshes, so 32bits is enough to fit 65k*65k
     uint32_t numVerts;
     uint32_t numFaces;
 

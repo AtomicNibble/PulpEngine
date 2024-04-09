@@ -13,7 +13,7 @@ X_NAMESPACE_BEGIN(engine)
 
 class Material;
 
-class IPrimativeContext
+class IPrimitiveContext
 {
 public:
     typedef render::TopoType PrimitiveType;
@@ -31,7 +31,7 @@ public:
     (
         Sphere,
         Cone,
-        Cylinder // get fooked. AINT nobody got time for cylinders.
+        Cylinder
     );
 
     // typedef InstancedData_MAT44_C4F ShapeInstanceData;
@@ -60,10 +60,10 @@ public:
     typedef std::array<float, 4> CoordArr;
 
 protected:
-    IPrimativeContext();
+    IPrimitiveContext();
 
 public:
-    virtual ~IPrimativeContext();
+    virtual ~IPrimitiveContext();
 
     virtual size_t maxVertsPerPrim(void) const X_ABSTRACT;
     virtual Mode getMode(void) const X_ABSTRACT;
@@ -192,12 +192,12 @@ private:
         Material* pMaterial, const CoordArr& s, const CoordArr& t, const Colorf& col, bool filtered = true);
 
 public:
-    virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, Material* pMaterial) X_ABSTRACT;
-    virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type) X_ABSTRACT;
+    virtual PrimVertex* addPrimitive(uint32_t num, PrimitiveType::Enum type, Material* pMaterial) X_ABSTRACT;
+    virtual PrimVertex* addPrimitive(uint32_t num, PrimitiveType::Enum type) X_ABSTRACT;
 
     virtual ShapeInstanceData* addShape(ShapeType::Enum type, bool solid, int32_t lodIdx = 0) X_ABSTRACT;
 };
 
 X_NAMESPACE_END
 
-#include "IPrimativeContext.inl"
+#include "IPrimitiveContext.inl"

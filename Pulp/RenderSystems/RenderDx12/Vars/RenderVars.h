@@ -13,14 +13,14 @@ public:
 
     void registerVars(void);
 
-    X_INLINE bool varsRegisterd(void) const; // check if vars are init
+    X_INLINE bool varsRegistered(void) const; // check if vars are init
     X_INLINE bool enableDebugLayer(void) const;
     X_INLINE const Colorf& getClearCol(void) const;
 
     void setNativeRes(const Vec2i& res);
 
 private:
-    bool varsRegisterd_;
+    bool varsRegistered_;
     bool _pad[3];
 
     int32_t debugLayer_;

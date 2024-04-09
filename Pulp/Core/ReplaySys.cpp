@@ -150,9 +150,9 @@ void ReplaySys::update(FrameInput& inputFrame)
     if (mode_ == Mode::RECORD) {
         EntryHdr hdr;
 
-        if (inputFrame.cusorPos != lastCusorPos_ || inputFrame.cusorPosClient != lastCusorPosClient_) {
-            lastCusorPos_ = inputFrame.cusorPos;
-            lastCusorPosClient_ = inputFrame.cusorPosClient;
+        if (inputFrame.cusorPos != lastCursorPos_ || inputFrame.cusorPosClient != lastCursorPosClient_) {
+            lastCursorPos_ = inputFrame.cusorPos;
+            lastCursorPosClient_ = inputFrame.cusorPosClient;
 
             hdr.flags.Set(DataFlag::CURSOR);
         }
@@ -266,8 +266,8 @@ void ReplaySys::update(FrameInput& inputFrame)
         // end of goat?
         X_ASSERT(!stream_.isEos(), "Stream is empty")();
 
-        inputFrame.cusorPos = lastCusorPos_;
-        inputFrame.cusorPosClient = lastCusorPosClient_;
+        inputFrame.cusorPos = lastCursorPos_;
+        inputFrame.cusorPosClient = lastCursorPosClient_;
         inputFrame.events.clear();
 
         // read events!
@@ -281,8 +281,8 @@ void ReplaySys::update(FrameInput& inputFrame)
                 stream_.read(inputFrame.cusorPos);
                 stream_.read(inputFrame.cusorPosClient);
 
-                lastCusorPos_ = inputFrame.cusorPos;
-                lastCusorPosClient_ = inputFrame.cusorPosClient;
+                lastCursorPos_ = inputFrame.cusorPos;
+                lastCursorPosClient_ = inputFrame.cusorPosClient;
             } 
 
             if (nextEntry_.flags.IsSet(DataFlag::EVENTS)) {

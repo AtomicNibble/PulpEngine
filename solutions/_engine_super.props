@@ -2,15 +2,15 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <_PropertySheetDisplayName>Engine Super</_PropertySheetDisplayName>
-    <OutDir>$(SolutionDir)..\..\build\$(PlatformName)\Super\</OutDir>
-    <IntDir>$(SolutionDir)..\..\Temp\$(Platform)\Super\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)..\build\$(PlatformName)\Super\</OutDir>
+    <IntDir>$(SolutionDir)..\Temp\$(Platform)\Super\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-    <ProgramDataBaseFileName>$(SolutionDir)..\..\Temp\$(Platform)\Super\$(ProjectName)\engine_$(ProjectName).compile.pdb</ProgramDataBaseFileName>
+    <ProgramDataBaseFileName>$(SolutionDir)..\Temp\$(Platform)\Super\$(ProjectName)\engine_$(ProjectName).compile.pdb</ProgramDataBaseFileName>
     </ClCompile>
 	<Link>
-		<AdditionalLibraryDirectories>$(SolutionDir)..\3rdparty\$(PlatformToolset)\$(PlatformName)\;$(SolutionDir)..\..\build\$(PlatformName)\Super\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+		<AdditionalLibraryDirectories>$(SolutionDir)..\3rdparty\$(PlatformToolset)\$(PlatformName)\;$(SolutionDir)..\build\$(PlatformName)\Super\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 	</Link>
   </ItemDefinitionGroup>
 </Project>

@@ -36,7 +36,7 @@ class XEngineModule_ConverterLib : public IEngineModule
 
         LinkModule(pCore, "ConverterLib");
 
-        if (!pCore->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "SqLite", "Engine_SqLite")) {
+        if (!pCore->InitializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "SqLite", "Engine_SqLite")) {
             return false;
         }
 

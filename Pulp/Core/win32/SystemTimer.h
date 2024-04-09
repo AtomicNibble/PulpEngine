@@ -7,9 +7,9 @@
 
 X_NAMESPACE_BEGIN(core)
 
-/// \brief high-res timer for genral game use.
-/// \details Returns the value as a 64bit int for the following reasons: http://www.altdevblogaday.com/2012/02/05/dont-store-that-in-a-float/
-/// ( basically float percision sucks after game running for long time )
+// high-res timer for genral game use.
+// Returns the value as a 64bit int for the following reasons: http://www.altdevblogaday.com/2012/02/05/dont-store-that-in-a-float/
+// ( basically float percision sucks after game running for long time )
 namespace SysTimer
 {
     typedef core::traits::Function<int64(void)> TimeUpdateFunc;

@@ -7,7 +7,7 @@
 
 // show me your vectors baby.
 
-// distance tpye selection using specilisation.
+// distance type selection using specialisation.
 template<typename T>
 struct VECTRAIT
 {
@@ -271,7 +271,7 @@ public:
         return x * x + y * y;
     }
 
-    //! Limits the length of a Vec2 to \a maxLength, scaling it proportionally if necessary.
+    // Limits the length of a Vec2 to maxLength, scaling it proportionally if necessary.
     X_INLINE void limit(DIST maxLength)
     {
         T lengthSquared = x * x + y * y;
@@ -283,7 +283,7 @@ public:
         }
     }
 
-    //! Returns a copy of the Vec2 with its length limited to \a maxLength, scaling it proportionally if necessary.
+    // Returns a copy of the Vec2 with its length limited to maxLength, scaling it proportionally if necessary.
     X_INLINE Vec2<T> limited(T maxLength) const
     {
         T lengthSquared = x * x + y * y;
@@ -605,7 +605,7 @@ public:
         return x * x + y * y + z * z;
     }
 
-    //! Limits the length of a Vec3 to \a maxLength, scaling it proportionally if necessary.
+    // Limits the length of a Vec3 to maxLength, scaling it proportionally if necessary.
     void limit(T maxLength)
     {
         T lengthSquared = x * x + y * y + z * z;
@@ -618,7 +618,7 @@ public:
         }
     }
 
-    //! Returns a copy of the Vec3 with its length limited to \a maxLength, scaling it proportionally if necessary.
+    // Returns a copy of the Vec3 with its length limited to maxLength, scaling it proportionally if necessary.
     Vec3<T> limited(T maxLength) const
     {
         T lengthSquared = x * x + y * y + z * z;
@@ -683,7 +683,7 @@ public:
             return *this;
     }
 
-    //! Returns a vector which is orthogonal to \a this
+    // Returns a vector which is orthogonal to this
     Vec3<T> getOrthogonal() const
     {
         if (math<T>::abs(y) < static_cast<T>(0.99)) // abs(dot(u, Y)), somewhat arbitrary epsilon
@@ -1120,7 +1120,7 @@ public:
         return *this;
     }
 
-    //! Limits the length of a Vec4 to \a maxLength, scaling it proportionally if necessary.
+    // Limits the length of a Vec4 to maxLength, scaling it proportionally if necessary.
     void limit(T maxLength)
     {
         T lenSq = lengthSquared();
@@ -1134,7 +1134,7 @@ public:
         }
     }
 
-    //! Returns a copy of the Vec4 with its length limited to \a maxLength, scaling it proportionally if necessary.
+    // Returns a copy of the Vec4 with its length limited to maxLength, scaling it proportionally if necessary.
     Vec4<T> limited(T maxLength) const
     {
         T lenSq = lengthSquared();

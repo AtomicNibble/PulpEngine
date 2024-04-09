@@ -113,13 +113,13 @@ namespace Compression
 
         // early out.
         if (srcBufLen == 0) {
-            X_WARNING("Zlib", "defalte called with empty src buffer");
+            X_WARNING("Zlib", "deflate called with empty src buffer");
             return false;
         }
 
         // check deflate size is valid.
         if (destBufLen < requiredDeflateDestBuf(srcBufLen)) {
-            X_ERROR("Zlib", "Destination buffer is too small. require: %x recived: %x",
+            X_ERROR("Zlib", "Destination buffer is too small. require: %x received: %x",
                 requiredDeflateDestBuf(srcBufLen), destBufLen);
             return false;
         }
@@ -161,7 +161,7 @@ namespace Compression
         ::deflateEnd(&stream);
 
         if (res != Z_STREAM_END) {
-            X_ERROR("Zlib", "defalte error: %" PRIi32 " -> %s", res, ZlibErrToStr(res));
+            X_ERROR("Zlib", "deflate error: %" PRIi32 " -> %s", res, ZlibErrToStr(res));
             return false;
         }
         else {
@@ -315,8 +315,8 @@ namespace Compression
 
     // --------------------------------------
 
-    ZlibDefalte::ZlibDefalte(core::MemoryArenaBase* arena, DeflateCallback&& defalteCallBack, CompressLevel::Enum lvl) :
-        callback_(std::forward<DeflateCallback>(defalteCallBack)),
+    ZlibDeflate::ZlibDeflate(core::MemoryArenaBase* arena, DeflateCallback&& deflateCallBack, CompressLevel::Enum lvl) :
+        callback_(std::forward<DeflateCallback>(deflateCallBack)),
         arena_(arena),
         buffer_(arena)
     {
@@ -332,13 +332,13 @@ namespace Compression
         ::deflateInit(stream_, CompLvlToZliblvl(lvl));
     }
 
-    ZlibDefalte::~ZlibDefalte()
+    ZlibDeflate::~ZlibDeflate()
     {
         ::deflateEnd(stream_);
         X_DELETE_AND_NULL(stream_, arena_);
     }
 
-    void ZlibDefalte::setBufferSize(size_t size)
+    void ZlibDeflate::setBufferSize(size_t size)
     {
         if (size < 1) {
             X_ERROR("Zlib", "Zero buffer size: %" PRIuS " reverting to default", size);
@@ -350,12 +350,12 @@ namespace Compression
         stream_->avail_out = safe_static_cast<uint32_t>(buffer_.size());
     }
 
-    size_t ZlibDefalte::deflatedSize(void) const
+    size_t ZlibDeflate::deflatedSize(void) const
     {
         return stream_->total_out;
     }
 
-    ZlibDefalte::Result::Enum ZlibDefalte::Deflate(const void* pSrcData, size_t len, bool finish)
+    ZlibDeflate::Result::Enum ZlibDeflate::Deflate(const void* pSrcData, size_t len, bool finish)
     {
         if (buffer_.isEmpty()) {
             setBufferSize(DEFAULT_BUF_SIZE);

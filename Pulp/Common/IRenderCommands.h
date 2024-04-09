@@ -249,7 +249,7 @@ namespace Commands
     }
 
     // not sure if i want to pack these down close or have each command start aligned.
-    // I currently support them been 8 bute aligned.
+    // I currently support them been 8 byte aligned.
     X_PACK_PUSH(1)
 
     struct CmdBase
@@ -277,7 +277,7 @@ namespace Commands
         // maybe i could make this in place and place the data in the aux buf.
         // requires copying of data but then the render pipeline can read from same cache line
         // i'll bench mark it.
-        // more memory but better cache access is proberly faster.
+        // more memory but better cache access is probably faster.
         ResourceStateBase resourceState;
     };
 

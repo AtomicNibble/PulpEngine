@@ -12,7 +12,7 @@ X_NAMESPACE_DECLARE(core,
                     struct IConsoleCmdArgs);
 
 X_NAMESPACE_DECLARE(engine,
-    class IPrimativeContext);
+    class IPrimitiveContext);
 
 X_NAMESPACE_BEGIN(engine)
 

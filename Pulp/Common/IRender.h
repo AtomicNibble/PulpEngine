@@ -34,8 +34,8 @@ X_NAMESPACE_DECLARE(render,
 
 X_NAMESPACE_BEGIN(render)
 
-static const bool DEPTH_REVERSE_Z = true; // setting this to false 'should' be enougth to turn reverse z on/off
-// make these small as possible, reducdes pool size.
+static const bool DEPTH_REVERSE_Z = true; // setting this to false 'should' be enough to turn reverse z on/off
+// make these small as possible, reduces pool size.
 static const uint32_t MAX_RENDER_TARGETS = 8;
 static const uint32_t MAX_CONST_BUFFERS_BOUND = 8;
 static const uint32_t MAX_TEXTURES_BOUND = 8;
@@ -195,9 +195,9 @@ X_DECLARE_ENUM8(TextureSlot)
 
 static_assert(MAX_TEXTURES_BOUND >= TextureSlot::ENUM_COUNT, "Slots bound must be greater or equal to num slots");
 
-// LINEAR is linera with none mip sampling aka LINEAR_MIP_NONE
-// BILINEAR is linera with point mip sampling aka LINEAR_MIP_NEAREST
-// TRILINEAR is linera with linear mip sampling aka LINEAR_MIP_LINEAR
+// LINEAR is linear with none mip sampling aka LINEAR_MIP_NONE
+// BILINEAR is linear with point mip sampling aka LINEAR_MIP_NEAREST
+// TRILINEAR is linear with linear mip sampling aka LINEAR_MIP_LINEAR
 X_DECLARE_ENUM8(FilterType)
 (
     NEAREST_MIP_NONE,

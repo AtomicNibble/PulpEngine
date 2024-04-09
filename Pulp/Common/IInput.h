@@ -123,7 +123,7 @@ struct KeyId
 
     typedef char Description[32];
 
-    // this is keyboard and mouse keys mergerd
+    // this is keyboard and mouse keys merged
     // with mouse been offset.
     enum Enum
     {
@@ -278,7 +278,7 @@ struct KeyId
         MOUSE_WHEELUP,
         MOUSE_WHEELDOWN,
 
-        // mouse movement sent as seprate events
+        // mouse movement sent as separate events
         MOUSE_X,
         MOUSE_Y,
         MOUSE_Z, // wheel.
@@ -391,7 +391,7 @@ struct InputSymbol
     KeyId::Enum keyId;
     InputState::Enum state; // the state of the key, UP, DOWN
     InputDeviceType::Enum deviceType;
-    ModifiersMasks::Enum modiferMask; // if modifier has it's mask
+    ModifiersMasks::Enum modifierMask; // if modifier has it's mask
 };
 
 // inherit from this if you want to register from input events.

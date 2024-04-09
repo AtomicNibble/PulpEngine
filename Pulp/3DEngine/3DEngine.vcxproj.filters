@@ -28,9 +28,6 @@
     <ClCompile Include="Model\RenderMesh.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
-    <ClCompile Include="Drawing\PrimativeContext.cpp">
-      <Filter>Source Files\Drawing</Filter>
-    </ClCompile>
     <ClCompile Include="Drawing\CBufferManager.cpp">
       <Filter>Source Files\Drawing</Filter>
     </ClCompile>
@@ -97,6 +94,7 @@
     <ClCompile Include="Gui\GuiContex.cpp">
       <Filter>Source Files\Gui</Filter>
     </ClCompile>
+    <ClCompile Include="Drawing\PrimitiveContext.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="X3DEngine.h">
@@ -116,9 +114,6 @@
     </ClInclude>
     <ClInclude Include="Model\RenderMesh.h">
       <Filter>Header Files\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Drawing\PrimativeContext.h">
-      <Filter>Header Files\Drawing</Filter>
     </ClInclude>
     <ClInclude Include="Drawing\CBufferManager.h">
       <Filter>Header Files\Drawing</Filter>
@@ -189,6 +184,7 @@
     <ClInclude Include="Gui\GuiContex.h">
       <Filter>Header Files\Gui</Filter>
     </ClInclude>
+    <ClInclude Include="Drawing\PrimitiveContext.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -268,9 +264,6 @@
     <None Include="Model\RenderMesh.inl">
       <Filter>Header Files\Model</Filter>
     </None>
-    <None Include="Drawing\PrimativeContext.inl">
-      <Filter>Header Files\Drawing</Filter>
-    </None>
     <None Include="Material\TechDefStateManager.inl">
       <Filter>Header Files\Material</Filter>
     </None>
@@ -304,5 +297,6 @@
     <None Include="Gui\Menu.inl">
       <Filter>Header Files\Gui</Filter>
     </None>
+    <None Include="Drawing\PrimitiveContext.inl" />
   </ItemGroup>
 </Project>

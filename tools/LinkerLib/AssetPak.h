@@ -100,7 +100,7 @@ private:
     AssetCountArr assetCounts_;
     AssetCountArr compressedAssetCounts_;
 
-    uint64_t defaltedAssetSize_;
+    uint64_t deflatedAssetSize_;
     uint64_t infaltedAssetSize_;
 };
 

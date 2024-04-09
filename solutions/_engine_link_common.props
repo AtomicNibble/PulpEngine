@@ -10,7 +10,7 @@
     </ClCompile>
     <Link>
 	<AdditionalDependencies>engine_Common.lib;%(AdditionalDependencies)</AdditionalDependencies>
-	<AdditionalLibraryDirectories>$(SolutionDir)..\..\code\3rdparty\$(PlatformToolset)\$(PlatformName)\;$(SolutionDir)..\..\build\$(PlatformName)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+	<AdditionalLibraryDirectories>$(SolutionDir)..\..\code\3rdparty\$(PlatformToolset)\$(PlatformName)\;$(SolutionDir)..\build\$(PlatformName)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />

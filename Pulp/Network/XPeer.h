@@ -79,7 +79,7 @@ struct PingAndClockDifferential
     core::TimeVal clockDifferential;
 };
 
-X_ALIGNED_SYMBOL(struct RemoteSystem, 64) // each remote can be updated on diffrent thread, prevent any false sharing.
+X_ALIGNED_SYMBOL(struct RemoteSystem, 64) // each remote can be updated on different thread, prevent any false sharing.
 {
     static const size_t PING_HISTORY_COUNT = 3;
 
@@ -110,9 +110,9 @@ public:
         core::TimeVal sendPingTime, core::TimeVal sendPongTime);
     void onPong(core::TimeVal sendPingTime, core::TimeVal sendPongTime);
 
-    X_INLINE bool sendReliabile(const uint8_t* pData, BitSizeT numberOfBitsToSend, bool ownData, PacketPriority::Enum priority,
+    X_INLINE bool sendReliable(const uint8_t* pData, BitSizeT numberOfBitsToSend, bool ownData, PacketPriority::Enum priority,
         PacketReliability::Enum reliability, OrderingChannel::Enum orderingChannel, core::TimeVal currentTime, SendReceipt receipt = INVALID_SEND_RECEIPT);
-    X_INLINE bool sendReliabile(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
+    X_INLINE bool sendReliable(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
         PacketReliability::Enum reliability, OrderingChannel::Enum orderingChannel, core::TimeVal currentTime, SendReceipt receipt = INVALID_SEND_RECEIPT);
 
 private:
@@ -200,7 +200,7 @@ class XPeer : public IPeer
     typedef core::Array<core::ThreadMember<XPeer>> ThreadArr;
 
     // a bit stream that don't own the memory.
-    // we just read directly off the recived buffer.
+    // we just read directly off the received buffer.
     typedef core::FixedBitStreamBase RecvBitStream;
     typedef core::FixedBitStreamBase UpdateBitStream;
     typedef core::FixedBitStreamStack<MAX_MTU_SIZE> BitStreamMTU;

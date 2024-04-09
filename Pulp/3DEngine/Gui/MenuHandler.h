@@ -9,7 +9,7 @@ X_NAMESPACE_DECLARE(net, struct ISession)
 
 X_NAMESPACE_BEGIN(engine)
 
-class IPrimativeContext;
+class IPrimitiveContext;
 
 namespace gui
 {
@@ -27,7 +27,7 @@ namespace gui
         ~MenuHandler() X_OVERRIDE = default;
 
         bool isActive(void) const X_FINAL;
-        void update(MenuParams& params, core::FrameData& frame, IPrimativeContext* pPrim) X_FINAL;
+        void update(MenuParams& params, core::FrameData& frame, IPrimitiveContext* pPrim) X_FINAL;
 
         bool openMenu(core::string_view name) X_FINAL;
         void close(void) X_FINAL;

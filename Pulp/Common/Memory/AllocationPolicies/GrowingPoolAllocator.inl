@@ -1,13 +1,13 @@
 
 
-// ---------------------------------------------------------------------------------------------------------------------
+
 inline void* GrowingPoolAllocator::allocate(size_t size, size_t alignment, size_t offset)
 {
     return allocate(size, alignment, offset, nullptr, 0);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<class T>
 inline void* GrowingPoolAllocator::allocate(size_t size, size_t alignment, size_t offset,
     typename std::enable_if<!core::compileTime::IsPointer<T>::Value, T>::type& chunkHeader)
@@ -16,8 +16,8 @@ inline void* GrowingPoolAllocator::allocate(size_t size, size_t alignment, size_
     return allocate(size, alignment, offset, &chunkHeader, sizeof(chunkHeader));
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 inline void GrowingPoolAllocator::free(void* ptr)
 {
     X_ASSERT_NOT_NULL(ptr);
@@ -31,8 +31,8 @@ inline void GrowingPoolAllocator::free(void* ptr)
 #endif
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 inline void GrowingPoolAllocator::free(void* ptr, size_t size)
 {
     X_UNUSED(size);
@@ -40,29 +40,29 @@ inline void GrowingPoolAllocator::free(void* ptr, size_t size)
     free(ptr);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 inline size_t GrowingPoolAllocator::getSize(void*) const
 {
     return maxSize_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 inline size_t GrowingPoolAllocator::usableSize(void*) const
 {
     return maxSize_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 inline bool GrowingPoolAllocator::containsAllocation(void* ptr) const
 {
     return ((ptr >= virtualStart_) && (ptr < physicalCurrent_));
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
+
+
 template<typename T>
 inline T* GrowingPoolAllocator::getChunkHeader(void* allocationAddress, unsigned int chunkSize, unsigned int chunkHeaderSize)
 {

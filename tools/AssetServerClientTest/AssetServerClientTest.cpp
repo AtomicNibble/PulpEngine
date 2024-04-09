@@ -192,7 +192,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                         X_ERROR("AssetClientTest", "Request failed: %s", err.c_str());
                     }
                     else {
-                        X_LOG0("AssetClientTest", "Reponse returned OK");
+                        X_LOG0("AssetClientTest", "Response returned OK");
                     }
                 }
 
@@ -236,7 +236,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                         X_ERROR("AssetClientTest", "Request failed: %s", err.c_str());
                     }
                     else {
-                        X_LOG0("AssetClientTest", "Reponse returned OK");
+                        X_LOG0("AssetClientTest", "Response returned OK");
                     }
                 }
 
@@ -280,7 +280,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                         X_ERROR("AssetClientTest", "Request failed: %s", err.c_str());
                     }
                     else {
-                        X_LOG0("AssetClientTest", "Reponse returned OK");
+                        X_LOG0("AssetClientTest", "Response returned OK");
                     }
                 }
 
@@ -330,7 +330,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 }
             }
 
-            // shut down the slut.
+            // shut down.
             google::protobuf::ShutdownProtobufLibrary();
 
             // muh consolas!

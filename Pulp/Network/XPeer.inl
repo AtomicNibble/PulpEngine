@@ -8,7 +8,7 @@ X_INLINE bool PingAndClockDifferential::isValid(void) const
 
 // --------------------------------------------------------------
 
-X_INLINE bool RemoteSystem::sendReliabile(const uint8_t* pData, BitSizeT numberOfBitsToSend, bool ownData, PacketPriority::Enum priority,
+X_INLINE bool RemoteSystem::sendReliable(const uint8_t* pData, BitSizeT numberOfBitsToSend, bool ownData, PacketPriority::Enum priority,
     PacketReliability::Enum reliability, OrderingChannel::Enum orderingChannel, core::TimeVal currentTime, SendReceipt receipt)
 {
     if (!canSend()) {
@@ -32,7 +32,7 @@ X_INLINE bool RemoteSystem::sendReliabile(const uint8_t* pData, BitSizeT numberO
     return res;
 }
 
-X_INLINE bool RemoteSystem::sendReliabile(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
+X_INLINE bool RemoteSystem::sendReliable(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
     PacketReliability::Enum reliability, OrderingChannel::Enum orderingChannel, core::TimeVal currentTime, SendReceipt receipt)
 {
     if (!canSend()) {

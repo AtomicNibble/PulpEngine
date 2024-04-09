@@ -52,7 +52,7 @@ public:
 
     MemoryAllocatorStatistics getStatistics(void) const;
 
-    /// Returns whether a given allocation belongs to this allocator.
+    // Returns whether a given allocation belongs to this allocator.
     X_INLINE bool containsAllocation(void* ptr) const;
     X_INLINE bool containsAllocation(void* ptr, size_t sizeIn) const;
     X_INLINE bool containsAllocation(void* ptr, size_t* pSizeOut) const;

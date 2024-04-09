@@ -5,7 +5,7 @@
 X_NAMESPACE_BEGIN(net)
 
 // This handles outgoing snapshots for a given peer.
-// Also handles rebuiling snapshots deltas from server.
+// Also handles rebuilding snapshots deltas from server.
 class SnapshotManager
 {
     static const int32_t MAX_PENDING_DELTAS = 16;

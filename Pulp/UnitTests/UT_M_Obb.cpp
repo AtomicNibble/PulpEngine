@@ -49,7 +49,7 @@ TEST(Obb, SetMat)
 
 TEST(Obb, SetQuat)
 {
-    AABB aabb(Vec3f(5.f), Vec3f(15.f, 105.f, 865.f)); // something diffrent heeh
+    AABB aabb(Vec3f(5.f), Vec3f(15.f, 105.f, 865.f)); // something different heeh
     OBB obb;
 
     // create a rotation.

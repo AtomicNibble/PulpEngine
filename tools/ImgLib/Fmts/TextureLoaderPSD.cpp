@@ -308,12 +308,12 @@ namespace PSD
         }
 
         if (hdr.mode != PsdColorMode::RGB) {
-            X_ERROR("TexturePSD", "PSD color mode is not supported. providied: %i required: 3", hdr.mode);
+            X_ERROR("TexturePSD", "PSD color mode is not supported. provided: %i required: 3", hdr.mode);
             return false;
         }
 
         if (hdr.depth != 8) {
-            X_ERROR("TexturePSD", "PSD depth is not supported. providied: %i required: 8", hdr.depth);
+            X_ERROR("TexturePSD", "PSD depth is not supported. provided: %i required: 8", hdr.depth);
             return false;
         }
 
@@ -348,7 +348,7 @@ namespace PSD
 
         imgFile.setType(TextureType::T2D);
         imgFile.setFormat(Texturefmt::A8R8G8B8);
-        imgFile.setHeigth(safe_static_cast<uint16_t, uint32_t>(hdr.height));
+        imgFile.setHeight(safe_static_cast<uint16_t, uint32_t>(hdr.height));
         imgFile.setWidth(safe_static_cast<uint16_t, uint32_t>(hdr.width));
         imgFile.setDepth(1);
         imgFile.setNumMips(1);

@@ -16,16 +16,16 @@ public:
     virtual void FreeTexture(void) X_FINAL;
 
     // draw a load of test text.
-    virtual void DrawTestText(engine::IPrimativeContext* pPrimCon, const core::FrameTimeData& time) X_FINAL;
+    virtual void DrawTestText(engine::IPrimitiveContext* pPrimCon, const core::FrameTimeData& time) X_FINAL;
 
-    // these draw the text into the primative context.
-    virtual void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+    // these draw the text into the primitive context.
+    virtual void DrawString(engine::IPrimitiveContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
         const TextDrawContext& contex, const char* pBegin, const char* pEnd) X_FINAL;
-    virtual void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+    virtual void DrawString(engine::IPrimitiveContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
         const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_FINAL;
-    virtual void DrawString(engine::IPrimativeContext* pPrimCon,
+    virtual void DrawString(engine::IPrimitiveContext* pPrimCon,
         const Vec3f& pos, const TextDrawContext& contex, const char* pBegin, const char* pEnd) X_FINAL;
-    virtual void DrawString(engine::IPrimativeContext* pPrimCon,
+    virtual void DrawString(engine::IPrimitiveContext* pPrimCon,
         const Vec3f& pos, const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_FINAL;
 
     virtual size_t GetTextLength(const char* pBegin, const char* pEnd, const bool asciiMultiLine) const X_FINAL;

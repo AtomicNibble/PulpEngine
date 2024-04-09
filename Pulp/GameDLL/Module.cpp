@@ -46,7 +46,7 @@ class XEngineModule_Game : public IEngineModule
 
         g_gameArena = X_NEW(GameArena, gEnv->pArena, "GameArena")(&g_gameAlloc, "GameArena");
 
-        if (!gEnv->pCore->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "ModelLib", "Engine_ModelLib")) {
+        if (!gEnv->pCore->InitializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "ModelLib", "Engine_ModelLib")) {
             X_ERROR("GameDLL", "Failed to init ModelLib");
             return false;
         }

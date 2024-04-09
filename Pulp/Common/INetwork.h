@@ -9,7 +9,7 @@
 #include <IAssetDb.h>
 
 X_NAMESPACE_DECLARE(engine,
-    class IPrimativeContext);
+    class IPrimitiveContext);
 
 X_NAMESPACE_DECLARE(core,
     struct FrameTimeData;
@@ -83,7 +83,7 @@ X_DECLARE_ENUM8(PacketPriority)
     Medium,
     Low);
 
-// Sequenced - We ignore any packets that are older than last recived packet.
+// Sequenced - We ignore any packets that are older than last received packet.
 // Ordered - all packets come out the other side in order for a given channel.
 X_DECLARE_ENUM8(PacketReliability)
 (
@@ -179,8 +179,8 @@ struct NetStatistics
         BytesPushed,
         BytesSent,
         BytesResent,
-        BytesRecivedProcessed,
-        BytesRecivedIgnored,
+        BytesReceivedProcessed,
+        BytesReceivedIgnored,
         // includes any overhead
         ActualBytesSent,
         ActualBytesReceived);
@@ -210,16 +210,16 @@ struct NetBandwidthStatistics
 {
     X_INLINE NetBandwidthStatistics& operator+=(const NetBandwidthStatistics& oth)
     {
-        numPacketsRecived += oth.numPacketsRecived;
-        numBytesRecived += oth.numBytesRecived;
+        numPacketsReceived += oth.numPacketsReceived;
+        numBytesReceived += oth.numBytesReceived;
         numPacketsSent += oth.numPacketsSent;
         numBytesSent += oth.numBytesSent;
         return *this;
     }
 
     // leave signed.
-    int64_t numPacketsRecived;
-    int64_t numBytesRecived;
+    int64_t numPacketsReceived;
+    int64_t numBytesReceived;
 
     int64_t numPacketsSent;
     int64_t numBytesSent;
@@ -670,7 +670,7 @@ struct ISession
     
     virtual ILobby* getLobby(LobbyType::Enum type) X_ABSTRACT;
 
-    virtual Vec2f drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const X_ABSTRACT;
+    virtual Vec2f drawDebug(Vec2f base, engine::IPrimitiveContext* pPrim) const X_ABSTRACT;
 };
 
 // ---------------------------------

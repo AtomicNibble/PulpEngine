@@ -187,7 +187,7 @@ public:
     static Matrix33<T> createRotation(const Vec3<T>& from, const Vec3<T>& to, const Vec3<T>& worldUp);
     // equivalent to rotate( zAxis, z ), then rotate( yAxis, y ) then rotate( xAxis, x )
     static Matrix33<T> createRotation(const Vec3<T>& eulerRadians);
-    // diffrnet name as i might use it instead of the one above.
+    // different name as i might use it instead of the one above.
     // if i'm drunk :Z
     static Matrix33<T> createRotationV01(const Vec3<T>& v0, const Vec3<T>& v1);
 

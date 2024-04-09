@@ -170,13 +170,11 @@ CacheResult::Enum XFontTexture::PreCacheString(const char* pBegin, const char* p
     return CacheResult::UNCHANGED;
 }
 
-//-------------------------------------------------------------------------------------------------
 wchar_t XFontTexture::GetSlotChar(int32_t slot) const
 {
     return slotList_[slot].currentChar;
 }
 
-//-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetCharSlot(wchar_t cChar)
 {
     XTextureSlotTableItor pItor = slotTable_.find(cChar);
@@ -188,14 +186,12 @@ XTextureSlot* XFontTexture::GetCharSlot(wchar_t cChar)
     return nullptr;
 }
 
-//-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetGradientSlot(void)
 {
     X_ASSERT(slotList_.isNotEmpty(), "slot list should be valid")();
     return &slotList_[0];
 }
 
-//-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetLRUSlot(void)
 {
     const auto it = std::min_element(slotList_.begin(), slotList_.end(), [](const XTextureSlot& s1, const XTextureSlot& s2) {
@@ -206,7 +202,6 @@ XTextureSlot* XFontTexture::GetLRUSlot(void)
     return &slot;
 }
 
-//-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetMRUSlot(void)
 {
     const auto it = std::max_element(slotList_.begin(), slotList_.end(), [](const XTextureSlot& s1, const XTextureSlot& s2) {
@@ -245,14 +240,12 @@ bool XFontTexture::CreateSlotList(int32_t listSize)
     return true;
 }
 
-//-------------------------------------------------------------------------------------------------
 bool XFontTexture::ReleaseSlotList(void)
 {
     slotList_.free();
     return true;
 }
 
-//-------------------------------------------------------------------------------------------------
 bool XFontTexture::UpdateSlot(XTextureSlot* pSlot, uint16 slotUsage, wchar_t cChar)
 {
     X_ASSERT_NOT_NULL(pSlot);
@@ -385,7 +378,6 @@ bool XFontTexture::WriteToFile(core::string_view filename)
     return false;
 }
 
-//-------------------------------------------------------------------------------------------------
 
 void XFontTexture::GetTextureCoord(const XTextureSlot* pSlot, XCharCords& cords) const
 {

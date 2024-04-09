@@ -409,7 +409,7 @@ namespace RawModel
 
             vert.binds_.resize(numBinds);
             for (auto& bind : vert.binds_) {
-                // boneIDx + weigth
+                // boneIDx + weight
                 if (!lex.ParseInt(bind.boneIdx_) || !lex.ParseFloat(bind.weight_)) {
                     X_ERROR("RawModel", "Vert(%s" PRIuS ") failed to read bind info", i);
                 }

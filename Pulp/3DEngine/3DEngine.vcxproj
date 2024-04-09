@@ -434,7 +434,7 @@
     <ClInclude Include="Anim\AnimInstance.h" />
     <ClInclude Include="Anim\AnimManager.h" />
     <ClInclude Include="Drawing\CBufferManager.h" />
-    <ClInclude Include="Drawing\PrimativeContext.h" />
+    <ClInclude Include="Drawing\PrimitiveContext.h" />
     <ClInclude Include="Drawing\VariableStateManager.h" />
     <ClInclude Include="EngineEnv.h" />
     <ClInclude Include="Gui\GuiContex.h" />
@@ -466,7 +466,7 @@
     <ClCompile Include="Anim\AnimInstance.cpp" />
     <ClCompile Include="Anim\AnimManager.cpp" />
     <ClCompile Include="Drawing\CBufferManager.cpp" />
-    <ClCompile Include="Drawing\PrimativeContext.cpp" />
+    <ClCompile Include="Drawing\PrimitiveContext.cpp" />
     <ClCompile Include="Drawing\VariableStateManager.cpp" />
     <ClCompile Include="Gui\GuiContex.cpp" />
     <ClCompile Include="Gui\Menu.cpp" />
@@ -510,7 +510,7 @@
     <ClCompile Include="X3DEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Drawing\PrimativeContext.inl" />
+    <None Include="Drawing\PrimitiveContext.inl" />
     <None Include="Gui\Menu.inl" />
     <None Include="Material\MaterialManager.inl" />
     <None Include="Material\TechDefStateManager.inl" />

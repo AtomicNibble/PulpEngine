@@ -10,7 +10,7 @@
 #include <ITexture.h>
 #include <IMaterial.h>
 #include <IFileSys.h>
-#include <IPrimativeContext.h>
+#include <IPrimitiveContext.h>
 #include <IRenderCommands.h>
 #include <IFrameData.h>
 
@@ -77,7 +77,7 @@ bool XFont::isReady(void)
     return (bool)pFontTexture_;
 }
 
-void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon, const core::FrameTimeData& time)
+void XFont::DrawTestText(engine::IPrimitiveContext* pPrimCon, const core::FrameTimeData& time)
 {
     font::TextDrawContext ctx;
     ctx.pFont = this;
@@ -255,7 +255,7 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon, const core::FrameT
     pPrimCon->drawText(posX, posY + 70.f, ctx, "meow meow\tmeow meow\nmeow meow\t  OOOOO\nmeow\t\t\tmeow");
 }
 
-void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+void XFont::DrawString(engine::IPrimitiveContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
     const TextDrawContext& ctx, const char* pBegin, const char* pEnd)
 {
     DrawStringInternal(
@@ -267,7 +267,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, co
         &ang);
 }
 
-void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+void XFont::DrawString(engine::IPrimitiveContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
     const TextDrawContext& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
 {
     char narrow[MAX_TXT_SIZE];
@@ -285,7 +285,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, co
         &ang);
 }
 
-void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
+void XFont::DrawString(engine::IPrimitiveContext* pPrimCon, const Vec3f& pos,
     const TextDrawContext& ctx, const char* pBegin, const char* pEnd)
 {
     DrawStringInternal(
@@ -297,7 +297,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
         nullptr);
 }
 
-void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
+void XFont::DrawString(engine::IPrimitiveContext* pPrimCon, const Vec3f& pos,
     const TextDrawContext& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
 {
     char narrow[MAX_TXT_SIZE];
@@ -315,7 +315,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
         nullptr);
 }
 
-void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
+void XFont::DrawStringInternal(engine::IPrimitiveContext* pPrimCon, const Vec3f& pos,
     const TextDrawContext& ctx, const char* pBegin, const char* pEnd, const Matrix33f* pRotation)
 {
     const size_t textLen = (pEnd - pBegin);
@@ -452,7 +452,7 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
             Vec2f gradientUvMin, gradientUvMax;
             GetGradientTextureCoord(gradientUvMin.x, gradientUvMin.y, gradientUvMax.x, gradientUvMax.y);
 
-            engine::IPrimativeContext::PrimVertex* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, pMaterial_);
+            engine::IPrimitiveContext::PrimVertex* pVerts = pPrimCon->addPrimitive(6, render::TopoType::TRIANGLELIST, pMaterial_);
 
             pVerts[0].pos = v0;
             pVerts[0].color = frameColor;
@@ -641,7 +641,7 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
 
             // We need 6 since each char is not connected.
             // so we make seprate tri's
-            engine::IPrimativeContext::PrimVertex* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, pMaterial_);
+            engine::IPrimitiveContext::PrimVertex* pVerts = pPrimCon->addPrimitive(6, render::TopoType::TRIANGLELIST, pMaterial_);
 
             // TL
             pVerts[0].pos = tl;

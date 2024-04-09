@@ -372,7 +372,7 @@ size_t VideoCompiler::getBufferSizeForWindow(int32_t bufferMS) const
             windowsize += block.data.size() + sizeof(BlockHdr);
             window.push(&block);
 
-            // if the window is big enougth
+            // if the window is big enough
             if (windowNS >= bufferNS)
             {
                 windowsizeMax = core::Max(windowsizeMax, windowsize);

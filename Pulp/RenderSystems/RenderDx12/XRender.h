@@ -151,7 +151,7 @@ class XRender : public IRender
         ConstBuffersArr constBuffers; // rootSig indexed
 
         // a buffer that can store any variable state.
-        // and we can just memcmp to know if it's diffrent.
+        // and we can just memcmp to know if it's different.
         int32_t variableStateSize;
         uint8_t variableState[render::Commands::ResourceStateBase::getMaxStateSize()];
 
@@ -326,7 +326,7 @@ private:
     StatePoolArena statePool_;
 
     Vec2i displayRes_; // the resolution we render to.
-    Vec2i targetRes_;  // if diffrent, the render buffers we be resized to this next frame.
+    Vec2i targetRes_;  // if different, the render buffers we be resized to this next frame.
     
     texture::Texture* pDisplayPlanes_[SWAP_CHAIN_BUFFER_COUNT];
     uint32_t currentBufferIdx_;

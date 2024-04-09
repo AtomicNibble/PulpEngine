@@ -12,7 +12,7 @@
 
 struct ICore;
 
-X_NAMESPACE_DECLARE(engine, class IPrimativeContext);
+X_NAMESPACE_DECLARE(engine, class IPrimitiveContext);
 X_NAMESPACE_DECLARE(core, struct FrameTimeData);
 
 X_NAMESPACE_BEGIN(font)
@@ -69,7 +69,7 @@ X_DECLARE_FLAGS(DrawTextFlag)
     CENTER,      // the center(hoz) of the text is placed at the draw pos, by default it's far left.
     CENTER_VER,  // the center(ver) of the text is placed at the draw pos, by default it's at the top.
     RIGHT,       // the end of the text (hoz) is placed at draw pos. (setting this will ignore 'CENTER', but 'CENTER_VER' is still valid)
-    FRAMED,      // Draws a filled 65% opacity dark rectenagle under the text. aka a block background
+    FRAMED,      // Draws a filled 65% opacity dark rectangle under the text. aka a block background
     FRAMED_SNUG, // includes descenders and moves top to max ascender.
     CLIP         // Clip the text against the provided rect, partial chars are drawn.
 
@@ -164,16 +164,16 @@ struct IFont
     virtual void FreeTexture(void) X_ABSTRACT;
 
     // draw a load of test text.
-    virtual void DrawTestText(engine::IPrimativeContext* pPrimCon, const core::FrameTimeData& time) X_ABSTRACT;
+    virtual void DrawTestText(engine::IPrimitiveContext* pPrimCon, const core::FrameTimeData& time) X_ABSTRACT;
 
-    // these draw the text into the primative context.
-    virtual void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+    // these draw the text into the primitive context.
+    virtual void DrawString(engine::IPrimitiveContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
         const TextDrawContext& contex, const char* pBegin, const char* pEnd) X_ABSTRACT;
-    virtual void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+    virtual void DrawString(engine::IPrimitiveContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
         const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_ABSTRACT;
-    virtual void DrawString(engine::IPrimativeContext* pPrimCon,
+    virtual void DrawString(engine::IPrimitiveContext* pPrimCon,
         const Vec3f& pos, const TextDrawContext& contex, const char* pBegin, const char* pEnd) X_ABSTRACT;
-    virtual void DrawString(engine::IPrimativeContext* pPrimCon,
+    virtual void DrawString(engine::IPrimitiveContext* pPrimCon,
         const Vec3f& pos, const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_ABSTRACT;
 
     virtual size_t GetTextLength(const char* pBegin, const char* pEnd, const bool asciiMultiLine) const X_ABSTRACT;

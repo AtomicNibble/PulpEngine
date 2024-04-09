@@ -585,7 +585,7 @@ namespace techset
             return false;
         }
 
-        if (blendStateExsists(name)) {
+        if (blendStateExists(name)) {
             X_ERROR("TechDef", "BlendState with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
             return false;
         }
@@ -733,7 +733,7 @@ namespace techset
             return false;
         }
 
-        if (stencilStateExsists(name)) {
+        if (stencilStateExists(name)) {
             X_ERROR("TechDef", "StencilState with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
             return false;
         }
@@ -845,7 +845,7 @@ namespace techset
             return false;
         }
 
-        if (stateExsists(name)) {
+        if (stateExists(name)) {
             X_ERROR("TechDef", "State with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
             return false;
         }
@@ -904,7 +904,7 @@ namespace techset
                 }
                 case "blendState"_fnv1a:
                 case "blendState0"_fnv1a:
-                    // we should probs support blend states for the diffrent rt's
+                    // we should probs support blend states for the different rt's
                 case "blendState1"_fnv1a:
                 case "blendState2"_fnv1a:
                     if (!parseBlendState(lex, state.blend)) {
@@ -914,7 +914,7 @@ namespace techset
                     // work out if blend state should be anbled.
                     if (
                         state.blend.colorOp != render::BlendOp::OP_ADD || state.blend.dstBlendColor != render::BlendType::ONE || state.blend.srcBlendColor != render::BlendType::ZERO || state.blend.alphaOp != render::BlendOp::OP_ADD || state.blend.dstBlendAlpha != render::BlendType::ONE || state.blend.srcBlendAlpha != render::BlendType::ZERO ||
-                        // enable if wrtie mask diffrent?
+                        // enable if wrtie mask different?
                         !state.blend.writeMask.AreAllSet()) {
                         // check for disabled op's also.
                         if (state.blend.colorOp != render::BlendOp::DISABLE && state.blend.alphaOp != render::BlendOp::DISABLE) {
@@ -984,13 +984,13 @@ namespace techset
     bool TechSetDef::parseBlendState(core::XParser& lex, render::BlendState& blendState)
     {
         return parseHelper<render::BlendState>(lex, blendState, &TechSetDef::parseBlendStateData,
-            &TechSetDef::blendStateExsists, "State", "BlendState");
+            &TechSetDef::blendStateExists, "State", "BlendState");
     }
 
     bool TechSetDef::parseStencilState(core::XParser& lex, StencilState& stencilstate)
     {
         return parseHelper<StencilState>(lex, stencilstate, &TechSetDef::parseStencilStateData,
-            &TechSetDef::stencilStateExsists, "State", "StencilState");
+            &TechSetDef::stencilStateExists, "State", "StencilState");
     }
 
     bool TechSetDef::parseStencilRef(core::XParser& lex, uint32_t& stencilRef)
@@ -1071,7 +1071,7 @@ namespace techset
     bool TechSetDef::parsePrimitiveType(core::XParser& lex, render::TopoType::Enum& topo)
     {
         return parseHelper<render::TopoType::Enum>(lex, topo, &TechSetDef::parsePrimitiveTypeData,
-            &TechSetDef::primTypeExsists, "State", "PrimitiveType");
+            &TechSetDef::primTypeExists, "State", "PrimitiveType");
     }
 
     // ----------------------------------------------------
@@ -1096,7 +1096,7 @@ namespace techset
             return false;
         }
 
-        if (primTypeExsists(name)) {
+        if (primTypeExists(name)) {
             X_ERROR("TechDef", "PrimType with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
             return false;
         }
@@ -1180,7 +1180,7 @@ namespace techset
             return false;
         }
 
-        if (shaderExsists(name, stage)) {
+        if (shaderExists(name, stage)) {
             X_ERROR("TechDef", "Shader with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
             return false;
         }
@@ -1297,7 +1297,7 @@ namespace techset
             return false;
         }
 
-        if (techniqueExsists(name)) {
+        if (techniqueExists(name)) {
             X_ERROR("TechDef", "Technique with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
             return false;
         }
@@ -1378,7 +1378,7 @@ namespace techset
     bool TechSetDef::parseState(core::XParser& lex, render::StateDesc& state)
     {
         return parseHelper<render::StateDesc>(lex, state, &TechSetDef::parseStateData,
-            &TechSetDef::stateExsists, "Tech", "State");
+            &TechSetDef::stateExists, "Tech", "State");
     }
 
     bool TechSetDef::parseShaderStage(core::XParser& lex, Technique& tech, render::shader::ShaderType::Enum type)
@@ -1417,7 +1417,7 @@ namespace techset
         }
 
         if (name.isNotEmpty()) {
-            if (shaderExsists(name, type, &shader)) {
+            if (shaderExists(name, type, &shader)) {
                 return true;
             }
 
@@ -1430,13 +1430,13 @@ namespace techset
             if (parentName.isNotEmpty()) {
                 // inline define can have a parent.
                 // but it must exist if defined.
-                if (!shaderExsists(parentName, type, &shader)) {
+                if (!shaderExists(parentName, type, &shader)) {
                     X_ERROR("TechDef", "Tech has a inline %s define with a undefined parent of: %s \"%s\" File: %s:%" PRIi32,
                         defName.c_str(), parentName.c_str(), lex.GetFileName(), lex.GetLineNumber());
                     return false;
                 }
 
-                // if we selected a parent it should be impossible for it to have a diffrent stage.
+                // if we selected a parent it should be impossible for it to have a different stage.
                 // even if the user wanted to. this is source code logic fail.
                 X_ASSERT(shader.type == type, "Parent not from same stage")(shader.type, type); 
             }
@@ -1659,7 +1659,7 @@ namespace techset
             return false;
         }
 
-        if (samplerExsists(name)) {
+        if (samplerExists(name)) {
             X_ERROR("TechDef", "Texture with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
             return false;
         }
@@ -1719,7 +1719,7 @@ namespace techset
         {
             // i want to support like defaults
             // so for normal maps etc I can specify a default texture name.
-            // but I also want to be able to specify textures that only exsist at runtime.
+            // but I also want to be able to specify textures that only exist at runtime.
             // i guess i don't really need any special logic for that just need to give the runtime textures names.
 
             // "iamgeName" : hardcoded image name
@@ -1798,7 +1798,7 @@ namespace techset
             return false;
         }
 
-        if (samplerExsists(name)) {
+        if (samplerExists(name)) {
             X_ERROR("TechDef", "Sampler with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
             return false;
         }
@@ -1905,7 +1905,7 @@ namespace techset
             return false;
         }
 
-        if (paramExsists(name)) {
+        if (paramExists(name)) {
             X_ERROR("TechDef", "Param with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
             return false;
         }
@@ -2135,10 +2135,10 @@ namespace techset
     template<typename T>
     bool TechSetDef::parseHelper(core::XParser& lex, T& state,
         typename core::traits::MemberFunction<TechSetDef, bool(core::XParser& lex, T& state)>::Pointer parseStateFunc,
-        typename core::traits::MemberFunction<TechSetDef, bool(const core::string& name, T* pState)>::Pointer stateExsistsFunc,
+        typename core::traits::MemberFunction<TechSetDef, bool(const core::string& name, T* pState)>::Pointer stateExistsFunc,
         const char* pObjName, const char* pStateName)
     {
-        // this supports inline defines we parents or name of exsisting state.
+        // this supports inline defines we parents or name of existing state.
         core::string name, parentName;
 
         if (!parseInlineDefine(lex, name, parentName, pStateName)) {
@@ -2146,7 +2146,7 @@ namespace techset
         }
 
         if (name.isNotEmpty()) {
-            if ((*this.*stateExsistsFunc)(name, &state)) {
+            if ((*this.*stateExistsFunc)(name, &state)) {
                 return true;
             }
 
@@ -2159,7 +2159,7 @@ namespace techset
             if (parentName.isNotEmpty()) {
                 // inline define can have a parent.
                 // but it must exist if defined.
-                if (!(*this.*stateExsistsFunc)(parentName, &state)) {
+                if (!(*this.*stateExistsFunc)(parentName, &state)) {
                     X_ERROR("TechDef", "%s has a inline %s define with a undefined parent of: %s \"%s\" File: %s:%" PRIi32,
                         pObjName, pStateName, parentName.c_str(), lex.GetFileName(), lex.GetLineNumber());
                     return false;
@@ -2246,22 +2246,22 @@ namespace techset
         return true;
     }
 
-    bool TechSetDef::blendStateExsists(const core::string& name, render::BlendState* pBlendOut)
+    bool TechSetDef::blendStateExists(const core::string& name, render::BlendState* pBlendOut)
     {
         return findHelper(blendStates_, name, pBlendOut);
     }
 
-    bool TechSetDef::stencilStateExsists(const core::string& name, StencilState* pStencilOut)
+    bool TechSetDef::stencilStateExists(const core::string& name, StencilState* pStencilOut)
     {
         return findHelper(stencilStates_, name, pStencilOut);
     }
 
-    bool TechSetDef::stateExsists(const core::string& name, render::StateDesc* pStateOut)
+    bool TechSetDef::stateExists(const core::string& name, render::StateDesc* pStateOut)
     {
         return findHelper(states_, name, pStateOut);
     }
 
-    bool TechSetDef::shaderExsists(const core::string& name, render::shader::ShaderType::Enum type, Shader* pShaderOut)
+    bool TechSetDef::shaderExists(const core::string& name, render::shader::ShaderType::Enum type, Shader* pShaderOut)
     {
         core::string mergedName(name);
         mergedName += render::shader::ShaderType::ToString(type);
@@ -2269,27 +2269,27 @@ namespace techset
         return findHelper(shaders_, mergedName, pShaderOut);
     }
 
-    bool TechSetDef::techniqueExsists(const core::string& name)
+    bool TechSetDef::techniqueExists(const core::string& name)
     {
         return findHelper(techs_, name) != techs_.end();
     }
 
-    bool TechSetDef::primTypeExsists(const core::string& name, render::TopoType::Enum* pTopo)
+    bool TechSetDef::primTypeExists(const core::string& name, render::TopoType::Enum* pTopo)
     {
         return findHelper(prims_, name, pTopo);
     }
 
-    bool TechSetDef::paramExsists(const core::string& name, Param* pParam)
+    bool TechSetDef::paramExists(const core::string& name, Param* pParam)
     {
         return findHelper(params_, name, pParam);
     }
 
-    bool TechSetDef::textureExsists(const core::string& name, Texture* pTexture)
+    bool TechSetDef::textureExists(const core::string& name, Texture* pTexture)
     {
         return findHelper(textures_, name, pTexture);
     }
 
-    bool TechSetDef::samplerExsists(const core::string& name, Sampler* pSampler)
+    bool TechSetDef::samplerExists(const core::string& name, Sampler* pSampler)
     {
         return findHelper(samplers_, name, pSampler);
     }

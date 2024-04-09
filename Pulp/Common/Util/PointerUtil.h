@@ -9,11 +9,11 @@ X_NAMESPACE_BEGIN(core)
 
 namespace pointerUtil
 {
-    /// Aligns a pointer to the top of a given power-of-two alignment boundary.
+    // Aligns a pointer to the top of a given power-of-two alignment boundary.
     template<typename T>
     inline T* AlignTop(T* ptr, size_t alignment);
 
-    /// Aligns a pointer to the bottom of a given power-of-two alignment boundary.
+    // Aligns a pointer to the bottom of a given power-of-two alignment boundary.
     template<typename T>
     inline T* AlignBottom(T* ptr, size_t alignment);
 

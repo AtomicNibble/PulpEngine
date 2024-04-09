@@ -655,11 +655,11 @@ namespace DDS
 
         if (hdr.dwSize != DDSSizeofDDSurfaceDesc2) {
             // i've seen a dds file with valid size if ignore the 16 MSB's
-            // lets support it, even if unvalid.
+            // lets support it, even if invalid.
             uint16_t size16 = static_cast<uint16_t>(hdr.dwSize & 0xFFFF);
 
             if (size16 != DDSSizeofDDSurfaceDesc2) {
-                X_ERROR("DDSLoader", "image header surface size is invalid. provided: %" PRIu32 " epected: 124", hdr.dwSize);
+                X_ERROR("DDSLoader", "image header surface size is invalid. provided: %" PRIu32 " expected: 124", hdr.dwSize);
                 return false;
             }
             else {
@@ -985,10 +985,10 @@ namespace DDS
 
         // set the info
         imgFile.setWidth(safe_static_cast<uint16_t, uint32_t>(hdr.dwWidth));
-        imgFile.setHeigth(safe_static_cast<uint16_t, uint32_t>(hdr.dwHeight));
+        imgFile.setHeight(safe_static_cast<uint16_t, uint32_t>(hdr.dwHeight));
         imgFile.setNumMips(safe_static_cast<int32_t, uint32_t>(num_mip_maps));
         imgFile.setNumFaces(safe_static_cast<int32_t, uint32_t>(num_faces)); // 1 for 2D 6 for a cube.
-        imgFile.setDepth(1);                                                 /// We Don't allow volume texture loading yet.
+        imgFile.setDepth(1);                                                 // We Don't allow volume texture loading yet.
         imgFile.setFlags(flags);
         imgFile.setFormat(mapped_format);
         imgFile.resize();
@@ -999,7 +999,7 @@ namespace DDS
         X_ASSERT(imgFile.getFaceSize() == total_bytes_per_face, "Face size mismatch")(imgFile.getFaceSize(), total_bytes_per_face); 
 
         // allocate memory / read.
-        // no idear if allocating then reading has any benfits for cube maps.
+        // no idea if allocating then reading has any benefits for cube maps.
         for (i = 0; i < num_faces; i++) {
             bytes_read = safe_static_cast<uint32_t, size_t>(file->read(imgFile.getFace(i), total_bytes_per_face));
 

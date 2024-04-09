@@ -133,8 +133,7 @@ namespace techset
         path.toLower();
 
         core::FindFirstScoped find;
-
-        if (find.findfirst(path)) {
+        if (find.findFirst(path)) {
 
             do {
                 auto& fd = find.fileData();

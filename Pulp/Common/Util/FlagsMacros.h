@@ -3,41 +3,6 @@
 #ifndef X_FLAGSMACROS_H_
 #define X_FLAGSMACROS_H_
 
-/// \def X_DECLARE_FLAGS_IMPL_ENUM
-/// \brief Internal macro used by \ref X_DECLARE_FLAGS.
-/// \sa X_DECLARE_FLAGS
-
-/// \def X_DECLARE_FLAGS_IMPL_BITS
-/// \brief Internal macro used by \ref X_DECLARE_FLAGS.
-/// \sa X_DECLARE_FLAGS
-
-/// \def X_DECLARE_FLAGS_IMPL_TO_STRING
-/// \brief Internal macro used by \ref X_DECLARE_FLAGS.
-/// \sa X_DECLARE_FLAGS
-
-/// \def X_DECLARE_FLAGS_IMPL
-/// \brief Internal macro used by \ref X_DECLARE_FLAGS.
-/// \sa X_DECLARE_FLAGS
-
-/// \def X_DECLARE_FLAGS
-/// \ingroup Util
-/// \brief A macro that declares a struct to be used in conjunction with the Flags template class.
-/// \details This macro can be used instead of manually implementing all parts of a struct as required by the Flags class.
-/// The macro relies on Potato's preprocessor utilities, and expects the following simple syntax:
-/// \code
-///   X_DECLARE_FLAGS(name)(comma-separated list of flag values);
-/// \endcode
-/// As an example, the \a PlayerStatusFlags example struct from the Flags class can be declared with the following code:
-/// \code
-///   X_DECLARE_FLAGS(PlayerStatusFlags)
-///   (
-///     POISONED,
-///     BLEEDING,
-///     STARVING,
-///     DEAD
-///   );
-/// \endcode
-/// \sa Flags
 #define X_DECLARE_FLAGS_IMPL_ENUM(value, n) value = (1u << n),
 #define X_DECLARE_FLAGS_IMPL_BITS(member, n) uint32_t member : 1;
 #define X_DECLARE_FLAGS8_IMPL_BITS(member, n) uint8_t member : 1;

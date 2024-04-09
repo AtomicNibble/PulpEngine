@@ -319,20 +319,20 @@ namespace techset
         template<typename T>
         bool parseHelper(core::XParser& lex, T& state,
             typename core::traits::MemberFunction<TechSetDef, bool(core::XParser& lex, T& state)>::Pointer parseStateFunc,
-            typename core::traits::MemberFunction<TechSetDef, bool(const core::string& name, T* pState)>::Pointer stateExsistsFunc,
+            typename core::traits::MemberFunction<TechSetDef, bool(const core::string& name, T* pState)>::Pointer stateExistsFunc,
             const char* pObjName, const char* pStateName);
         bool parseInlineDefine(core::XParser& lex, core::string& name, core::string& parentName, const char* pStateName);
         bool parseNameInline(core::XParser& lex, core::string& parentName);
 
-        bool blendStateExsists(const core::string& name, render::BlendState* pBlendOut = nullptr);
-        bool stencilStateExsists(const core::string& name, StencilState* pStencilOut = nullptr);
-        bool stateExsists(const core::string& name, render::StateDesc* pStateOut = nullptr);
-        bool shaderExsists(const core::string& name, render::shader::ShaderType::Enum type, Shader* pShaderOut = nullptr);
-        bool techniqueExsists(const core::string& name);
-        bool primTypeExsists(const core::string& name, render::TopoType::Enum* pTopo = nullptr);
-        bool paramExsists(const core::string& name, Param* pParam = nullptr);
-        bool textureExsists(const core::string& name, Texture* pTexture = nullptr);
-        bool samplerExsists(const core::string& name, Sampler* pSampler = nullptr);
+        bool blendStateExists(const core::string& name, render::BlendState* pBlendOut = nullptr);
+        bool stencilStateExists(const core::string& name, StencilState* pStencilOut = nullptr);
+        bool stateExists(const core::string& name, render::StateDesc* pStateOut = nullptr);
+        bool shaderExists(const core::string& name, render::shader::ShaderType::Enum type, Shader* pShaderOut = nullptr);
+        bool techniqueExists(const core::string& name);
+        bool primTypeExists(const core::string& name, render::TopoType::Enum* pTopo = nullptr);
+        bool paramExists(const core::string& name, Param* pParam = nullptr);
+        bool textureExists(const core::string& name, Texture* pTexture = nullptr);
+        bool samplerExists(const core::string& name, Sampler* pSampler = nullptr);
 
         render::BlendState& addBlendState(const core::string& name, const core::string& parentName);
         StencilState& addStencilState(const core::string& name, const core::string& parentName);

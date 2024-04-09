@@ -25,7 +25,7 @@ InputSymbol* XBaseInput::defineSymbol(InputDeviceType::Enum deviceType, KeyId::E
     pSymbol->deviceType = deviceType;
     pSymbol->name = name_;
     pSymbol->type = type_;
-    pSymbol->modiferMask = modMask;
+    pSymbol->modifierMask = modMask;
     pSymbol->keyId = id_;
 
     return pSymbol;

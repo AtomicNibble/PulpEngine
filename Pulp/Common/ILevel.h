@@ -32,9 +32,9 @@ X_NAMESPACE_DECLARE(model,
 X_NAMESPACE_BEGIN(level)
 
 //
-// Some Refrences: (in no order)
-//	* These refrences very useful, gave me a good understanding of
-//		how quake bsp are made, and the goals + optermisations.
+// Some References: (in no order)
+//	* These references very useful, gave me a good understanding of
+//		how quake bsp are made, and the goals + optimisations.
 //		which has allowed me to develop my own version.
 //
 //  http://www.mralligator.com/q3/
@@ -51,7 +51,7 @@ X_NAMESPACE_BEGIN(level)
 //		||||| BlockHeader[ numblocks ] ||||||
 //      ||||| blockData[ numblocks ] ||||
 //
-//	This layout is simular to quake bsp's I more than likly will update this layout
+//	This layout is similar to quake bsp's I more than likely will update this layout
 //	to one i can map in memory so i don't have to allocate other buffers.
 //
 //
@@ -60,9 +60,9 @@ X_NAMESPACE_BEGIN(level)
 //	we take a .map file which contains multiple models.
 //	the first been the world models.
 //
-//	each model contains 1.* entites which can be a brush / patch.
+//	each model contains 1.* entitles which can be a brush / patch.
 //
-//	we take all the brushs and patches and turn it into a vertex / index list.
+//	we take all the brushes and patches and turn it into a vertex / index list.
 //	so that we can draw the whole level.
 //
 //	Optimisation 1: Duplicates
@@ -79,23 +79,23 @@ X_NAMESPACE_BEGIN(level)
 //
 //		Instead of global grouping.
 //
-//		Should I split the vertex / index lists into seprate blocks?
+//		Should I split the vertex / index lists into separate blocks?
 //		This would allow only parts of the map to be on the gpu.
 //
 //		I don't really see the point, since I'm not going to be supporting huge
 //		levels
 //
 //		And the size of the maps whole vertex buffer is going to be nothing
-//		compare to the models, 5-6 high poly players models probs be more verts lol.
+//		compare to the models, 5-6 high poly players models probably be more verts lol.
 //
 //		so.. Duplicates will be check on a level basis not area!
 //
 //		--------------------------------------
 //
 //		I will calculate vis info for the area's so that i know what
-//		area's are visable when inside a area.
+//		area's are visible when inside a area.
 //
-//		probs use my intrusive lists to link them, since it supports a item
+//		probably use my intrusive lists to link them, since it supports a item
 //		been in multiple lists, then i just work out which area the player is in.
 //		and draw the list.
 //
@@ -104,7 +104,7 @@ X_NAMESPACE_BEGIN(level)
 //	There will be some lights that are baked in.
 //	ones that never change color or intensity.
 //
-//	Probs not that many though since most lights will be dynamic
+//	probably not that many though since most lights will be dynamic
 //	With the ability to turn on / off so that I can a rooms lights on / off on the fly!
 //
 //	not sure how much I can / make static yet have to see later.
@@ -112,7 +112,7 @@ X_NAMESPACE_BEGIN(level)
 //	Optimisation 4: group drawing
 //
 //	If a area has multiple surfaces with the same surface type and shader.
-//	which is super fucking likley.
+//	which is super fucking likely.
 //
 //	I should group that into a single draw.
 //
@@ -163,18 +163,18 @@ X_NAMESPACE_BEGIN(level)
 //
 //  Nodes:
 //		Used to find the leaf we are in.
-//		We traverse it untill we find a leaf.
+//		We traverse it until we find a leaf.
 //
 //  Leafs:
 //		A leaf has info like bounds and cluster.
 //		If we get the Leaf from traversing the nodes.
 //
-//		We can use that cluster to check what other leaves are potentialy visable.
+//		We can use that cluster to check what other leaves are potentially visible.
 //		By doing a bit lookup in the VisData
 //
 //	Areas:
 //		Areas are basically a section of the map, or the whole map (in the case of zero portals)
-//		Each area is seperated by one or more portals.
+//		Each area is separated by one or more portals.
 //
 //		It provides surface info offset, so that all the surfaces for this area can be located.
 //
@@ -200,28 +200,28 @@ X_NAMESPACE_BEGIN(level)
 //		the portals plane is facing away from us. (aka the direction of the portal, leaving the area basically).
 //
 //		We then clip out current portal planes with the winding of the portal.
-//		If the clipped area is zero in size then it's not visable.
+//		If the clipped area is zero in size then it's not visible.
 //
-//		When a portal is visable, we then go into the next area, passing the current clipped planes
+//		When a portal is visible, we then go into the next area, passing the current clipped planes
 //		Down via a stack so that the next area's portal must then be inside the current portal.
 //
 //	Step 3:
 //
-//		We can then use this info to create scissor rects, so that when we draw the area visable via
+//		We can then use this info to create scissor rects, so that when we draw the area visible via
 //		the doorway or what ever, only the shit inside the doorway will have pixel operations run.
 //
-//		The scissor is a retangle, so the smallest rectange that contains the portal is made.
+//		The scissor is a rectangle, so the smallest rectangle that contains the portal is made.
 //		Meaning some overdraw will occur but very minimal.
 //
 //	Step 4:
 //
-//		Each area that has been determined as visable, has it's entiry list processed.
+//		Each area that has been determined as visible, has it's entity list processed.
 //		When the level was compiled all the ents in the area where added to the area's ent ref list.
 //		So I know what is visible in each area.
 //
-//		We can then perform aditional culling on this list: funcstrum, portal stack.
+//		We can then perform additional culling on this list: frustum, portal stack.
 //
-//		Ent's that are in multiple area's are stored / processed diffrently.
+//		Ent's that are in multiple area's are stored / processed differently.
 //
 //		How they are stored:
 //
@@ -265,11 +265,9 @@ X_NAMESPACE_BEGIN(level)
 //
 //
 
-static const uint32_t LVL_VERSION = 16; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
+static const uint32_t LVL_VERSION = 16; //  change every time the format changes. (I will reset it once i'm doing messing around)
 static const uint32_t LVL_FOURCC = X_TAG('x', 'l', 'v', 'l');
-static const uint32_t LVL_FOURCC_INVALID = X_TAG('x', 'e', 'r', 'r'); // if a file falid to write the final header, this will be it's FourCC
-// feels kinda wrong to call it a '.bsp', since it's otherthings as well.
-// '.level' is more pleasing to me and more importantly the BushMaster of Christmas Island(Southeast Asia).
+static const uint32_t LVL_FOURCC_INVALID = X_TAG('x', 'e', 'r', 'r'); // if a file failed to write the final header, this will be it's FourCC
 static const char* LVL_FILE_EXTENSION = "level"; // ".bsp";
 static const char* LVL_ENT_FILE_EXTENSION = "json";
 
@@ -278,7 +276,7 @@ static const int32_t MAX_WORLD_COORD = (128 * 1024);
 static const int32_t MIN_WORLD_COORD = (-128 * 1024);
 static const int32_t MAX_WORLD_SIZE = (MAX_WORLD_COORD - MIN_WORLD_COORD);
 
-// some of these limts are done on .map load.
+// some of these limits are done on .map load.
 // others checked while compiling bsp.
 // slap a hat, swing a rat and hit it with a bat.
 static const uint32_t MAP_MAX_PLANES = 65536;
@@ -308,7 +306,7 @@ static const uint32_t MAP_MAX_AREA_COL_DATA_SIZE = std::numeric_limits<uint16_t>
 static const uint32_t MAP_MAX_ENTITES = 0x400;
 static const uint32_t MAP_MAX_LIGHTS_WORLD = 4096;
 
-// might be removed in-favor of embeded binary materials
+// might be removed in-favour of embedded binary materials
 static const uint32_t MAP_MAX_MATERIAL_LEN = assetDb::ASSET_NAME_MAX_LENGTH;
 
 // Key / Value limits
@@ -365,7 +363,7 @@ typedef Flags<MatSurfaceFlags> MatSurfaceFlag;
 typedef core::GrowingStringTable<256, 16, 4, uint32_t> StringTable;
 typedef core::GrowingStringTableUnique<256, 16, 4, uint32_t> StringTableUnique;
 
-// I might make this a actualy material definition.
+// I might make this a actually material definition.
 // instead of the name of a material.
 // might as well make it internal.
 // Hotreload:
@@ -404,7 +402,7 @@ struct StaticModel : public Entity
 };
 #else
 
-// not saved to file sruntime only.
+// not saved to file runtime only.
 struct StaticModel
 {
     Transformf transform;
@@ -426,7 +424,7 @@ struct StaticModel
 // One question:
 //
 //	How do i want to store all the entities.
-//	the problem is that we support many diffrent kvp's for some ent's
+//	the problem is that we support many different kvp's for some ent's
 //	so i can't really have a structure that represents that in binary.
 //	so what i was thinking was have static models represented by binary layout
 //	since there will be so many of them compared to other ents.
@@ -573,7 +571,7 @@ struct FileHeader
     uint32_t numStrings;
 
     // the number of area;s in the level file.
-    // also signifys how many multi area ref ent lists we have. (num / 32) + 1
+    // also signifies how many multi area ref ent lists we have. (num / 32) + 1
     int32_t numAreas;
     int32_t numinterAreaPortals;
     int32_t numNodes;

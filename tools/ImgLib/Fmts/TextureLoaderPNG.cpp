@@ -250,7 +250,7 @@ namespace PNG
         }
 
         if (ihdr.tag != IHDR::TAG_ID) {
-            X_ERROR("TexturePNG", "invalid sub tag. expoected: IHDR");
+            X_ERROR("TexturePNG", "invalid sub tag. expected: IHDR");
             return false;
         }
 
@@ -303,7 +303,7 @@ namespace PNG
             return false;
         }
 
-        // skip all the tags untill we reach PNG_TAG_IDAT
+        // skip all the tags until we reach PNG_TAG_IDAT
         uint32_t tagName;
         for (int32_t i = 0; i < 256; i++) {
             if (file->readObj(length) != sizeof(length)) {
@@ -354,11 +354,11 @@ namespace PNG
         imgFile.setDepth(1);
         imgFile.setFlags(flags);
         imgFile.setType(TextureType::T2D);
-        imgFile.setHeigth(safe_static_cast<uint16_t, uint32_t>(ihdr.height));
+        imgFile.setHeight(safe_static_cast<uint16_t, uint32_t>(ihdr.height));
         imgFile.setWidth(safe_static_cast<uint16_t, uint32_t>(ihdr.width));
         imgFile.resize();
 
-        // ok so the length is the size of the compreseed block we need to read.
+        // ok so the length is the size of the compressed block we need to read.
         // it is possible to have multiple IDAT blocks.
         const uint32_t bpp = png_get_bpp(ihdr.bitDepth, ihdr.colType);
         const uint32_t inflated_size = (ihdr.width * ihdr.height * bpp);
@@ -392,7 +392,7 @@ namespace PNG
             ++pData;
             --len;
 
-            X_ASSERT(bytesLeft >= len, "Recived too much data")(bytesLeft, len); 
+            X_ASSERT(bytesLeft >= len, "Received too much data")(bytesLeft, len); 
             bytesLeft -= len;
 
             std::memcpy(pDst, pData, len);
@@ -407,7 +407,7 @@ namespace PNG
 
         ZlibInflate::Result::Enum zRes;
 
-        // going to just load the block in chuncks so even if a png is saved as single large block.
+        // going to just load the block in chunks so even if a png is saved as single large block.
         // my memory usage will stay low.
         core::Array<uint8_t> deflatedData(swapArea);
         deflatedData.resize(IO_READ_BLOCK_SIZE);
@@ -431,7 +431,7 @@ namespace PNG
                 pCrc->Update(deflatedData.ptr(), readSize, calcCrc);
 #endif // !VALIDATE_IDAT_CRC
 
-                // infalte it baby.
+                // inflate it baby.
                 zRes = inflater.Inflate(deflatedData.ptr(), readSize);
 
                 if (zRes == ZlibInflate::Result::ERROR) {
@@ -586,11 +586,11 @@ namespace PNG
 
         using namespace core::Compression;
 
-        // micro optermisation, don't bother calculating tag crc each time lol.
+        // micro optimisation, don't bother calculating tag crc each time lol.
         uint32_t idataCrc = pCrc->Begin();
         pCrc->Update(&IDAT::TAG_ID, sizeof(IDAT::TAG_ID), idataCrc);
 
-        ZlibDefalte zlib(swapArena, [&](const uint8_t* pData, size_t len, size_t deflateOffset) {
+        ZlibDeflate zlib(swapArena, [&](const uint8_t* pData, size_t len, size_t deflateOffset) {
             X_UNUSED(deflateOffset);
             // get crc of block.
             uint32_t crc = idataCrc;
@@ -634,8 +634,8 @@ namespace PNG
             }
 
             auto res = zlib.Deflate(&filterType, sizeof(filterType), false);
-            if (res != ZlibDefalte::Result::OK) {
-                X_ERROR("TexturePNG", "Failed to deflate image \"%s\"", ZlibDefalte::Result::ToString(res));
+            if (res != ZlibDeflate::Result::OK) {
+                X_ERROR("TexturePNG", "Failed to deflate image \"%s\"", ZlibDeflate::Result::ToString(res));
                 return false;
             }
 
@@ -646,14 +646,14 @@ namespace PNG
             res = zlib.Deflate(pRGBRow, rowBytes, lastRow);
 
             if (lastRow) {
-                if (res != ZlibDefalte::Result::DONE) {
-                    X_ERROR("TexturePNG", "Failed to deflate(flush) image \"%s\"", ZlibDefalte::Result::ToString(res));
+                if (res != ZlibDeflate::Result::DONE) {
+                    X_ERROR("TexturePNG", "Failed to deflate(flush) image \"%s\"", ZlibDeflate::Result::ToString(res));
                     return false;
                 }
             }
             else {
-                if (res != ZlibDefalte::Result::OK) {
-                    X_ERROR("TexturePNG", "Failed to deflate image \"%s\"", ZlibDefalte::Result::ToString(res));
+                if (res != ZlibDeflate::Result::OK) {
+                    X_ERROR("TexturePNG", "Failed to deflate image \"%s\"", ZlibDeflate::Result::ToString(res));
                     return false;
                 }
             }

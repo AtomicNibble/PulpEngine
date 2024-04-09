@@ -278,7 +278,7 @@ namespace Inter
             return false;
         }
 
-        // check dat version number slut.
+        // check dat version number.
         if (version < anim::ANIM_INTER_VERSION) {
             X_ERROR("Anim", "Anim file version is too old: %" PRIi32 " required: %" PRIu32,
                 version, anim::ANIM_INTER_VERSION);

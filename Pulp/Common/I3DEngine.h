@@ -27,7 +27,7 @@ X_DECLARE_ENUM(PrimContext)
     CONSOLE     // 2d
 );
 
-class IPrimativeContext;
+class IPrimitiveContext;
 struct IMaterialManager;
 struct IWorld3D;
 
@@ -53,7 +53,7 @@ struct I3DEngine : public core::IEngineSysBase
     virtual void onFrameBegin(core::FrameData& frame) X_ABSTRACT;
 
     // each enum has a instance, and you don't own the pointer.
-    virtual IPrimativeContext* getPrimContext(PrimContext::Enum user) X_ABSTRACT;
+    virtual IPrimitiveContext* getPrimContext(PrimContext::Enum user) X_ABSTRACT;
     virtual IMaterialManager* getMaterialManager(void) X_ABSTRACT;
     virtual model::IModelManager* getModelManager(void) X_ABSTRACT;
     virtual anim::IAnimManager* getAnimManager(void) X_ABSTRACT;

@@ -11,7 +11,7 @@ X_NAMESPACE_DECLARE(core, struct FrameInput)
 
 X_NAMESPACE_BEGIN(engine)
 
-class PrimativeContext;
+class PrimitiveContext;
 
 namespace gui
 {
@@ -101,13 +101,13 @@ namespace gui
             typedef core::FixedStack<ItemID, 32> ItemIDStack;
 
         public:
-            Window(PrimativeContext* pPrim, const char* pName);
+            Window(PrimitiveContext* pPrim, const char* pName);
 
             ItemID getID(const char* pLabel);
             ItemID getID(const char* pBegin, const char* pEnd);
 
         public:
-            PrimativeContext* pPrim;
+            PrimitiveContext* pPrim;
             core::StackString<32, char> name;
             ItemID ID;
             WindowFlags flags;
@@ -143,7 +143,7 @@ namespace gui
         ~GuiContex();
 
         void init(engine::Material* pCursor, engine::Material* pSpinner);
-        void setPrimContet(PrimativeContext* pPrim);
+        void setPrimContet(PrimitiveContext* pPrim);
 
         void processInput(core::FrameInput& input);
 
@@ -223,7 +223,7 @@ namespace gui
 
     private:
         MenuParams params_;
-        PrimativeContext* pPrim_;
+        PrimitiveContext* pPrim_;
         Rectf screenRect_;
         font::TextDrawContext txtCtx_;
 

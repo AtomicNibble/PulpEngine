@@ -77,9 +77,9 @@ public:
 
     void update(void);
 
-    void drawChat(core::FrameTimeData& time, engine::IPrimativeContext* pPrim);
-    void drawEvents(core::FrameTimeData& time, engine::IPrimativeContext* pPrim);
-    void drawLeaderboard(engine::IPrimativeContext* pPrim);
+    void drawChat(core::FrameTimeData& time, engine::IPrimitiveContext* pPrim);
+    void drawEvents(core::FrameTimeData& time, engine::IPrimitiveContext* pPrim);
+    void drawLeaderboard(engine::IPrimitiveContext* pPrim);
 
     void readFromSnapShot(core::FixedBitStreamBase& bs);
     void writeToSnapShot(core::FixedBitStreamBase& bs);
@@ -99,8 +99,8 @@ private:
     void onPlyKilled(int32_t param0, int32_t param1);
 
 private:
-    void drawChat(engine::IPrimativeContext* pPrim);
-    void drawEvents(engine::IPrimativeContext* pPrim);
+    void drawChat(engine::IPrimitiveContext* pPrim);
+    void drawEvents(engine::IPrimitiveContext* pPrim);
     void updateChat(core::TimeVal dt);
     void updateEvents(core::TimeVal dt);
 

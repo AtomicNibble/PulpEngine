@@ -25,14 +25,14 @@ namespace shader
     static const uint32_t MAX_HW_SHADERS = 512;
     static const uint32_t MAX_SHADER_SOURCE = 256;
     static const uint32_t MAX_SHADER_PERMS = 512;
-    static const uint32_t MAX_SHADER_CB_PER_PERM = 16; // max const buffers allowed for a permatation.
+    static const uint32_t MAX_SHADER_CB_PER_PERM = 16; // max const buffers allowed for a permutation.
 
     static const char* SOURCE_FILE_EXTENSION = "hlsl";
     static const char* SOURCE_INCLUDE_FILE_EXTENSION = "inc";
     static const char* SOURCE_MERGED_FILE_EXTENSION = "fxcb.hlsl"; // merged source.
     static const char* COMPILED_SHADER_FILE_EXTENSION = "fxcb";
 
-    // we have shader params that will need to be updated at diffrent rates.
+    // we have shader params that will need to be updated at different rates.
     // so we should group them.
     //
     // Some example shader parmas
@@ -102,7 +102,7 @@ namespace shader
 
         PF_Time,        // float ms (total time passed)
         PF_FrameTime,   // float ms (frame delta)
-        PF_FrameTimeUI, // float ms (frame detla with UI scale);
+        PF_FrameTimeUI, // float ms (frame delta with UI scale);
         PF_ScreenSize,  // x,y, 0.5/x, 0.5 /y
         PF_CameraPos,
 
@@ -114,7 +114,7 @@ namespace shader
 
     typedef Flags<ParamType> ParamTypeFlags;
 
-    // I support diffrent vertex formats
+    // I support different vertex formats
     // for use by the engine, not so much assets.
 
     // P = Position
@@ -137,7 +137,7 @@ namespace shader
         P3F_T2S_C4B_N3F,
         P3F_T2S_C4B_N3F_TB3F,
 
-        // same as above but using compressed normals.
+        // same as above but using compressed normal.
         P3F_T2S_C4B_N10,
         P3F_T2S_C4B_N10_TB10,
 
@@ -203,7 +203,7 @@ namespace shader
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     //
-    // These ILFlags are automatically detected whne parsing the hlsl source file.
+    // These ILFlags are automatically detected when parsing the hlsl source file.
     // It looks for macros that start with IL_*(Normal, BiNormal, Color)
     //
     // When it finds these flags it knows the source supports been compiled with AND without that flags.
@@ -212,7 +212,7 @@ namespace shader
     // The source will be compiled first with no flags defined which will be the minimum the shader requires as input.
     // Then the shader works out what the required streams are for that compiled source.
     //
-    //  It then repeats this step each time adding a flag follwed by calculating the IL for that compiled source.
+    //  It then repeats this step each time adding a flag followed by calculating the IL for that compiled source.
     //
     //	Example:
     //
@@ -270,13 +270,13 @@ namespace shader
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     //
-    //	These flags are to allow a shader to be compiled supporting difffrent features.
+    //	These flags are to allow a shader to be compiled supporting different features.
     //
     //	This means a shader can be select that supports skinning only
     //	Or the same shader that supports skinning and instancing.
     //	The flags are defined in the .shader file with the tech name currently.
     //
-    //	Every permatation of the shader will be compiled:
+    //	Every permutation of the shader will be compiled:
     //
     //	"Fill(Textured)" -> compiled with: <none>, X_TEXTURED
     //	"Fill(Color)" -> compiled with: <none>, X_COLOR
@@ -309,12 +309,12 @@ typedef Flags<TechFlag> TechFlags;
     struct IShaderPermatation
     {
         template<typename T>
-        using LineraArray = core::Array<T, core::ArrayAllocator<T>, core::growStrat::FixedLinear<4>>;
+        using LinearArray = core::Array<T, core::ArrayAllocator<T>, core::growStrat::FixedLinear<4>>;
 
-        typedef LineraArray<CBufferLink> CBufLinksArr;
-        typedef LineraArray<Buffer> BufferArr;
-        typedef LineraArray<Sampler> SamplerArr;
-        typedef LineraArray<Texture> TexutreArr;
+        typedef LinearArray<CBufferLink> CBufLinksArr;
+        typedef LinearArray<Buffer> BufferArr;
+        typedef LinearArray<Sampler> SamplerArr;
+        typedef LinearArray<Texture> TexutreArr;
 
         virtual ~IShaderPermatation() = default;
 

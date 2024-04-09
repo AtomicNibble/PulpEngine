@@ -19,8 +19,8 @@ public:
 
     X_INLINE void* allocate(size_t size, size_t alignment, size_t offset);
 
-    /// \brief Allocates raw memory, and additionally fills newly allocated physical memory chunks with the given header data.
-    /// \remark The returned pointer will always adhere to the following alignment requirements: <tt>((ptr + offset) % alignment) == 0</tt>.
+    // Allocates raw memory, and additionally fills newly allocated physical memory chunks with the given header data.
+    // The returned pointer will always adhere to the following alignment requirements: <tt>((ptr + offset) % alignment) == 0</tt>.
     template<class T>
     X_INLINE void* allocate(size_t size, size_t alignment, size_t offset,
         typename std::enable_if<!core::compileTime::IsPointer<T>::Value, T>::type& chunkHeader);
@@ -33,18 +33,18 @@ public:
 
     MemoryAllocatorStatistics getStatistics(void) const;
 
-    /// \brief Returns whether a given allocation belongs to this allocator.
-    /// \details This is done by checking if the allocation resides in the virtual address space of the allocator.
+    // Returns whether a given allocation belongs to this allocator.
+    // This is done by checking if the allocation resides in the virtual address space of the allocator.
     X_INLINE bool containsAllocation(void* ptr) const;
 
-    /// \brief Returns the address of the chunk header for a given allocation.
-    /// \details The address of a chunk header is determined by rounding the address to the next multiple of the given
-    /// chunk size, and subtracting the size of the header.
+    // Returns the address of the chunk header for a given allocation.
+    // The address of a chunk header is determined by rounding the address to the next multiple of the given
+    // chunk size, and subtracting the size of the header.
     template<typename T>
     static X_INLINE T* getChunkHeader(void* allocationAddress, unsigned int chunkSize, unsigned int chunkHeaderSize);
 
 private:
-    /// Allocates raw memory, and additionally fills newly allocated physical memory chunks with the given header data (if any).
+    // Allocates raw memory, and additionally fills newly allocated physical memory chunks with the given header data (if any).
     void* allocate(size_t size, size_t alignment, size_t offset, const void* chunkHeaderData, size_t chunkHeaderSize);
 
     Freelist freelist_;

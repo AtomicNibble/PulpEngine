@@ -70,8 +70,8 @@ namespace Converter
         virtual float evaluate(float x) const X_OVERRIDE;
     };
 
-    /// Mitchell & Netravali's two-param cubic
-    /// @see "Reconstruction Filters in Computer Graphics", SIGGRAPH 88
+    // Mitchell & Netravali's two-param cubic
+    // @see "Reconstruction Filters in Computer Graphics", SIGGRAPH 88
     class MitchellFilter : public Filter
     {
     public:

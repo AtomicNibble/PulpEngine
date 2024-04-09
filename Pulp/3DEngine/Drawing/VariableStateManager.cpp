@@ -7,13 +7,13 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace
 {
-    // didnt make these static members as Vs won't show me the size when i hover over :(
+    // didn't make these static members as Vs won't show me the size when i hover over :(
 
     const uint32_t MAX_ALIGN = X_ALIGN_OF(render::Commands::ResourceStateBase);
     const uint32_t MAX_ALOC_SIZE = render::Commands::ResourceStateBase::getMaxStateSize();
 
     // used to access the protected members.
-    // thought id try somthing diffrent than making the manager a friend :|
+    // thought id try somthing different than making the manager a friend :|
     struct ResourceStateInit : public render::Commands::ResourceStateBase
     {
 #if !X_COMPILER_CLANG
