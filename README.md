@@ -11,6 +11,8 @@ As such anything visual in the engine is either programmer art or assets found o
 
 ## Architecture
 
+![architecture overview](docs/img/architecture.png)
+
 There is a central runtime that handles startup, loads required engine modules and hosts central services like: logging, job system, console, configuration and the virtual file system.
 
 The central runtime is called `core` and can be found under `Pulp/`
