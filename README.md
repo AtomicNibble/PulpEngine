@@ -2,7 +2,7 @@
 
 This project is 3D Game engine that I developed in my spare time over about 6 years.
 
-It severed as a technical playground for me to experiment and solve interesting technical problems.
+It served as a technical playground for me to experiment and solve interesting technical problems.
 
 The engine is designed for 3D high detail enclosed levels, which I picked because the tech problems in that area interested me.  
 I did not intend to develop or ship such a game as I'm no artist and don't have the budget for such a game.
@@ -15,17 +15,17 @@ As such anything visual in the engine is either programmer art or assets found o
 
 There is a central runtime that handles startup, loads required engine modules and hosts central services like: logging, job system, console, configuration and the virtual file system.
 
-The central runtime is called `core` and can be found under `Pulp/`
-Any application that uses this runtime we refer to as an **EngineApp**.  
+The central runtime is called `core` and can be found under [Pulp](Pulp)
+Any application that uses this runtime is referred to as an **EngineApp**.  
 
-The Game, Editor, Converter, Linker, ... are all EngineApps as this allows tools to make use of useful engine features and share code with ease. Each app passes `CoreInitParams` on startup which defines what systems should be enabled so we don't bother loading the render logic for engine tools.
+The Game, Editor, Converter, Linker, ... are all EngineApps as this allows tools to make use of useful engine features and share code with ease. Each app passes `CoreInitParams` on startup which defines what systems should be enabled so things like loading the render module is skipped for engine tools.
 
 ### No blocking IO
 
 One of the design goals of the engine was to have zero blocking IO at runtime this includes opening file handles.
 
 So all IO requests (open, read, write, close) go via the IO thread which handles the async reading.
-This means you can run Games on top of slow storage or even network backed storage without effecting the frame rate.
+This means Games can run on top of slow storage or even network backed storage without effecting the frame rate.
 
 The filesystem includes some settings for simulating slow IO with artificial delays to help test this.
 
@@ -41,12 +41,12 @@ In hindsight I'm not sure heavily leaning in to multithreading was worth it, as 
 
 ### No Global allocator
 
-Making a general purpose allocator that works well for all use cases is difficult and requires you to make compromises.
+Making a general purpose allocator that works well for all use cases is difficult and requires compromises.
 
-When writing a section of code and it's obvious what type of allocation strategy would work best I want to be able to make that choice.
+When writing a section of code, if it's obvious what type of allocation strategy would work best I want to be able to make that choice.
 
 So the engine provides a collection of allocation strategies and synchronisation policies that can be used to build an allocation arena.
-Combined with a custom c++ standard library that requires you to pass an arena for allocation it makes it trivial to pick the correct allocator for the job.
+Combined with a custom c++ [standard library](Pulp/Common) that requires an arena for allocation it makes it trivial to pick the correct allocator for the job.
 
 For developer builds every allocator has a parent and a top level allocator is created for each engine module.  
 This gives us a tree of all allocators in the engine that can be traversed for stats collection.
@@ -60,7 +60,20 @@ The only exception to this is strings which use a global allocator specialized f
 Throughout the codebase there is a strong focus on using the stack as much as possible when it makes sense.
 This helps keep allocations fast and keep working data in the CPUs cache.
 
-The engines standard library provides stack based versions of most containers to make allocation on the stack trivial.
+The engines [standard library](Pulp/Common) provides stack based versions of most containers to make allocation on the stack trivial.
+
+### Fast builds
+
+Large c++ codebases are typically plagued with slow build times which is something I wanted to avoid.
+
+To combat this the engine is split into various modules that don't depend on each other allowing them to build in parallel.
+This also means that even though a full rebuild takes about 60 seconds if you are working on a single module build times are typically below 1 second.
+
+One downside of this approach is that all intermodule communication happens via virtual functions, so the interfaces are designed to accept large batches of data to minimize virtual calls.
+
+For shipping builds all the engine modules are static linked into a single binary which allows devirtualization to occur.
+
+But one very nice upside is that some modules can be compiled with optimisations enabled (Eg physics) allowing the game to run at 60fps without issue with everything else compiled as debug.
 
 ## Feature Overview
 
@@ -469,7 +482,7 @@ Handles converting source assets to engine assets.
 
 Build PAK files from assets, automatically includes dependencies.
 
-It will also compress assets skipping compression if has has n
+It will also compress assets skipping compression if no net gain.
 
 ### ShaderCompiler
 
@@ -492,8 +505,18 @@ Can also be used to train shared compression dictionaries.
 
 ### Maya Plugin
 
-Adds logic for exporting Models and Animations into the engines intermediate formats.
+Adds logic for exporting Models and Animations into the engine's intermediate formats.
 Also supports connecting directly to the AssetServer to streamline the export process.
+
+## Screenshots
+
+Some basic images can be seen [here](docs/img/README.md)
+
+## Name
+
+The engine name has changed over the years so references to the old name appear here and there.
+
+They do say naming things is the hardest problem in programming, I've now learned that also extends to the name of the project.
 
 ## Project structure
 
