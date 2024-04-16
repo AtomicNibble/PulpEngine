@@ -48,7 +48,7 @@ When writing a section of code and it's obvious what type of allocation strategy
 So the engine provides a collection of allocation strategies and synchronisation policies that can be used to build an allocation arena.
 Combined with a custom c++ standard library that requires you to pass an arena for allocation it makes it trivial to pick the correct allocator for the job.
 
-For developer builds every allocator expect the first one has a parent and a top level allocator is created for each engine module.
+For developer builds every allocator has a parent and a top level allocator is created for each engine module.  
 This gives us a tree of all allocators in the engine that can be traversed for stats collection.
 
 Giving a very fine grained overview of memory usage as a whole, for each module and each section of a given module.
@@ -58,7 +58,7 @@ The only exception to this is strings which use a global allocator specialized f
 ### Stack is king
 
 Throughout the codebase there is a strong focus on using the stack as much as possible when it makes sense.
-This helps keep allocations fast and items are more likely to be in the CPUs cache.
+This helps keep allocations fast and keep working data in the CPUs cache.
 
 The engines standard library provides stack based versions of most containers to make allocation on the stack trivial.
 
@@ -74,6 +74,8 @@ Allowing the render backend to be simple minimizing duplicate logic across backe
 - Culling
     - Frustum
     - Recursive Portals
+- Rendering
+    - Render scale (up or down)
 - PrimitiveContext
     - Allows efficient rendering of large amounts of primitives (lines,sphere,cone,rectangles)
     - Used by font engine and GUI
