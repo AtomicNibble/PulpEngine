@@ -75,6 +75,12 @@ For shipping builds all the engine modules are static linked into a single binar
 
 But one very nice upside is that some modules can be compiled with optimisations enabled (Eg physics) allowing the game to run at 60fps without issue with everything else compiled as debug.
 
+### Fast start times
+
+Fast build times are not that useful in supporting quick iteration if the engine then takes forever to load.
+
+To help combat this many of the engine modules are initialized in parallel keeping start times under a second for debug builds and at around 100ms for shipping builds.
+
 ## Feature Overview
 
 <details>
