@@ -543,7 +543,32 @@ Below is the output of cloc for tools/ and  Pulp/ just to give an idea of projec
 | SUM           | 2,256      | 90,210   | 23,704    | 321,427   |  
 
 
+## Takeaways
 
+Some takeaways from my time working on this project.
+
+### Code Readability
+
+Probably the most important one is a strong focus on code readability / minimizing cognitive load.
+I think this played a major role in being able to stay productive in a large codebase as better readability allows understanding and moving through the codebase faster.
+
+As a general rule of thumb if it took more than 2 seconds to understand a line of code I simplified it.
+On many occasions I would notice a bug when simplifying the code that become obvious in the simplified version.
+I also found simplified code was either faster by default or more easy to optimise, so I don't feel performance critical code has to have poor readability.
+
+#### Comments
+
+As part of readability I believe comments should not contain anything you can learn from reading the code.
+
+Essentially they should only explain the why not the how.
+Comments that explain what the code is doing can be come stale and hurt readability as you waste time reading the comment and the code to confirm the comment is correct.
+
+### Iteration beats planning
+
+I've found the most reliable way to design something is to just start and iterate on it over time.
+
+Even if you end up writing the first version and starting again with the knowledge you have acquired it's a reliable way to end up with something good.  
+Spending time trying to plan something perfect up front often takes longer with unreliable results.
 
 ## Credits
 
