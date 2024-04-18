@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "Core.h"
 
+#include <Platform\Console.h>
 #include <ModuleExports.h>
 
 #if !defined(X_LIB)
@@ -46,10 +47,12 @@ extern "C" IPCORE_API ICore* CreateCoreInterface(CoreInitParams& startupParams)
         // this is just to remove races on shutdown logic.
         (void)pCore->InitAsyncWait();
 
-        X_BREAKPOINT;
-
         if (gEnv && gEnv->pLog) {
             X_ERROR("Core", "Failed to init core");
+
+            if (gEnv->pConsoleWnd != nullptr) {
+                gEnv->pConsoleWnd->pressToContinue();
+            }
         }
 
         pCore->Release();
