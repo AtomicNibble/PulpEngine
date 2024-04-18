@@ -259,7 +259,7 @@ bool XGame::update(core::FrameData& frame)
     // is a data based call.
     // but i have all the input events in this
     // but they are no use since i don't know if i'm allowed to use them all.
-    // i likethe input sinks tho
+    // i like the input sinks tho
     // as things are registered with priority
     // and each devices gets input events it's allowed to use.
     // the problem is this data not linked to framedata
@@ -320,7 +320,7 @@ bool XGame::update(core::FrameData& frame)
         // if not that, num frames since state change?
         if (prevStatus_ != net::SessionStatus::Loading)
         {
-            // frist frame in loading.
+            // first frame in loading.
             pMenuHandler_->openMenu("loading"_sv);
 
             clearWorld();
@@ -349,7 +349,7 @@ bool XGame::update(core::FrameData& frame)
             }
         }
 
-        // so i need to support been loaded, yet sillt in the loading state, while we wait for shity peers.
+        // so i need to support been loaded, yet still in the loading state, while we wait for peers.
         // to finish loading, this is so the loading screen is still showing and can show pleb progress.
         // where to store this state?
         if (world_)
@@ -469,7 +469,7 @@ bool XGame::update(core::FrameData& frame)
     }
     else
     {
-        X_ERROR("Game", "Unhandle session status: %s", net::SessionStatus::ToString(status));
+        X_ERROR("Game", "Unhandled session status: %s", net::SessionStatus::ToString(status));
     }
 
     prevStatus_ = status;
@@ -714,7 +714,7 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
         else
         {
             X_WARNING("Game", "no userCmd for remote player %" PRIi32, playerIdx);
-            // dam user not sending user commads run an empty command.
+            // dam user not sending user commands run an empty command.
             auto userCmd = lastUserCmdRun_[playerIdx];
             runUserCmdForPlayer(dt, userCmd, playerIdx);
 
@@ -996,7 +996,6 @@ void XGame::Cmd_Chat(core::IConsoleCmdArgs* pCmd)
     if (userNetMap_.localPlayerIdx >= 0) {
         const auto& netGuid = userNetMap_.getLocalPlayerGUID();
 
-        // fucking goat muncher!
         net::UserInfo info;
         if (pLobby->getUserInfoForGuid(netGuid, info)) {
             name = info.name;

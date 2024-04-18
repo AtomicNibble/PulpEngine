@@ -110,14 +110,14 @@ namespace entity
         void spawnPlayer(const UserNetMappings& unm, int32_t clientIdx, const Vec3f& pos, bool local);
         bool addController(EntityId id);
 
-        bool loadEntites(const char* pJsonBegin, const char* pJsonEnd);
+        bool loadEntities(const char* pJsonBegin, const char* pJsonEnd);
 
         bool postLoad(void);
 
     private:
         bool createTranslatours(void);
 
-        bool parseEntites(const char* pJsonBegin, const char* pJsonEnd);
+        bool parseEntities(const char* pJsonBegin, const char* pJsonEnd);
 
         template<typename CompnentT>
         static bool parseComponent(DataTranslator<CompnentT>& translator, CompnentT& comp, const core::json::Value& compDesc);

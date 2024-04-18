@@ -411,7 +411,7 @@ namespace entity
                 netSync.prev = netSync.next;
                 netSync.next = trans;
                 // frac of 0.f
-                // TODO: we may not want todo this if we exterpolated maybe ??
+                // TODO: we may not want todo this if we extrapolated maybe ??
                 netSync.current = netSync.prev; 
             }
 
@@ -775,18 +775,18 @@ namespace entity
         return true;
     }
 
-    bool EntitySystem::loadEntites(const char* pJsonBegin, const char* pJsonEnd)
+    bool EntitySystem::loadEntities(const char* pJsonBegin, const char* pJsonEnd)
     {
         // TODO: bother checking we clear? 
-        ttZone(gEnv->ctx, "(Game) LoadEntites");
+        ttZone(gEnv->ctx, "(Game) loadEntities");
 
-        if (!parseEntites(pJsonBegin, pJsonEnd)) {
-            X_ERROR("Ents", "Failed to parse ents");
+        if (!parseEntities(pJsonBegin, pJsonEnd)) {
+            X_ERROR("Ents", "Failed to parse entities");
             return false;
         }
 
         // now i need to build the id map.
-        // i basically need the newst id.
+        // i basically need the newest id.
         endOfmapEnts_ = reg_.create();
 
         // Fill in the ent map skipping player slots.
@@ -795,7 +795,7 @@ namespace entity
         return true;
     }
 
-    bool EntitySystem::parseEntites(const char* pJsonBegin, const char* pJsonEnd)
+    bool EntitySystem::parseEntities(const char* pJsonBegin, const char* pJsonEnd)
     {
         core::json::MemoryStream ms(pJsonBegin, union_cast<ptrdiff_t>(pJsonEnd - pJsonBegin));
         core::json::EncodedInputStream<core::json::UTF8<>, core::json::MemoryStream> is(ms);
@@ -1158,7 +1158,7 @@ namespace entity
                     }
 
 
-                    // we need to create a emmiter on the world.
+                    // we need to create a emitter on the world.
                     // to play our fx.
                     engine::fx::Effect* pEffect = nullptr;
                     

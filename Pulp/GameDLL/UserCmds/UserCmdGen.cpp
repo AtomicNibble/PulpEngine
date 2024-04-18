@@ -313,7 +313,7 @@ void UserCmdGen::setButtonState(input::KeyId::Enum key, bool down)
     if (down) {
         ++buttonStates_[ub];
 
-        // so want to seperate out impulses.
+        // so want to separate out impulses.
         if (ub >= UserButton::WEAP0) {
             int32_t val = static_cast<int32_t>(ub - UserButton::WEAP0);
             X_ASSERT(val >= 0 && val < net::Impulse::ENUM_COUNT, "Out of range")(val);

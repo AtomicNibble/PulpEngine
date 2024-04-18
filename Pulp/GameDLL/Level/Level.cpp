@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Level.h"
-#include "Enity\EntitySystem.h"
+#include "Entity\EntitySystem.h"
 
 #include <Threading\JobSystem2.h>
 
@@ -303,7 +303,7 @@ bool Level::processEnts(void)
     {
         core::XFileFixedBuf file = fileHdr_.FileBufForNode(levelData_.ptr(), level::FileNodes::ENTITIES);
 
-        entSys_.loadEntites(
+        entSys_.loadEntities(
             reinterpret_cast<const char*>(file.getBufferStart()),
             reinterpret_cast<const char*>(file.getBufferEnd()));
     }
@@ -317,7 +317,7 @@ bool Level::processEnts(void)
         const char* pBegin = entDescData_.ptr();
         const char* pEnd = pBegin + entDescSize_;
 
-        if (!entSys_.loadEntites(pBegin, pEnd)) {
+        if (!entSys_.loadEntities(pBegin, pEnd)) {
 
             return false;
         }
@@ -427,10 +427,10 @@ void World::spawnPlayer(const UserNetMappings& unm, int32_t playerIdx, bool loca
     // we want to take the give ent and set it up as a player.
     // the ent may not have all the required components yet.
     // we also want to support spawning different types of players with various definitions.
-    // maybe i should write some system for defining what each enity type has.
+    // maybe i should write some system for defining what each entity type has.
     // for now can be just in code, but setup in way that can be data driven.
-    // which ia suspect should be handled by the enitiy system.
-    // so we almost what a make ent type helper, that we can just call and it makes the ent a player.
+    // which ia suspect should be handled by the entity system.
+    // so we almost want a make ent type helper, that we can just call and it makes the ent a player.
     // then here we can do shit with the player.
     entity::EntityId id = static_cast<entity::EntityId>(playerIdx);
     auto pos = Vec3f(-80, -50.f + (playerIdx * 50.f), 10);

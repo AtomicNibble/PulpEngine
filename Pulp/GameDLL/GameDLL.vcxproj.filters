@@ -25,7 +25,7 @@
     <Filter Include="Source Files\Vars">
       <UniqueIdentifier>{3d3b1f5b-6f42-47b1-985c-2ef055121f62}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Enity">
+    <Filter Include="Header Files\Entity">
       <UniqueIdentifier>{d790a810-514d-4cc7-8d82-ebcd76a6fae7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Entity">
@@ -46,7 +46,7 @@
     <Filter Include="Source Files\Weapon">
       <UniqueIdentifier>{f6eedb93-d6f3-40f3-b0f8-46adbe6b99bc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Enity\Systems">
+    <Filter Include="Header Files\Entity\Systems">
       <UniqueIdentifier>{af288212-5a5c-49b7-a8ba-ca85fe080067}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Entity\Systems">
@@ -78,8 +78,8 @@
     <ClInclude Include="Vars\PlayerVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\DataTranslator.h">
-      <Filter>Header Files\Enity</Filter>
+    <ClInclude Include="Entity\DataTranslator.h">
+      <Filter>Header Files\Entity</Filter>
     </ClInclude>
     <ClInclude Include="Weapon\WeaponManager.h">
       <Filter>Header Files\Weapon</Filter>
@@ -87,23 +87,23 @@
     <ClInclude Include="Weapon\WeaponDef.h">
       <Filter>Header Files\Weapon</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\AnimatedSys.h">
-      <Filter>Header Files\Enity\Systems</Filter>
+    <ClInclude Include="Entity\AnimatedSys.h">
+      <Filter>Header Files\Entity\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\CameraSys.h">
-      <Filter>Header Files\Enity\Systems</Filter>
+    <ClInclude Include="Entity\CameraSys.h">
+      <Filter>Header Files\Entity\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\PhysicsSystem.h">
-      <Filter>Header Files\Enity\Systems</Filter>
+    <ClInclude Include="Entity\PhysicsSystem.h">
+      <Filter>Header Files\Entity\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\SoundSys.h">
-      <Filter>Header Files\Enity\Systems</Filter>
+    <ClInclude Include="Entity\SoundSys.h">
+      <Filter>Header Files\Entity\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\PlayerSys.h">
-      <Filter>Header Files\Enity\Systems</Filter>
+    <ClInclude Include="Entity\PlayerSys.h">
+      <Filter>Header Files\Entity\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\WeaponSystem.h">
-      <Filter>Header Files\Enity\Systems</Filter>
+    <ClInclude Include="Entity\WeaponSystem.h">
+      <Filter>Header Files\Entity\Systems</Filter>
     </ClInclude>
     <ClInclude Include="UserCmds\UserCmdGen.h">
       <Filter>Header Files\UserCmds</Filter>
@@ -117,11 +117,11 @@
     <ClInclude Include="UserNetMappings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\EntitySystem.h">
-      <Filter>Header Files\Enity</Filter>
+    <ClInclude Include="Entity\EntitySystem.h">
+      <Filter>Header Files\Entity</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\EntityComponents.h">
-      <Filter>Header Files\Enity</Filter>
+    <ClInclude Include="Entity\EntityComponents.h">
+      <Filter>Header Files\Entity</Filter>
     </ClInclude>
     <ClInclude Include="ECS\MessageQueue.h">
       <Filter>Header Files\ECS</Filter>
@@ -129,23 +129,23 @@
     <ClInclude Include="ECS\EntityId.h">
       <Filter>Header Files\ECS</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\EmitterSys.h">
-      <Filter>Header Files\Enity\Systems</Filter>
+    <ClInclude Include="Entity\EmitterSys.h">
+      <Filter>Header Files\Entity\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\MeshRendererSys.h">
-      <Filter>Header Files\Enity\Systems</Filter>
+    <ClInclude Include="Entity\MeshRendererSys.h">
+      <Filter>Header Files\Entity\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\HealthSys.h">
-      <Filter>Header Files\Enity\Systems</Filter>
+    <ClInclude Include="Entity\HealthSys.h">
+      <Filter>Header Files\Entity\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\NetworkSys.h">
-      <Filter>Header Files\Enity\Systems</Filter>
+    <ClInclude Include="Entity\NetworkSys.h">
+      <Filter>Header Files\Entity\Systems</Filter>
     </ClInclude>
     <ClInclude Include="NetInterpolationState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\LightSys.h">
-      <Filter>Header Files\Enity\Systems</Filter>
+    <ClInclude Include="Entity\LightSys.h">
+      <Filter>Header Files\Entity\Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -173,25 +173,25 @@
     <ClCompile Include="Weapon\WeaponDef.cpp">
       <Filter>Source Files\Weapon</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\AnimatedSys.cpp">
+    <ClCompile Include="Entity\AnimatedSys.cpp">
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\CameraSys.cpp">
+    <ClCompile Include="Entity\CameraSys.cpp">
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\PhysicsSystem.cpp">
+    <ClCompile Include="Entity\PhysicsSystem.cpp">
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\PlayerSys.cpp">
+    <ClCompile Include="Entity\PlayerSys.cpp">
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\SoundSys.cpp">
+    <ClCompile Include="Entity\SoundSys.cpp">
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\WeaponSystem.cpp">
+    <ClCompile Include="Entity\WeaponSystem.cpp">
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\ComponentMeta.cpp">
+    <ClCompile Include="Entity\ComponentMeta.cpp">
       <Filter>Source Files\Entity</Filter>
     </ClCompile>
     <ClCompile Include="UserCmds\UserCmdGen.cpp">
@@ -203,25 +203,25 @@
     <ClCompile Include="Multiplayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\EntitySystem.cpp">
+    <ClCompile Include="Entity\EntitySystem.cpp">
       <Filter>Source Files\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\EntityComponents.cpp">
+    <ClCompile Include="Entity\EntityComponents.cpp">
       <Filter>Source Files\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\EmitterSys.cpp">
+    <ClCompile Include="Entity\EmitterSys.cpp">
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\MeshRendererSys.cpp">
+    <ClCompile Include="Entity\MeshRendererSys.cpp">
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\HealthSys.cpp">
+    <ClCompile Include="Entity\HealthSys.cpp">
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\NetworkSys.cpp">
+    <ClCompile Include="Entity\NetworkSys.cpp">
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\LightSys.cpp">
+    <ClCompile Include="Entity\LightSys.cpp">
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
   </ItemGroup>
@@ -229,8 +229,8 @@
     <None Include="Vars\PlayerVars.inl">
       <Filter>Header Files\Vars</Filter>
     </None>
-    <None Include="Enity\DataTranslator.inl">
-      <Filter>Header Files\Enity</Filter>
+    <None Include="Entity\DataTranslator.inl">
+      <Filter>Header Files\Entity</Filter>
     </None>
     <None Include="Weapon\WeaponDef.inl">
       <Filter>Header Files\Weapon</Filter>

@@ -60,11 +60,11 @@ void PlayerVars::registerVars(void)
     ADD_CVAR_REF("ply_crouch_view_height", crouchViewHeight_, crouchViewHeight_, 0, 256, core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
         "Height of player when crouched");
     ADD_CVAR_REF("ply_crouch_height", crouchHeight_, crouchHeight_, 0, 256, core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
-        "Height of player collsion shape when crouched");
+        "Height of player collision shape when crouched");
     ADD_CVAR_REF("ply_view_height", normalViewHeight_, normalViewHeight_, 0, 256, core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
         "Height of player view");
     ADD_CVAR_REF("ply_height", normalHeight_, normalHeight_, 0, 256, core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
-        "Height of player's collsion shape (Must crouch to apply)");
+        "Height of player's collision shape (Must crouch to apply)");
     ADD_CVAR_REF("ply_crouch_rate", crouchRate_, crouchRate_, 0, 1.f, core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
         "Time it takes to move in and out of crouch");
 

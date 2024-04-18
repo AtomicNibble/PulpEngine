@@ -442,7 +442,7 @@ X_DECLARE_ENUM(FileNodes)
     LIGHTS_STATIC,
     LIGHTS_DYNAMIC);
 
-struct EnityInfoHdr
+struct EntityInfoHdr
 {
     uint32_t dataSize[game::ClassType::ENUM_COUNT]; // the size of the data for the given class type.
 };
@@ -616,7 +616,7 @@ struct FileHeader
 // X_ENSURE_SIZE(Portal, 0x28);
 //X_ENSURE_SIZE(Area, 0x28 + 0xC + 12);
 
-X_ENSURE_SIZE(EnityInfoHdr, 4 * game::ClassType::ENUM_COUNT);
+X_ENSURE_SIZE(EntityInfoHdr, 4 * game::ClassType::ENUM_COUNT);
 
 X_ENSURE_SIZE(FileAreaRefHdr, 8);
 X_ENSURE_SIZE(AreaEntRef, 4);

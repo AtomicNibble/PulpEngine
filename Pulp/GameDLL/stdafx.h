@@ -47,4 +47,4 @@ X_LINK_ENGINE_LIB("AnimLib");
 #include "ECS\ComponentPool.h"
 #include "ECS\Registry.h"
 
-#include "Enity\EntityComponents.h"
+#include "Entity\EntityComponents.h"

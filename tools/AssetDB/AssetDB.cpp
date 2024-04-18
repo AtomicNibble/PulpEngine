@@ -2890,7 +2890,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
 {
     // so my little floating goat, we gonna store the thumbs with hash names.
     // that way i don't need to rename the fuckers if i rename the asset.
-    // might do same for raw assets at somepoint...
+    // might do same for raw assets at some point...
 
     if (!core::Compression::ICompressor::validBuffer(compressedData)) {
         X_ERROR("AssetDB", "Passed invalid buffer to UpdateAssetThumb");
@@ -2927,7 +2927,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
         filePath /= hash.ToString(strBuf);
 
         // if a thumb with same md5 exists don't update.
-        // now we wait for a collsion, (that we notice) before this code needs updating :D
+        // now we wait for a collision, (that we notice) before this code needs updating :D
         if (!gEnv->pFileSys->fileExists(filePath, virDir)) {
             if (!gEnv->pFileSys->createDirectoryTree(filePath, virDir)) {
                 X_ERROR("AssetDB", "Failed to create dir to save thumb");

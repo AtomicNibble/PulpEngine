@@ -77,7 +77,7 @@ void Multiplayer::update(void)
         // remote peer pings
         auto sysHandle = netMappings_.sysHandles[i];
         if (sysHandle == net::INVALID_SYSTEM_HANDLE) {
-            X_ASSERT(i == netMappings_.localPlayerIdx, "Invalid system handle for none localy player")();
+            X_ASSERT(i == netMappings_.localPlayerIdx, "Invalid system handle for none local player")();
             continue;
         }
 
@@ -101,7 +101,7 @@ void Multiplayer::update(void)
 
 void Multiplayer::drawChat(core::FrameTimeData& time, engine::IPrimitiveContext* pPrim)
 {
-    // TODO: maybe seperate this out.
+    // TODO: maybe separate this out.
     updateChat(time.deltas[core::Timer::UI]);
 
     drawChat(pPrim);
@@ -109,7 +109,7 @@ void Multiplayer::drawChat(core::FrameTimeData& time, engine::IPrimitiveContext*
 
 void Multiplayer::drawEvents(core::FrameTimeData& time, engine::IPrimitiveContext* pPrim)
 {
-    // TODO: maybe seperate this out.
+    // TODO: maybe separate this out.
     updateEvents(time.deltas[core::Timer::UI]);
 
     drawEvents(pPrim);
@@ -130,13 +130,11 @@ void Multiplayer::writeToSnapShot(core::FixedBitStreamBase& bs)
 
 void Multiplayer::playerSpawned(int32_t localIndex)
 {
-    // hellow you little shit!
     const auto& netGuid = netMappings_.lobbyUserGuids[localIndex];
     if (!netGuid.isValid()) {
         X_ERROR("Game", "Spawned players guid is not valid: %" PRIi32, localIndex);
     }
 
-    // fucking goat muncher!
     auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
 
     net::UserInfo info;
@@ -228,7 +226,7 @@ void Multiplayer::drawChat(engine::IPrimitiveContext* pPrim)
 
     float height = 20.f;
 
-    // TODO: select center?
+    // TODO: select centre?
     float x = 5.f;
     float y = 500.f - (height * chatLines_.size());
 
@@ -259,7 +257,7 @@ void Multiplayer::drawEvents(engine::IPrimitiveContext* pPrim)
 
     float height = 20.f;
 
-    // TODO: select center?
+    // TODO: select centre?
     float x = 5.f;
     float y = 920.f - (height * eventLines_.size());
 
@@ -425,7 +423,7 @@ void Multiplayer::buildChatPacket(ChatPacketBs& bs, core::string_view name, core
 void Multiplayer::drawLeaderboard(engine::IPrimitiveContext* pPrim)
 {
     // want some rows that are fixed size maybe?
-    // but centered in screen.
+    // but centred in screen.
     // think this is something we should just scale based on res.
     // 800 X 600 as base.
 
