@@ -147,7 +147,7 @@ bool RootSignature::finalize(RootSignatureDeviceCache& cache, D3D12_ROOT_SIGNATU
 #else
         X_WARNING("Dx12", "finalize called on a rootSig that already has a device object");
         return false;
-#endif // !PSO_HOT_RELOAD
+#endif // PSO_HOT_RELOAD
     }
 
     X_ASSERT(samplesInitCount_ == static_cast<uint32_t>(samplers_.size()), "Not all samplers are init")(samplesInitCount_, samplers_.size());
@@ -188,7 +188,7 @@ bool RootSignature::finalize(RootSignatureDeviceCache& cache, D3D12_ROOT_SIGNATU
         return false;
     }
 
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
     auto hash = gethashAndPopulateDescriptorTableMap(rootDesc, flags);
 

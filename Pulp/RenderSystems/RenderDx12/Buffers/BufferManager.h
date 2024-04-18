@@ -153,7 +153,7 @@ private:
 private:
 #if VID_MEMORY_STATS
     Stats stats_;
-#endif // !VID_MEMORY_STATS
+#endif // VID_MEMORY_STATS
 };
 
 X_NAMESPACE_END

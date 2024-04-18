@@ -46,7 +46,7 @@ typedef core::MemoryArena<
     core::NoBoundsChecking,
     core::NoMemoryTracking,
     core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES
+#endif // X_ENABLE_MEMORY_DEBUG_POLICIES
     >
     VarPool;
 

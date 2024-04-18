@@ -55,4 +55,4 @@ X_NAMESPACE_END
 
 #include "XGlyphBitmap.inl"
 
-#endif // !_X_FONT_GLYPH_BITMAP_H_
+#endif // _X_FONT_GLYPH_BITMAP_H_

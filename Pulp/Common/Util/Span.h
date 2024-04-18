@@ -162,7 +162,7 @@ namespace details
         {
 #if CPP14_CONSTEXPR
             X_ASSERT(span_ == rhs.span_, "")();
-#endif // !CPP14_CONSTEXPR
+#endif // CPP14_CONSTEXPR
             return index_ - rhs.index_;
         }
 
@@ -188,7 +188,7 @@ namespace details
         {
 #if CPP14_CONSTEXPR
             X_ASSERT(lhs.span_ == rhs.span_, "")();
-#endif // !CPP14_CONSTEXPR
+#endif // CPP14_CONSTEXPR
 
             return lhs.index_ < rhs.index_;
         }
@@ -280,7 +280,7 @@ namespace details
         {
 #if CPP14_CONSTEXPR
             X_ASSERT(size >= 0, "Extent size can't be negative")(size);
-#endif // !CPP14_CONSTEXPR
+#endif // CPP14_CONSTEXPR
         }
 
         constexpr index_type size(void) const

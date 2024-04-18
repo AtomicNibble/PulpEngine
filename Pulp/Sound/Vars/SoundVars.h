@@ -85,4 +85,4 @@ X_NAMESPACE_END
 
 #include "SoundVars.inl"
 
-#endif // !_X_SOUND_VARS_H_
+#endif // _X_SOUND_VARS_H_

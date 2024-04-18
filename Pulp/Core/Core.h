@@ -63,11 +63,11 @@ typedef core::MemoryArena<
     core::SimpleMemoryTracking,
 #else
     core::NoMemoryTracking,
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
     core::NoMemoryTagging>
     StrArena;
 
-#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES
+#endif // X_ENABLE_MEMORY_DEBUG_POLICIES
 
 typedef core::MemoryArena<
     StrArena::AllocationPolicy,
@@ -88,7 +88,7 @@ typedef core::MemoryArena<
     core::NoBoundsChecking,
     core::NoMemoryTracking,
     core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
     >
     CoreArena;
 
@@ -266,7 +266,7 @@ private:
 
 #if X_ENABLE_PROFILER
     core::profiler::XProfileSys* pProfiler_;
-#endif // !X_ENABLE_PROFILER
+#endif // X_ENABLE_PROFILER
 
     // Hot reload stuff
     core::XDirectoryWatcher* pDirWatcher_;
@@ -290,4 +290,4 @@ X_NAMESPACE_END
 
 #include "Core.inl"
 
-#endif // !_X_CORE_H_
+#endif // _X_CORE_H_

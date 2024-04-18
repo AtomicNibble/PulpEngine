@@ -72,7 +72,7 @@ class Session : public ISession, ISessionCallbacks
         core::NoBoundsChecking,
         core::NoMemoryTracking,
         core::NoMemoryTagging
-#endif // !X_DEBUG
+#endif // X_DEBUG
     >
     SnapShotArena;
 

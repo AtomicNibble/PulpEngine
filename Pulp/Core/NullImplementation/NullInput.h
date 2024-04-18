@@ -23,4 +23,4 @@ public:
 
 X_NAMESPACE_END
 
-#endif // ! _X_NULL_INPUT_H_
+#endif //  _X_NULL_INPUT_H_

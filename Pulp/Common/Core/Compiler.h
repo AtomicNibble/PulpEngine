@@ -8,4 +8,4 @@
     break;
 #else
 #define X_NO_SWITCH_DEFAULT_ASSERT X_NO_SWITCH_DEFAULT
-#endif // !X_ENABLE_ASSERTIONS
+#endif // X_ENABLE_ASSERTIONS

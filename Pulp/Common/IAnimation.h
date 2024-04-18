@@ -188,4 +188,4 @@ X_ENSURE_SIZE(Note, 8);
 
 X_NAMESPACE_END
 
-#endif // !_X_ASSET_ANIM_H_
+#endif // _X_ASSET_ANIM_H_

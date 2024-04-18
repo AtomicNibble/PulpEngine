@@ -15,7 +15,7 @@ X_LINK_ENGINE_LIB("SqLite")
 
 X_FORCE_LINK_FACTORY("XEngineModule_SqLite");
 
-#endif // !X_LIB
+#endif // X_LIB
 
 namespace
 {

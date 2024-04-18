@@ -45,7 +45,7 @@ using namespace core::string_view_literals;
 
 #if X_PLATFORM_WIN32
 #include <conio.h>
-#endif // !X_PLATFORM_WIN32
+#endif // X_PLATFORM_WIN32
 
 
 namespace
@@ -229,7 +229,7 @@ void XCore::ShutDown()
             pProfiler_->shutDown();
             core::Mem::DeleteAndNull(pProfiler_, &coreArena_);
         }
-    #endif // !X_ENABLE_PROFILER
+    #endif // X_ENABLE_PROFILER
 
         // clean up file logger, now
         if (pFileLogger_) {
@@ -282,7 +282,7 @@ void XCore::ShutDown()
         if (!initParams_.bTesting && initParams_.bPauseShutdown && pConsole_) { // don't pause when testing.
             pConsole_->pressToContinue();
         }
-    #endif // !X_ENABLE_LOGGING
+    #endif // X_ENABLE_LOGGING
 
         if (env_.pConsole) {
             env_.pConsole->shutDown();

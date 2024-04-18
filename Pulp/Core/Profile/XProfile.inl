@@ -14,4 +14,4 @@ namespace profiler
 
 X_NAMESPACE_END
 
-#endif // !X_ENABLE_PROFILER
+#endif // X_ENABLE_PROFILER

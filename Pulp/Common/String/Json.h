@@ -7,7 +7,7 @@
 
 #ifdef GetObject
 #undef GetObject
-#endif // !GetObject
+#endif // GetObject
 
 #if X_COMPILER_CLANG
 #ifdef _MSC_VER
@@ -34,7 +34,7 @@
 #if X_64
 #define RAPIDJSON_SSE2
 #define RAPIDJSON_48BITPOINTER_OPTIMIZATION 1
-#endif // !X_^$
+#endif // X_^$
 
 
 #include <../../3rdparty/source/rapidjson/rapidjson.h>
@@ -115,4 +115,4 @@ struct JsonByteStreamWriter
 
 RAPIDJSON_NAMESPACE_END
 
-#endif // !X_STRING_JSON_H_
+#endif // X_STRING_JSON_H_

@@ -173,7 +173,7 @@ CVarInt<T>::CVarInt(XConsole* pConsole, core::string_view name, const int iDefau
             "Error VarInt has a default value outside min/max")
         (iDefault, Min, Max);
     }
-#endif // !X_DEBUG
+#endif // X_DEBUG
 }
 
 template<class T>
@@ -303,7 +303,7 @@ CVarFloat<T>::CVarFloat(XConsole* pConsole, core::string_view name, const float 
             "Error VarFloat has a default value outside min/max")
         (fDefault, Min, Max);
     }
-#endif // !X_DEBUG
+#endif // X_DEBUG
 }
 
 template<class T>
@@ -445,7 +445,7 @@ CVarIntRef::CVarIntRef(XConsole* pConsole, core::string_view name, int* pVar,
             "Error VarInt has a default value outside min/max")
         (*pVar, Min, Max);
     }
-#endif // !X_DEBUG
+#endif // X_DEBUG
 }
 
 CVarIntRef::~CVarIntRef()
@@ -557,7 +557,7 @@ CVarFloatRef::CVarFloatRef(XConsole* pConsole, core::string_view name, float* pV
             "Error VarFloat has a default value outside min/max")
         (*pVal, Min, Max);
     }
-#endif // !X_DEBUG
+#endif // X_DEBUG
 }
 
 CVarFloatRef::~CVarFloatRef()

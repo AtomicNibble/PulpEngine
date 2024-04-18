@@ -54,4 +54,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_LVL_BUILDER_MAT_MANAGER_H_
+#endif // X_LVL_BUILDER_MAT_MANAGER_H_

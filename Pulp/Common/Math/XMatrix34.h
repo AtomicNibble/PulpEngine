@@ -210,4 +210,4 @@ const T Matrix34<T>::EPSILON = math<T>::CMP_EPSILON;
 
 #include "XMatrix34.inl"
 
-#endif // !_X_MATH_MATRIX_34_H_
+#endif // _X_MATH_MATRIX_34_H_

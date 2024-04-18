@@ -68,7 +68,7 @@ namespace entity
             core::NoBoundsChecking,
             core::NoMemoryTracking,
             core::NoMemoryTagging
-#endif // !X_DEBUG
+#endif // X_DEBUG
         >
             ECSArena;
 

@@ -6,7 +6,7 @@ X_NAMESPACE_BEGIN(core)
 
 #ifdef RegisterClass
 #undef RegisterClass
-#endif // !RegisterClass
+#endif // RegisterClass
 
 class TrayIcon
 {

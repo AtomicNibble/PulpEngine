@@ -11,4 +11,4 @@
 #include "XPlane.h"
 #include "XVector.h"
 
-#endif // !_X_MATH_INTERSECT_H_
+#endif // _X_MATH_INTERSECT_H_

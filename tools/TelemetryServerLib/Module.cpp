@@ -20,7 +20,7 @@ X_LINK_ENGINE_LIB("TelemetrySymbols")
 
 X_FORCE_LINK_FACTORY("XEngineModule_SqLite");
 
-#endif // !X_LIB
+#endif // X_LIB
 
 
 class XTelemSrvLib : public IEngineModule

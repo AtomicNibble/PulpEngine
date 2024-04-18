@@ -46,4 +46,4 @@ X_NAMESPACE_END
 
 #include "RenderModel.inl"
 
-#endif // !X_RENDER_MODEL_H_
+#endif // X_RENDER_MODEL_H_

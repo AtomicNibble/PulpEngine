@@ -33,4 +33,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_THREADING_SIGNAL_H_
+#endif // X_THREADING_SIGNAL_H_

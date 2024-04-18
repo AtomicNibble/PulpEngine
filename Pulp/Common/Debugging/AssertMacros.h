@@ -33,7 +33,7 @@ X_NAMESPACE_END
 #else
 static const X_NAMESPACE(core)::SourceInfo g_blank_source_info("", -1, "", "");
 #define X_SOURCE_INFO_ASSERT g_blank_source_info
-#endif // !X_ENABLE_ASSERTIONS_SOURCE_INFO
+#endif // X_ENABLE_ASSERTIONS_SOURCE_INFO
 
 #define X_ASSERT_IMPL_VAR(variable, n)                  .Variable(X_PP_STRINGIZE(variable), variable)
 #define X_ASSERT_IMPL_VARS(...)							X_PP_EXPAND_ARGS(X_ASSERT_IMPL_VAR, __VA_ARGS__), X_BREAKPOINT)
@@ -52,7 +52,7 @@ static const X_NAMESPACE(core)::SourceInfo g_blank_source_info("", -1, "", "");
 #define X_ASSERT_NOT_NULL(ptr) (decltype(ptr)) ptr
 #else
 #define X_ASSERT_NOT_NULL(ptr) ptr
-#endif // !X_COMPILER_CLANG
+#endif // X_COMPILER_CLANG
 
 #define X_ASSERT_UNREACHABLE()
 #define X_ASSERT_NOT_IMPLEMENTED()

@@ -86,4 +86,4 @@ X_NAMESPACE_END
 
 #include "OsFileAsyncOperation.inl"
 
-#endif // !_X_FILE_SYSTEM_OSFILE_ASYNC_OPERATION_H_
+#endif // _X_FILE_SYSTEM_OSFILE_ASYNC_OPERATION_H_

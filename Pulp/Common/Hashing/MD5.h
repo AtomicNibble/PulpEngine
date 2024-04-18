@@ -64,4 +64,4 @@ X_NAMESPACE_END
 
 #include "MD5.inl"
 
-#endif // !X_HASH_MD5_H_
+#endif // X_HASH_MD5_H_

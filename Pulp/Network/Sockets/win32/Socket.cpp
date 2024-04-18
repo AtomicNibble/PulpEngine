@@ -18,7 +18,7 @@ namespace
 #if NET_IPv6_SUPPORT
             case IpVersion::Ipv6:
                 return platform::IPPROTO_IPV6;
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 
             default:
                 X_ASSERT_UNREACHABLE();
@@ -34,7 +34,7 @@ namespace
 
 #if NET_IPv6_SUPPORT
         static_assert(AddressFamily::INet6 == AF_INET6, "AddressFamily enum don't match platform value");
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 
         return family;
     }
@@ -231,7 +231,7 @@ SendResult NetSocket::send(SendParameters& sendParameters)
 #if X_ENABLE_NET_STATS
     ++stats_.numPacketsSent;
     stats_.numBytesSent += sendParameters.length;
-#endif // !X_ENABLE_NET_STATS
+#endif // X_ENABLE_NET_STATS
 
     const auto ipVer = sendParameters.systemAddress.getIPVersion();
     if (sendParameters.ttl > 0) {
@@ -318,7 +318,7 @@ RecvResult::Enum NetSocket::recv(RecvData& dataOut)
 #if X_ENABLE_NET_STATS
     ++stats_.numPacketsReceived;
     stats_.numBytesReceived += bytesRead;
-#endif // !X_ENABLE_NET_STATS
+#endif // X_ENABLE_NET_STATS
 
     dataOut.timeRead = gEnv->pTimer->GetTimeNowReal();
     dataOut.pSrcSocket = this;
@@ -499,6 +499,6 @@ NetBandwidthStatistics NetSocket::getStats(void) const
     return stats_;
 }
 
-#endif // !X_ENABLE_NET_STATS
+#endif // X_ENABLE_NET_STATS
 
 X_NAMESPACE_END

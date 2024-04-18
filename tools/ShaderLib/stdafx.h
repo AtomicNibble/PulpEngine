@@ -14,7 +14,7 @@ typedef core::MemoryArena<
     core::NoBoundsChecking,
     core::NoMemoryTracking,
     core::NoMemoryTagging
-#endif // !X_DEBUG
+#endif // X_DEBUG
     >
     ShaderLibArena;
 
@@ -27,7 +27,7 @@ extern ShaderLibArena* g_ShaderLibArena;
 #define SHADERLIB_EXPORT X_EXPORT
 #else
 #define SHADERLIB_EXPORT X_IMPORT
-#endif // !SHADER_LIB_EXPORT
+#endif // SHADER_LIB_EXPORT
 #endif // X_LIB
 
 // this shader lib is dx12 specific for now.

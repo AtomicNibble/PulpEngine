@@ -121,7 +121,7 @@ namespace shader
                     return InputLayoutFormat::Invalid;
 #else
                     X_NO_SWITCH_DEFAULT;
-#endif // !X_DEBUG
+#endif // X_DEBUG
             }
         }
 
@@ -164,7 +164,7 @@ namespace shader
                     return ILFlags();
 #else
                     X_NO_SWITCH_DEFAULT;
-#endif // !X_DEBUG
+#endif // X_DEBUG
             }
         }
 

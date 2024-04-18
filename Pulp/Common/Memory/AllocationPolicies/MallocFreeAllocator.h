@@ -35,7 +35,7 @@ public:
 private:
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     MemoryAllocatorStatistics statistics_;
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 };
 
 #include "MallocFreeAllocator.inl"

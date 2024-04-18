@@ -97,4 +97,4 @@ X_NAMESPACE_END
 
 #include "TextureFile.inl"
 
-#endif // !X_TEXTURE_FILE_H_
+#endif // X_TEXTURE_FILE_H_

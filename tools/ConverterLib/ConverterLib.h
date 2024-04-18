@@ -13,10 +13,10 @@
 #define CONVERTERLIB_EXPORT X_EXPORT
 #else
 #define CONVERTERLIB_EXPORT X_IMPORT
-#endif // !CONVERTER_LIB_EXPORT
+#endif // CONVERTER_LIB_EXPORT
 #endif // X_LIB
-#endif // !CONVERTERLIB_EXPORT
+#endif // CONVERTERLIB_EXPORT
 
 #include "Converter.h"
 
-#endif // !X_CONVERTER_LIB_H_
+#endif // X_CONVERTER_LIB_H_

@@ -38,9 +38,9 @@ GrowingPoolAllocator::GrowingPoolAllocator(size_t maxSizeInBytes, size_t growSiz
 
 #if X_ENABLE_POOL_ALLOCATOR_CHECK
     offset_ = offset;
-#else
+#else // X_ENABLE_POOL_ALLOCATOR_CHECK
     X_UNUSED(offset);
-#endif
+#endif // X_ENABLE_POOL_ALLOCATOR_CHECK
 
     X_ASSERT(bitUtil::IsPowerOfTwo(growSize), "Pool Grow size must be a power-of-two.")(growSize);
 
@@ -60,7 +60,7 @@ GrowingPoolAllocator::GrowingPoolAllocator(size_t maxSizeInBytes, size_t growSiz
     wastePerElement_ = maxElementSize - elementSize_;
 
     statistics_.type_ = "GrowPoolAllocator";
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 // Frees all physical memory owned by the allocator.
@@ -99,7 +99,7 @@ void* GrowingPoolAllocator::allocate(size_t size, size_t alignment, size_t offse
         statistics_.allocationCountMax_ = Max(statistics_.allocationCountMax_, statistics_.allocationCount_);
         statistics_.physicalMemoryUsedMax_ = Max(statistics_.physicalMemoryUsedMax_, statistics_.physicalMemoryUsed_);
         statistics_.wasteAlignmentMax_ = Max(statistics_.wasteAlignmentMax_, statistics_.wasteAlignment_);
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
         return pMem;
     }
 
@@ -155,7 +155,7 @@ void* GrowingPoolAllocator::allocate(size_t size, size_t alignment, size_t offse
     statistics_.allocationCountMax_ = Max(statistics_.allocationCountMax_, statistics_.allocationCount_);
     statistics_.physicalMemoryUsedMax_ = Max(statistics_.physicalMemoryUsedMax_, statistics_.physicalMemoryUsed_);
     statistics_.wasteAlignmentMax_ = Max(statistics_.wasteAlignmentMax_, statistics_.wasteAlignment_);
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
     return pMem;
 }
@@ -164,11 +164,11 @@ MemoryAllocatorStatistics GrowingPoolAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     return statistics_;
-#else
+#else // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     static MemoryAllocatorStatistics stats;
     core::zero_object(stats);
     return stats;
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 X_NAMESPACE_END

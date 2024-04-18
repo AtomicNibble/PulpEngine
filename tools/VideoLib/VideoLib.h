@@ -10,6 +10,6 @@
 #define VIDEOLIB_EXPORT X_EXPORT
 #else
 #define VIDEOLIB_EXPORT X_IMPORT
-#endif // !VIDEO_LIB_EXPORT
+#endif // VIDEO_LIB_EXPORT
 #endif // X_LIB
-#endif // !VIDEOLIB_EXPORT
+#endif // VIDEOLIB_EXPORT

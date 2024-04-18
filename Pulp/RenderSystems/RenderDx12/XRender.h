@@ -88,19 +88,19 @@ class XRender : public IRender
 #if PSO_HOT_RELOAD
             pPassState = nullptr;
             pPerm = nullptr;
-#endif // !PSO_HOT_RELOAD
+#endif // PSO_HOT_RELOAD
         }
 
 #if DEVICE_STATE_STORE_CPU_DESC
         StateDesc cpuDesc;
-#endif // !DEVICE_STATE_STORE_CPU_DESC
+#endif // DEVICE_STATE_STORE_CPU_DESC
 
 #if PSO_HOT_RELOAD
         const PassState* pPassState;
         const shader::IShaderPermatation* pPerm;
 
         SamplerStateArray staticSamplers;
-#endif // !PSO_HOT_RELOAD
+#endif // PSO_HOT_RELOAD
 
         RootSignature rootSig; // dam rootsig is a chunky fucker.
         ID3D12PipelineState* pPso;
@@ -142,7 +142,7 @@ class XRender : public IRender
             numVBChanges = 0;
             numTexUpload = 0;
             numTexUploadSize = 0;
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
         }
 
         StateHandle handle;
@@ -167,7 +167,7 @@ class XRender : public IRender
         int32_t numVBChanges;
         int32_t numTexUpload;
         int32_t numTexUploadSize;
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
     };
 
     static const size_t MAX_STATES = 1024 * 4;
@@ -186,7 +186,7 @@ class XRender : public IRender
         core::NoBoundsChecking,
         core::NoMemoryTracking,
         core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
         >
         StatePoolArena;
 
@@ -249,7 +249,7 @@ public:
 
 #if PSO_HOT_RELOAD
     bool updateStateState(DeviceState* pState);
-#endif // !PSO_HOT_RELOAD
+#endif // PSO_HOT_RELOAD
 
     // Release
     void releaseShaderPermatation(shader::IShaderPermatation* pPerm) X_FINAL;
@@ -346,15 +346,15 @@ private:
 #if PSO_HOT_RELOAD
     core::CriticalSection dsCS_;
     DeviceStateArr deviceStates_;
-#endif // !PSO_HOT_RELOAD
+#endif // PSO_HOT_RELOAD
 
 #if RENDER_STATS
     Stats stats_;
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
 
     bool coreEventReg_;
 };
 
 X_NAMESPACE_END
 
-#endif // !X_RENDER_DX12_H_
+#endif // X_RENDER_DX12_H_

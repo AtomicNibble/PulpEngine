@@ -97,11 +97,11 @@ namespace profiler
         void DrawSubsysInfo(engine::IPrimitiveContext* pPrim, float xStart, float yStart, float width, float height,
             const SubSystemTimeArr& subTimes);
 
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
 
 #if X_ENABLE_PROFILER_WARNINGS
         void drawWarnings(engine::IPrimitiveContext* pPrim);
-#endif // !X_ENABLE_PROFILER_WARNINGS
+#endif // X_ENABLE_PROFILER_WARNINGS
 
     private:
         ProfilerVars vars_;
@@ -136,7 +136,7 @@ namespace profiler
         engine::Material* pWarnFileSys_;
 
         WarningArr warningList_;
-#endif // !X_ENABLE_PROFILER_WARNINGS
+#endif // X_ENABLE_PROFILER_WARNINGS
 
         bool eventListerReg_;
     };
@@ -148,4 +148,4 @@ X_NAMESPACE_END
 #include "XProfile.inl"
 
 #endif //!X_ENABLE_PROFILER
-#endif // !_X_PROFILE_H_
+#endif // _X_PROFILE_H_

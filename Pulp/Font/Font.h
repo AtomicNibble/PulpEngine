@@ -125,4 +125,4 @@ X_INLINE XFontTexture* XFont::getFontTexture(void) const
 
 X_NAMESPACE_END
 
-#endif // !_X_FONT_SYS_H_
+#endif // _X_FONT_SYS_H_

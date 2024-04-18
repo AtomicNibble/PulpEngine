@@ -59,4 +59,4 @@ X_NAMESPACE_END
 
 #include "CommandSignature.inl"
 
-#endif // !X_CMD_SIG_H_
+#endif // X_CMD_SIG_H_

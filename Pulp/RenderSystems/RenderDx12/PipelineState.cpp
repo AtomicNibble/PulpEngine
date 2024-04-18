@@ -19,7 +19,7 @@ namespace
 #else
         // if we don't reload shaders hashing the pointer to byte code is enough.
         X_UNUSED(hasher, s);
-#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+#endif // X_ENABLE_RENDER_SHADER_RELOAD
     };
 
 } // namespace

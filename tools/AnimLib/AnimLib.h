@@ -13,11 +13,11 @@
 #define ANIMLIB_EXPORT X_EXPORT
 #else
 #define ANIMLIB_EXPORT X_IMPORT
-#endif // !ANIM_LIB_EXPORT
+#endif // ANIM_LIB_EXPORT
 #endif // X_LIB
-#endif // !ANIMLIB_EXPORT
+#endif // ANIMLIB_EXPORT
 
 #include "Anim\Anim.h"
 #include "Anim\Animator.h"
 
-#endif // !X_ANIM_LIB_H_
+#endif // X_ANIM_LIB_H_

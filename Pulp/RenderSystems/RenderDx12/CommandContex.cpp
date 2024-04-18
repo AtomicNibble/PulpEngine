@@ -125,7 +125,7 @@ CommandContext::CommandContext(ContextManager& contexMan, core::MemoryArenaBase*
 
 #if X_DEBUG
     contexFreed_ = 0;
-#endif // !X_DEBUG
+#endif // X_DEBUG
 }
 
 X_ENABLE_WARNING(4355)
@@ -139,7 +139,7 @@ CommandContext::~CommandContext(void)
     // not sure i Like this..
     // might make a commandContext scope helper.
     X_ASSERT(contexFreed_ == 1, "COmmandContext was not freed correct.")(contexFreed_);
-#endif // !X_DEBUG
+#endif // X_DEBUG
 }
 
 uint64_t CommandContext::flush(bool waitForCompletion)
@@ -204,7 +204,7 @@ uint64_t CommandContext::finishAndFree(bool waitForCompletion)
 
 #if X_DEBUG
     contexFreed_ = 1;
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
     contextManager_.freeContext(this);
 
@@ -222,7 +222,7 @@ void CommandContext::initialize(void)
 
 #if X_DEBUG
     contexFreed_ = 0;
-#endif // !X_DEBUG
+#endif // X_DEBUG
 }
 
 void CommandContext::reset(void)
@@ -247,7 +247,7 @@ void CommandContext::reset(void)
 
 #if X_DEBUG
     contexFreed_ = 0;
-#endif // !X_DEBUG
+#endif // X_DEBUG
 }
 
 void CommandContext::copyBuffer(GpuResource& dest, GpuResource& src)

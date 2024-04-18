@@ -254,4 +254,4 @@ Hierarchy<T>* Hierarchy<T>::priorBrotherNode(void) const
     return prev;
 }
 
-#endif // !_X_HIERARCHY_H_
+#endif // _X_HIERARCHY_H_

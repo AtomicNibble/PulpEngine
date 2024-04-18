@@ -115,4 +115,4 @@ struct IConverter
     }
 };
 
-#endif // !X_CONVETER_MODULE_I_H_
+#endif // X_CONVETER_MODULE_I_H_

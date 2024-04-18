@@ -33,4 +33,4 @@ struct IGame
 
 X_NAMESPACE_END
 
-#endif // !X_GAME_I_H_
+#endif // X_GAME_I_H_

@@ -105,4 +105,4 @@ X_INLINE const Matrix44f& XCamera::getViewMatrix(void) const
     return viewMatrix_;
 }
 
-#endif // !_X_MATH_CAMERA_H_
+#endif // _X_MATH_CAMERA_H_

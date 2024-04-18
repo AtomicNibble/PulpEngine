@@ -12,19 +12,18 @@ GrowingGenericAllocator::GrowingGenericAllocator(uint32_t maxSizeInBytesPerPool,
     zero_object(statistics_);
 
     statistics_.type_ = "GrowingGeneric";
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
-// Returns statistics regarding the allocations made by the allocator.
 MemoryAllocatorStatistics GrowingGenericAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     return statistics_;
-#else
+#else // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     static MemoryAllocatorStatistics stats;
     core::zero_object(stats);
     return stats;
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
@@ -37,6 +36,6 @@ void GrowingGenericAllocator::updateStatistics(void)
     statistics_ += Micro;
     statistics_ += Block;
 }
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
 X_NAMESPACE_END

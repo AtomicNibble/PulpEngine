@@ -122,4 +122,4 @@ XListIntrusiveDeclare<T, offset>::XListIntrusiveDeclare() :
 
 X_NAMESPACE_END
 
-#endif // !X_LINKED_LIST_INTRUSIVE_H_
+#endif // X_LINKED_LIST_INTRUSIVE_H_

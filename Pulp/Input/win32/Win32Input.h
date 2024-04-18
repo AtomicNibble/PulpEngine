@@ -67,4 +67,4 @@ X_NAMESPACE_END
 
 #include "Win32Input.inl"
 
-#endif // !_X_INPUT_WIN32_H_
+#endif // _X_INPUT_WIN32_H_

@@ -13,9 +13,9 @@
 #define IMGLIB_EXPORT X_EXPORT
 #else
 #define IMGLIB_EXPORT X_IMPORT
-#endif // !IMG_LIB_EXPORT
+#endif // IMG_LIB_EXPORT
 #endif // X_LIB
-#endif // !IMGLIB_EXPORT
+#endif // IMGLIB_EXPORT
 
 #include "Fmts\TextureLoaderCI.h"
 #include "Fmts\TextureLoaderDDS.h"
@@ -29,4 +29,4 @@
 
 #include "Converter\Converter.h"
 
-#endif // !X_IMGLIB_H_
+#endif // X_IMGLIB_H_

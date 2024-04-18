@@ -27,4 +27,4 @@ protected:
 
 #include "XRay.inl"
 
-#endif // !_X_MATH_RAY_H_
+#endif // _X_MATH_RAY_H_

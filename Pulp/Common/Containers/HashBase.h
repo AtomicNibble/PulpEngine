@@ -565,7 +565,7 @@ _HashBase_iterator<Key, Value, HashFn, EqualKey>&
 
             X_ASSERT(pTemp != nullptr, "Index lookup error")();
         }
-#endif // !X_ENABLE_ASSERTIONS
+#endif // X_ENABLE_ASSERTIONS
 
         while (!cur_ && ++buketIdx < hm_->buckets_.size()) {
             cur_ = hm_->buckets_[buketIdx];
@@ -608,7 +608,7 @@ _HashBase_const_iterator<Key, Value, HashFn, EqualKey>&
 
             X_ASSERT(pTemp != nullptr, "Index lookup error")();
         }
-#endif // !X_ENABLE_ASSERTIONS
+#endif // X_ENABLE_ASSERTIONS
 
         while (!cur_ && ++buketIdx < hm_->buckets_.size()) {
             cur_ = hm_->buckets_[buketIdx];
@@ -628,4 +628,4 @@ inline _HashBase_const_iterator<Key, Value, HashFn, EqualKey>
 
 X_NAMESPACE_END
 
-#endif // !_CON_HASH_BASE_H_
+#endif // _CON_HASH_BASE_H_

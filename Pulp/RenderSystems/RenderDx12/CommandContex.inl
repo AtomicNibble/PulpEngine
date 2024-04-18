@@ -180,7 +180,7 @@ X_INLINE void GraphicsContext::setViewport(const D3D12_VIEWPORT& vp)
     if (vp.MinDepth == 0.f && vp.MaxDepth == 0.f) {
         X_WARNING_EVERY_N(60, "Dx12", "Viewport min and max depth are zero is this intended?");
     }
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
     pCommandList_->RSSetViewports(1, &vp);
 }
@@ -324,7 +324,7 @@ X_INLINE void GraphicsContext::setDynamicDescriptors(uint32_t rootIndex, uint32_
     for (uint32_t i = 0; i < count; i++) {
         X_ASSERT(pHandles[i].ptr != 0 && pHandles[i].ptr != std::numeric_limits<size_t>::max(), "Invalid handle")();
     }
-#endif // !X_ENABLE_ASSERTIONS
+#endif // X_ENABLE_ASSERTIONS
 
     dynamicDescriptorHeap_.setGraphicsDescriptorHandles(rootIndex, offset, count, pHandles);
 }
@@ -342,7 +342,7 @@ X_INLINE void GraphicsContext::setDynamicSamplerDescriptors(uint32_t rootIndex, 
     for (uint32_t i = 0; i < count; i++) {
         X_ASSERT(pHandles[i].ptr != 0 && pHandles[i].ptr != std::numeric_limits<size_t>::max(), "Invalid handle")();
     }
-#endif // !X_ENABLE_ASSERTIONS
+#endif // X_ENABLE_ASSERTIONS
 
     dynamicSamplerDescriptorHeap_.setGraphicsDescriptorHandles(rootIndex, offset, count, pHandles);
 }

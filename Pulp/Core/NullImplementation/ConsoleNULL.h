@@ -64,4 +64,4 @@ public:
 
 X_NAMESPACE_END
 
-#endif // !_X_CONSOLE_NULL_DEF_H_
+#endif // _X_CONSOLE_NULL_DEF_H_

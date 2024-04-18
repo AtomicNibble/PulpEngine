@@ -165,7 +165,7 @@ bool XAnimLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args,
 
 #if X_DEBUG && false
     compiler.printStats(true);
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
     return true;
 }

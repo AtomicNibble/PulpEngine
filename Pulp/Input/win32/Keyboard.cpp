@@ -499,7 +499,7 @@ void XKeyboard::processKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
     }
 
     // get the symbol
-    InputSymbol* pSymbol = this->pSymbol_[virtualKey];
+    InputSymbol* pSymbol = pSymbol_[virtualKey];
 
     if (pSymbol) {
         InputState::Enum newstate;

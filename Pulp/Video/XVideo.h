@@ -299,7 +299,7 @@ private:
 
     // mutable so we can be sure we are read only for all other fields in debug view.
     mutable Stats stats_;
-#endif // !X_ENABLE_VIDEO_DEBUG
+#endif // X_ENABLE_VIDEO_DEBUG
 };
 
 X_NAMESPACE_END

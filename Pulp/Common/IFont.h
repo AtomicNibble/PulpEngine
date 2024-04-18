@@ -262,4 +262,4 @@ X_ENSURE_SIZE(FontPass, 12);
 
 X_NAMESPACE_END
 
-#endif // !_X_FONT_I_H_
+#endif // _X_FONT_I_H_

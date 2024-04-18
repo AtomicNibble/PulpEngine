@@ -31,7 +31,7 @@ Texture::~Texture()
 {
 #if X_DEBUG
     X_ASSERT(!pPixelBuffer_, "Dangling pixel buffer instance")(render::PixelBufferType::ToString(pixelBufType_), pPixelBuffer_);
-#endif // !X_DEBUG
+#endif // X_DEBUG
 }
 
 void Texture::destroy(void)

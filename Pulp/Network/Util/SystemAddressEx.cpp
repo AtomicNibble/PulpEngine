@@ -12,7 +12,7 @@ namespace
 
 #if NET_IPv6_SUPPORT
     static_assert(AddressFamily::INet6 == AF_INET6, "AddressFamily enum don't match platform value");
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 
 } // namespace
 
@@ -30,7 +30,7 @@ bool SystemAddressEx::operator>(const SystemAddressEx& rhs) const
         return std::memcmp(&address_.addr6.addr, &rhs.address_.addr6.addr, sizeof(address_.addr6.addr)) > 0;
 #else
         return address_.addr4.addr.as_int > rhs.address_.addr4.addr.as_int;
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
     }
     return address_.addr4.port > rhs.address_.addr4.port;
 }
@@ -46,7 +46,7 @@ bool SystemAddressEx::operator<(const SystemAddressEx& rhs) const
         return std::memcmp(&address_.addr6.addr, &rhs.address_.addr6.addr, sizeof(address_.addr6.addr)) < 0;
 #else
         return address_.addr4.addr.as_int < rhs.address_.addr4.addr.as_int;
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
     }
     return address_.addr4.port < rhs.address_.addr4.port;
 }
@@ -70,7 +70,7 @@ void SystemAddressEx::setFromSocket(SocketHandle socket)
     uint8_t zeroBuf[core::Max(ipv4AddSize, ipv6AddSize)];
 #else
     uint8_t zeroBuf[ipv4AddSize];
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 
     core::zero_object(zeroBuf);
 
@@ -79,7 +79,7 @@ void SystemAddressEx::setFromSocket(SocketHandle socket)
 
 #if X_DEBUG
         portPeekVal_ = platform::ntohs(address_.addr4.port);
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
         if (std::memcmp(&address_.addr4.addr, zeroBuf, ipv4AddSize) == 0) {
             setToLoopback(IpVersion::Ipv4);
@@ -92,7 +92,7 @@ void SystemAddressEx::setFromSocket(SocketHandle socket)
 
 #if X_DEBUG
         portPeekVal_ = platform::ntohs(address_.addr6.port);
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
         if (std::memcmp(&address_.addr6.addr, zeroBuf, ipv6AddSize) == 0) {
             setToLoopback(IpVersion::Ipv6);
@@ -102,7 +102,7 @@ void SystemAddressEx::setFromSocket(SocketHandle socket)
     {
         X_ASSERT_UNREACHABLE();
     }
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 }
 
 void SystemAddressEx::setFromAddInfo(platform::addrinfo* pAddInfo)
@@ -112,7 +112,7 @@ void SystemAddressEx::setFromAddInfo(platform::addrinfo* pAddInfo)
 
 #if X_DEBUG
         portPeekVal_ = platform::ntohs(address_.addr4.port);
-#endif // !X_DEBUG
+#endif // X_DEBUG
     }
     else
 #if NET_IPv6_SUPPORT
@@ -121,13 +121,13 @@ void SystemAddressEx::setFromAddInfo(platform::addrinfo* pAddInfo)
 
 #if X_DEBUG
         portPeekVal_ = platform::ntohs(address_.addr6.port);
-#endif // !X_DEBUG
+#endif // X_DEBUG
     }
 #else
     {
         X_ASSERT_UNREACHABLE();
     }
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 }
 
 void SystemAddressEx::setFromAddStorage(const platform::sockaddr_storage& addStorage)
@@ -137,7 +137,7 @@ void SystemAddressEx::setFromAddStorage(const platform::sockaddr_storage& addSto
 
 #if X_DEBUG
         portPeekVal_ = platform::ntohs(address_.addr4.port);
-#endif // !X_DEBUG
+#endif // X_DEBUG
     }
     else
 #if NET_IPv6_SUPPORT
@@ -146,13 +146,13 @@ void SystemAddressEx::setFromAddStorage(const platform::sockaddr_storage& addSto
 
 #if X_DEBUG
         portPeekVal_ = platform::ntohs(address_.addr6.port);
-#endif // !X_DEBUG
+#endif // X_DEBUG
     }
 #else
     {
         X_ASSERT_UNREACHABLE();
     }
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 }
 
 const char* SystemAddressEx::toString(IPStr& strBuf, bool incPort) const
@@ -185,7 +185,7 @@ const char* SystemAddressEx::toString(IPStr& strBuf, bool incPort) const
     {
         X_ASSERT_UNREACHABLE();
     }
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 
     if (ret != 0) {
         lastErrorWSA::Description Dsc;
@@ -269,7 +269,7 @@ bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHo
 
 #if X_DEBUG
         portPeekVal_ = platform::ntohs(address_.addr4.port);
-#endif // !X_DEBUG
+#endif // X_DEBUG
     }
     else {
         address_.addr4.port = oldPort;
@@ -292,7 +292,7 @@ bool SystemAddressEx::resolve(const HostStr& hostStr, bool isHost, AddressArr& a
     else if (ipVersion == IpVersion::Ipv6) {
         hints.ai_family = AF_INET6;
     }
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
     else if (ipVersion == IpVersion::Any) {
         hints.ai_family = AF_UNSPEC;
     }
@@ -320,7 +320,7 @@ bool SystemAddressEx::resolve(const HostStr& hostStr, bool isHost, AddressArr& a
             }
         }
         else
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
         {
             lastErrorWSA::Description Dsc;
             X_ERROR("Net", "Failed to get address info for: \"%s\" Error: \"%s\"", hostStr.c_str(), lastErrorWSA::ToString(Dsc));
@@ -368,7 +368,7 @@ bool SystemAddressEx::resolve(const HostStr& hostStr, bool isHost, AddressArr& a
         else {
             X_ASSERT_UNREACHABLE();
         }
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 
         address.emplace_back(std::move(addr));
 

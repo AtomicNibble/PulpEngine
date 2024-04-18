@@ -38,4 +38,4 @@ struct IDirectoryWatcherListener
 
 X_NAMESPACE_END
 
-#endif // !X_DIRECTORY_WATCHER_I_H_
+#endif // X_DIRECTORY_WATCHER_I_H_

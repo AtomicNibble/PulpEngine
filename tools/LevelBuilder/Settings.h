@@ -16,4 +16,4 @@ extern Settings gSettings;
 
 X_NAMESPACE_END
 
-#endif // !X_LVL_SETTINGS_H_
+#endif // X_LVL_SETTINGS_H_

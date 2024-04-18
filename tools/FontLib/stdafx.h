@@ -18,7 +18,7 @@ typedef core::MemoryArena<
     core::NoBoundsChecking,
     core::NoMemoryTracking,
     core::NoMemoryTagging
-#endif // !X_DEBUG
+#endif // X_DEBUG
     >
     FontLibArena;
 
@@ -31,11 +31,11 @@ extern FontLibArena* g_FontLibArena;
 #define FONTLIB_EXPORT X_EXPORT
 #else
 #define FONTLIB_EXPORT X_IMPORT
-#endif // !FONT_LIB_EXPORT
+#endif // FONT_LIB_EXPORT
 #endif // X_LIB
 
 #if X_DEBUG
 X_LINK_LIB("freetype265d");
 #else
 X_LINK_LIB("freetype265");
-#endif // !X_DEBUG
+#endif // X_DEBUG

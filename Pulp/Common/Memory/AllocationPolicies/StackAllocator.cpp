@@ -13,7 +13,7 @@ StackAllocator::StackAllocator(void* start, void* end) :
 {
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
     allocationID_ = 0;
-#endif
+#endif // X_ENABLE_STACK_ALLOCATOR_CHECK
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     zero_this(&statistics_);
@@ -24,7 +24,7 @@ StackAllocator::StackAllocator(void* start, void* end) :
     statistics_.virtualMemoryReserved_ = Len;
     statistics_.physicalMemoryAllocated_ = Len;
     statistics_.physicalMemoryAllocatedMax_ = Len;
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 void* StackAllocator::allocate(size_t size, size_t alignment, size_t align_offset)
@@ -38,7 +38,7 @@ void* StackAllocator::allocate(size_t size, size_t alignment, size_t align_offse
     const uint32_t allocationOffset = safe_static_cast<uint32_t>(current_ - start_);
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     const char* old_current = current_;
-#endif // !X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
     // align it at the offset position, then go back the offset to bring us to start.
     // of return data not actual start as alignment can waste some memory.
@@ -63,7 +63,7 @@ void* StackAllocator::allocate(size_t size, size_t alignment, size_t align_offse
     statistics_.internalOverheadMax_ = Max(statistics_.internalOverhead_, statistics_.internalOverheadMax_);
     statistics_.physicalMemoryUsedMax_ = Max(statistics_.physicalMemoryUsed_, statistics_.physicalMemoryUsedMax_);
 
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
     union
     {
@@ -75,7 +75,7 @@ void* StackAllocator::allocate(size_t size, size_t alignment, size_t align_offse
     as_char = current_;
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
     as_header->AllocationID_ = allocationID_++;
-#endif
+#endif // X_ENABLE_STACK_ALLOCATOR_CHECK
     as_header->allocationOffset_ = allocationOffset;
     as_header->AllocationSize_ = AllocationSize;
     as_char += sizeof(BlockHeader);
@@ -115,7 +115,7 @@ void StackAllocator::free(void* ptr)
     statistics_.physicalMemoryUsed_ = as_header->allocationOffset_;
     statistics_.internalOverhead_ -= sizeof(BlockHeader);
     statistics_.wasteAlignment_ -= safe_static_cast<uint32_t>(as_char - current_);
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 void StackAllocator::free(void* ptr, size_t size)
@@ -128,11 +128,11 @@ MemoryAllocatorStatistics StackAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     return this->statistics_;
-#else
+#else // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     static MemoryAllocatorStatistics stats;
     core::zero_object(stats);
     return stats;
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 X_NAMESPACE_END

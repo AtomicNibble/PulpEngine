@@ -21,7 +21,7 @@ X_INLINE IpVersion::Enum SystemAddress::getIPVersion(void) const
 #else
     X_ASSERT_UNREACHABLE();
     return IpVersion::Ipv4;
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 }
 
 X_INLINE void SystemAddress::setToLoopback(void)
@@ -34,7 +34,7 @@ X_INLINE void SystemAddress::setPortFromHostByteOrder(uint16_t port)
     address_.addr4.port = hton(port);
 #if X_DEBUG
     portPeekVal_ = port;
-#endif // !X_DEBUG
+#endif // X_DEBUG
 }
 
 X_INLINE void SystemAddress::setPortFromNetworkByteOrder(uint16_t port)
@@ -42,7 +42,7 @@ X_INLINE void SystemAddress::setPortFromNetworkByteOrder(uint16_t port)
     address_.addr4.port = port;
 #if X_DEBUG
     portPeekVal_ = ntoh(port);
-#endif // !X_DEBUG
+#endif // X_DEBUG
 }
 
 X_NAMESPACE_END

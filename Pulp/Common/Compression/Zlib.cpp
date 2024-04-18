@@ -12,7 +12,7 @@ extern "C" {
 X_LINK_LIB("zlibstatd");
 #else
 X_LINK_LIB("zlibstat");
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
 X_NAMESPACE_BEGIN(core)
 

@@ -63,4 +63,4 @@ inline bool EngineGUID::operator<(const EngineGUID& rhs) const
     return hi == rhs.hi ? (low < rhs.low) : (hi < rhs.hi);
 }
 
-#endif // !_X_GUID_I_H_
+#endif // _X_GUID_I_H_

@@ -77,4 +77,4 @@ X_NAMESPACE_END
 
 #include "XGlyphCache.inl"
 
-#endif // !_X_FONT_GLYPH_CACHE_H_
+#endif // _X_FONT_GLYPH_CACHE_H_

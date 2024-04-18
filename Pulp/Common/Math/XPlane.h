@@ -109,4 +109,4 @@ private:
 typedef Plane<float> Planef;
 typedef Plane<double> Planed;
 
-#endif // !_X_MATH_PLANE_H_
+#endif // _X_MATH_PLANE_H_

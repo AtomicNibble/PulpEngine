@@ -414,7 +414,7 @@ size_t LvlBrush::FilterBrushIntoTree_r(XPlaneSet& planes, bspNode* node)
         node->brushes.append(this);
 
         // classify the leaf by the structural brush
-        if (this->opaque) {
+        if (opaque) {
             node->opaque = true;
         }
 

@@ -20,4 +20,4 @@ typedef Flags<Alignment> AlignmentFlags;
 
 X_DECLARE_FLAG_OPERATORS(AlignmentFlags);
 
-#endif // !_X_MATH_ALIGNMENT_H_
+#endif // _X_MATH_ALIGNMENT_H_

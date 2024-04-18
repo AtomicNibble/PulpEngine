@@ -432,7 +432,7 @@ namespace Inter
 
 #if X_ANIM_NOTE_LOWER_CASE_VALUE
             note.value.toLower();
-#endif // !X_ANIM_NOTE_LOWER_CASE_VALUE
+#endif // X_ANIM_NOTE_LOWER_CASE_VALUE
 
             notes_.append(note);
         }
@@ -485,7 +485,7 @@ namespace Inter
 
 #if X_MODEL_BONES_LOWER_CASE_NAMES
             bone.name.toLower();
-#endif // !X_MODEL_BONES_LOWER_CASE_NAMES
+#endif // X_MODEL_BONES_LOWER_CASE_NAMES
 
             bones_.append(bone);
         }

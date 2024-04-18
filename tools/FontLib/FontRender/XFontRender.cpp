@@ -120,7 +120,7 @@ bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, wchar_t char
 	}
 #endif
 
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
     // does the bitmap fit into the dest are the requested offset?
     if (dstGlyphWidth < pGlyph->bitmap.width || dstGlyphHeight < pGlyph->bitmap.rows) {

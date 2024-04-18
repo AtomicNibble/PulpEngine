@@ -304,12 +304,12 @@ namespace TGA
 #if X_DEBUG == 1
             // update left.
             left = file->remainingBytes();
-#endif // !X_DEBUG
+#endif // X_DEBUG
         }
 
 #if X_DEBUG == 1
         X_WARNING_IF(left > 0, "TextureTGA", "potential read fail, bytes left in file: %" PRIu64, left);
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
         // flip it
         if (isFlipped) {

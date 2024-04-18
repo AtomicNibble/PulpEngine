@@ -15,7 +15,7 @@ XFileSysVars::XFileSysVars() :
     artOpenDelay_ = 0;
     artReadDelay_ = 0;
     artWriteDelay_ = 0;
-#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+#endif // X_ENABLE_FILE_ARTIFICAIL_DELAY
 
     core::zero_object(pVirtualDirs_);
 }
@@ -42,7 +42,7 @@ void XFileSysVars::registerVars(void)
 
     ADD_CVAR_REF("filesys_art_write_delay", artWriteDelay_, artWriteDelay_, 0, 100000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Introduce artificial file write delay(ms)");
-#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+#endif // X_ENABLE_FILE_ARTIFICAIL_DELAY
 
     // create vars for the virtual directories which we then update with the paths once set.
     size_t i;

@@ -28,11 +28,11 @@ public:
     int32_t artOpenDelay_;
     int32_t artReadDelay_;
     int32_t artWriteDelay_;
-#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+#endif // X_ENABLE_FILE_ARTIFICAIL_DELAY
 
     core::ICVar* pVirtualDirs_[core::FS_MAX_VIRTUAL_DIR];
 };
 
 X_NAMESPACE_END
 
-#endif // !_X_FILE_SYSTEM_VARS_H_
+#endif // _X_FILE_SYSTEM_VARS_H_

@@ -18,7 +18,7 @@ typedef core::MemoryArena<
     core::NoBoundsChecking,
     core::NoMemoryTracking,
     core::NoMemoryTagging
-#endif // !X_DEBUG
+#endif // X_DEBUG
     >
     MatLibArena;
 
@@ -31,5 +31,5 @@ extern MatLibArena* g_MatLibArena;
 #define MATLIB_EXPORT X_EXPORT
 #else
 #define MATLIB_EXPORT X_IMPORT
-#endif // !MAT_LIB_EXPORT
+#endif // MAT_LIB_EXPORT
 #endif // X_LIB

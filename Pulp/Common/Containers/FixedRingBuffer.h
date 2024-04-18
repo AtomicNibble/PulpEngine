@@ -228,4 +228,4 @@ X_NAMESPACE_END
 
 #include "FixedRingBuffer.inl"
 
-#endif // !X_CONTAINER_FIXED_RING_BUFFER_H_
+#endif // X_CONTAINER_FIXED_RING_BUFFER_H_

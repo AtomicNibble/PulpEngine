@@ -12,7 +12,7 @@ X_INLINE const platform::sockaddr& SystemAddressEx::getSocketAdd(void) const
 #else
     X_ASSERT_UNREACHABLE();
     return reinterpret_cast<const platform::sockaddr&>(address_.addr4);
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 }
 
 X_INLINE int32_t SystemAddressEx::getSocketAddSize(void) const
@@ -23,7 +23,7 @@ X_INLINE int32_t SystemAddressEx::getSocketAddSize(void) const
 
 #if !NET_IPv6_SUPPORT
     X_ASSERT_UNREACHABLE();
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 
     return sizeof(platform::sockaddr_in6);
 }

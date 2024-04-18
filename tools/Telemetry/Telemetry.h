@@ -62,10 +62,10 @@
 #define __TELEMETRYLIB_EXPORT __TELEM_EXPORT
 #else
 #define __TELEMETRYLIB_EXPORT __TELEM_IMPORT
-#endif // !TELEMETRY_LIB_EXPORT
+#endif // TELEMETRY_LIB_EXPORT
 #endif // TELEM_LIB
 
-#endif // !__TELEMETRYLIB_EXPORT
+#endif // __TELEMETRYLIB_EXPORT
 
 #if defined(_WIN32) || defined(_WIN64)
 #if _WIN64
@@ -750,6 +750,9 @@ namespace telem
 #define ttZone(...)
 #define ttZoneFilterd(...)
 
+#define ttZoneFunction(...)
+#define ttZoneFunctionFilterd(...)
+
 #define ttInit() true
 #define ttShutDown() 
 
@@ -774,7 +777,10 @@ namespace telem
 
 #define ttSetFlag(...)
 
-#define ttGetStati(...)
+#define ttGetStati(...) 0
+
+#define ttFastTime(...) 0
+#define ttFastTimeToMs(...) 0.0
 
 // Thread
 #define ttSetThreadName(...)
@@ -783,8 +789,8 @@ namespace telem
 #define ttSetThreadGroupDefaultSort(...)
 
 #define ttGetCallStack(...)
-#define ttSendCallStack(...)
-#define ttSendCallStackSkip(...)
+#define ttSendCallStack(...) 0
+#define ttSendCallStackSkip(...) 0
 
 // Zones
 #define ttEnter(...);

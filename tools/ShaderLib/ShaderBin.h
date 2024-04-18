@@ -58,4 +58,4 @@ X_NAMESPACE_END
 
 #include "ShaderBin.inl"
 
-#endif // !X_SHADER_BIN_H_
+#endif // X_SHADER_BIN_H_

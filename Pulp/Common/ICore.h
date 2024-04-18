@@ -510,4 +510,4 @@ IPCORE_API ICore* CreateCoreInterface(CoreInitParams& initParams);
 #define CORE_DLL_INITFUNC "CreateCoreInterface"
 }
 
-#endif // !_X_CORE_I_H_
+#endif // _X_CORE_I_H_

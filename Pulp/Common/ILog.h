@@ -79,4 +79,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !_X_LOG_I_H_
+#endif // _X_LOG_I_H_

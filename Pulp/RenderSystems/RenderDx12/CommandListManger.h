@@ -50,4 +50,4 @@ X_NAMESPACE_END
 
 #include "CommandListManger.inl"
 
-#endif // !X_COMMAND_QUE_H_
+#endif // X_COMMAND_QUE_H_

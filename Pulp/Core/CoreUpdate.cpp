@@ -68,7 +68,7 @@ bool XCore::Update(void)
     if (pProfiler_) {
         pProfiler_->OnFrameBegin(frameData.timeInfo);
     }
-#endif // !X_ENABLE_PROFILER
+#endif // X_ENABLE_PROFILER
 
     JobSystem& jobSys = *env_.pJobSys;
 
@@ -79,7 +79,7 @@ bool XCore::Update(void)
         if (pProfiler_) {
             paused = pProfiler_->getVars().isPaused();
         }
-#endif // !X_ENABLE_PROFILER
+#endif // X_ENABLE_PROFILER
 
         jobSys.OnFrameBegin(paused);
     }
@@ -116,7 +116,7 @@ bool XCore::Update(void)
             if (pProfiler_ && pProfiler_->onInputEvent(ev)) {
                 continue;
             }
-#endif // !X_ENABLE_PROFILER
+#endif // X_ENABLE_PROFILER
 
             gEnv->pGame->onInputEvent(ev);
         }
@@ -130,7 +130,7 @@ bool XCore::Update(void)
 #if X_ENABLE_DIR_WATCHER
             Job* pDirectoryWatchProcess = jobSys.CreateMemberJobAsChild<XCore>(pSyncJob, this, &XCore::Job_DirectoryWatcher, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
             jobSys.Run(pDirectoryWatchProcess);
-#endif // !X_ENABLE_DIR_WATCHER
+#endif // X_ENABLE_DIR_WATCHER
 
     }
 
@@ -234,7 +234,7 @@ void XCore::RenderEnd(core::FrameData& frameData)
             pos = pProfiler_->Render(pPrim, pos, frameData.timeInfo, env_.pJobSys);
         }
 
-#endif // !X_ENABLE_PROFILER
+#endif // X_ENABLE_PROFILER
 
         if (env_.pVideoSys) {
             pos += env_.pVideoSys->drawDebug(pPrim, pos);
@@ -257,5 +257,5 @@ void XCore::RenderEnd(core::FrameData& frameData)
         pProfiler_->OnFrameEnd();
     }
 
-#endif // !X_ENABLE_PROFILER
+#endif // X_ENABLE_PROFILER
 }

@@ -18,7 +18,7 @@ typedef core::MemoryArena<
     core::NoBoundsChecking,
     core::NoMemoryTracking,
     core::NoMemoryTagging
-#endif // !X_DEBUG
+#endif // X_DEBUG
     >
     AnimLibArena;
 
@@ -31,7 +31,7 @@ extern AnimLibArena* g_AnimLibArena;
 #define ANIMLIB_EXPORT X_EXPORT
 #else
 #define ANIMLIB_EXPORT X_IMPORT
-#endif // !ANIM_LIB_EXPORT
+#endif // ANIM_LIB_EXPORT
 #endif // X_LIB
 
 #include "Util\AnimUtil.h"

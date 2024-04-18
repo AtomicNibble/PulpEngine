@@ -59,4 +59,4 @@ X_ENSURE_SIZE(CITextureHeader, 36);
 
 X_NAMESPACE_END
 
-#endif // !X_CI_IMG_H_
+#endif // X_CI_IMG_H_

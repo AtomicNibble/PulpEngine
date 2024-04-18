@@ -16,7 +16,7 @@ namespace atomic
     X_INTRINSIC(_InterlockedExchangeAdd64)
     X_INTRINSIC(_InterlockedExchange64)
     X_INTRINSIC(_InterlockedCompareExchange64)
-#endif // !X_64
+#endif // X_64
 
     //	X_INTRINSIC (_InterlockedIncrement16)
     //	X_INTRINSIC (_InterlockedDecrement16)
@@ -78,7 +78,7 @@ namespace atomic
                     static_cast<__int64>(exchange), static_cast<__int64>(comperand)));
             }
         };
-#endif // !X_64
+#endif // X_64
 
         // Template specialization for 4-byte types.
         template<>

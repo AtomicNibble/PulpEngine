@@ -277,4 +277,4 @@ inline Color8u operator*(float s, const Color8u& c)
 #define Col_Yellowgreen Colorf(0.604f, 0.804f, 0.196f)
 
 
-#endif // !_X_MATH_COLOR_H_
+#endif // _X_MATH_COLOR_H_

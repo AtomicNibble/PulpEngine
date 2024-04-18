@@ -68,7 +68,7 @@ protected:
 
         uint32_t scope_id;
     };
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 
 protected:
 #if X_DEBUG
@@ -81,7 +81,7 @@ protected:
 
 #if NET_IPv6_SUPPORT
         addr6_in addr6;
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
     } address_;
 };
 

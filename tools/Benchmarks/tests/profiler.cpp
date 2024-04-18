@@ -90,6 +90,8 @@ BENCHMARK_DEFINE_F(TelemFixture, lock_try)(benchmark::State& state) {
         ttTryLock(ctx, &bogusHandle, "AcquireSlot");
         ttEndTryLock(ctx, &bogusHandle, TtLockResultAcquired);
     }
+
+    X_UNUSED(bogusHandle);
 }
 
 BENCHMARK_DEFINE_F(TelemFixture, lock_setstate)(benchmark::State& state) {
@@ -97,6 +99,8 @@ BENCHMARK_DEFINE_F(TelemFixture, lock_setstate)(benchmark::State& state) {
     for (auto _ : state) {
         ttSetLockState(ctx, &bogusHandle, TtLockStateLocked);
     }
+
+    X_UNUSED(bogusHandle);
 }
 
 BENCHMARK_DEFINE_F(TelemFixture, plot)(benchmark::State& state) {  

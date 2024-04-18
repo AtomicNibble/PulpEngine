@@ -13,12 +13,12 @@
 #define LINKERLIB_EXPORT X_EXPORT
 #else
 #define LINKERLIB_EXPORT X_IMPORT
-#endif // !LINKER_LIB_EXPORT
+#endif // LINKER_LIB_EXPORT
 #endif // X_LIB
-#endif // !LINKERLIB_EXPORT
+#endif // LINKERLIB_EXPORT
 
 
 #include "Linker.h"
 #include "AssetList.h"
 
-#endif // !X_LINKER_LIB_H_
+#endif // X_LINKER_LIB_H_

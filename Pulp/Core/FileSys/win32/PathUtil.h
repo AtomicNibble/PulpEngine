@@ -7,11 +7,11 @@ X_NAMESPACE_BEGIN(core)
 
 #ifdef DeleteFile
 #undef DeleteFile
-#endif // !DeleteFile
+#endif // DeleteFile
 
 #ifdef MoveFile
 #undef MoveFile
-#endif // !MoveFile
+#endif // MoveFile
 
 namespace PathUtil
 {

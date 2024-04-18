@@ -194,7 +194,7 @@ extern "C"
 
 #if _MSC_FULL_VER >= 190024210 && !defined(DELAYIMP_INSECURE_WRITABLE_HOOKS)
     const
-#endif // !_MSC_FULL_VER
+#endif // _MSC_FULL_VER
 
     PfnDliHook __pfnDliNotifyHook2
     = delayHook;
@@ -205,7 +205,7 @@ extern "C"
 
 #if _MSC_FULL_VER >= 190024210 && !defined(DELAYIMP_INSECURE_WRITABLE_HOOKS)
 const
-#endif // !_MSC_FULL_VER
+#endif // _MSC_FULL_VER
 
     PfnDliHook __pfnDliFailureHook2
     = delayLoadFail;

@@ -1750,4 +1750,4 @@ typedef Vec5<uint32_t> Vec5ui;
 typedef Vec5<float32_t> Vec5f;
 typedef Vec5<float64_t> Vec5d;
 
-#endif // !_X_MATH_VEC_H_
+#endif // _X_MATH_VEC_H_

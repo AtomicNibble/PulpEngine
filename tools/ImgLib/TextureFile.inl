@@ -267,7 +267,7 @@ X_INLINE size_t XTextureFile::getFaceSize(void) const
         X_ASSERT_NOT_IMPLEMENTED();
     }
 
-    // devide by zero.
+    // divide by zero.
     X_ASSERT(numFaces_ > 0, "Face count must be greater than 1")(numFaces_); 
     return data_.size() / numFaces_;
 }
@@ -297,7 +297,7 @@ X_INLINE size_t XTextureFile::getLevelRowbytes(size_t mipIdx) const
 
 X_INLINE void XTextureFile::setSize(const Vec2<uint16_t> size)
 {
-    this->size_ = size;
+    size_ = size;
 }
 
 X_INLINE void XTextureFile::setWidth(const uint16_t width)
@@ -312,17 +312,17 @@ X_INLINE void XTextureFile::setHeight(const uint16_t height)
 
 X_INLINE void XTextureFile::setFlags(TextureFlags flags)
 {
-    this->flags_ = flags;
+    flags_ = flags;
 }
 
 X_INLINE void XTextureFile::setType(TextureType::Enum type)
 {
-    this->type_ = type;
+    type_ = type;
 }
 
 X_INLINE void XTextureFile::setFormat(Texturefmt::Enum format)
 {
-    this->format_ = format;
+    format_ = format;
 }
 
 X_INLINE void XTextureFile::setNumFaces(const int32_t faces)

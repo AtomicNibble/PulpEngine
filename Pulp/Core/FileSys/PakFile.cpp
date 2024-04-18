@@ -15,7 +15,7 @@ namespace
 {
 #if X_ENABLE_FILE_STATS
     static XFileStats s_stats;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
 } // namespace
 
@@ -37,7 +37,7 @@ size_t XPakFile::read(void* pBuffer, size_t length)
 #if X_ENABLE_FILE_STATS
     s_stats.NumBytesRead += length;
     ++s_stats.NumReads;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
     if (entry_.isCompressed()) {
         X_ASSERT_NOT_IMPLEMENTED();
@@ -126,6 +126,6 @@ XFileStats& XPakFile::fileStats(void)
 {
     return s_stats;
 }
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
 X_NAMESPACE_END

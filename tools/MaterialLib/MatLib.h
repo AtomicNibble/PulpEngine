@@ -13,13 +13,13 @@
 #define MATLIB_EXPORT X_EXPORT
 #else
 #define MATLIB_EXPORT X_IMPORT
-#endif // !MAT_LIB_EXPORT
+#endif // MAT_LIB_EXPORT
 #endif // X_LIB
-#endif // !MATLIB_EXPORT
+#endif // MATLIB_EXPORT
 
 #include "Material.h"
 #include "Util\MatUtil.h"
 #include "TechDefs\TechDefs.h"
 #include "TechDefs\TechSetDef.h"
 
-#endif // !X_MATLIB_H_
+#endif // X_MATLIB_H_

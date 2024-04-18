@@ -33,7 +33,7 @@ class GrowingMicroAllocator
 
     static_assert(sizeof(ChunkHeader) == 1, "Chunkheader size is incorrect");
 
-#endif // !X_USE_FULL_LOOKUP_TABLE
+#endif // X_USE_FULL_LOOKUP_TABLE
     X_PACK_POP
 
 public:
@@ -74,7 +74,7 @@ private:
     GrowingPoolAllocator* poolAllocators_[257];
 #else
     GrowingPoolAllocator* poolAllocators_[8];
-#endif // !X_USE_FULL_LOOKUP_TABLE
+#endif // X_USE_FULL_LOOKUP_TABLE
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     MemoryAllocatorStatistics statistics_;

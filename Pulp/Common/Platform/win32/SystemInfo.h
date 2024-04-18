@@ -93,4 +93,4 @@ namespace SysInfo
 
 X_NAMESPACE_END
 
-#endif // !X_SYSINFO_H_
+#endif // X_SYSINFO_H_

@@ -13,13 +13,13 @@ ExtendedMemoryTracking::AllocationData::AllocationData(size_t originalSize, size
     internalSize_(internalSize),
 #if X_ENABLE_MEMORY_SOURCE_INFO
     sourceInfo_(sourceInfo),
-#endif // !X_ENABLE_MEMORY_SOURCE_INFO
+#endif // X_ENABLE_MEMORY_SOURCE_INFO
     memoryArenaName_(memoryArenaName)
 {
 #if X_ENABLE_MEMORY_HUMAN_IDS
     ID_ = ID;
     typeName_ = typeName;
-#endif // !X_ENABLE_MEMORY_HUMAN_IDS
+#endif // X_ENABLE_MEMORY_HUMAN_IDS
 }
 
 const char* const ExtendedMemoryTracking::TYPE_NAME = "ExtendedTracking";
@@ -38,7 +38,7 @@ ExtendedMemoryTracking::ExtendedMemoryTracking(void) :
 
 ExtendedMemoryTracking::~ExtendedMemoryTracking(void)
 {
-    if (this->numAllocations_) {
+    if (numAllocations_) {
         //	X_ASSERT(numAllocations_ == 0, "Memory leaks detected.")(numAllocations_);
 
         AllocationTable::const_iterator it = table_.begin();
@@ -63,7 +63,7 @@ ExtendedMemoryTracking::~ExtendedMemoryTracking(void)
 #if X_ENABLE_MEMORY_HUMAN_IDS
                     X_LOG0("ExMemTracking", "Allocation ID: \"%s\"", info.ID_);
                     X_LOG0("ExMemTracking", "Type name: \"%s\"", info.typeName_);
-#endif // !X_ENABLE_MEMORY_HUMAN_IDS
+#endif // X_ENABLE_MEMORY_HUMAN_IDS
                     X_LOG0("ExMemTracking", "Original size: %d", info.originalSize_);
                     //	X_LOG0( "ExMemTracking", "Allocated size: %d", info.);
 
@@ -74,7 +74,7 @@ ExtendedMemoryTracking::~ExtendedMemoryTracking(void)
                     X_LOG0("ExMemTracking", "Function: \"%s\"", sourceInfo.pFunction_);
                     X_LOG0("ExMemTracking", "Function signature: \"%s\"", sourceInfo.pFunctionSignature_);
 
-#endif // !X_ENABLE_MEMORY_SOURCE_INFO
+#endif // X_ENABLE_MEMORY_SOURCE_INFO
                 }
                 ++it;
                 Num++;
@@ -107,4 +107,4 @@ void ExtendedMemoryTracking::OnDeallocation(void* memory)
 
 X_NAMESPACE_END
 
-#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES_DEFS
+#endif // X_ENABLE_MEMORY_DEBUG_POLICIES_DEFS

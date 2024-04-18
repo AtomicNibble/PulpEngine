@@ -49,7 +49,7 @@ class TextureManager : private core::IAssetLoadSink
         core::NoBoundsChecking,
         core::NoMemoryTracking,
         core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES
+#endif // X_ENABLE_MEMORY_DEBUG_POLICIES
         >
         BlockArena;
 

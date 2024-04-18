@@ -236,4 +236,4 @@ X_ENSURE_SIZE(APakEntry, 20);
 
 X_NAMESPACE_END
 
-#endif // !_X_ASSET_PAK_I_H_
+#endif // _X_ASSET_PAK_I_H_

@@ -18,7 +18,7 @@ typedef core::MemoryArena<
     core::NoBoundsChecking,
     core::NoMemoryTracking,
     core::NoMemoryTagging
-#endif // !X_DEBUG
+#endif // X_DEBUG
     >
     ImgLibArena;
 
@@ -31,7 +31,7 @@ extern ImgLibArena* g_ImgLibArena;
 #define IMGLIB_EXPORT X_EXPORT
 #else
 #define IMGLIB_EXPORT X_IMPORT
-#endif // !IMG_LIB_EXPORT
+#endif // IMG_LIB_EXPORT
 #endif // X_LIB
 
 namespace ispc

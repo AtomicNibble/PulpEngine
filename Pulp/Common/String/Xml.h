@@ -18,4 +18,4 @@ namespace xml
 
 X_NAMESPACE_END
 
-#endif // !X_STRING_XML_H_
+#endif // X_STRING_XML_H_

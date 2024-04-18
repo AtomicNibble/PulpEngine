@@ -10,8 +10,8 @@
 #define FXLIB_EXPORT X_EXPORT
 #else
 #define FXLIB_EXPORT X_IMPORT
-#endif // !FX_LIB_EXPORT
+#endif // FX_LIB_EXPORT
 #endif // X_LIB
-#endif // !FXLIB_EXPORT
+#endif // FXLIB_EXPORT
 
 #include "Util\FxUtil.h"

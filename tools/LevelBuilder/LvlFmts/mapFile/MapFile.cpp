@@ -202,7 +202,7 @@ namespace mapFile
 #if X_MTL_PATCH_DOUBLE_UNDERSCORE
         core::StackString<4> slashStr(assetDb::ASSET_NAME_SLASH);
         name.replaceAll("__", slashStr.c_str());
-#endif // !X_MTL_PATCH_DOUBLE_UNDERSCORE
+#endif // X_MTL_PATCH_DOUBLE_UNDERSCORE
 
         // repeats every X / Y
         // if this value is 512 x 512, this means the texture repeats every
@@ -643,7 +643,7 @@ namespace mapFile
         X_LOG0("Map", "internalOverhead: ^6%i", stats.internalOverhead_);
         X_LOG0("Map", "internalOverheadMax: ^6%i", stats.internalOverheadMax_);
 #endif
-#endif // !X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     }
 
 } // namespace mapFile

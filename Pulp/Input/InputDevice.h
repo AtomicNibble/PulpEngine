@@ -44,4 +44,4 @@ X_NAMESPACE_END
 
 #include "InputDevice.inl"
 
-#endif // !_X_INPUTDEVICE_H_
+#endif // _X_INPUTDEVICE_H_

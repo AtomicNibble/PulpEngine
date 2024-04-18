@@ -2,7 +2,7 @@
 
 #ifdef INVALID_SOCKET
 #undef INVALID_SOCKET
-#endif // !INVALID_SOCKET
+#endif // INVALID_SOCKET
 
 X_NAMESPACE_BEGIN(net)
 

@@ -65,7 +65,7 @@ namespace V2
         return frameHistory_[currentIdx_];
     }
 
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
 
     // ===================================
 
@@ -166,7 +166,7 @@ namespace V2
         core::zero_object(pJobAllocators_);
 #if X_ENABLE_JOBSYS_PROFILER
         core::zero_object(pTimeLines_);
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
     }
 
     JobSystem::~JobSystem()
@@ -232,7 +232,7 @@ namespace V2
             if (pTimeLines_[i]) {
                 X_DELETE(pTimeLines_[i], arena_);
             }
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
         }
 
         threadIdToIndex_.clear();
@@ -241,7 +241,7 @@ namespace V2
         core::zero_object(pJobAllocators_);
 #if X_ENABLE_JOBSYS_PROFILER
         core::zero_object(pTimeLines_);
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
 
         // clear main thread tls values also.
         ThreadQue_.setValue(nullptr);
@@ -266,7 +266,7 @@ namespace V2
             }
         }
 
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
     }
 
     // ===============================================
@@ -364,7 +364,7 @@ namespace V2
 
 #if X_ENABLE_JOBSYS_PROFILER
         pTimeLines_[idx] = X_NEW(JobQueueHistory, arena_, "JobThreadTimeline");
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
 
         numQueue_ = idx + 1;
     }
@@ -384,7 +384,7 @@ namespace V2
 
 #if X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
         job->subSystem = subSystem;
-#endif // !X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
+#endif // X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
 
 #if X_DEBUG
         core::zero_object(job->continuations);
@@ -406,7 +406,7 @@ namespace V2
 
 #if X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
         job->subSystem = subSystem;
-#endif // !X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
+#endif // X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
 
 #if X_DEBUG
         core::zero_object(job->continuations);
@@ -435,7 +435,7 @@ namespace V2
             if (nextJob) {
 #if X_ENABLE_JOBSYS_PROFILER
                 ++stats_[currentHistoryIdx_].jobsAssited;
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
 
                 Execute(nextJob, threadIdx);
             }
@@ -460,7 +460,7 @@ namespace V2
         if (nextJob) {
 #if X_ENABLE_JOBSYS_PROFILER
             ++stats_[currentHistoryIdx_].jobsAssited;
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
 
             Execute(nextJob, threadIdx);
             return true;
@@ -485,7 +485,7 @@ namespace V2
         return pJob;
 #else
         return &pAllocator->jobs[index & (JobSystem::MAX_JOBS - 1u)];
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
     }
 
     Job* JobSystem::AllocateJob(size_t threadIdx)
@@ -500,7 +500,7 @@ namespace V2
         return pJob;
 #else
         return &pAllocator->jobs[index & (JobSystem::MAX_JOBS - 1u)];
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
     }
 
     void JobSystem::FreeJob(Job* pJob)
@@ -573,7 +573,7 @@ namespace V2
 
 #if X_ENABLE_JOBSYS_PROFILER
         ++stats_[currentHistoryIdx_].jobsStolen;
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
 
         return stolenJob;
     }
@@ -594,7 +594,7 @@ namespace V2
             if (!IsEmptyJob(stolenJob)) {
 #if X_ENABLE_JOBSYS_PROFILER
                 ++stats_[currentHistoryIdx_].jobsStolen;
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
 
                 return stolenJob;
             }
@@ -625,7 +625,7 @@ namespace V2
         ++history.bottom_;
 
         core::StopWatch timer;
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
 
         (pJob->pFunction)(*this, threadIdx, pJob, pJob->pArgData);
 
@@ -643,7 +643,7 @@ namespace V2
         pEntry->subsystem = pJob->subSystem;
 #else
         pEntry->subsystem = core::profiler::SubSys::UNCLASSIFIED;
-#endif // !X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
+#endif // X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
 
         COMPILER_BARRIER_W;
 
@@ -653,7 +653,7 @@ namespace V2
         ++stats_[currentHistoryIdx].jobsRun;
         stats_[currentHistoryIdx].workerUsedMask |= static_cast<int32_t>(BIT(threadIdx));
 
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
 
         Finish(pJob, threadIdx);
     }
@@ -764,7 +764,7 @@ namespace V2
             }
 #if X_ENABLE_JOBSYS_PROFILER
             stats_[currentHistoryIdx_].workerAwokenMask |= static_cast<int32_t>(BIT(threadIdx));
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
         }
 
         while (thread.shouldRun()) {

@@ -51,7 +51,7 @@ class Compiler
         core::GrowingPoolAllocator>
         PoolArena;
 
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
 
     template<typename T>
     using ArrayExpGrow = core::Array<T, core::ArrayAllocator<T>, core::growStrat::Multiply>;

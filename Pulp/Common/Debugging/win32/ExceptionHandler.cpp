@@ -252,7 +252,7 @@ namespace exceptionHandler
 
                     const DWORD machine = IMAGE_FILE_MACHINE_I386;
 
-#endif // !X_64
+#endif // X_64
 
                     HANDLE CurrentThread = GetCurrentThread();
                     HANDLE CurrentPro = GetCurrentProcess();
@@ -308,7 +308,7 @@ namespace exceptionHandler
                         X_LOG0("ExceptionHandler", "EDX = 0x%08" PRIxPTR, ContextRecord->Edx);
                         X_LOG0("ExceptionHandler", "ESI = 0x%08" PRIxPTR, ContextRecord->Esi);
                         X_LOG0("ExceptionHandler", "EDI = 0x%08" PRIxPTR, ContextRecord->Edi);
-#endif // !X_64
+#endif // X_64
                     }
                 }
 
@@ -346,7 +346,7 @@ namespace exceptionHandler
                         X_LOG0("ExceptionHandler", "CS = 0x%08" PRIxPTR, ContextRecord->SegCs);
                         X_LOG0("ExceptionHandler", "SS = 0x%08" PRIxPTR, ContextRecord->SegSs);
 
-#endif // !X_64
+#endif // X_64
                     }
                 }
 
@@ -369,7 +369,7 @@ namespace exceptionHandler
                         X_LOG0("ExceptionHandler", "Dr3 = 0x%08" PRIxPTR, ContextRecord->Dr3);
                         X_LOG0("ExceptionHandler", "Dr6 = 0x%08" PRIxPTR, ContextRecord->Dr6);
                         X_LOG0("ExceptionHandler", "Dr7 = 0x%08" PRIxPTR, ContextRecord->Dr7);
-#endif // !X_64
+#endif // X_64
                     }
                 }
 
@@ -417,7 +417,7 @@ namespace exceptionHandler
                         //	X_LOG0("ExceptionHandler", "RegisterArea = 0x%08X", ContextRecord->FloatSave.RegisterArea); //Cr0NpxState );
                     }
                 }
-#endif // !X_64
+#endif // X_64
 
                 {
                     core::SysInfo::UserNameStr userName;

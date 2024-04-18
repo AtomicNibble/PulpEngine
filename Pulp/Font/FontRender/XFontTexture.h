@@ -176,4 +176,4 @@ X_NAMESPACE_END
 
 #include "XFontTexture.inl"
 
-#endif // !_X_FONT_TEXTURE_H_
+#endif // _X_FONT_TEXTURE_H_

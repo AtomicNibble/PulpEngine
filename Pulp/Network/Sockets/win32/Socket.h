@@ -104,7 +104,7 @@ public:
 
 #if X_ENABLE_NET_STATS
     NetBandwidthStatistics getStats(void) const;
-#endif // !X_ENABLE_NET_STATS
+#endif // X_ENABLE_NET_STATS
 
 public:
     static bool getMyIPs(SystemAddArr& addresses);
@@ -136,7 +136,7 @@ private:
 
 #if X_ENABLE_NET_STATS
     NetBandwidthStatistics stats_;
-#endif // !X_ENABLE_NET_STATS
+#endif // X_ENABLE_NET_STATS
 };
 
 X_NAMESPACE_END

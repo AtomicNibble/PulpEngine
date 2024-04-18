@@ -11,9 +11,9 @@
 #include <vector>
 #else
 #include "Containers\FixedArray.h"
-#endif // !X_COMPILER_CLANG
+#endif // X_COMPILER_CLANG
 
-#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
+#endif // X_ENABLE_MEMORY_ARENA_CHILDREN
 
 X_NAMESPACE_BEGIN(core)
 
@@ -27,8 +27,8 @@ public:
     typedef std::vector<MemoryArenaBase*> ArenaArr;
 #else
     typedef core::FixedArray<MemoryArenaBase*, MAX_ARENA_CHILDREN> ArenaArr;
-#endif // !X_COMPILER_CLANG
-#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
+#endif // X_COMPILER_CLANG
+#endif // X_ENABLE_MEMORY_ARENA_CHILDREN
 
 public:
     virtual ~MemoryArenaBase(void) = default;
@@ -57,7 +57,7 @@ public:
     {
         return children_;
     }
-#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
+#endif // X_ENABLE_MEMORY_ARENA_CHILDREN
 
     // adds it baby.
     inline void addChildArena(MemoryArenaBase* arena)
@@ -73,7 +73,7 @@ public:
         }
 #else
         X_UNUSED(arena);
-#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
+#endif // X_ENABLE_MEMORY_ARENA_CHILDREN
     }
 
 
@@ -85,13 +85,13 @@ public:
         }
 #else
         X_UNUSED(arena);
-#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
+#endif // X_ENABLE_MEMORY_ARENA_CHILDREN
     }
 
 protected:
 #if X_ENABLE_MEMORY_ARENA_CHILDREN
     ArenaArr children_;
-#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
+#endif // X_ENABLE_MEMORY_ARENA_CHILDREN
 };
 
 X_NAMESPACE_END

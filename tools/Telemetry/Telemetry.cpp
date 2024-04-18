@@ -41,7 +41,7 @@ TELEM_INTRINSIC(_BitScanForward)
 #if X_64
 TELEM_INTRINSIC(_BitScanReverse64)
 TELEM_INTRINSIC(_BitScanForward64)
-#endif // !X_64
+#endif // X_64
 
 
 namespace
@@ -221,7 +221,7 @@ namespace
         struct MyDosHeader : public IMAGE_DOS_HEADER
         {
             bool isValid(void) const {
-                return this->e_magic == DOS_HEADER_MAGIC;
+                return e_magic == DOS_HEADER_MAGIC;
             }
 
             MyNtHeader* GetNtHeader(void) const {
@@ -232,7 +232,7 @@ namespace
         struct MyNtHeader : public IMAGE_NT_HEADERS64
         {
             bool isValid(void) const {
-                return this->Signature == NT_SIGNATURE;
+                return Signature == NT_SIGNATURE;
             }
             MyOptionalHeader* GetOptionalHeader(void) {
                 return reinterpret_cast<MyOptionalHeader*>(&OptionalHeader);
@@ -242,16 +242,16 @@ namespace
         struct MyOptionalHeader : public IMAGE_OPTIONAL_HEADER64
         {
             bool isValid(void) const {
-                return this->Magic == OPTIONAL_HEADER_MAGIC64;
+                return Magic == OPTIONAL_HEADER_MAGIC64;
             }
         };
 
-#else
+#else // X_64
 
         struct MyDosHeader : public IMAGE_DOS_HEADER
         {
             bool isValid(void) const {
-                return this->e_magic == DOS_HEADER_MAGIC;
+                return e_magic == DOS_HEADER_MAGIC;
             }
             MyNtHeader* GetNtHeader(void) const {
                 return reinterpret_cast<MyNtHeader*>(e_lfanew + reinterpret_cast<LONG>(this));
@@ -261,7 +261,7 @@ namespace
         struct MyNtHeader : public IMAGE_NT_HEADERS32
         {
             bool isValid(void) const {
-                return this->Signature == NT_SIGNATURE;
+                return Signature == NT_SIGNATURE;
             }
             MyOptionalHeader* GetOptionalHeader(void) {
                 return reinterpret_cast<MyOptionalHeader*>(&OptionalHeader);
@@ -271,11 +271,11 @@ namespace
         struct MyOptionalHeader : public IMAGE_OPTIONAL_HEADER32
         {
             bool isValid(void) const {
-                return this->Magic == OPTIONAL_HEADER_MAGIC;
+                return Magic == OPTIONAL_HEADER_MAGIC;
             }
 
             bool is64Bit(void) const {
-                return this->Magic == OPTIONAL_HEADER_MAGIC64;
+                return Magic == OPTIONAL_HEADER_MAGIC64;
             }
 
         };
@@ -287,7 +287,7 @@ namespace
             PDBSig() {
                 zero_this(this);
             }
-#endif
+#endif // X_DEBUG
 
             int32_t     imageSize;
 
@@ -454,7 +454,7 @@ namespace
                     return index;
                 }
                 return NO_BIT_SET;
-#endif // !X_64
+#endif // X_64
             }
         };
 
@@ -1420,7 +1420,7 @@ namespace
 
 #else
         TELEM_UNUSED(pComp);
-#endif // !PACKET_COMPRESSION
+#endif // PACKET_COMPRESSION
     }
 
     tt_int32 getCompressionBufferSpace(PacketCompressor* pComp)
@@ -1456,7 +1456,7 @@ namespace
         pComp->writeEnd += len;
 #else
         addToPacketBuffer(pComp->pCtx, pComp->pBuffer, pData, len);
-#endif // !PACKET_COMPRESSION
+#endif // PACKET_COMPRESSION
     }
 
     void addToCompressionBuffer(PacketCompressor* pComp, const void* pData, tt_int32 len)
@@ -1476,7 +1476,7 @@ namespace
         pComp->writeEnd += len;
 #else
         addToPacketBuffer(pComp->pCtx, pComp->pBuffer, pData, len);
-#endif // !PACKET_COMPRESSION
+#endif // PACKET_COMPRESSION
     }
 
     TELEM_NO_INLINE void writeStringCompressionBuffer(PacketCompressor* pComp, StringTableIndex idx, const char* pStr)
@@ -2435,7 +2435,7 @@ namespace
         if (pBuf->argDataSize) {
             ::DebugBreak();
         }
-#endif // !RUNTIME_CHECKED
+#endif // RUNTIME_CHECKED
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
 
@@ -2481,7 +2481,7 @@ namespace
         if (pBuf->argDataSize) {
             ::DebugBreak();
         }
-#endif // !RUNTIME_CHECKED
+#endif // RUNTIME_CHECKED
 
         addToCompressionBuffer(pComp, &packet, sizeof(packet));
         return GetSizeNotArgData<std::remove_pointer_t<decltype(pBuf)>>();
@@ -2986,7 +2986,7 @@ namespace
             pDataHeader->dataSize = 0;
             pDataHeader->type = PacketType::DataStream;
         }
-#endif // !PACKET_COMPRESSION
+#endif // PACKET_COMPRESSION
 
         SocketRecvState recvState;
 
@@ -4317,7 +4317,7 @@ void TelemFree(TraceContexHandle ctx, const char* pFile, tt_int32 line, void* pP
     data.type = QueueDataType::MemFree;
 #if RUNTIME_CHECKED
     data.argDataSize = 0;
-#endif // !RUNTIME_CHECKED
+#endif // RUNTIME_CHECKED
     data.time = getRelativeTicks(pCtx);
     data.pPtr = pPtr;
     data.threadID = getThreadID();

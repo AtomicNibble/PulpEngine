@@ -32,4 +32,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_CORE_FILESYS_DISK_FILE_H_
+#endif // X_CORE_FILESYS_DISK_FILE_H_

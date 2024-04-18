@@ -40,4 +40,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_CORE_EVENT_DISPATCHER_H_
+#endif // X_CORE_EVENT_DISPATCHER_H_

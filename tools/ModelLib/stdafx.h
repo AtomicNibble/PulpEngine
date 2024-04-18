@@ -19,7 +19,7 @@ typedef core::MemoryArena<
     core::NoBoundsChecking,
     core::NoMemoryTracking,
     core::NoMemoryTagging
-#endif // !X_DEBUG
+#endif // X_DEBUG
     >
     ModelLibrena;
 
@@ -32,5 +32,5 @@ extern ModelLibrena* g_ModelLibArena;
 #define MODELLIB_EXPORT X_EXPORT
 #else
 #define MODELLIB_EXPORT X_IMPORT
-#endif // !MODEL_LIB_EXPORT
+#endif // MODEL_LIB_EXPORT
 #endif // X_LIB

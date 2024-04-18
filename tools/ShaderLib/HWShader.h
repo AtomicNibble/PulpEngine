@@ -91,7 +91,7 @@ namespace shader
 
 #if X_ENABLE_RENDER_SHADER_RELOAD
         X_INLINE int32_t getCompileCount(void) const;
-#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+#endif // X_ENABLE_RENDER_SHADER_RELOAD
 
         X_INLINE ShaderStatus::Enum getStatus(void) const;
         X_INLINE bool isValid(void) const;
@@ -136,7 +136,7 @@ namespace shader
 
 #if X_ENABLE_RENDER_SHADER_RELOAD
         int32_t compileCount_;
-#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+#endif // X_ENABLE_RENDER_SHADER_RELOAD
 
         // status
         ShaderStatus::Enum status_;

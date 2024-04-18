@@ -105,7 +105,7 @@ void FixedHashTableBase<Key, Value, Hash, KeyEqual>::clear(void)
         X_ASSERT(isIndexEmpty(i), "Index is not empty")(i);
     }
 
-#endif // !X_ENABLE_ASSERTIONS
+#endif // X_ENABLE_ASSERTIONS
 }
 
 

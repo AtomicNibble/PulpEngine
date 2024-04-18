@@ -57,7 +57,7 @@ X_INLINE int32_t CoreVars::getTelemPaused(void) const
     return telemPause_;
 #else
     return 0;
-#endif // !TTELEMETRY_ENABLED
+#endif // TTELEMETRY_ENABLED
 }
 
 X_INLINE core::ICVar* CoreVars::getVarWinPosX(void)

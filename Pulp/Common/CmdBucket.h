@@ -62,7 +62,7 @@ private:
         core::NoBoundsChecking,
         core::NoMemoryTracking,
         core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
         >
         LinearArena;
 
@@ -138,7 +138,7 @@ public:
 #if X_COMPILER_CLANG == 0
     static_assert(PixelBufferWithFlags::BIT_COUNT >= DepthBindFlag::FLAGS_COUNT, "Not enough space for flags");
     static_assert(RenderTargetWithFlags::BIT_COUNT >= RenderTargetFlag::FLAGS_COUNT, "Not enough space for flags");
-#endif // !X_COMPILE_CLANG
+#endif // X_COMPILE_CLANG
 
 protected:
     CommandBucketBase(core::MemoryArenaBase* arena, size_t size, const XViewPort& viewport);

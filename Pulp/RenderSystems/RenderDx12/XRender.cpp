@@ -59,7 +59,7 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 
 #if PSO_HOT_RELOAD
     deviceStates_(arena),
-#endif // !PSO_HOT_RELOAD
+#endif // PSO_HOT_RELOAD
 
     coreEventReg_(false)
 {
@@ -74,7 +74,7 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 
 #if PSO_HOT_RELOAD
     ttSetLockName(gEnv->ctx, &dsCS_, "DeviceStatesLock");
-#endif // !PSO_HOT_RELOAD
+#endif // PSO_HOT_RELOAD
 }
 
 XRender::~XRender()
@@ -494,7 +494,7 @@ void XRender::renderBegin(void)
         }
     }
 
-#endif // !PSO_HOT_RELOAD
+#endif // PSO_HOT_RELOAD
 
 #if RENDER_STATS
     core::atomic::Exchange(&stats_.numBatches, 0);
@@ -505,7 +505,7 @@ void XRender::renderBegin(void)
     core::atomic::Exchange(&stats_.numVBChanges, 0);
     core::atomic::Exchange(&stats_.numTexUpload, 0);
     core::atomic::Exchange(&stats_.numTexUploadSize, 0);
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
 
 
     ColorBuffer& colBuf = pDisplayPlanes_[currentBufferIdx_]->getColorBuf();
@@ -562,7 +562,7 @@ CommandListHandle XRender::createCommandLists(CommandBucket<uint32_t>& cmdBucket
 
 #if RENDER_STATS
     ++stats_.numBatches;
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
 
     const auto& sortedIdx = cmdBucket.getSortedIdx();
     const auto& packets = cmdBucket.getPackets();
@@ -673,7 +673,7 @@ CommandListHandle XRender::createCommandLists(CommandBucket<uint32_t>& cmdBucket
         X_ASSERT(union_cast<uintptr_t>(pPacket) != static_cast<uintptr_t>(0xDBDBDBDBDBDBDBDB), "Invalid packet")(pPacket);
 #else
         X_ASSERT(union_cast<uintptr_t>(pPacket) != static_cast<uintptr_t>(0xDBDBDBDB), "Invalid packet")(pPacket);
-#endif // !X_64
+#endif // X_64
 
 #endif
 
@@ -703,7 +703,7 @@ CommandListHandle XRender::createCommandLists(CommandBucket<uint32_t>& cmdBucket
 #if RENDER_STATS
                     ++curState.numDrawCall;
                     curState.numPoly += pDraw->vertexCount;
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
                     break;
                 }
                 case Commands::Command::DRAW_INDEXED: {
@@ -721,13 +721,13 @@ CommandListHandle XRender::createCommandLists(CommandBucket<uint32_t>& cmdBucket
 #if RENDER_STATS
                     ++curState.numDrawCall;
                     curState.numPoly += pDraw->indexCount;
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
                     break;
                 }
                 case Commands::Command::DRAW_INSTANCED: {
 #if RENDER_STATS
                     ++curState.numDrawCall;
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
 
                     const Commands::DrawInstanced* pDraw = reinterpret_cast<const Commands::DrawInstanced*>(pCmd);
 
@@ -740,7 +740,7 @@ CommandListHandle XRender::createCommandLists(CommandBucket<uint32_t>& cmdBucket
 #if RENDER_STATS
                     ++curState.numDrawCall;
                     curState.numPoly += (pDraw->vertexCountPerInstance * pDraw->instanceCount);
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
                     break;
                 }
                 case Commands::Command::DRAW_INSTANCED_INDEXED: {
@@ -759,7 +759,7 @@ CommandListHandle XRender::createCommandLists(CommandBucket<uint32_t>& cmdBucket
 #if RENDER_STATS
                     ++curState.numDrawCall;
                     curState.numPoly += (pDraw->indexCountPerInstance * pDraw->instanceCount);
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
                     break;
                 }
                 case Commands::Command::COPY_BUF_DATA: {
@@ -812,7 +812,7 @@ CommandListHandle XRender::createCommandLists(CommandBucket<uint32_t>& cmdBucket
 #if RENDER_STATS
                     ++curState.numTexUpload;
                     curState.numTexUploadSize += updateTex.size;
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
                 } break;
 
                 case Commands::Command::UPDATE_TEXTUTE_SUB_BUF_DATA: {
@@ -823,7 +823,7 @@ CommandListHandle XRender::createCommandLists(CommandBucket<uint32_t>& cmdBucket
 #if RENDER_STATS
                     ++curState.numTexUpload;
                     curState.numTexUploadSize += updateSubTex.size;
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
                 } break;
 
                 case Commands::Command::CLEAR_DEPTH_STENCIL: {
@@ -864,7 +864,7 @@ CommandListHandle XRender::createCommandLists(CommandBucket<uint32_t>& cmdBucket
                     break;
 #else
                     X_NO_SWITCH_DEFAULT;
-#endif // !X_DEBUG
+#endif // X_DEBUG
             }
 
             pPacket = CommandPacket::loadNextCommandPacket(pPacket);
@@ -882,7 +882,7 @@ CommandListHandle XRender::createCommandLists(CommandBucket<uint32_t>& cmdBucket
     core::atomic::Add(&stats_.numVBChanges, curState.numVBChanges);
     core::atomic::Add(&stats_.numTexUpload, curState.numTexUpload);
     core::atomic::Add(&stats_.numTexUploadSize, curState.numTexUploadSize);
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
 
     return reinterpret_cast<CommandListHandle>(pContext);
 }
@@ -1019,7 +1019,7 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
     {
 #if RENDER_STATS
         ++curState.numStatesChanges;
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
 
         // the render system should not have to check every state is valid, the 3dengine should check at creation time.
         // so it's a one off cost not a cost we pay for every fucking state change.
@@ -1046,7 +1046,7 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
     if (std::memcmp(curState.vertexBuffers.data(), vertexBuffers.data(), sizeof(vertexBuffers)) != 0) {
 #if RENDER_STATS
         ++curState.numVBChanges;
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
 
         curState.vertexBuffers = vertexBuffers;
 
@@ -1075,7 +1075,7 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
 
 #if RENDER_STATS
         ++curState.numVariableStateChanges;
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
 
         if (resourceState.anySet()) {
             if (resourceState.getNumTextStates()) {
@@ -1317,7 +1317,7 @@ Stats XRender::getStats(void) const
     Stats stats;
 #if RENDER_STATS
     stats = stats_;
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
     return stats;
 }
 
@@ -1402,7 +1402,7 @@ PassStateHandle XRender::createPassState(const RenderTargetFmtsArr& rtfs)
 #if RENDER_STATS
     ++stats_.numPassStates;
     stats_.maxPassStates = core::Max(stats_.maxPassStates, stats_.numPassStates);
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
 
     return reinterpret_cast<PassStateHandle>(pPass);
 }
@@ -1413,7 +1413,7 @@ void XRender::destoryPassState(PassStateHandle passHandle)
 
 #if RENDER_STATS
     --stats_.numPassStates;
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
 
     X_DELETE(pPassState, &statePool_);
 }
@@ -1473,7 +1473,7 @@ bool XRender::updateStateState(DeviceState* pState)
     pState->pPso = pso.getPipelineStateObject();
     return true;
 }
-#endif // !PSO_HOT_RELOAD
+#endif // PSO_HOT_RELOAD
 
 StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm,
     const StateDesc& desc,
@@ -1498,7 +1498,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
         }
 #else
         return INVALID_STATE_HANLDE;
-#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+#endif // X_ENABLE_RENDER_SHADER_RELOAD
     }
 
     if (perm.getILFmt() != shader::Util::ILfromVertexFormat(desc.vertexFmt)) {
@@ -1532,7 +1532,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 
 #if DEVICE_STATE_STORE_CPU_DESC
     pState->cpuDesc = desc;
-#endif // !DEVICE_STATE_STORE_CPU_DESC
+#endif // DEVICE_STATE_STORE_CPU_DESC
 
 #if PSO_HOT_RELOAD
     pState->pPassState = pPassState;
@@ -1541,7 +1541,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
     for (size_t i = 0; i < numStaticSamplers; i++) {
         pState->staticSamplers.append(pStaticSamplers[i]);
     }
-#endif // !PSO_HOT_RELOAD
+#endif // PSO_HOT_RELOAD
 
     // we need a root sig to compile this PSO with.
     // but it don't have to be the rootSig we render with.
@@ -1565,14 +1565,14 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 #if RENDER_STATS
     ++stats_.numStates;
     stats_.maxStates = core::Max(stats_.maxStates, stats_.numStates);
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
 
 #if PSO_HOT_RELOAD
     {
         core::CriticalSection::ScopedLock lock(dsCS_);
         deviceStates_.push_back(pState);
     }
-#endif // !PSO_HOT_RELOAD
+#endif // PSO_HOT_RELOAD
 
     return reinterpret_cast<StateHandle>(pState);
 }
@@ -1589,11 +1589,11 @@ void XRender::destoryState(StateHandle handle)
         core::CriticalSection::ScopedLock lock(dsCS_);
         deviceStates_.remove(pState);
     }
-#endif // !PSO_HOT_RELOAD
+#endif // PSO_HOT_RELOAD
 
 #if RENDER_STATS
     --stats_.numStates;
-#endif // !RENDER_STATS
+#endif // RENDER_STATS
 
     X_DELETE(pState, &statePool_);
 }

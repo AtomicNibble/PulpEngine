@@ -13,9 +13,9 @@
 #define SHADERLIB_EXPORT X_EXPORT
 #else
 #define SHADERLIB_EXPORT X_IMPORT
-#endif // !SHADER_LIB_EXPORT
+#endif // SHADER_LIB_EXPORT
 #endif // X_LIB
-#endif // !SHADERLIB_EXPORT
+#endif // SHADERLIB_EXPORT
 
 #include "ShaderBin.h"
 #include "SourceBin.h"
@@ -25,4 +25,4 @@
 #include "ShaderManager.h"
 #include "ShaderPermatation.h"
 
-#endif // !X_SHADERLIB_H_
+#endif // X_SHADERLIB_H_

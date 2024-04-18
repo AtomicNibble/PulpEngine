@@ -17,7 +17,7 @@ X_LINK_ENGINE_LIB("RenderNull")
 // X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@@0V12@A")
 X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSingletonFactory@VXEngineModule_Render@render@Potato@@@@A");
 
-#endif // !X_LIB
+#endif // X_LIB
 
 #include "..\protobuf\src\assetdb.pb.h"
 
@@ -25,7 +25,7 @@ X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSinglet
 X_LINK_LIB("libprotobufd")
 #else
 X_LINK_LIB("libprotobuf")
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
 typedef core::MemoryArena<
     core::MallocFreeAllocator,
@@ -38,7 +38,7 @@ typedef core::MemoryArena<
     core::NoBoundsChecking,
     core::NoMemoryTracking,
     core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
     >
     AssetServerTestArena;
 

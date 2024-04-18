@@ -165,7 +165,7 @@ bool XScene::createPxScene(physx::PxSceneDesc& pxDesc)
     const bool lock = false; // this don't result in scene lock so we get api errors :/
 #else
     const bool lock = false;
-#endif // !PHYSX_SCENE_REQUIRES_LOCK
+#endif // PHYSX_SCENE_REQUIRES_LOCK
 
     pControllerManager_ = PxCreateControllerManager(*pScene_, lock);
     if (!pControllerManager_) {
@@ -210,7 +210,7 @@ LockHandle XScene::lock(LockAccess::Enum access)
 
 #else
     X_UNUSED(write);
-#endif // !PHYSX_SCENE_REQUIRES_LOCK
+#endif // PHYSX_SCENE_REQUIRES_LOCK
 
     return static_cast<LockHandle>(access);
 }
@@ -228,7 +228,7 @@ void XScene::unLock(LockHandle lock)
     }
 #else
     X_UNUSED(lock);
-#endif // !PHYSX_SCENE_REQUIRES_LOCK
+#endif // PHYSX_SCENE_REQUIRES_LOCK
 }
 
 // ------------------------------------------

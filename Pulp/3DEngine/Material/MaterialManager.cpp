@@ -307,7 +307,7 @@ bool XMaterialManager::processData(Material* pMaterial, core::XFile* pFile)
 #if X_DEBUG
     const auto left = pFile->remainingBytes();
     X_WARNING_IF(left > 0, "Material", "potential read fail, bytes left in file: %" PRIu64, left);
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
     TechDefState* pTechDefState = pTechDefMan_->getTechDefState(hdr.cat, core::string_view(catType));
     if (!pTechDefState) {
@@ -443,7 +443,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
             pBuffers[i].buf = render::INVALID_BUF_HANLDE;
         }
     }
-#endif // !X_ENABLE_ASSERTIONS
+#endif // X_ENABLE_ASSERTIONS
 
     {
         // need to map material textures to perm textures.
@@ -712,7 +712,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
             X_ASSERT(pCBHandles[i] != render::INVALID_BUF_HANLDE, "Cbuffer handle is invalid")();
         }
     }
-#endif // !X_ENABLE_ASSERTIONS
+#endif // X_ENABLE_ASSERTIONS
 
     pMat->addTech(std::move(matTech));
 

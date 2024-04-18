@@ -152,4 +152,4 @@ namespace Compression
 
 X_NAMESPACE_END
 
-#endif // !X_COMPRESSION_ZLIB_H_
+#endif // X_COMPRESSION_ZLIB_H_

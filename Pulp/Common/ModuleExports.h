@@ -37,7 +37,7 @@ extern "C" DLL_EXPORT void LinkModule(ICore* pCore, const char* moduleName)
     core::invalidParameterHandler::Startup();
     core::pureVirtualFunctionCallHandler::Startup();
     core::abortHandler::Startup();
-#endif // !X_NO_DEBUG_HANDLERS
+#endif // X_NO_DEBUG_HANDLERS
 
     if (gEnv) { // Already registered.
         return;
@@ -55,6 +55,6 @@ extern "C" DLL_EXPORT void LinkModule(ICore* pCore, const char* moduleName)
 #endif
 }
 
-#endif // !X_LIB
+#endif // X_LIB
 
-#endif // !_X_ENGINE_MOUDLE_EXPORTS_H_
+#endif // _X_ENGINE_MOUDLE_EXPORTS_H_

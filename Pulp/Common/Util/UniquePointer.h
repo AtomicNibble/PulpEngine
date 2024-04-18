@@ -151,4 +151,4 @@ X_NAMESPACE_END
 
 #include "UniquePointer.inl"
 
-#endif // !X_UTIL_SCOPED_POINTER_H_
+#endif // X_UTIL_SCOPED_POINTER_H_

@@ -11,7 +11,7 @@
 
 #ifdef YieldProcessor
 #undef YieldProcessor
-#endif // !YieldProcessor
+#endif // YieldProcessor
 
 X_NAMESPACE_BEGIN(core)
 
@@ -185,4 +185,4 @@ X_NAMESPACE_END
 
 #include "Thread.inl"
 
-#endif // !_X_THREAD_H_
+#endif // _X_THREAD_H_

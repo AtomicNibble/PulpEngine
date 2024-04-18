@@ -16,14 +16,14 @@ SystemAddress::SystemAddress()
 
     static_assert(X_OFFSETOF(SystemAddress, address_.addr4.family) == X_OFFSETOF(SystemAddress, address_.addr6.family),
         "ports offsets not match");
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 
     core::zero_object(address_);
     address_.addr4.family = AddressFamily::INet;
 
 #if X_DEBUG
     portPeekVal_ = 0;
-#endif // !X_DEBUG
+#endif // X_DEBUG
 }
 
 SystemAddress& SystemAddress::operator=(const SystemAddress& oth)
@@ -32,7 +32,7 @@ SystemAddress& SystemAddress::operator=(const SystemAddress& oth)
 
 #if X_DEBUG
     portPeekVal_ = oth.portPeekVal_;
-#endif // !X_DEBUG
+#endif // X_DEBUG
     return *this;
 }
 
@@ -47,7 +47,7 @@ void SystemAddress::fromBitStream(core::FixedBitStreamBase& bs)
 
 #if X_DEBUG
     portPeekVal_ = ntoh(address_.addr4.port);
-#endif // !X_DEBUG
+#endif // X_DEBUG
 }
 
 bool SystemAddress::IsLoopBack(void) const
@@ -69,7 +69,7 @@ bool SystemAddress::IsLoopBack(void) const
             return true;
         }
     }
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 
     return false;
 }
@@ -93,7 +93,7 @@ void SystemAddress::setToLoopback(IpVersion::Enum ipVersion)
         const static char localhost[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
         std::memcpy(&address_.addr6.addr, localhost, sizeof(address_.addr6.addr));
     }
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 
     X_ASSERT(IsLoopBack(), "Failed to set to loopback")();
 }
@@ -118,7 +118,7 @@ bool SystemAddress::equalExcludingPort(const SystemAddress& oth) const
 
 #else
     return ipv4Equal;
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 }
 
 X_NAMESPACE_END

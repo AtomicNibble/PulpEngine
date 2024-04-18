@@ -26,7 +26,7 @@ X_NAMESPACE_BEGIN(sound)
 #define X_SOUND_DEBUG_NAME(expr)
 #define X_SOUND_DEBUG_NAME_COM(expr)
 #define X_SOUND_DEBUG_NAME_PARAM(expr)
-#endif // !X_SOUND_ENABLE_DEBUG_NAMES
+#endif // X_SOUND_ENABLE_DEBUG_NAMES
 
 typedef core::Hash::Fnv1Val HashVal;
 typedef uint64_t SndObjectHandle;
@@ -233,4 +233,4 @@ struct ISound : public core::IEngineSysBase
 
 X_NAMESPACE_END
 
-#endif // !_X_SOUND_I_H_
+#endif // _X_SOUND_I_H_

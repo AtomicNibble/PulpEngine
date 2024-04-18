@@ -416,7 +416,7 @@ namespace PNG
 #if VALIDATE_IDAT_CRC
             uint32_t calcCrc = pCrc->Begin();
             pCrc->Update(&IDAT::TAG_ID, sizeof(IDAT::TAG_ID), calcCrc);
-#endif // !VALIDATE_IDAT_CRC
+#endif // VALIDATE_IDAT_CRC
 
             int32_t bytesToRead = idatBlockLength;
             while (bytesToRead > 0) {
@@ -429,7 +429,7 @@ namespace PNG
 
 #if VALIDATE_IDAT_CRC
                 pCrc->Update(deflatedData.ptr(), readSize, calcCrc);
-#endif // !VALIDATE_IDAT_CRC
+#endif // VALIDATE_IDAT_CRC
 
                 // inflate it baby.
                 zRes = inflater.Inflate(deflatedData.ptr(), readSize);
@@ -455,7 +455,7 @@ namespace PNG
                 X_ERROR("TexturePNG", "IDAT crc mismatch. dataCrc: %" PRIu32 " expectedCrc: %" PRIu32, calcCrc, blockCrc);
                 return false;
             }
-#endif // !VALIDATE_IDAT_CRC
+#endif // VALIDATE_IDAT_CRC
 
             uint32_t blockLen;
             if (file->readObj(blockLen) != sizeof(blockLen)) {

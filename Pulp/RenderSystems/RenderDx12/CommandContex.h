@@ -179,7 +179,7 @@ protected:
 
 #if X_DEBUG
     int32_t contexFreed_;
-#endif // !X_DEBUG
+#endif // X_DEBUG
 };
 
 class GraphicsContext : public CommandContext

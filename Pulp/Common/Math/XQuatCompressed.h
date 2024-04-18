@@ -47,4 +47,4 @@ typedef XQuatCompressed<float64_t> XQuatCompressedd;
 
 #include "XQuatCompressed.inl"
 
-#endif // !_X_MATH_QUAT_COMPRESSED_H_
+#endif // _X_MATH_QUAT_COMPRESSED_H_

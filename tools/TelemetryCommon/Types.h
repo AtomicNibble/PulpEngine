@@ -36,4 +36,4 @@ static_assert(sizeof(tt_uintptr) == sizeof(void*), "Size mismatch");
 
 using TtFileHandle = tt_uintptr;
 
-#endif // !__TELEM_TYPES
+#endif // __TELEM_TYPES

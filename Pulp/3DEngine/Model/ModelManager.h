@@ -76,4 +76,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_MODEL_MANAGER_H_
+#endif // X_MODEL_MANAGER_H_

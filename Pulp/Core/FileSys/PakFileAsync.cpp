@@ -17,7 +17,7 @@ namespace
 {
 #if X_ENABLE_FILE_STATS
     static XFileStats s_stats;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
     struct CopyJobData
     {
@@ -91,7 +91,7 @@ XFileAsyncOperation XPakFileAsync::readAsync(void* pBuffer, size_t length, uint6
 #if X_ENABLE_FILE_STATS
         s_stats.NumBytesRead += pakLength;
         ++s_stats.NumReads;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
         auto* pSrc = &pPak_->data[safe_static_cast<size_t>(pakPos)];
         auto length32 = safe_static_cast<uint32_t>(pakLength);
@@ -207,6 +207,6 @@ XFileStats& XPakFileAsync::fileStats(void)
 {
     return s_stats;
 }
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
 X_NAMESPACE_END

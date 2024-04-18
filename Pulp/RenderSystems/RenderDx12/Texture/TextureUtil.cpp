@@ -96,7 +96,7 @@ namespace Util
 #else
             default:
                 X_NO_SWITCH_DEFAULT;
-#endif // !X_DEBUG
+#endif // X_DEBUG
         }
     }
 
@@ -196,7 +196,7 @@ namespace Util
 #else
             default:
                 X_NO_SWITCH_DEFAULT;
-#endif // !X_DEBUG
+#endif // X_DEBUG
         }
     }
 

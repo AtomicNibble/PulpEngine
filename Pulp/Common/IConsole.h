@@ -184,4 +184,4 @@ struct ICVar
 
 X_NAMESPACE_END
 
-#endif // !_X_CONSOLE_INTER_H_
+#endif // _X_CONSOLE_INTER_H_

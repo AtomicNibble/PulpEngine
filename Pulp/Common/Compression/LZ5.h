@@ -164,4 +164,4 @@ namespace Compression
 
 X_NAMESPACE_END
 
-#endif // !X_COMPRESSION_LZ5_H_
+#endif // X_COMPRESSION_LZ5_H_

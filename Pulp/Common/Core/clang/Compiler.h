@@ -88,4 +88,4 @@ struct check_size_static : std::true_type
 
 // clang-format on
 
-#endif // ! X_COMPILER_H
+#endif //  X_COMPILER_H

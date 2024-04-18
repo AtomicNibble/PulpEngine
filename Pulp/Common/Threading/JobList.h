@@ -248,4 +248,4 @@ namespace JobList
 
 X_NAMESPACE_END
 
-#endif // !X_SCHEDULER_H_
+#endif // X_SCHEDULER_H_

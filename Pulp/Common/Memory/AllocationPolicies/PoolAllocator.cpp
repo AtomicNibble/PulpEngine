@@ -30,7 +30,7 @@ PoolAllocator::PoolAllocator(void* start, void* end, size_t maxElementSize, size
     ,
     maxAlignment_(maxAlignment),
     offset_(offset)
-#endif
+#endif // X_ENABLE_POOL_ALLOCATOR_CHECK
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     size_t ElemSize = CalculateElementSize(maxElementSize, maxAlignment);
@@ -56,18 +56,18 @@ PoolAllocator::PoolAllocator(void* start, void* end, size_t maxElementSize, size
     statistics_.internalOverheadMax_ = Max(statistics_.internalOverhead_, statistics_.internalOverheadMax_);
     statistics_.physicalMemoryUsedMax_ = Max(statistics_.physicalMemoryUsed_, statistics_.physicalMemoryUsedMax_);
     statistics_.physicalMemoryAllocatedMax_ = Max(statistics_.physicalMemoryAllocated_, statistics_.physicalMemoryAllocatedMax_);
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 MemoryAllocatorStatistics PoolAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     return this->statistics_;
-#else
+#else // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     static MemoryAllocatorStatistics stats;
     core::zero_object(stats);
     return stats;
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 X_NAMESPACE_END

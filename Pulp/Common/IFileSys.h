@@ -11,7 +11,7 @@
 
 #if X_ENABLE_FILE_STATS
 #include "Time\TimeVal.h"
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
 // i need the definition :|
 #include X_INCLUDE(../Core/FileSys/X_PLATFORM/OsFileAsyncOperation.h)
@@ -657,7 +657,7 @@ struct IoRequestBase
     {
         addTime = time;
     }
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
     IoCallBack callback; // 8 bytes
     void* pUserData;
@@ -667,7 +667,7 @@ protected:
 
 #if X_ENABLE_FILE_STATS
     core::TimeVal addTime;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 };
 
 struct IoRequestOpen : public IoRequestBase
@@ -1318,4 +1318,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !_X_FILE_SYSTEM_I_H_
+#endif // _X_FILE_SYSTEM_I_H_

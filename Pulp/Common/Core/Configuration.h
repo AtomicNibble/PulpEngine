@@ -33,7 +33,7 @@
 #define X_CPUSTRING "x64"
 #else
 #define X_CPUSTRING "x86"
-#endif // !X_64
+#endif // X_64
 
 #define X_PLATFORM win32
 #define X_PLATFORM_STR "win32"
@@ -78,7 +78,7 @@
 #define X_ENGINE_BUILD_REF CI_COMMIT_SHA
 #else
 #define X_ENGINE_BUILD_REF -1
-#endif // !CI_COMMIT_SHA
+#endif // CI_COMMIT_SHA
 
 #define X_ENGINE_BUILD_REF_STR X_STRINGIZE(X_ENGINE_BUILD_REF)
 
@@ -208,7 +208,7 @@
 #define X_MEM_HUMAN_IDS_CB(x) , x
 #else
 #define X_MEM_HUMAN_IDS_CB(x)
-#endif // !X_ENABLE_MEMORY_HUMAN_IDS
+#endif // X_ENABLE_MEMORY_HUMAN_IDS
 
 #if X_ENABLE_LOGGING_SOURCE_INFO
 #define X_SOURCE_INFO_LOG_CB(x) , x
@@ -216,6 +216,6 @@
 #else
 #define X_SOURCE_INFO_LOG_CB(x)
 #define X_SOURCE_INFO_LOG_CA(x)
-#endif // !X_ENABLE_LOGGING_SOURCE_INFO
+#endif // X_ENABLE_LOGGING_SOURCE_INFO
 
 #endif // _X_ENGINE_CONFIG_H_

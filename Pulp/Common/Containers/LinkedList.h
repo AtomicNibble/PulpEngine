@@ -72,4 +72,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_LINKED_LIST_H_
+#endif // X_LINKED_LIST_H_

@@ -157,7 +157,7 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
                 X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Action: ^9%s",
                     FileActionToStr(pInfo->Action));
-#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+#endif // X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 
                 if (!path.isEmpty()) {
                     bool is_directory = false;
@@ -171,14 +171,14 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
                             case FILE_ACTION_ADDED:
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
                                 X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Dir \"%s\" was added", filename);
-#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+#endif // X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
                                 notify(Action::ADDED, filename, nullptr, true);
                                 break;
 
                             case FILE_ACTION_MODIFIED:
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
                                 X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Dir \"%s\" was modified", filename);
-#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+#endif // X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 
                                 notify(Action::MODIFIED, filename, nullptr, true);
                                 break;
@@ -193,7 +193,7 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
                                 X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Dir \"%s\" was renamed to \"%s\"",
                                     oldFilename, filename);
-#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+#endif // X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 
                                 notify(Action::RENAMED, filename, oldFilename, true);
                                 break;
@@ -204,14 +204,14 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
                             case FILE_ACTION_ADDED:
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
                                 X_LOG1_IF(isDebugEnabled(), "DirWatcher", "File \"%s\" was added", filename);
-#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+#endif // X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
                                 notify(Action::ADDED, filename, nullptr, false);
                                 break;
 
                             case FILE_ACTION_REMOVED:
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
                                 X_LOG1_IF(isDebugEnabled(), "DirWatcher", "File \"%s\" was removed", filename);
-#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+#endif // X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
                                 notify(Action::REMOVED, filename, nullptr, false);
                                 break;
 
@@ -220,7 +220,7 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
                                 if (!IsRepeat(path)) {
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
                                     X_LOG1_IF(isDebugEnabled(), "DirWatcher", "File \"%s\" was modified", filename);
-#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+#endif // X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
                                     notify(Action::MODIFIED, filename, nullptr, false);
                                 }
                             } break;
@@ -234,7 +234,7 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
                             case FILE_ACTION_RENAMED_NEW_NAME:
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
                                 X_LOG1_IF(isDebugEnabled(), "DirWatcher", "File \"%s\" was renamed to \"%s\"", oldFilename, filename);
-#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+#endif // X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
                                 notify(Action::RENAMED, filename, oldFilename, false);
                                 break;
                         }
@@ -329,7 +329,7 @@ void XDirectoryWatcher::notify(Action::Enum action,
         if ((*it)->OnFileChange(action, pName, pOldName, isDirectory)) {
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
             X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Event was handled");
-#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+#endif // X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
             break;
         }
     }
@@ -338,7 +338,7 @@ void XDirectoryWatcher::notify(Action::Enum action,
     if (it == listeners_.end()) {
         X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Event was NOT handled");
     }
-#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+#endif // X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 }
 
 X_NAMESPACE_END

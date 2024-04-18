@@ -57,4 +57,4 @@ X_INLINE uint32_t XMatrixStack::GetDepth(void) const
     return curDpeth_;
 }
 
-#endif // !X_MATRIX_STACK_H_
+#endif // X_MATRIX_STACK_H_

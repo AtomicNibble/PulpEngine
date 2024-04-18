@@ -72,7 +72,7 @@ namespace gui
 
 #if X_SUPER == 0
         man_.setActiveHandler(nullptr);
-#endif // !X_SUPER
+#endif // X_SUPER
 
         ctx_.endFrame();
     }

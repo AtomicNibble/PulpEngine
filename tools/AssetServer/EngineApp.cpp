@@ -68,7 +68,7 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
 
     pICore_ = pfnCreateCoreInterface(params);
 
-#endif // !X_LIB
+#endif // X_LIB
 
     if (!pICore_) {
         Error("Engine Init Failed"_sv);
@@ -90,7 +90,7 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
 
 bool EngineApp::ShutDown(void)
 {
-    this->DestoryIcon();
+    DestoryIcon();
 
     if (pICore_) {
         pICore_->UnRegisterAssertHandler(this);

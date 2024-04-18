@@ -741,4 +741,4 @@ X_ENSURE_SIZE(CollisionConvexHdr, 2);
 
 X_NAMESPACE_END
 
-#endif // !_X_ASSET_MODEL_H_
+#endif // _X_ASSET_MODEL_H_

@@ -99,4 +99,4 @@ Matrix44<T> lastFrame(
     return lastFrame(prevMatrix, prevPoint.xyz(), lastPoint.xyz());
 }
 
-#endif // !_X_MATH_MATRIX_H_
+#endif // _X_MATH_MATRIX_H_

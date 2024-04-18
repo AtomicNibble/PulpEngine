@@ -126,4 +126,4 @@ struct XHalf4
 
 X_NAMESPACE_END
 
-#endif // !_H_MATH_HALF_H_
+#endif // _H_MATH_HALF_H_

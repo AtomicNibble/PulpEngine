@@ -61,7 +61,7 @@ X_INLINE core::profiler::IProfiler* XCore::GetProfiler(void)
     return pProfiler_;
 #else
     return nullptr;
-#endif // !X_ENABLE_PROFILER
+#endif // X_ENABLE_PROFILER
 }
 
 X_INLINE core::ILog* XCore::GetILog(void)

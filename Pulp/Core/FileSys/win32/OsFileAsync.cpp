@@ -14,7 +14,7 @@ namespace
 {
 #if X_ENABLE_FILE_STATS
     static XFileStats s_stats;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
     inline VOID CALLBACK s_CompiletionRoutine(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlap)
     {
@@ -34,7 +34,7 @@ namespace
 #if X_ENABLE_FILE_STATS
         s_stats.NumBytesWrite += dwNumberOfBytesTransfered;
         ++s_stats.NumReads;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
         s_CompiletionRoutine(dwErrorCode, dwNumberOfBytesTransfered, lpOverlap);
     }
@@ -44,7 +44,7 @@ namespace
 #if X_ENABLE_FILE_STATS
         s_stats.NumBytesRead += dwNumberOfBytesTransfered;
         ++s_stats.NumReads;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
         s_CompiletionRoutine(dwErrorCode, dwNumberOfBytesTransfered, lpOverlap);
     }
@@ -87,7 +87,7 @@ OsFileAsync::OsFileAsync(const core::Path<wchar_t>& path, IFileSys::FileFlags mo
         core::Thread::sleep(delay);
     }
 
-#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+#endif // X_ENABLE_FILE_ARTIFICAIL_DELAY
 
     if (!valid()) {
         logFileError(path, mode);
@@ -95,7 +95,7 @@ OsFileAsync::OsFileAsync(const core::Path<wchar_t>& path, IFileSys::FileFlags mo
     else {
 #if X_ENABLE_FILE_STATS
         s_stats.NumFilesOpened++;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
     }
 }
 
@@ -139,7 +139,7 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint6
 #if X_ENABLE_FILE_STATS
     s_stats.NumBytesRead += length;
     ++s_stats.NumReads;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
     return op;
 }
@@ -172,7 +172,7 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length
 #if X_ENABLE_FILE_STATS
     s_stats.NumBytesWrite += length;
     ++s_stats.NumWrties;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
     return op;
 }
@@ -259,7 +259,7 @@ uint64_t OsFileAsync::tell(void) const
 
 #if X_ENABLE_FILE_STATS
     s_stats.NumTells++;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
     if (!SetFilePointerEx(hFile_, Move, &current, FILE_CURRENT)) {
         lastError::Description dsc;
@@ -275,7 +275,7 @@ uint64_t OsFileAsync::fileSize(void) const
 
 #if X_ENABLE_FILE_STATS
     s_stats.NumByteLeftChecks++;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
     if (!GetFileInformationByHandle(hFile_, &info)) {
         lastError::Description dsc;
@@ -312,7 +312,7 @@ XFileStats& OsFileAsync::fileStats(void)
 {
     return s_stats;
 }
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
 void OsFileAsync::seek(int64_t position, IFileSys::SeekMode::Enum origin)
 {
@@ -325,7 +325,7 @@ void OsFileAsync::seek(int64_t position, IFileSys::SeekMode::Enum origin)
 
 #if X_ENABLE_FILE_STATS
     s_stats.NumSeeks++;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
     LARGE_INTEGER move;
     move.QuadPart = position;

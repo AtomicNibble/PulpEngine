@@ -103,7 +103,7 @@ struct InputState
                 X_ASSERT_UNREACHABLE();
 #else
                 X_NO_SWITCH_DEFAULT;
-#endif // !X_DEBUG
+#endif // X_DEBUG
         }
 
         return "";
@@ -423,4 +423,4 @@ struct IInput
 
 X_NAMESPACE_END
 
-#endif // !_X_INPUT_I_H_
+#endif // _X_INPUT_I_H_

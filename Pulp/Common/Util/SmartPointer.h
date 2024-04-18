@@ -47,4 +47,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_SMART_POINTER_H_
+#endif // X_SMART_POINTER_H_

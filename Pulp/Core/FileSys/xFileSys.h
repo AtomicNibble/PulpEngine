@@ -142,7 +142,7 @@ class xFileSys : public IFileSys
         core::Array<DelayedPendingCompletionOp>, pendingop_less>
         PendingComplitionOpPriorityQueue;
 
-#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+#endif // X_ENABLE_FILE_ARTIFICAIL_DELAY
 
     typedef core::MemoryArena<
         core::PoolAllocator,
@@ -155,7 +155,7 @@ class xFileSys : public IFileSys
         core::NoBoundsChecking,
         core::NoMemoryTracking,
         core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
         >
         FilePoolArena;
 
@@ -170,7 +170,7 @@ class xFileSys : public IFileSys
         core::NoBoundsChecking,
         core::NoMemoryTracking,
         core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
         >
         AsyncOpPoolArena;
 
@@ -185,7 +185,7 @@ class xFileSys : public IFileSys
         core::NoBoundsChecking,
         core::NoMemoryTracking,
         core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
     >
         MemfileArena;
 
@@ -200,7 +200,7 @@ class xFileSys : public IFileSys
         core::NoBoundsChecking,
         core::NoMemoryTracking,
         core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
         >
         VirtualDirArena;
 
@@ -319,7 +319,7 @@ public:
     XFileStats getStats(void) const;
     XFileStats getStatsAsync(void) const;
     IOQueueStats getIOQueueStats(void) const;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
     // IoRequest que.
     RequestHandle AddCloseRequestToQue(core::XFileAsync* pFile) X_FINAL;
@@ -422,11 +422,11 @@ private:
 
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
     PendingComplitionOpPriorityQueue delayedOps_;
-#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+#endif // X_ENABLE_FILE_ARTIFICAIL_DELAY
 
 #if X_ENABLE_FILE_STATS
     IOQueueStats stats_;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 };
 
 X_NAMESPACE_END

@@ -8,7 +8,7 @@ namespace bitUtil
 #if X_64
     X_INTRINSIC(_BitScanReverse64)
     X_INTRINSIC(_BitScanForward64)
-#endif // !X_64
+#endif // X_64
 
     namespace internal
     {
@@ -112,7 +112,7 @@ namespace bitUtil
                     value >>= 16 / 4;
                 }
                 return r + bval[value] - 1;
-#endif // !X_64
+#endif // X_64
             }
 
             // index of LSB
@@ -138,7 +138,7 @@ namespace bitUtil
                     return index;
                 }
                 return NO_BIT_SET;
-#endif // !X_64
+#endif // X_64
             }
 
             template<typename T>

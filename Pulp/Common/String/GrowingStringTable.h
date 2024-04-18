@@ -141,4 +141,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_GROWING_STRING_TABLE_H_
+#endif // X_GROWING_STRING_TABLE_H_

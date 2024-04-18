@@ -105,4 +105,4 @@ X_INLINE bool XDirectoryWatcher::isDebugEnabled(void) const
 
 X_NAMESPACE_END
 
-#endif // !X_DIRECTORY_WATCHER_H_
+#endif // X_DIRECTORY_WATCHER_H_

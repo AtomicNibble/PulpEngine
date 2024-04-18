@@ -29,4 +29,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_CON_FREELIST_H_
+#endif // X_CON_FREELIST_H_

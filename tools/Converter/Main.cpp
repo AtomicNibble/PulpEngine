@@ -28,7 +28,7 @@ X_LINK_ENGINE_LIB("RenderNull")
 X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSingletonFactory@VXEngineModule_Render@render@Potato@@@@A");
 X_FORCE_LINK_FACTORY("XEngineModule_ConverterLib");
 
-#endif // !X_LIB
+#endif // X_LIB
 
 typedef core::MemoryArena<
     core::MallocFreeAllocator,
@@ -41,7 +41,7 @@ typedef core::MemoryArena<
     core::NoBoundsChecking,
     core::NoMemoryTracking,
     core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
     >
     ConverterArena;
 

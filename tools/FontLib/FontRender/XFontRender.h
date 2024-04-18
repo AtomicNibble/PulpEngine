@@ -85,4 +85,4 @@ X_NAMESPACE_END
 
 #include "XFontRender.inl"
 
-#endif // !_X_FONT_RENDER_H_
+#endif // _X_FONT_RENDER_H_

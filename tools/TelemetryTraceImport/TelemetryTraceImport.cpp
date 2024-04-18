@@ -20,7 +20,7 @@ X_LINK_ENGINE_LIB("TelemetrySymbols")
 X_FORCE_LINK_FACTORY("XTelemSrvLib");
 X_FORCE_LINK_FACTORY("XTelemSymLib");
 
-#endif // !X_LIB
+#endif // X_LIB
 
 X_LINK_ENGINE_LIB("TelemetryServerLib")
 
@@ -38,7 +38,7 @@ namespace
         core::NoBoundsChecking,
         core::NoMemoryTracking,
         core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
     >
         TelemetryTraceImportArena;
 

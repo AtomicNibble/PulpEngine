@@ -52,7 +52,7 @@ public:
     void OnCoreEvent(const CoreEventData& ed) X_OVERRIDE;
     // ~ISystemEventListener
 
-    X_INLINE ModifierFlags getModifiers(void);
+    X_INLINE ModifierFlags getModifiers(void) const;
     X_INLINE void setModifiers(ModifierFlags flags);
     X_INLINE void clearModifiers(void);
 
@@ -87,4 +87,4 @@ X_NAMESPACE_END
 
 #include "BaseInput.inl"
 
-#endif // !_X_INPUT_BASE_H_
+#endif // _X_INPUT_BASE_H_

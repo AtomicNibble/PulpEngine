@@ -19,7 +19,7 @@ X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSinglet
 
 X_FORCE_LINK_FACTORY("XEngineModule_SqLite")
 
-#endif // !X_LIB
+#endif // X_LIB
 
 typedef core::MemoryArena<
     core::MallocFreeAllocator,
@@ -32,7 +32,7 @@ typedef core::MemoryArena<
     core::NoBoundsChecking,
     core::NoMemoryTracking,
     core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
     >
     AssertServerArena;
 
@@ -55,7 +55,7 @@ namespace
         return FALSE;
     }
 } // namespace
-#endif // !X_PLATFORM_WIN32
+#endif // X_PLATFORM_WIN32
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -75,7 +75,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             if (!SetConsoleCtrlHandler(HandlerRoutine, TRUE)) {
                 return 1;
             }
-#endif // !X_PLATFORM_WIN32
+#endif // X_PLATFORM_WIN32
 
             assetServer::AssetServer as(&arena);
 
@@ -86,7 +86,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 #if X_PLATFORM_WIN32
         pEngine = nullptr;
-#endif // !X_PLATFORM_WIN32
+#endif // X_PLATFORM_WIN32
     }
 
     return 0;

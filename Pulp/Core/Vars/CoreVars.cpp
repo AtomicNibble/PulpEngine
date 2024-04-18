@@ -27,7 +27,7 @@ CoreVars::CoreVars() :
 
 #if TTELEMETRY_ENABLED
     telemPause_ = 0;
-#endif // !TTELEMETRY_ENABLED
+#endif // TTELEMETRY_ENABLED
 
     fullscreen_ = 0;
     monitor_ = -1; // detect default monitor.
@@ -77,7 +77,7 @@ void CoreVars::registerVars(void)
 
 #if TTELEMETRY_ENABLED
     ADD_CVAR_REF("telem_pause", telemPause_, telemPause_, 0, 1, VarFlag::SYSTEM, "Pause telemetry collection");
-#endif // !TTELEMETRY_ENABLED
+#endif // TTELEMETRY_ENABLED
 }
 
 void CoreVars::setFullScreen(int32_t val)

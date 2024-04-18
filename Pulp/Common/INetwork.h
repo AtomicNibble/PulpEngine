@@ -125,7 +125,7 @@ X_DECLARE_ENUM8(IpVersion)
     Any // ipv4 only yo!
 );
 
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
 
 struct AddressFamily
 {
@@ -134,7 +134,7 @@ struct AddressFamily
         INet = 2,
 #if NET_IPv6_SUPPORT
         INet6 = 23 // best be a static asset for this magic number :|
-#endif // !NET_IPv6_SUPPORT
+#endif // NET_IPv6_SUPPORT
     };
 };
 

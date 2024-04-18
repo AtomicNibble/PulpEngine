@@ -23,7 +23,7 @@ X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSinglet
 
 X_FORCE_LINK_FACTORY("XConverterLib_Shader");
 
-#endif // !X_LIB
+#endif // X_LIB
 
 using namespace core::string_view_literals;
 
@@ -40,7 +40,7 @@ namespace
         core::NoBoundsChecking,
         core::NoMemoryTracking,
         core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
         >
         CompilerArena;
 

@@ -40,4 +40,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_POINTER_64_H_
+#endif // X_POINTER_64_H_

@@ -101,16 +101,16 @@ typedef signed __int64 int64;
 #include <stdint.h>
 #else
 
-#endif // !_MSC_FULL_VER < 190023506
+#endif // _MSC_FULL_VER < 190023506
 
 #ifndef _PTRDIFF_T_DEFINED
-#ifdef _WIN64
+#ifdef X_64
 typedef __int64 ptrdiff_t;
-#else  /* _WIN64 */
+#else  // X_64
 typedef int ptrdiff_t;
-#endif /* _WIN64 */
+#endif // X_64
 #define _PTRDIFF_T_DEFINED
-#endif /* _PTRDIFF_T_DEFINED */
+#endif // _PTRDIFF_T_DEFINED
 
 #undef INT8_MIN
 #undef INT8_MAX
@@ -170,4 +170,4 @@ static_assert(sizeof(int64_t) == 8, "sizeof(int64_t) is not 8 bytes");
 
 static_assert(sizeof(QWORD) == 8, "sizeof(QWORD) is not 8 bytes");
 
-#endif // !_X_TYPES_H_
+#endif // _X_TYPES_H_

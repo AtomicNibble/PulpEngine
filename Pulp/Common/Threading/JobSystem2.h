@@ -21,7 +21,7 @@
 #include "Time\TimeVal.h"
 
 #include "Containers\Array.h"
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
 
 X_NAMESPACE_BEGIN(core)
 
@@ -82,7 +82,7 @@ namespace V2
         profiler::SubSys::Enum subSystem;
 #else
         uint8_t _subSysPad;
-#endif // !X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
+#endif // X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
 
         uint8_t origThreadIdx;
         uint8_t runFlags;
@@ -111,7 +111,7 @@ namespace V2
 #define JOB_SYS_SUB_PARAM_SINGLE
 #define JOB_SYS_SUB_PASS(sub)
 
-#endif // !X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
+#endif // X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
 
 #if X_ENABLE_JOBSYS_PROFILER
 
@@ -186,7 +186,7 @@ namespace V2
     };
     X_ENABLE_WARNING(4324)
 
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
 
     X_DISABLE_WARNING(4324)
 
@@ -218,7 +218,7 @@ namespace V2
         core::random::XorShift128 rand_;
 #else
         core::random::XorShift rand_;
-#endif // !X_64
+#endif // X_64
 
         Job* jobs_[MAX_NUMBER_OF_JOBS];
     };
@@ -384,7 +384,7 @@ namespace V2
 #if X_ENABLE_JOBSYS_PROFILER
         typedef std::array<JobSystemStats, JOBSYS_HISTORY_COUNT> ProfilerStatsArr;
         typedef std::array<JobQueueHistory*, HW_THREAD_MAX> ProfilerThreadTimelinesArr;
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
 
     private:
         typedef core::FixedArray<std::pair<uint32_t, size_t>, HW_THREAD_MAX> ThreadIdToIndex;
@@ -415,7 +415,7 @@ namespace V2
 
         X_INLINE const ProfilerThreadTimelinesArr& GetTimeLines(void) const;
         X_INLINE const ProfilerStatsArr& GetStats(void) const;
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
 
     private:
         bool StartThreads(void);
@@ -547,7 +547,7 @@ namespace V2
 
         core::AtomicInt currentHistoryIdx_;
         ProfilerStatsArr stats_;
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
     };
 
     X_ENABLE_WARNING(4324)

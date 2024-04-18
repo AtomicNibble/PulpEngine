@@ -26,7 +26,7 @@ public:
 private:
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     void updateStatistics(void);
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
     X_NO_COPY(GrowingGenericAllocator);
     X_NO_ASSIGN(GrowingGenericAllocator);
@@ -36,7 +36,7 @@ private:
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     MemoryAllocatorStatistics statistics_;
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 };
 
 #include "GrowingGenericAllocator.inl"

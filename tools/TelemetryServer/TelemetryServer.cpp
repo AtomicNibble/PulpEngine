@@ -17,7 +17,7 @@ struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 X_LINK_ENGINE_LIB("Core")
 X_FORCE_LINK_FACTORY("XTelemSrvLib");
 
-#endif // !X_LIB
+#endif // X_LIB
 
 X_LINK_ENGINE_LIB("TelemetryServerLib")
 
@@ -35,7 +35,7 @@ namespace
         core::NoBoundsChecking,
         core::NoMemoryTracking,
         core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
     >
         TelemetryServerArena;
 

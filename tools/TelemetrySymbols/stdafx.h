@@ -20,10 +20,10 @@ X_LINK_LIB("diaguids.lib");
 #define TELEMETRY_SYMLIB_EXPORT X_EXPORT
 #else
 #define TELEMETRY_SYMLIB_EXPORT X_IMPORT
-#endif // !TELEMETRY_SYM_LIB_EXPORT
+#endif // TELEMETRY_SYM_LIB_EXPORT
 #endif // X_LIB
 
-#endif // !TELEMETRY_SYMLIB_EXPORT
+#endif // TELEMETRY_SYMLIB_EXPORT
 
 
 typedef core::MemoryArena<
@@ -37,7 +37,7 @@ typedef core::MemoryArena<
     core::NoBoundsChecking,
     core::NoMemoryTracking,
     core::NoMemoryTagging
-#endif // !X_DEBUG
+#endif // X_DEBUG
 >
 TelemSymLibArena;
 

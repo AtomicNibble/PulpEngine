@@ -40,4 +40,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !_X_XFIND_DATA_H_
+#endif // _X_XFIND_DATA_H_

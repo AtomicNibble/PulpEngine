@@ -20,4 +20,4 @@ struct IEngineModule : public IEngineUnknown
     virtual bool ShutDown(void) X_ABSTRACT;
 };
 
-#endif // !_X_ENGINEMODULE_I_H_
+#endif // _X_ENGINEMODULE_I_H_

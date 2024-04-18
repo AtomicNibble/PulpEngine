@@ -795,4 +795,4 @@ MatrixAffine2<T> MatrixAffine2<T>::makeSkewY(T radians)
 typedef MatrixAffine2<float32_t> MatrixAffine2f;
 typedef MatrixAffine2<float64_t> MatrixAffine2d;
 
-#endif // !_X_MATH_MATRIX_AFFINE_H_
+#endif // _X_MATH_MATRIX_AFFINE_H_

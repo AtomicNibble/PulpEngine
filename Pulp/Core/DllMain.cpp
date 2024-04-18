@@ -23,7 +23,7 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 
     return TRUE;
 }
-#endif // !X_LIB
+#endif // X_LIB
 
 extern "C" IPCORE_API ICore* CreateCoreInterface(CoreInitParams& startupParams)
 {
@@ -42,9 +42,11 @@ extern "C" IPCORE_API ICore* CreateCoreInterface(CoreInitParams& startupParams)
 #endif
 
     if (!pCore->Init(startupParams)) {
-        // wait till any async events either fail or succeded i don't care.
+        // wait till any async events either fail or succeeded i don't care.
         // this is just to remove races on shutdown logic.
         (void)pCore->InitAsyncWait();
+
+        X_BREAKPOINT;
 
         if (gEnv && gEnv->pLog) {
             X_ERROR("Core", "Failed to init core");

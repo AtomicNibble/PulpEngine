@@ -456,7 +456,7 @@ X_INLINE void TextureManager::releasePixelBuffer_internal(render::IPixelBuffer* 
 
 #if X_DEBUG
         pTex->setPixelBuffer(render::PixelBufferType::NONE, nullptr);
-#endif // !X_DEBUG
+#endif // X_DEBUG
     }
 }
 

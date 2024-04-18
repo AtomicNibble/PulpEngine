@@ -28,4 +28,4 @@ bool GetProcessMemInfo(XProcessMemInfo& minfo);
 
 X_NAMESPACE_END
 
-#endif // !_X_MEMINFO_H_
+#endif // _X_MEMINFO_H_

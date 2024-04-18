@@ -65,7 +65,7 @@ namespace shader
         }
 #else
         X_UNUSED(name);
-#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+#endif // X_ENABLE_RENDER_SHADER_RELOAD
     }
 
     X_INLINE void SourceFile::removeRefrence(const core::string& name)
@@ -76,7 +76,7 @@ namespace shader
         refrences_.remove(name);
 #else
         X_UNUSED(name);
-#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+#endif // X_ENABLE_RENDER_SHADER_RELOAD
     }
 
 } // namespace shader

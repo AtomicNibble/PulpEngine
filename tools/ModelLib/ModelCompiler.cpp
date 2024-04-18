@@ -1031,11 +1031,11 @@ bool ModelCompiler::saveModel(core::XFile* pFile)
     const size_t hitBoxDataSize = calculateHitBoxDataSize();
 
     // Sizes
-    header.tagNameDataSize = safe_static_cast<uint16_t>(this->calculateTagNameDataSize());
-    header.materialNameDataSize = safe_static_cast<uint16_t>(this->calculateMaterialNameDataSize());
-    header.boneDataSize = safe_static_cast<uint16_t>(this->calculateBoneDataSize());
-    header.meshDataSize = safe_static_cast<uint32_t>(this->calculateMeshDataSize(streamsFlags));
-    header.physDataSize = safe_static_cast<uint16_t>(this->calculatePhysDataSize());
+    header.tagNameDataSize = safe_static_cast<uint16_t>(calculateTagNameDataSize());
+    header.materialNameDataSize = safe_static_cast<uint16_t>(calculateMaterialNameDataSize());
+    header.boneDataSize = safe_static_cast<uint16_t>(calculateBoneDataSize());
+    header.meshDataSize = safe_static_cast<uint32_t>(calculateMeshDataSize(streamsFlags));
+    header.physDataSize = safe_static_cast<uint16_t>(calculatePhysDataSize());
 
     // turn it into num blocks.
     static_assert(MODEL_MAX_HITBOX_DATA_SIZE / 64 <= std::numeric_limits<uint8_t>::max(), "Can't represent max hitbox data");
@@ -1665,7 +1665,7 @@ bool ModelCompiler::saveModel(core::XFile* pFile)
         const auto fileSize = pFile->tell();
 
         X_ASSERT((fileSize % MODEL_STREAM_ALIGN) == 0, "Not aligned")(fileSize, fileSize); 
-#endif // !X_ENABLE_ASSERTIONS
+#endif // X_ENABLE_ASSERTIONS
 
         if (pFile->write(meshDataStream.ptr(), meshDataStream.size()) != meshDataStream.size()) {
             X_ERROR("Model", "Failed to write mesh stream");
@@ -2553,7 +2553,7 @@ bool ModelCompiler::CheckLimits(void)
                 bone.name_.c_str());
             return false;
         }
-#endif // !X_MODEL_BONES_LOWER_CASE_NAMES
+#endif // X_MODEL_BONES_LOWER_CASE_NAMES
     }
 
     for (size_t i = 0; i < compiledLods_.size(); i++) {
@@ -2605,7 +2605,7 @@ bool ModelCompiler::CheckLimits(void)
                     mat.name_.c_str());
                 return false;
             }
-#endif // !X_MODEL_MTL_LOWER_CASE_NAMES
+#endif // X_MODEL_MTL_LOWER_CASE_NAMES
 
             // check col mesh limits again here.
             if (mesh.colMeshes_.size() > MODEL_MESH_COL_MAX_MESH) {
@@ -2930,7 +2930,7 @@ void ModelCompiler::SortVertsJob(Mesh* pMesh, uint32_t count)
             });
 
         X_ASSERT(sorted, "Not sorted")(sorted); 
-#endif // !X_ENABLE_ASSERTIONS
+#endif // X_ENABLE_ASSERTIONS
     }
 }
 

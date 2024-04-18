@@ -318,7 +318,7 @@ void Console::redirectSTD(FILE* pOut, FILE* pErr)
     //	setvbuf( stderr, NULL, _IONBF, 0 );
 
     std::ios::sync_with_stdio();
-#endif // !_MSC_FULL_VER
+#endif // _MSC_FULL_VER
 }
 
 void Console::pressToContinue(void) const

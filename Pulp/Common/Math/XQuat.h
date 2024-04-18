@@ -137,4 +137,4 @@ inline Vec3<T> operator*(const Vec3<T>& vec, const Quat<T>& q)
 }
 
 
-#endif // !_X_MATH_QUAT_H_
+#endif // _X_MATH_QUAT_H_

@@ -68,4 +68,4 @@ struct I3DEngine : public core::IEngineSysBase
 
 X_NAMESPACE_END
 
-#endif // !_X_RENDER_SYS_I_H_
+#endif // _X_RENDER_SYS_I_H_

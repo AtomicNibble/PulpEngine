@@ -20,7 +20,7 @@ namespace
         static const size_t lastMemberEnd = X_OFFSETOF(ResourceStateBase, numBuffers) + sizeof(ResourceStateBase::numBuffers);
         // make sure that the compiler did not add in padding after last member.
         static_assert(sizeof(ResourceStateBase) == lastMemberEnd, "Compiler added paddin at end");
-#endif // !X_COMPILER_CLANG
+#endif // X_COMPILER_CLANG
 
         void setSizes(int8_t numTex, int8_t numSamp, int8_t numCBs, int8_t numBuf)
         {
@@ -99,7 +99,7 @@ void VariableStateManager::releaseVariableState(render::Commands::ResourceStateB
         stats_.numSamplers += pVS->getNumSamplers();
         stats_.numCBS += pVS->getNumCBs();
     }
-#endif // !X_ENABLE_VARIABLE_STATE_STATS
+#endif // X_ENABLE_VARIABLE_STATE_STATS
 
     X_DELETE(pVS, &statePool_);
 }
@@ -120,7 +120,7 @@ render::Commands::ResourceStateBase* VariableStateManager::createVariableState_I
         stats_.numCBS += numCBs;
         stats_.numBuffers += numBuf;
     }
-#endif // !X_ENABLE_VARIABLE_STATE_STATS
+#endif // X_ENABLE_VARIABLE_STATE_STATS
 
     const size_t requiredBytes = allocSize(numTexStates, numSamp, numCBs, numBuf);
     void* pData = statePool_.allocate(requiredBytes, MAX_ALIGN, 0 X_MEM_IDS("State", "ResourceStateBase") X_SOURCE_INFO_MEM_CB(X_SOURCE_INFO));
@@ -146,7 +146,7 @@ VariableStateManager::Stats VariableStateManager::getStats(void) const
 #else
     static Stats stats;
     return stats;
-#endif // !X_ENABLE_VARIABLE_STATE_STATS
+#endif // X_ENABLE_VARIABLE_STATE_STATS
 }
 
 X_NAMESPACE_END

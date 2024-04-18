@@ -7,13 +7,13 @@
 X_LINK_LIB("LzmaLibd");
 #else
 X_LINK_LIB("LzmaLib");
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
 #if X_COMPILER_CLANG
 #define X_FASTCALL
 #else
 #define X_FASTCALL __fastcall
-#endif // !X_COMPILER_CLANG
+#endif // X_COMPILER_CLANG
 
 X_NAMESPACE_BEGIN(core)
 

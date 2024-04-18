@@ -219,7 +219,7 @@ namespace strUtil
 #endif
         };
 
-#endif // !X_COMPILER_CLANG
+#endif // X_COMPILER_CLANG
 
         uint32_t upperCaseSIMD(uint32_t x)
         {
@@ -351,7 +351,7 @@ namespace strUtil
         return std::strlen(str);
 #else
         return static_cast<size_t>(Implementation<sizeof(const char*)>::strlen(str));
-#endif // !X_COMPILER_CLANG
+#endif // X_COMPILER_CLANG
     }
 
     size_t strlen(const wchar_t* str)

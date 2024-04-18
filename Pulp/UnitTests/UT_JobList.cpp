@@ -79,7 +79,7 @@ TEST(Threading, JobList)
             core::NoBoundsChecking,
             core::NoMemoryTracking,
             core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
             >
             StackArena;
 
@@ -127,7 +127,7 @@ TEST(Threading, JobList)
             for (size_t j = 0; j < numLists; j++) {
 #if SCHEDULER_LOGS
                 X_LOG0("jobListRunner", "wait for list: %i", j);
-#endif // !SCHEDULER_LOGS
+#endif // SCHEDULER_LOGS
                 jobLists[j]->Wait();
             }
 

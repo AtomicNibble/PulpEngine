@@ -51,7 +51,7 @@ private:
 
 #if TTELEMETRY_ENABLED
     int32_t telemPause_;
-#endif // !TTELEMETRY_ENABLED
+#endif // TTELEMETRY_ENABLED
 
 private:
     core::ICVar* pWinPosX_;

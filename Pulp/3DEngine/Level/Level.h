@@ -327,4 +327,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_BSP_LOADER_H_
+#endif // X_BSP_LOADER_H_

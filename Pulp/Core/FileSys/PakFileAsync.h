@@ -89,7 +89,7 @@ public:
 
 #if X_ENABLE_FILE_STATS
     static XFileStats& fileStats(void);
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
 private:
     void Job_copyData(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* job, void* jobData);

@@ -61,4 +61,4 @@ namespace gui
 
 X_NAMESPACE_END
 
-#endif // !X_GUI_H_I_
+#endif // X_GUI_H_I_

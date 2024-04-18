@@ -17,4 +17,4 @@ namespace clipboard
 
 X_NAMESPACE_END
 
-#endif // !X_PLATFORM_CLIPBOARD_H_
+#endif // X_PLATFORM_CLIPBOARD_H_

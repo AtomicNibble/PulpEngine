@@ -99,7 +99,7 @@ StringRef<CharT>::~StringRef()
     // in debug builds check for double deconstruction.
 #if X_DEBUG
     str_ = nullptr;
-#endif // !X_DEBUG
+#endif // X_DEBUG
 }
 
 // =============================================================================

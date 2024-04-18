@@ -84,4 +84,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !_X_CON_STACK_H_
+#endif // _X_CON_STACK_H_

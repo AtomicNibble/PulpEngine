@@ -5,7 +5,7 @@
 
 #ifdef UNALIGNED
 #undef UNALIGNED
-#endif // !UNALIGNED
+#endif // UNALIGNED
 
 X_NAMESPACE_BEGIN(core)
 

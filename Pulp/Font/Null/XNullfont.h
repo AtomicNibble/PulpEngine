@@ -74,4 +74,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !_X_FONT_NULL_H_
+#endif // _X_FONT_NULL_H_

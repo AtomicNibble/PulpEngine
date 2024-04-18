@@ -37,4 +37,4 @@ X_NAMESPACE_END
 
 #include "CommandAllocatorPool.inl"
 
-#endif // !X_COMMAND_ALLOCATOR_POOL_H_
+#endif // X_COMMAND_ALLOCATOR_POOL_H_

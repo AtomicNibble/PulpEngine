@@ -181,7 +181,7 @@ xFileSys::xFileSys(core::MemoryArenaBase* arena) :
 
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
     delayedOps_(arena),
-#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+#endif // X_ENABLE_FILE_ARTIFICAIL_DELAY
 
     ioQueueDataArena_(arena)
 {
@@ -670,7 +670,7 @@ Directory* xFileSys::addDirInteral(const PathWT& osPath)
     // add hot reload dir.
 #if X_ENABLE_DIR_WATCHER
     gEnv->pDirWatcher->addDirectory(fixedPath);
-#endif // !X_ENABLE_DIR_WATCHER
+#endif // X_ENABLE_DIR_WATCHER
 
     if (!loadPacks_) {
         return search->pDir;
@@ -1155,7 +1155,7 @@ IOQueueStats xFileSys::getIOQueueStats(void) const
     return stats_;
 }
 
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
 // ----------------------- io que ---------------------------
 
@@ -1238,7 +1238,7 @@ RequestHandle xFileSys::AddIoRequestToQue(IoRequestBase* pRequest)
 #if X_ENABLE_FILE_STATS
         auto addTime = core::StopWatch::GetTimeNow();
         pRequest->setAddTime(addTime);
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
         reqHandle = getNextRequestHandle();
 
@@ -1467,7 +1467,7 @@ void xFileSys::AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOpera
                     return;
                 }
             }
-#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+#endif // X_ENABLE_FILE_ARTIFICAIL_DELAY
 
             onOpFinished(asyncOp, bytesTransferred);
             pendingCompOps_.removeIndex(i);
@@ -1485,7 +1485,7 @@ void xFileSys::updatePendingOpsStats(void)
 {
 #if X_ENABLE_FILE_STATS
     stats_.PendingOps = pendingCompOps_.size() + pendingOps_.size();
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 }
 
 Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
@@ -1541,7 +1541,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
         return pendingOps_.isEmpty()
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
                && delayedOps_.isEmpty()
-#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+#endif // X_ENABLE_FILE_ARTIFICAIL_DELAY
             ;
     };
 
@@ -1579,7 +1579,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 #if X_ENABLE_FILE_STATS
         auto start = core::StopWatch::GetTimeNow();
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
         if (type == IoRequest::OPEN) {
             IoRequestOpen* pOpen = static_cast<IoRequestOpen*>(pRequest);
@@ -1616,7 +1616,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
             else {
 #if X_ENABLE_FILE_STATS
                 stats_.NumBytesRead += fileSize;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
                 uint8_t* pData = X_NEW_ARRAY_ALIGNED(uint8_t, safe_static_cast<size_t>(fileSize), pOpenRead->arena, "AsyncIOReadAll", 16);
                 auto fileType = pFileAsync->getType();
@@ -1681,7 +1681,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 #if X_ENABLE_FILE_STATS
             stats_.NumBytesWrite += pOpenWrite->data.size();
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
             XFileAsyncOperationCompiltion operation = pFile->writeAsync(
                 pOpenWrite->data.ptr(),
@@ -1708,7 +1708,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 #if X_ENABLE_FILE_STATS
             stats_.NumBytesRead += pRead->dataSize;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
             ttZone(gEnv->ctx, "(Core/FileSys) Dispatch - Read");
 
@@ -1760,7 +1760,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 #if X_ENABLE_FILE_STATS
             stats_.NumBytesWrite += pWrite->dataSize;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
             ttZone(gEnv->ctx, "(Core/FileSys) Dispatch - Write");
 
@@ -1779,7 +1779,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
         ++stats_.RequestCounts[type];
         stats_.RequestTime[type] += (end - start).GetValue();
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
     }
 
     return Thread::ReturnValue(0);

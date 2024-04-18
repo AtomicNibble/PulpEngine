@@ -120,4 +120,4 @@ X_ENSURE_SIZE(Vertex_P3F_T4F_C4B_N3F, 44);
 
 X_ENSURE_SIZE(InstancedData_MAT44_C4F, 68);
 
-#endif // !X_VERTEX_FORMATS_H_
+#endif // X_VERTEX_FORMATS_H_

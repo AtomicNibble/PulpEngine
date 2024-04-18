@@ -74,7 +74,7 @@ using namespace core::string_view_literals;
 
 #include <VersionHelpers.h>
 
-#endif // !defined(WIN32)
+#endif // defined(WIN32)
 
 X_USING_NAMESPACE;
 
@@ -335,7 +335,7 @@ bool XCore::IntializeEngineModule(const char* pDllName, const char* pModuleClass
 
 #if X_SUPER == 0
     X_LOG0("Engine", "ModuleInit \"%s\": %s ^6%gms", pName ? (pName + 1) : pDllName, res ? "OK" : "Fail", time.GetMilliSeconds());
-#endif // !X_SUPER
+#endif // X_SUPER
 
 #endif // #if !defined(X_LIB)
 
@@ -440,7 +440,7 @@ bool XCore::Init(CoreInitParams& startupParams)
 #if X_ENABLE_DIR_WATCHER
     pDirWatcher_ = X_NEW(core::XDirectoryWatcher, &coreArena_, "CoreDirectoryWatcher")(&coreArena_);
     pDirWatcher_->registerListener(this);
-#endif // !X_ENABLE_DIR_WATCHER
+#endif // X_ENABLE_DIR_WATCHER
 
     pCoreEventDispatcher_ = X_NEW(core::XCoreEventDispatcher, &coreArena_, "CoreEventDispatch")(vars_, &coreArena_);
     pCoreEventDispatcher_->RegisterListener(this);
@@ -472,7 +472,7 @@ bool XCore::Init(CoreInitParams& startupParams)
         pProfiler_ = X_NEW(core::profiler::XProfileSys, &coreArena_, "ProfileSys")(&coreArena_);
 
         env_.pProfiler = pProfiler_;
-#endif // !X_ENABLE_PROFILER
+#endif // X_ENABLE_PROFILER
     }
 
     X_PROFILE_NO_HISTORY_BEGIN("CoreInit", core::profiler::SubSys::CORE);
@@ -573,7 +573,7 @@ bool XCore::Init(CoreInitParams& startupParams)
         pProfiler_->registerVars();
         pProfiler_->registerCmds();
     }
-#endif // !X_ENABLE_PROFILER
+#endif // X_ENABLE_PROFILER
 
     // register verbosity vars.
     if (pConsoleLogger_) {
@@ -696,7 +696,7 @@ bool XCore::Init(CoreInitParams& startupParams)
             return false;
         }
     }
-#endif // !X_ENABLE_PROFILER
+#endif // X_ENABLE_PROFILER
 
     if (startupParams.bEnableNetworking) {
         // #------------------------- Networking -------------------------
@@ -793,7 +793,7 @@ bool XCore::Init(CoreInitParams& startupParams)
                 return false;
             }
         }
-#endif // !X_ENABLE_PROFILER
+#endif // X_ENABLE_PROFILER
     }
 
     //  #------------------------- Game Dll -------------------------
@@ -818,7 +818,7 @@ bool XCore::Init(CoreInitParams& startupParams)
     {
         // Sync up any asynchronous initialization so we are fully init.
         // This is stuff like loading default assets, that can be done in background to
-        // minamize startup time.
+        // minimizes start up time.
         if (!InitAsyncWait()) {
             return false;
         }
@@ -867,7 +867,7 @@ bool XCore::InitAsyncWait(void)
     if (pProfiler_ && !pProfiler_->asyncInitFinalize()) {
         return false;
     }
-#endif // !X_ENABLE_PROFILER
+#endif // X_ENABLE_PROFILER
 
     if (env_.pSound) {
         allOk &= env_.pSound->asyncInitFinalize();

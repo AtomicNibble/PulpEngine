@@ -7,7 +7,7 @@
 #ifdef X_LIB
 #undef X_LIB
 #define X_AS_LIB
-#endif // !X_LIB
+#endif // X_LIB
 
 #define _LAUNCHER
 
@@ -15,7 +15,7 @@
 
 #ifdef X_AS_LIB
 #define X_LIB
-#endif // !X_AS_LIB
+#endif // X_AS_LIB
 
 X_LINK_ENGINE_LIB("Core");
 
@@ -80,7 +80,7 @@ bool EngineApp::Init(void)
 
     pICore_ = pfnCreateCoreInterface(params);
 
-#endif // !X_LIB
+#endif // X_LIB
 
     if (!pICore_) {
         Error("Engine Init Failed"_sv);

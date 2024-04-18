@@ -11,7 +11,7 @@
 #define CONVERTERLIB_EXPORT X_EXPORT
 #else
 #define CONVERTERLIB_EXPORT X_IMPORT
-#endif // !CONVERTERLIB_EXPORT
+#endif // CONVERTERLIB_EXPORT
 #endif // X_LIB
 
 #ifdef X_LIB
@@ -30,4 +30,4 @@ X_FORCE_LINK_FACTORY("XConverterLib_Material");
 X_FORCE_LINK_FACTORY("XConverterLib_Weapon");
 X_FORCE_LINK_FACTORY("XConverterLib_Font");
 
-#endif // !X_LIB
+#endif // X_LIB

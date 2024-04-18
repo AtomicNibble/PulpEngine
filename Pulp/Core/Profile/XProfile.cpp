@@ -25,7 +25,7 @@
 #include <cpuid.h>
 #else
 #include <intrin.h>
-#endif // !X_COMPILER_CLANG
+#endif // X_COMPILER_CLANG
 
 X_NAMESPACE_BEGIN(core)
 
@@ -52,7 +52,7 @@ namespace
             __cpuid(temp, temp[0], temp[1], temp[2], temp[3]);
 #else
             __cpuid(temp, 0);
-#endif // !X_COMPILER_CLANG
+#endif // X_COMPILER_CLANG
 
             return __rdtsc();
         }
@@ -124,7 +124,7 @@ namespace profiler
 #if X_ENABLE_PROFILER_WARNINGS
         ,
         warningList_(arena)
-#endif // !X_ENABLE_PROFILER_WARNINGS
+#endif // X_ENABLE_PROFILER_WARNINGS
     {
         repeatEventTimer_ = TimeVal(0ll);
         repeatEventInterval_ = TimeVal(0.05f);
@@ -137,7 +137,7 @@ namespace profiler
         pWarnSndMem_ = nullptr;
         pWarnFileSys_ = nullptr;
 
-#endif // !X_ENABLE_PROFILER_WARNINGS
+#endif // X_ENABLE_PROFILER_WARNINGS
     }
 
     XProfileSys::~XProfileSys()
@@ -223,7 +223,7 @@ namespace profiler
         pWarnSndMem_ = pMatMan->loadMaterial("code/warnings/sound_mem"_sv);
         pWarnFileSys_ = pMatMan->loadMaterial("code/warnings/file"_sv);
 
-#endif // !X_ENABLE_PROFILER_WARNINGS
+#endif // X_ENABLE_PROFILER_WARNINGS
 
         return true;
     }
@@ -262,7 +262,7 @@ namespace profiler
         pWarnSndMem_->waitForLoad(pMatMan);
         pWarnFileSys_->waitForLoad(pMatMan);
 
-#endif // !X_ENABLE_PROFILER_WARNINGS
+#endif // X_ENABLE_PROFILER_WARNINGS
 
         return true;
     }
@@ -406,7 +406,7 @@ namespace profiler
         }
 
         return true;
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
     }
 
     Vec2f XProfileSys::Render(engine::IPrimitiveContext* pPrim, Vec2f pos, 
@@ -448,7 +448,7 @@ namespace profiler
             pos.y += area.y + padding;
 #else
             X_UNUSED(frameTimeInfo);
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
         }
 
         if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('s'))) {
@@ -492,7 +492,7 @@ namespace profiler
             area = RenderStr(pPrim, pos, "IO Qeue Stats"_sv, str3);
             pos.x += area.x + padding;
         }
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
         if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('t'))) {
             area = RenderArenaTree(pPrim, pos, gEnv->pArena);
@@ -510,7 +510,7 @@ namespace profiler
 
 #if X_ENABLE_PROFILER_WARNINGS
         drawWarnings(pPrim);
-#endif // !X_ENABLE_PROFILER_WARNINGS
+#endif // X_ENABLE_PROFILER_WARNINGS
         
         return pos;
     }
@@ -550,7 +550,7 @@ namespace profiler
             p.y += numChildren * 18.f;
             numChildren += RenderArenaTree_r(pPrim, ctx, p, treeIndent + 1, pChildArena);
         }
-#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
+#endif // X_ENABLE_MEMORY_ARENA_CHILDREN
         return numChildren;
     }
 
@@ -564,7 +564,7 @@ namespace profiler
 #else
         X_UNUSED(arena);
         return 1;
-#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
+#endif // X_ENABLE_MEMORY_ARENA_CHILDREN
     };
 
     Vec2f XProfileSys::RenderArenaTree(engine::IPrimitiveContext* pPrim, Vec2f pos, core::MemoryArenaBase* arena)
@@ -1039,7 +1039,7 @@ namespace profiler
         }
     }
 
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
 
 #if X_ENABLE_PROFILER_WARNINGS
 
@@ -1068,10 +1068,10 @@ namespace profiler
         }
     }
 
-#endif // !X_ENABLE_PROFILER_WARNINGS
+#endif // X_ENABLE_PROFILER_WARNINGS
 
 } // namespace profiler
 
 X_NAMESPACE_END
 
-#endif // !X_ENABLE_PROFILER
+#endif // X_ENABLE_PROFILER

@@ -128,7 +128,7 @@ TEST(StackAlloc, Stack)
         g_AssetChecker.ExpectAssertion(false);
 
         core::debugging::EnableBreakpoints(true);
-#endif // !X_ENABLE_STACK_ALLOCATOR_CHECK
+#endif // X_ENABLE_STACK_ALLOCATOR_CHECK
     }
 
     //	X_NEW(int, &arena, "test");

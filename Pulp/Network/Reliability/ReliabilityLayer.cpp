@@ -319,7 +319,7 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
     else {
 #if X_DEBUG
         reliableMessageNumber = std::numeric_limits<decltype(reliableMessageNumber)>::max();
-#endif // !X_DEBUG
+#endif // X_DEBUG
     }
 
     // sequenced.
@@ -348,7 +348,7 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 #if X_DEBUG
         splitPacketId = std::numeric_limits<decltype(splitPacketId)>::max();
         splitPacketIndex = std::numeric_limits<decltype(splitPacketIndex)>::max();
-#endif // !X_DEBUG
+#endif // X_DEBUG
     }
 
     // check for corruption.
@@ -552,7 +552,7 @@ void ReliabilityLayer::reset(int32_t MTUSize)
     // lets overflow soon, aint nobody got time for waiting.
     dagramSeqNumber_ = std::numeric_limits<decltype(dagramSeqNumber_)>::max() - 1024;
     dataGramHistoryPopCnt_ = dagramSeqNumber_;
-#endif // !dagramSeqNumber_
+#endif // dagramSeqNumber_
 }
 
 void ReliabilityLayer::clearPacketQueues(void)

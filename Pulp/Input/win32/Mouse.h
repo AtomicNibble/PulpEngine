@@ -53,4 +53,4 @@ X_NAMESPACE_END
 
 #include "Mouse.inl"
 
-#endif // !_X_MOUSE_DEVICE_H_
+#endif // _X_MOUSE_DEVICE_H_

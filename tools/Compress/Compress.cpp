@@ -26,7 +26,7 @@ struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 
 X_LINK_ENGINE_LIB("Core")
 
-#endif // !X_LIB
+#endif // X_LIB
 
 using namespace core::string_view_literals;
 
@@ -43,7 +43,7 @@ namespace
         core::NoBoundsChecking,
         core::NoMemoryTracking,
         core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
         >
         CompressorArena;
 

@@ -177,7 +177,7 @@ void DynamicDescriptorHeap::DescriptorHandleCache::copyAndBindStaleTables(D3D12_
 #if X_DEBUG
     core::fill_object(tableSize, 0xFF);
     core::fill_object(rootIndices, 0xFF);
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
     // Sum the maximum assigned offsets of stale descriptor tables to determine total needed space.
     uint32_t staleParams = staleRootParamsBitMap_;
@@ -215,7 +215,7 @@ void DynamicDescriptorHeap::DescriptorHandleCache::copyAndBindStaleTables(D3D12_
     // instead of zero i'll set to -1
     core::fill_object(pDestDescriptorRangeSizes, 0xFF);
     core::fill_object(pSrcDescriptorRangeSizes, 0xFF);
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
     for (uint32_t i = 0; i < staleParamCount; ++i) {
         rootIndex = rootIndices[i];
@@ -473,7 +473,7 @@ void DynamicDescriptorHeap::copyAndBindStagedTables(DescriptorHandleCache& handl
             X_ASSERT_UNREACHABLE();
             return;
         }
-#endif // !X_DEBUG
+#endif // X_DEBUG
     }
 
     // This can trigger the creation of a new heap

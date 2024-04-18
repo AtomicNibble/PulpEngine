@@ -71,4 +71,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !_X_THREADING_SEMAPHORE_H_
+#endif // _X_THREADING_SEMAPHORE_H_

@@ -10,32 +10,31 @@ namespace
 {
     //	static const size_t SIZE_OF_HEADER = sizeof(MallocFreeAllocator::BlockHeader);
 
-#ifdef _WIN64
+#if X_64
     static_assert(MallocFreeAllocator::SIZE_OF_HEADER == 24, "Allocation header has wrong size.");
-#else
+#else // X_64
     static_assert(MallocFreeAllocator::SIZE_OF_HEADER == 12, "Allocation header has wrong size.");
-#endif
+#endif // X_64
+
 } // namespace
 
-// Default constructor.
 MallocFreeAllocator::MallocFreeAllocator(void)
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     zero_object(statistics_);
 
     statistics_.type_ = "MallocFree";
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
-// Allocates raw memory.
-// The returned pointer will always adhere to the following alignment requirements: <tt>((ptr + offset) % alignment) == 0</tt>.
 void* MallocFreeAllocator::allocate(size_t Origsize, size_t alignment, size_t offset)
 {
-    X_ASSERT(alignment > 0, "Alignmnet must be greater than zero")(alignment);
+    X_ASSERT(alignment > 0, "Alignment must be greater than zero")(alignment);
 
     size_t size = Origsize + alignment + (SIZE_OF_HEADER);
 
     tt_uint64 matchId;
+    X_UNUSED(matchId);
     ttEnterEx(gEnv->ctx, matchId, 1000, "(Memory) Alloc");
 
     void* pMem = malloc(size);
@@ -56,7 +55,7 @@ void* MallocFreeAllocator::allocate(size_t Origsize, size_t alignment, size_t of
 
         as_byte -= offset; // take off any offset.
 
-        // we have taken off offfset so now header is just at -1 index.
+        // we have taken off offset so now header is just at -1 index.
         as_header[-1].originalAllocation_ = pMem;
         as_header[-1].AllocationSize_ = size;
         as_header[-1].originalSize_ = Origsize;
@@ -76,7 +75,7 @@ void* MallocFreeAllocator::allocate(size_t Origsize, size_t alignment, size_t of
         statistics_.physicalMemoryAllocatedMax_ = Max(statistics_.physicalMemoryAllocated_, statistics_.physicalMemoryAllocatedMax_);
         statistics_.wasteAlignmentMax_ = Max(statistics_.wasteAlignment_, statistics_.wasteAlignmentMax_);
         statistics_.internalOverheadMax_ = Max(statistics_.internalOverhead_, statistics_.internalOverheadMax_);
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
         return as_byte; // we return the mem - offset.
     }
@@ -84,7 +83,6 @@ void* MallocFreeAllocator::allocate(size_t Origsize, size_t alignment, size_t of
     return nullptr;
 }
 
-// Frees an allocation
 void MallocFreeAllocator::free(void* ptr)
 {
     X_ASSERT_NOT_NULL(ptr);
@@ -110,9 +108,9 @@ void MallocFreeAllocator::free(void* ptr)
     statistics_.physicalMemoryUsed_ -= Size;
     statistics_.internalOverhead_ -= SIZE_OF_HEADER;
     statistics_.wasteAlignment_ -= AlignmentWaste;
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
-    // must read adddress before we free, or make a copy.
+    // must read address before we free, or make a copy.
     ttFree(gEnv->ctx, as_header->originalAllocation_);
 
     ::free(as_header->originalAllocation_);
@@ -124,16 +122,15 @@ void MallocFreeAllocator::free(void* ptr, size_t size)
     free(ptr);
 }
 
-// Returns statistics regarding the allocations made by the allocator.
 MemoryAllocatorStatistics MallocFreeAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     return statistics_;
-#else
+#else // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     static MemoryAllocatorStatistics stats;
     core::zero_object(stats);
     return stats;
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 X_NAMESPACE_END

@@ -1000,7 +1000,7 @@ namespace entity
                         snd.handle = gEnv->pSound->registerObject(sndTrans, entName.name.c_str());
                     }
                     else
-#endif // !X_SOUND_ENABLE_DEBUG_NAMES
+#endif // X_SOUND_ENABLE_DEBUG_NAMES
                     {
                         snd.handle = gEnv->pSound->registerObject(sndTrans);
                     }

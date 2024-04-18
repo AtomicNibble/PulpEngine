@@ -14,7 +14,7 @@ X_NAMESPACE_BEGIN(core)
 
 #if X_ENABLE_FILE_STATS
 XFileStats OsFile::s_stats;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
 namespace
 {
@@ -60,7 +60,7 @@ OsFile::OsFile(const core::Path<wchar_t>& path, IFileSys::FileFlags mode) :
         core::Thread::sleep(delay);
     }
 
-#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+#endif // X_ENABLE_FILE_ARTIFICAIL_DELAY
 
     if (!valid()) {
         logFileError(path.c_str(), mode);
@@ -68,7 +68,7 @@ OsFile::OsFile(const core::Path<wchar_t>& path, IFileSys::FileFlags mode) :
     else {
 #if X_ENABLE_FILE_STATS
         ++s_stats.NumFilesOpened;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
         if (mode.IsSet(IFileSys::FileFlags::APPEND)) {
             this->seek(0, SeekMode::END, false);
@@ -109,7 +109,7 @@ size_t OsFile::read(void* pBuffer, size_t length)
 #if X_ENABLE_FILE_STATS
         s_stats.NumBytesRead += NumRead;
         ++s_stats.NumReads;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
 
@@ -119,7 +119,7 @@ size_t OsFile::read(void* pBuffer, size_t length)
             core::Thread::sleep(delay);
         }
 
-#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+#endif // X_ENABLE_FILE_ARTIFICAIL_DELAY
 
         return NumRead;
     }
@@ -153,7 +153,7 @@ size_t OsFile::write(const void* pBuffer, size_t length)
 #if X_ENABLE_FILE_STATS
         s_stats.NumBytesWrite += NumWrite;
         ++s_stats.NumWrties;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
 
@@ -163,7 +163,7 @@ size_t OsFile::write(const void* pBuffer, size_t length)
             core::Thread::sleep(delay);
         }
 
-#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+#endif // X_ENABLE_FILE_ARTIFICAIL_DELAY
 
         return NumWrite;
     }
@@ -188,7 +188,7 @@ void OsFile::seek(int64_t position, IFileSys::SeekMode::Enum origin, bool requir
 
 #if X_ENABLE_FILE_STATS
     s_stats.NumSeeks++;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
     LARGE_INTEGER move;
     move.QuadPart = position;
@@ -206,7 +206,7 @@ uint64_t OsFile::tell(void) const
 
 #if X_ENABLE_FILE_STATS
     s_stats.NumTells++;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
     if (!SetFilePointerEx(file_, Move, &current, FILE_CURRENT)) {
         lastError::Description dsc;
@@ -220,7 +220,7 @@ uint64_t OsFile::remainingBytes(void) const
 {
 #if X_ENABLE_FILE_STATS
     s_stats.NumByteLeftChecks++;
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
     uint64_t size = fileSize();
     uint64_t offset = tell();
@@ -265,7 +265,7 @@ XFileStats& OsFile::fileStats(void)
 {
     return s_stats;
 }
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
 bool OsFile::getDiskInfo(const wchar_t* pDevie, DiskInfo& info)
 {

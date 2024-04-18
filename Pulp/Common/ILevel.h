@@ -629,4 +629,4 @@ X_ENSURE_SIZE(FileHeader, 64 + (sizeof(FileNode) * FileNodes::ENUM_COUNT));
 
 X_NAMESPACE_END
 
-#endif // !X_BSP_MAP_H_
+#endif // X_BSP_MAP_H_

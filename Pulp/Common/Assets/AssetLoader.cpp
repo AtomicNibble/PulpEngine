@@ -192,7 +192,7 @@ bool AssetLoader::waitForLoad(AssetBase* pAsset)
 {
 #if X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
     X_ASSERT(processingThreads_.getValueInt() == 0, "Can't waitForLoad inside a asset data job, can deadlock")(processingThreads_.getValueInt());
-#endif // !X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
+#endif // X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
 
     if (pAsset->getStatus() == core::LoadStatus::Complete) {
         return true;
@@ -433,13 +433,13 @@ void AssetLoader::processData(AssetLoadRequest* pRequest)
 
 #if X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
     processingThreads_.setValueInt(1);
-#endif // !X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
+#endif // X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
 
     auto ok = assetsinks_[type]->processData(pAsset, std::move(pRequest->data), pRequest->dataSize);
 
 #if X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
     processingThreads_.setValueInt(0);
-#endif // !X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
+#endif // X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
 
     if (!ok) {
         onLoadRequestFail(pRequest);

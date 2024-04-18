@@ -108,6 +108,6 @@ X_POP_WARNING_LEVEL
 #else // !X_LIB
 #define DLL_EXPORT X_EXPORT
 #define DLL_IMPORT X_IMPORT
-#endif // !X_LIB
+#endif // X_LIB
 
-#endif // !_X_PLATFORM_WIN32_H_
+#endif // _X_PLATFORM_WIN32_H_

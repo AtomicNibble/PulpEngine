@@ -161,7 +161,7 @@ namespace shader
                 return true;
             }
 
-#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+#endif // X_ENABLE_RENDER_SHADER_RELOAD
 
             // now load the source file.
             auto* pSource = sourceBin_.loadRawSourceFile(pHWShader->getShaderSource(), false);
@@ -305,7 +305,7 @@ namespace shader
 		flags = COMPILE_DEBUG_FLAGS;
 #else
         flags = COMPILE_RELEASE_FLAGS;
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
         // we want to compile this then work out the cbuffer links.
         const auto& stages = pPerm->getStages();
@@ -403,7 +403,7 @@ namespace shader
 
 #if X_DEBUG
         X_LOG1("Shader", "Load: \"%.*s\"", name.length(), name.data());
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
         core::string_view nameView(name);
 
@@ -460,7 +460,7 @@ namespace shader
 
 #if X_ENABLE_RENDER_SHADER_RELOAD
             compileCount = pShader->getCompileCount();
-#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+#endif // X_ENABLE_RENDER_SHADER_RELOAD
 
             // little ugly as can't #if def inside macro call.
             X_LOG0("Shader", pFmt,

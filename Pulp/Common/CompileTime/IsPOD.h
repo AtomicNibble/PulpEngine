@@ -18,4 +18,4 @@ namespace compileTime
 
 X_NAMESPACE_END
 
-#endif // !X_ISPOD_H_
+#endif // X_ISPOD_H_

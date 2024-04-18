@@ -28,7 +28,7 @@ namespace JobList
 
 #if SCHEDULER_LOGS
         X_LOG0("NopJob", "NobJob: pParam: %x workerIdx: %x", pParam, workerIdx);
-#endif // !SCHEDULER_LOGS
+#endif // SCHEDULER_LOGS
     }
 
     JobList::JobList(core::MemoryArenaBase* arena) :
@@ -107,7 +107,7 @@ namespace JobList
         }
 #if SCHEDULER_LOGS
         X_LOG0("JobList", "is done id: %x", listId_);
-#endif // !SCHEDULER_LOGS
+#endif // SCHEDULER_LOGS
         isDone_ = true;
     }
 
@@ -263,7 +263,7 @@ namespace JobList
                 stats_.endTime = GetTimeReal();
 #if SCHEDULER_LOGS
                 X_LOG0("JobList", "sync count 0, for id: %x", listId_);
-#endif // !SCHEDULER_LOGS
+#endif // SCHEDULER_LOGS
                 return resFalgs | RunFlag::DONE;
             }
 

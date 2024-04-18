@@ -32,4 +32,4 @@ protected:
 
 #include "XSphere.inl"
 
-#endif // !_X_MATH_SPHERE_H_
+#endif // _X_MATH_SPHERE_H_

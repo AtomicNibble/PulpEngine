@@ -24,7 +24,7 @@ XScriptTable::XScriptTable() :
 #if X_DEBUG
     ,
     setChainActive_(false)
-#endif // !X_DEBUG
+#endif // X_DEBUG
 {
 }
 
@@ -81,7 +81,7 @@ void XScriptTable::setValueAny(const char* pKey, const ScriptValue& any, bool bC
     else {
 #if X_DEBUG
         X_ASSERT(setChainActive_, "begin chain not called")();
-#endif // !X_DEBUG
+#endif // X_DEBUG
     }
 
     size_t len = strlen(pKey);
@@ -132,7 +132,7 @@ bool XScriptTable::getValueAny(const char* pKey, ScriptValue& any, bool bChain)
     else {
 #if X_DEBUG
         X_ASSERT(setChainActive_, "begin chain not called")();
-#endif // !X_DEBUG
+#endif // X_DEBUG
     }
 
     stack::push_table_value(L, -2, pKey);
@@ -198,7 +198,7 @@ bool XScriptTable::beginChain(void)
 {
 #if X_DEBUG
     setChainActive_ = true;
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
     pushRef();
     return true;
@@ -208,7 +208,7 @@ void XScriptTable::endChain(void)
 {
 #if X_DEBUG
     setChainActive_ = false;
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
     if (stack::istable(L)) {
         stack::pop(L);
@@ -512,7 +512,7 @@ X_INLINE void XScriptTable::pushRef(void)
     }
 #else
     stack::push_ref(L, luaRef_);
-#endif // !X_DEBUG
+#endif // X_DEBUG
 }
 
 // Push reference to specified script table to the stack.

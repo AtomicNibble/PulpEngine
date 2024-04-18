@@ -109,4 +109,4 @@ X_ENSURE_SIZE(DateTimeStampSmall, 4);
 
 X_NAMESPACE_END
 
-#endif // !_X_DATE_TIME_STAMP_COMP_H_
+#endif // _X_DATE_TIME_STAMP_COMP_H_

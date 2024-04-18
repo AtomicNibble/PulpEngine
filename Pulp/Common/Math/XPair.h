@@ -24,4 +24,4 @@ typedef Pair<int> Pairi;
 typedef Pair<float> Pairf;
 typedef Pair<double> Paird;
 
-#endif // !_X_MATH_PAIR_H_
+#endif // _X_MATH_PAIR_H_

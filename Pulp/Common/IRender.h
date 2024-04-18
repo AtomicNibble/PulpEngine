@@ -470,4 +470,4 @@ struct IRender
 
 X_NAMESPACE_END
 
-#endif // !_X_RENDER_I_H_
+#endif // _X_RENDER_I_H_

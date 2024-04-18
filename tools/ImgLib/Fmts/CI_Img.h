@@ -16,4 +16,4 @@ namespace CI
 
 X_NAMESPACE_END
 
-#endif // !X_TEXTURE_CI_H_
+#endif // X_TEXTURE_CI_H_

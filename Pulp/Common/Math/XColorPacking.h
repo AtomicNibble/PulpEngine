@@ -109,4 +109,4 @@ struct CHANTRAIT<float>
     }
 };
 
-#endif // !_X_COLOR_PACKING_UTIL_H_
+#endif // _X_COLOR_PACKING_UTIL_H_

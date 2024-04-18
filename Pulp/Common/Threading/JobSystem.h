@@ -95,4 +95,4 @@ public:
 
 X_NAMESPACE_END
 
-#endif // !X_THREAD_JOB_SYS_H_
+#endif // X_THREAD_JOB_SYS_H_

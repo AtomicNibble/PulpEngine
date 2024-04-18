@@ -10,11 +10,11 @@ X_NAMESPACE_BEGIN(texture)
 
 #ifdef RGB
 #undef RGB
-#endif // !RGB
+#endif // RGB
 
 #ifdef CMYK
 #undef CMYK
-#endif // !CMYK
+#endif // CMYK
 
 namespace PSD
 {

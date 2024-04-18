@@ -105,4 +105,4 @@ X_NAMESPACE_END
 
 #include "XSphereGen.inl"
 
-#endif // !_X_MATH_SPHERE_GEN_H_
+#endif // _X_MATH_SPHERE_GEN_H_

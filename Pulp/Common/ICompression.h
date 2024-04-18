@@ -296,4 +296,4 @@ namespace Compression
 
 X_NAMESPACE_END
 
-#endif // !_X_COMPRESSION_I_H_
+#endif // _X_COMPRESSION_I_H_

@@ -84,4 +84,4 @@ X_INLINE const FontVars& XFontSystem::getVars(void) const
 
 X_NAMESPACE_END
 
-#endif // !_X_XFONNT_H_
+#endif // _X_XFONNT_H_

@@ -95,4 +95,4 @@ X_NAMESPACE_END
 
 #include "ThreadQue.inl"
 
-#endif // !X_THREADING_QUE_H_
+#endif // X_THREADING_QUE_H_

@@ -105,4 +105,4 @@ public:
 
 #include "XAabb.inl"
 
-#endif // !_X_MATH_AABB_H_
+#endif // _X_MATH_AABB_H_

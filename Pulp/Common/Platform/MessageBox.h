@@ -63,4 +63,4 @@ namespace msgbox
 
 X_NAMESPACE_END
 
-#endif // !X_PLATFORM_MSGBOX_H_
+#endif // X_PLATFORM_MSGBOX_H_

@@ -55,7 +55,7 @@ X_FORCE_LINK_FACTORY("XConverterLib_Model")
 X_FORCE_LINK_FACTORY("XConverterLib_Anim")
 X_FORCE_LINK_FACTORY("XConverterLib_Font")
 
-#endif // !X_LIB
+#endif // X_LIB
 
 namespace
 {

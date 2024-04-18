@@ -74,4 +74,4 @@ namespace Compression
 
 X_NAMESPACE_END
 
-#endif // !X_COMPRESSION_STORE_H_
+#endif // X_COMPRESSION_STORE_H_

@@ -59,4 +59,4 @@ X_NAMESPACE_END
 
 #include "Keyboard.inl"
 
-#endif // !_X_KEYBOARD_DEVICE_H_
+#endif // _X_KEYBOARD_DEVICE_H_

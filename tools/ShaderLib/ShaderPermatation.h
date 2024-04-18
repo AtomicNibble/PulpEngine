@@ -54,4 +54,4 @@ X_NAMESPACE_END
 
 #include "ShaderPermatation.inl"
 
-#endif // !X_SHADER_H_
+#endif // X_SHADER_H_

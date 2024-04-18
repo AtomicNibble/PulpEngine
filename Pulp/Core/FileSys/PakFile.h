@@ -36,7 +36,7 @@ public:
 
 #if X_ENABLE_FILE_STATS
     static XFileStats& fileStats(void);
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
 private:
     uint64_t getPosition(void) const;

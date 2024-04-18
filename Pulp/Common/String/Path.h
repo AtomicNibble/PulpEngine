@@ -80,4 +80,4 @@ public:
 
 X_NAMESPACE_END
 
-#endif // !_X_STRING_PATH_H_
+#endif // _X_STRING_PATH_H_

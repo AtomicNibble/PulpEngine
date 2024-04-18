@@ -82,7 +82,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
 
     pICore_ = pfnCreateCoreInterface(params);
 
-#endif // !X_LIB
+#endif // X_LIB
 
     if (!pICore_) {
         Error("Engine Init Failed"_sv);

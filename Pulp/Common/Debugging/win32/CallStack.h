@@ -29,4 +29,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !_X_CALLSTACK_H_
+#endif // _X_CALLSTACK_H_

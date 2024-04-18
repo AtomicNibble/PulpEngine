@@ -18,7 +18,7 @@ typedef core::MemoryArena<
     core::NoBoundsChecking,
     core::NoMemoryTracking,
     core::NoMemoryTagging
-#endif // !X_DEBUG
+#endif // X_DEBUG
     >
     FxLibArena;
 
@@ -31,5 +31,5 @@ extern FxLibArena* g_FxLibArena;
 #define FXLIB_EXPORT X_EXPORT
 #else
 #define FXLIB_EXPORT X_IMPORT
-#endif // !FX_LIB_EXPORT
+#endif // FX_LIB_EXPORT
 #endif // X_LIB

@@ -19,4 +19,4 @@ public:
 
 X_NAMESPACE_END
 
-#endif // !_X_INPUT_CVARS_H_
+#endif // _X_INPUT_CVARS_H_

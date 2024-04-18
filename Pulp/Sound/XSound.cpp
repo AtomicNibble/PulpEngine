@@ -32,7 +32,7 @@ X_ENABLE_WARNING(4505)
 
 #if !X_ENABLE_SOUND_COMS
 #error must have sound coms for debug 
-#endif // !X_ENABLE_SOUND_COMS
+#endif // X_ENABLE_SOUND_COMS
 
 #define WWISE_LIB "Debug"
 #elif X_ENABLE_SOUND_COMS
@@ -56,7 +56,7 @@ X_ENABLE_WARNING(4505)
 #define PLUGIN_Effect 1
 #define PLUGIN_Source 1
 #define PLUGIN_Auro 0
-#endif // !PLUGIN_All
+#endif // PLUGIN_All
 
 // link the libs..
 
@@ -73,7 +73,7 @@ X_LINK_LIB_WWISE("AkStreamMgr");
 #if PLUGIN_Codec
 #include <AK/Plugin/AkVorbisDecoderFactory.h>
 X_LINK_LIB_WWISE("AkVorbisDecoder");
-#endif // !PLUGIN_Codec
+#endif // PLUGIN_Codec
 
 // source
 #include <AK/Plugin/AkAudioInputSourceFactory.h>
@@ -118,7 +118,7 @@ X_LINK_LIB_WWISE("AkAudioInputSource");
 #if PLUGIN_Auro
 #include <AK/Plugin/AuroHeadphoneFXFactory.h>
 X_LINK_LIB_WWISE("AuroHeadphoneFX");
-#endif // !PLUGIN_Auro
+#endif // PLUGIN_Auro
 
 
 // new?
@@ -146,7 +146,7 @@ X_LINK_LIB_WWISE("iZTrashFiltersFX");
 #if PLUGIN_Auro
 #include <AK/Plugin/AuroPannerMixerFactory.h>
 X_LINK_LIB_WWISE("AuroPannerMixer");
-#endif // !PLUGIN_Auro
+#endif // PLUGIN_Auro
 
 // platform
 X_LINK_LIB("dinput8");
@@ -402,7 +402,7 @@ bool XSound::init(void)
 
         comsSysInit_ = true;
     }
-#endif // !X_ENABLE_SOUND_COMS
+#endif // X_ENABLE_SOUND_COMS
 
 
     SetAudioInputCallbacks(executeCallback_s, getFormatCallback_s, nullptr);
@@ -478,7 +478,7 @@ void XSound::shutDown(void)
         Comm::Term();
         comsSysInit_ = false;
     }
-#endif // !X_ENABLE_SOUND_COMS
+#endif // X_ENABLE_SOUND_COMS
 
     freeDangling();
 

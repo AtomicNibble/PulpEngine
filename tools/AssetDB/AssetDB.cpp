@@ -2526,7 +2526,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 
 #if X_ENABLE_ASSERTIONS
     assetId = INVALID_ASSET_ID;
-#endif // !X_ENABLE_ASSERTIONS
+#endif // X_ENABLE_ASSERTIONS
 
     if (!AssetExists(type, name, &assetId)) {
         // add it?
@@ -2653,7 +2653,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 
 #if X_ENABLE_ASSERTIONS
     assetId = INVALID_ASSET_ID;
-#endif // !X_ENABLE_ASSERTIONS
+#endif // X_ENABLE_ASSERTIONS
 
     if (!AssetExists(type, name, &assetId)) {
         // add it?

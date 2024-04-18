@@ -22,4 +22,4 @@ private:                       \
     X_NO_MOVE(className); \
     X_NO_MOVE_ASSIGN(className)
 
-#endif // !X_CLASSMACROS_H_
+#endif // X_CLASSMACROS_H_

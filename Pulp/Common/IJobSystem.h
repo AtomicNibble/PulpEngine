@@ -55,4 +55,4 @@ public:
 
 X_NAMESPACE_END
 
-#endif // !X_JOBSYSTEM_I_H_
+#endif // X_JOBSYSTEM_I_H_

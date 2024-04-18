@@ -155,4 +155,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !_X_CON_FIXED_FIFO_H_
+#endif // _X_CON_FIXED_FIFO_H_

@@ -7,7 +7,7 @@
 #include <cpuid.h>
 #else
 #include <intrin.h>
-#endif // !X_COMPILER_CLANG
+#endif // X_COMPILER_CLANG
 
 X_NAMESPACE_BEGIN(core)
 
@@ -22,7 +22,7 @@ namespace
         __cpuid(infoType, pInts[0], pInts[1], pInts[2], pInts[3]);
 #else
         __cpuid(pInts, infoType);
-#endif // !X_COMPILER_CLANG
+#endif // X_COMPILER_CLANG
     }
 
     template<typename T>
@@ -35,7 +35,7 @@ namespace
         __cpuid(infoType, pInts[0], pInts[1], pInts[2], pInts[3]);
 #else
         __cpuid(pInts, infoType);
-#endif // !X_COMPILER_CLANG
+#endif // X_COMPILER_CLANG
     }
 
     int32_t NumExtended(void)

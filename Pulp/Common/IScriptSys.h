@@ -570,4 +570,4 @@ X_NAMESPACE_END
 
 #include "IScriptSys.inl"
 
-#endif // !_X_SCRIPT_SYS_I_H_
+#endif // _X_SCRIPT_SYS_I_H_

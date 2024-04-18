@@ -50,4 +50,4 @@ void SimpleBoundsChecking::CheckBack(const void* memory)
 
 X_NAMESPACE_END
 
-#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES_DEFS
+#endif // X_ENABLE_MEMORY_DEBUG_POLICIES_DEFS

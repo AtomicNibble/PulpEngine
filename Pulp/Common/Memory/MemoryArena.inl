@@ -236,7 +236,7 @@ MemoryAllocatorStatistics MemoryArena<AllocationPolicy, ThreadPolicy, BoundsChec
         for (const auto& arena : children_) {
             stats += arena->getAllocatorStatistics(true);
         }
-#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
+#endif // X_ENABLE_MEMORY_ARENA_CHILDREN
     }
 
     return stats;

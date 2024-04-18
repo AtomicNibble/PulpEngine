@@ -61,4 +61,4 @@ X_INLINE size_t XDiskFileAsync::waitUntilFinished(const XFileAsyncOperation& ope
 
 X_NAMESPACE_END
 
-#endif // !X_CORE_FILESYS_DISK_FILE_ASYNC_H_
+#endif // X_CORE_FILESYS_DISK_FILE_ASYNC_H_

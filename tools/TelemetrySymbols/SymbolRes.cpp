@@ -37,7 +37,7 @@ namespace
     struct MyDosHeader : public IMAGE_DOS_HEADER
     {
         bool isValid(void) const {
-            return this->e_magic == DOS_HEADER_MAGIC;
+            return e_magic == DOS_HEADER_MAGIC;
         }
 
         MyNtHeader* GetNtHeader(void) const {
@@ -48,7 +48,7 @@ namespace
     struct MyNtHeader : public IMAGE_NT_HEADERS64
     {
         bool isValid(void) const {
-            return this->Signature == NT_SIGNATURE;
+            return Signature == NT_SIGNATURE;
         }
         MyOptionalHeader* GetOptionalHeader(void) {
             return reinterpret_cast<MyOptionalHeader*>(&OptionalHeader);
@@ -58,16 +58,16 @@ namespace
     struct MyOptionalHeader : public IMAGE_OPTIONAL_HEADER64
     {
         bool isValid(void) const {
-            return this->Magic == OPTIONAL_HEADER_MAGIC64;
+            return Magic == OPTIONAL_HEADER_MAGIC64;
         }
     };
 
-#else
+#else // X_64
 
     struct MyDosHeader : public IMAGE_DOS_HEADER
     {
         bool isValid(void) const {
-            return this->e_magic == DOS_HEADER_MAGIC;
+            return e_magic == DOS_HEADER_MAGIC;
         }
         MyNtHeader* GetNtHeader(void) const {
             return reinterpret_cast<MyNtHeader*>(e_lfanew + reinterpret_cast<LONG>(this));
@@ -77,7 +77,7 @@ namespace
     struct MyNtHeader : public IMAGE_NT_HEADERS32
     {
         bool isValid(void) const {
-            return this->Signature == NT_SIGNATURE;
+            return Signature == NT_SIGNATURE;
         }
         MyOptionalHeader* GetOptionalHeader(void) {
             return reinterpret_cast<MyOptionalHeader*>(&OptionalHeader);
@@ -87,11 +87,11 @@ namespace
     struct MyOptionalHeader : public IMAGE_OPTIONAL_HEADER32
     {
         bool isValid(void) const {
-            return this->Magic == OPTIONAL_HEADER_MAGIC;
+            return Magic == OPTIONAL_HEADER_MAGIC;
         }
 
         bool is64Bit(void) const {
-            return this->Magic == OPTIONAL_HEADER_MAGIC64;
+            return Magic == OPTIONAL_HEADER_MAGIC64;
         }
 
     };

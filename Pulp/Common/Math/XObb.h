@@ -44,4 +44,4 @@ private:
 
 #include "XObb.inl"
 
-#endif // !_X_MATH_OBB_H_
+#endif // _X_MATH_OBB_H_

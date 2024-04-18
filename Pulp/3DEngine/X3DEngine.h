@@ -117,4 +117,4 @@ X_ENABLE_WARNING(4324) //  structure was padded due to alignment specifier
 
 X_NAMESPACE_END
 
-#endif // !_X_RENDER_SYS_H_
+#endif // _X_RENDER_SYS_H_

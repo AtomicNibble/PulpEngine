@@ -18,7 +18,7 @@ public:
         return arena_->allocate(size, 16, 0 X_MEM_IDS("Physx", typeName), srcInfo);
 #else
         return arena_->allocate(size, 16, 0 X_MEM_IDS("Physx", typeName));
-#endif // !X_ENABLE_MEMORY_SOURCE_INFO
+#endif // X_ENABLE_MEMORY_SOURCE_INFO
     }
 
     X_INLINE void deallocate(void* ptr) X_FINAL

@@ -1476,7 +1476,7 @@ NetBandwidthStatistics XPeer::getBandwidthStatistics(void) const
         stats += socket.getStats();
     }
 
-#endif // !X_ENABLE_NET_STATS
+#endif // X_ENABLE_NET_STATS
 
     return stats;
 }

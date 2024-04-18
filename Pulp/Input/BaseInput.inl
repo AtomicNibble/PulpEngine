@@ -2,19 +2,19 @@
 
 X_NAMESPACE_BEGIN(input)
 
-XBaseInput::ModifierFlags XBaseInput::getModifiers(void)
+XBaseInput::ModifierFlags XBaseInput::getModifiers(void) const
 {
     return modifiers_;
 }
 
 void XBaseInput::setModifiers(ModifierFlags flags)
 {
-    this->modifiers_ = flags;
+    modifiers_ = flags;
 }
 
 void XBaseInput::clearModifiers(void)
 {
-    this->modifiers_.Clear();
+    modifiers_.Clear();
 }
 
 InputSymbol* XBaseInput::defineSymbol(InputDeviceType::Enum deviceType, KeyId::Enum id_,

@@ -140,7 +140,7 @@ private:
 
 #if X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
     ThreadLocalStorage processingThreads_;
-#endif // !X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
+#endif // X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
 };
 
 X_NAMESPACE_END

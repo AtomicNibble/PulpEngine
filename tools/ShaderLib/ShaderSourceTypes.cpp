@@ -19,7 +19,7 @@ namespace shader
         includedFiles_(arena),
 #if X_ENABLE_RENDER_SHADER_RELOAD
         refrences_(arena),
-#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+#endif // X_ENABLE_RENDER_SHADER_RELOAD
         sourceCrc32_(0)
     {
     }
@@ -38,7 +38,7 @@ namespace shader
         for (const auto& pIncSource : includedFiles_) {
             pIncSource->addRefrence(name_);
         }
-#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+#endif // X_ENABLE_RENDER_SHADER_RELOAD
     }
 
     void SourceFile::removeRefrences(void) const
@@ -47,7 +47,7 @@ namespace shader
         for (const auto& pIncSource : includedFiles_) {
             pIncSource->removeRefrence(name_);
         }
-#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+#endif // X_ENABLE_RENDER_SHADER_RELOAD
     }
 
 } // namespace shader

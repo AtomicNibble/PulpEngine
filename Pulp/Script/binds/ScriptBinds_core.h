@@ -9,7 +9,7 @@ X_NAMESPACE_DECLARE(core,
 
 #ifdef DrawText
 #undef DrawText
-#endif // !DrawText
+#endif // DrawText
 
 #include "ScriptBinds.h"
 
@@ -45,4 +45,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_SCRIPT_BINDS_CORE_H_
+#endif // X_SCRIPT_BINDS_CORE_H_

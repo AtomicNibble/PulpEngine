@@ -286,7 +286,7 @@ namespace V2
                 pParent = pParent->pParent;
             }
         }
-#endif // !X_ENABLE_JOBSYS_PARENT_CHECK
+#endif // X_ENABLE_JOBSYS_PARENT_CHECK
 
         size_t threadIdx = GetThreadIndex();
         ThreadJobAllocator* pThreadAlloc = GetWorkerThreadAllocator(threadIdx);
@@ -356,7 +356,7 @@ namespace V2
         return stats_;
     }
 
-#endif // !X_ENABLE_JOBSYS_PROFILER
+#endif // X_ENABLE_JOBSYS_PROFILER
 
 } // namespace V2
 

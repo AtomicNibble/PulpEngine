@@ -276,7 +276,7 @@ namespace Compression
     {
 #if X_DEBUG
         core::zero_object(decodeStream_);
-#endif // !X_DEBUG
+#endif // X_DEBUG
     }
 
     bool LZ5StreamDecode::loadDict(const uint8_t* pDict, size_t size)

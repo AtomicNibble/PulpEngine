@@ -84,4 +84,4 @@ X_NAMESPACE_END
 
 #include "XModel.inl"
 
-#endif // !X_MODEL_H_
+#endif // X_MODEL_H_

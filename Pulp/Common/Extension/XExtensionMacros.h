@@ -225,4 +225,4 @@ protected:                                       \
 #define X_ENGINE_REGISTER_CLASS(classname) \
     XSingletonFactory<classname> classname::s_factory;
 
-#endif // !_X_POTATO_EXTENSION_MACROS_H_
+#endif // _X_POTATO_EXTENSION_MACROS_H_

@@ -213,4 +213,4 @@ private:
 
 #include "XInterpolate.inl"
 
-#endif // !X_MATH_INTERPOLATE_H_
+#endif // X_MATH_INTERPOLATE_H_

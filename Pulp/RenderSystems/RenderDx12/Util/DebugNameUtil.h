@@ -58,4 +58,4 @@ namespace D3DDebug
 
 X_NAMESPACE_END
 
-#endif // !X_NAME_UTIL_H_
+#endif // X_NAME_UTIL_H_

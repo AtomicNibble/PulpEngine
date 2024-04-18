@@ -27,7 +27,7 @@ namespace internal
         {
 #if X_COMPILER_CLANG == 0
             static_assert(false, "Empty constant strings cannot be hashed.");
-#endif // !X_COMPILER_CLANG
+#endif // X_COMPILER_CLANG
             return 0u;
         }
     };

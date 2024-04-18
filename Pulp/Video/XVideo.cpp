@@ -277,7 +277,7 @@ void Video::processIOData(void)
 
         // don't bother touching the memory if queus are fine.
         if (minTrackSize < 128)
-#endif // !X_RELEASE
+#endif // X_RELEASE
         {
             int32_t offset = io_.bufferReadOffset;
             const int32_t readOffset = safe_static_cast<int32_t>(io_.ringBuffer.tell());
@@ -778,7 +778,7 @@ void Video::validateQueues(void)
             X_ASSERT(hdr.type < TrackType::ENUM_COUNT, "Invalid type")(hdr.type);
         }
     }
-#endif // !X_ENABLE_ASSERTIONS
+#endif // X_ENABLE_ASSERTIONS
 };
 
 void Video::seekIoBuffer(int32_t numBytes)
@@ -1275,7 +1275,7 @@ Vec2f Video::drawDebug(engine::IPrimitiveContext* pPrim, Vec2f pos) const
 
 
     return size;
-#endif // !X_ENABLE_VIDEO_DEBUG
+#endif // X_ENABLE_VIDEO_DEBUG
 }
 
 X_NAMESPACE_END

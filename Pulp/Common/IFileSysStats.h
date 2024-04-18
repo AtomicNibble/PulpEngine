@@ -100,6 +100,6 @@ struct IOQueueStats
     RequestTimsArr RequestTime;
 };
 
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
 X_NAMESPACE_END

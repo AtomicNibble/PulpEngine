@@ -576,4 +576,4 @@ inline int solveQuadratic(T a, T b, T c, T result[2])
     return 2;
 }
 
-#endif // !_X_MATH_H_
+#endif // _X_MATH_H_

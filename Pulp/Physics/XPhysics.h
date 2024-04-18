@@ -211,7 +211,7 @@ private:
 
 #if PHYSX_SCENE_REQUIRES_LOCK
     core::CriticalSection outofBoundsCS_;
-#endif // !PHYSX_SCENE_REQUIRES_LOCK
+#endif // PHYSX_SCENE_REQUIRES_LOCK
     ActorsArr outOfBoundsObjects_;
 
     uint8_t* pScratchBlock_;

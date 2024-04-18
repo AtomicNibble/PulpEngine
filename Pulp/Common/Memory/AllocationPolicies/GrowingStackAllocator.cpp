@@ -16,7 +16,7 @@ GrowingStackAllocator::GrowingStackAllocator(size_t maxSizeInBytes, size_t granu
     granularity_ = granularity;
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
     allocationID_ = 0;
-#endif
+#endif // X_ENABLE_STACK_ALLOCATOR_CHECK
 
     if (!bitUtil::IsPowerOfTwo(granularity)) {
         X_ASSERT("GrowingStackAlloc", "Granularity size must be a power of 2")(granularity);
@@ -32,7 +32,7 @@ GrowingStackAllocator::GrowingStackAllocator(size_t maxSizeInBytes, size_t granu
     core::zero_object(statistics_);
     statistics_.type_ = "GrowingStackAlloc";
     statistics_.virtualMemoryReserved_ = maxSizeInBytes;
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 GrowingStackAllocator::~GrowingStackAllocator(void)
@@ -78,7 +78,7 @@ void* GrowingStackAllocator::allocate(size_t size, size_t alignment, size_t offs
     statistics_.wasteAlignmentMax_ = core::Max<size_t>(statistics_.wasteAlignment_, statistics_.wasteAlignmentMax_);
     statistics_.internalOverhead_ += sizeof(BlockHeader);
     statistics_.internalOverheadMax_ = core::Max<size_t>(statistics_.internalOverhead_, statistics_.internalOverheadMax_);
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
     union
     {
@@ -90,7 +90,7 @@ void* GrowingStackAllocator::allocate(size_t size, size_t alignment, size_t offs
     as_char = physicalCurrent_;
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
     as_header->AllocationID_ = allocationID_++;
-#endif
+#endif // X_ENABLE_STACK_ALLOCATOR_CHECK
     as_header->allocationOffset_ = safe_static_cast<uint32_t>(allocationOffset);
     as_header->allocationSize_ = safe_static_cast<uint32_t>(allocationSize);
     as_char += sizeof(BlockHeader);
@@ -121,7 +121,7 @@ void GrowingStackAllocator::free(void* ptr)
     }
 
     allocationID_--;
-#endif
+#endif // X_ENABLE_STACK_ALLOCATOR_CHECK
 
     physicalCurrent_ = &virtualStart_[as_header->allocationOffset_];
 
@@ -130,7 +130,7 @@ void GrowingStackAllocator::free(void* ptr)
     statistics_.physicalMemoryUsed_ = as_header->allocationOffset_;
     statistics_.internalOverhead_ -= sizeof(BlockHeader);
     statistics_.wasteAlignment_ -= safe_static_cast<size_t>(as_char - physicalCurrent_);
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 void GrowingStackAllocator::free(void* ptr, size_t size)
@@ -150,18 +150,18 @@ void GrowingStackAllocator::purge(void)
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     statistics_.physicalMemoryAllocated_ = safe_static_cast<size_t>(physicalEnd_ - virtualStart_);
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 MemoryAllocatorStatistics GrowingStackAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     return statistics_;
-#else
+#else // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     MemoryAllocatorStatistics stats;
     core::zero_object(stats);
     return stats;
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 X_NAMESPACE_END

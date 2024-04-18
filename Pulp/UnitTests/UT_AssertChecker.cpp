@@ -16,19 +16,19 @@ UtAssetCheckerHandler::~UtAssetCheckerHandler(void)
 
 void UtAssetCheckerHandler::ExpectAssertion(bool expect)
 {
-    this->m_expectAssertion = expect;
-    this->m_hadExpectedAssertion = false;
-    this->m_hadUnexpectedAssertion = false;
+    m_expectAssertion = expect;
+    m_hadExpectedAssertion = false;
+    m_hadUnexpectedAssertion = false;
 }
 
 bool UtAssetCheckerHandler::HadCorrectAssertions(void) const
 {
 #if X_ENABLE_ASSERTIONS
-    return this->m_hadExpectedAssertion;
-#else
+    return m_hadExpectedAssertion;
+#else // X_ENABLE_ASSERTIONS
     X_WARNING("UTAssert", "Assertions are disabled, unable to check if working.");
     return true;
-#endif
+#endif // X_ENABLE_ASSERTIONS
 }
 
 void UtAssetCheckerHandler::OnAssert(const SourceInfo& sourceInfo)
@@ -39,10 +39,10 @@ void UtAssetCheckerHandler::OnAssert(const SourceInfo& sourceInfo)
     m_hadUnexpectedAssertion = !expected;
 
     if (expected) {
-        X_LOG0("UTAssert", "An expected asset was triggerd");
+        X_LOG0("UTAssert", "An expected asset was triggered");
     }
     else {
-        X_LOG0("UTAssert", "An unexpected asset was triggerd");
+        X_LOG0("UTAssert", "An unexpected asset was triggered");
     }
 }
 

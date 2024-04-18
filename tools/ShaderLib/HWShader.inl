@@ -103,7 +103,7 @@ namespace shader
         return compileCount_;
     }
 
-#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+#endif // X_ENABLE_RENDER_SHADER_RELOAD
 
     X_INLINE bool XHWShader::isValid(void) const
     {

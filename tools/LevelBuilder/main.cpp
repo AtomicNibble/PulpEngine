@@ -35,7 +35,7 @@ namespace
         core::NoBoundsChecking,
         core::NoMemoryTracking,
         core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
         >
         LvlBuilderArena;
 
@@ -60,7 +60,7 @@ X_FORCE_LINK_FACTORY("XConverterLib_Model")
 X_FORCE_LINK_FACTORY("XConverterLib_Phys")
 X_FORCE_LINK_FACTORY("XEngineModule_LinkerLib")
 
-#endif // !X_LIB
+#endif // X_LIB
 
 namespace
 {

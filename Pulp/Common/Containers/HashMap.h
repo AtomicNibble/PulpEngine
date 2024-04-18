@@ -87,4 +87,4 @@ public:
 
 X_NAMESPACE_END
 
-#endif // !_X_CON_HASHMAP_H_
+#endif // _X_CON_HASHMAP_H_

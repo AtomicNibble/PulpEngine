@@ -55,7 +55,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
     params.bEnableVideo = true;
     params.bProfileSysEnabled = true;
     params.bIsGame = true;
-    params.bTelem = true;
+    params.bTelem = false;
     params.pTelemAppName = X_ENGINE_NAME " - Engine";
 
     // enable loggers
@@ -71,7 +71,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
 
 #if X_SUPER
     params.bFileLog = true;
-#endif // !X_SUPER
+#endif // X_SUPER
 
 #ifdef X_LIB
 
@@ -96,7 +96,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
 
     pICore_ = pfnCreateCoreInterface(params);
 
-#endif // !X_LIB
+#endif // X_LIB
 
     if (!pICore_) {
         Error("Engine Init Failed"_sv);

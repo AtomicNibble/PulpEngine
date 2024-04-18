@@ -5,7 +5,7 @@
 
 #ifdef IGNORE
 #undef IGNORE
-#endif // !IGNORE
+#endif // IGNORE
 
 X_NAMESPACE_DECLARE(core,
                     struct XFile;)

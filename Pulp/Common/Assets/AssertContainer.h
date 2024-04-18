@@ -39,7 +39,7 @@ public:
         core::NoBoundsChecking,
         core::NoMemoryTracking,
         core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
         >
         AssetPoolArena;
 
@@ -95,7 +95,7 @@ public:
         core::NoBoundsChecking,
         core::NoMemoryTracking,
         core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
         >
         AssetPoolArena;
 
@@ -327,4 +327,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_BASE_ASSET_H_
+#endif // X_BASE_ASSET_H_

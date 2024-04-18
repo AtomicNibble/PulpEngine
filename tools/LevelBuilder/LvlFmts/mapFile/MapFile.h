@@ -20,7 +20,7 @@ namespace mapFile
     //	core::NoMemoryTracking,
 #else
         core::NoMemoryTracking,
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
         core::NoMemoryTagging>
         PrimitivePoolArena;
 

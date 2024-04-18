@@ -116,9 +116,9 @@ private:
 
 #if X_DEBUG
     core::ToggleChecker setChainActive_;
-#endif // !X_DEBUG
+#endif // X_DEBUG
 };
 
 X_NAMESPACE_END
 
-#endif // !X_SCRIPT_TABLE_H_
+#endif // X_SCRIPT_TABLE_H_

@@ -45,4 +45,4 @@ typedef Transform<double> Transformd;
 
 #include "XTransform.inl"
 
-#endif // !_X_MATH_TRANSFORM_H_
+#endif // _X_MATH_TRANSFORM_H_

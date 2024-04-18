@@ -20,4 +20,4 @@ SimpleMemoryTracking::~SimpleMemoryTracking(void)
 
 X_NAMESPACE_END
 
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING

@@ -36,4 +36,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !_X_THREADING_LOCAL_STORAGE_H_
+#endif // _X_THREADING_LOCAL_STORAGE_H_

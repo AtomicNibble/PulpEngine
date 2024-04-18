@@ -96,4 +96,4 @@ struct check_size_static
 
 // clang-format on
 
-#endif // ! X_COMPILER_H
+#endif //  X_COMPILER_H

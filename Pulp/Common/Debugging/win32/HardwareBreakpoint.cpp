@@ -88,13 +88,13 @@ namespace hardwareBP
 
                             if (!SetThreadContext(hThread, &ct)) {
                                 lastError::Description Dsc;
-                                X_ERROR("HardwareBreakpoint", "Failed to set thread conext. Error: %s", lastError::ToString(Dsc));
+                                X_ERROR("HardwareBreakpoint", "Failed to set thread context. Error: %s", lastError::ToString(Dsc));
                             }
                         }
                     }
                     else {
                         lastError::Description Dsc;
-                        X_ERROR("HardwareBreakpoint", "Failed to retrive thread conext. Error: %s", lastError::ToString(Dsc));
+                        X_ERROR("HardwareBreakpoint", "Failed to retrieve thread context. Error: %s", lastError::ToString(Dsc));
                     }
                 }
 
@@ -117,15 +117,15 @@ namespace hardwareBP
 
                         if (!SetThreadContext(hThread, &ct)) {
                             lastError::Description Dsc;
-                            X_ERROR("HardwareBreakpoint", "Failed to set thread conext. Error: %s", lastError::ToString(Dsc));
+                            X_ERROR("HardwareBreakpoint", "Failed to set thread context. Error: %s", lastError::ToString(Dsc));
                         }
                     }
                     else {
                         lastError::Description Dsc;
-                        X_ERROR("HardwareBreakpoint", "Failed to retrive thread conext. Error: %s", lastError::ToString(Dsc));
+                        X_ERROR("HardwareBreakpoint", "Failed to retrieve thread context. Error: %s", lastError::ToString(Dsc));
                     }
                 }
-#endif // !_WIN64
+#endif // _WIN64
             };
 
             // Template specialization for 32bit
@@ -172,13 +172,13 @@ namespace hardwareBP
 
                             if (!SetThreadContext(hThread, &ct)) {
                                 lastError::Description Dsc;
-                                X_ERROR("HardwareBreakpoint", "Failed to set thread conext. Error: %s", lastError::ToString(Dsc));
+                                X_ERROR("HardwareBreakpoint", "Failed to set thread context. Error: %s", lastError::ToString(Dsc));
                             }
                         }
                     }
                     else {
                         lastError::Description Dsc;
-                        X_ERROR("HardwareBreakpoint", "Failed to retrive thread conext. Error: %s", lastError::ToString(Dsc));
+                        X_ERROR("HardwareBreakpoint", "Failed to retrieve thread context. Error: %s", lastError::ToString(Dsc));
                     }
                 }
 
@@ -200,16 +200,16 @@ namespace hardwareBP
 
                             if (!SetThreadContext(hThread, &ct)) {
                                 lastError::Description Dsc;
-                                X_ERROR("HardwareBreakpoint", "Failed to set thread conext. Error: %s", lastError::ToString(Dsc));
+                                X_ERROR("HardwareBreakpoint", "Failed to set thread context. Error: %s", lastError::ToString(Dsc));
                             }
                         }
                     }
                     else {
                         lastError::Description Dsc;
-                        X_ERROR("HardwareBreakpoint", "Failed to retrive thread conext. Error: %s", lastError::ToString(Dsc));
+                        X_ERROR("HardwareBreakpoint", "Failed to retrieve thread context. Error: %s", lastError::ToString(Dsc));
                     }
                 }
-#endif // !_WIN64
+#endif // _WIN64
             };
 
         } // namespace internal

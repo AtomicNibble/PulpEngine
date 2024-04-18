@@ -18,7 +18,7 @@ typedef core::MemoryArena<
     core::NoBoundsChecking,
     core::NoMemoryTracking,
     core::NoMemoryTagging
-#endif // !X_DEBUG
+#endif // X_DEBUG
     >
     VideoLibArena;
 
@@ -31,7 +31,7 @@ extern VideoLibArena* g_VideoLibArena;
 #define VIDEOLIB_EXPORT X_EXPORT
 #else
 #define VIDEOLIB_EXPORT X_IMPORT
-#endif // !VIDEO_LIB_EXPORT
+#endif // VIDEO_LIB_EXPORT
 #endif // X_LIB
 
 

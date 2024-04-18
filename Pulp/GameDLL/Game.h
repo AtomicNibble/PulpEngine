@@ -144,4 +144,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_GAME_H_
+#endif // X_GAME_H_

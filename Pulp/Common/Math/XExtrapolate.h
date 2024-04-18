@@ -206,4 +206,4 @@ X_INLINE type XExtrapolate<type>::GetCurrentSpeed(int time) const
     }
 }
 
-#endif // !X_MATH_EXTRAPOLATE_H_
+#endif // X_MATH_EXTRAPOLATE_H_

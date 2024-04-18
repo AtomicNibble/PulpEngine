@@ -157,4 +157,4 @@ typedef XWindingT<WindingGlobalAlloc> XWinding;
 
 #undef alloca16
 
-#endif // !X_WINDING_H_
+#endif // X_WINDING_H_

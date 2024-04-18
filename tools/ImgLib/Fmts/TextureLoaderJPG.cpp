@@ -14,7 +14,7 @@
 X_LINK_LIB("jpegd");
 #else
 X_LINK_LIB("jpeg");
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
 X_NAMESPACE_BEGIN(texture)
 X_DISABLE_WARNING(4611)

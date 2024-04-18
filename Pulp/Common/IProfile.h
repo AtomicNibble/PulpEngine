@@ -26,4 +26,4 @@ namespace profiler
 
 X_NAMESPACE_END
 
-#endif // !X_PROFILER_I_H_
+#endif // X_PROFILER_I_H_

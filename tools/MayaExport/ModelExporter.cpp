@@ -673,7 +673,7 @@ MStatus ModelExporter::loadLODs(void)
                     CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getColors(colorsArray, nullptr));
 #else
                     CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getColors(colorsArray, nullptr, &defaultCol));
-#endif // !MAYA_SDK
+#endif // MAYA_SDK
                 }
             }
 

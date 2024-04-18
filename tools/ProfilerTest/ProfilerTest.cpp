@@ -17,7 +17,7 @@
 
 #if TTELEMETRY_LINK
 X_LINK_ENGINE_LIB("TelemetryLib")
-#endif // !TTELEMETRY_LINK
+#endif // TTELEMETRY_LINK
 
 
 #define _LAUNCHER
@@ -31,7 +31,7 @@ X_LINK_ENGINE_LIB("RenderNull")
 
 X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSingletonFactory@VXEngineModule_Render@render@Potato@@@@A");
 
-#endif // !X_LIB
+#endif // X_LIB
 
 
 typedef core::MemoryArena<
@@ -45,7 +45,7 @@ typedef core::MemoryArena<
     core::NoBoundsChecking,
     core::NoMemoryTracking,
     core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // X_ENABLE_MEMORY_SIMPLE_TRACKING
     >
     BenchmarkArena;
 
@@ -55,7 +55,7 @@ namespace
 {
 #if TTELEMETRY_ENABLED
     telem::ContexHandle ctx;
-#endif // !TTELEMETRY_ENABLED
+#endif // TTELEMETRY_ENABLED
 
     template<class ThreadPolicy>
     class ScopedLockTelemetry
@@ -96,12 +96,15 @@ namespace
         TtCallStack stack;
 
         int32_t i = 0;
+        X_UNUSED(i);
+
         while(running)
         {
             ttZone(ctx, "Sample zone with arg! %" PRIi32, i++);
 
             ttGetCallStack(ctx, stack);
             auto stackID = ttSendCallStack(ctx, &stack);
+            X_UNUSED(stackID);
 
             ttMessage(ctx, TtMsgFlagsSeverityMsg, "Message with callstack: %t", stackID);
 
@@ -210,7 +213,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
             g_arena = &arena;
 
+#if TTELEMETRY_ENABLED
             ctx = gEnv->ctx;
+#endif // TTELEMETRY_ENABLED
 
             // now engine logging is init redirect logs here.
             ttSetContextLogFunc(ctx, LogFunc, nullptr);
@@ -254,6 +259,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             core::Thread::sleep(50);
             auto time1 = ttFastTime();
             auto ellapsed = ttFastTimeToMs(ctx, time1 - time0);
+
+            X_UNUSED(time0, time1);
 
             X_LOG0("Main", "fasttime check: %f", ellapsed);
 

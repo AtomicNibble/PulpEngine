@@ -19,7 +19,7 @@ X_LINK_ENGINE_LIB("TelemetrySymbols")
 X_FORCE_LINK_FACTORY("XTelemSrvLib");
 X_FORCE_LINK_FACTORY("XTelemSymLib");
 
-#endif // !X_LIB
+#endif // X_LIB
 
 
 X_DISABLE_WARNING(4505) // unreferenced local function has been removed

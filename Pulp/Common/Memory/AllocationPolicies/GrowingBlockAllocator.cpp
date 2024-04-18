@@ -11,9 +11,9 @@
 
 #if X_ENABLE_MEMORY_ALLOCATOR_DMALLOC_STATISTICS
 #define NO_MALLINFO
-#endif // !X_ENABLE_MEMORY_ALLOCATOR_DMALLOC_STATISTICS
+#endif // X_ENABLE_MEMORY_ALLOCATOR_DMALLOC_STATISTICS
 
-#endif // !X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
 #include "memory/dlmalloc-2.8.6.h"
 
@@ -27,7 +27,7 @@ GrowingBlockAllocator::GrowingBlockAllocator(void)
     zero_object(statistics_);
 
     statistics_.type_ = "GrowBlock";
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 GrowingBlockAllocator::~GrowingBlockAllocator(void)
@@ -73,12 +73,12 @@ void* GrowingBlockAllocator::allocate(size_t originalSize, size_t alignment, siz
     statistics_.physicalMemoryAllocated_ = info.uordblks;
     statistics_.physicalMemoryUsedMax_ = info.usmblks;
     statistics_.physicalMemoryAllocatedMax_ = info.usmblks;
-#endif // !X_ENABLE_MEMORY_ALLOCATOR_DMALLOC_STATISTICS
+#endif // X_ENABLE_MEMORY_ALLOCATOR_DMALLOC_STATISTICS
 
     statistics_.allocationCountMax_ = Max(statistics_.allocationCount_, statistics_.allocationCountMax_);
     statistics_.wasteAlignmentMax_ = Max(statistics_.wasteAlignment_, statistics_.wasteAlignmentMax_);
     statistics_.internalOverheadMax_ = Max(statistics_.internalOverhead_, statistics_.internalOverheadMax_);
-#endif // !X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
     return as_void;
 }
@@ -101,7 +101,7 @@ void GrowingBlockAllocator::free(void* ptr)
     statistics_.allocationCount_--;
     statistics_.internalOverhead_ -= sizeof(BlockHeader);
     statistics_.wasteAlignment_ -= safe_static_cast<size_t>(reinterpret_cast<uintptr_t>(ptr) - reinterpret_cast<uintptr_t>(as_header->originalAllocation_));
-#endif // !X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
     mspace_free(memorySpace_, as_header->originalAllocation_);
 
@@ -109,7 +109,7 @@ void GrowingBlockAllocator::free(void* ptr)
     mallinfo info = mspace_mallinfo(memorySpace_);
     statistics_.physicalMemoryUsed_ = info.uordblks;
     statistics_.physicalMemoryAllocated_ = info.uordblks;
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS && X_ENABLE_MEMORY_ALLOCATOR_DMALLOC_STATISTICS
 }
 
 void GrowingBlockAllocator::free(void* ptr, size_t size)
@@ -127,11 +127,11 @@ MemoryAllocatorStatistics GrowingBlockAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     return statistics_;
-#else
+#else // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     static MemoryAllocatorStatistics stats;
     core::zero_object(stats);
     return stats;
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 X_NAMESPACE_END

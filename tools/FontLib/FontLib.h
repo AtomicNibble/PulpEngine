@@ -10,9 +10,9 @@
 #define FONTLIB_EXPORT X_EXPORT
 #else
 #define FONTLIB_EXPORT X_IMPORT
-#endif // !FONT_LIB_EXPORT
+#endif // FONT_LIB_EXPORT
 #endif // X_LIB
-#endif // !FONTLIB_EXPORT
+#endif // FONTLIB_EXPORT
 
 #include "FontRender\XFontGlyph.h"
 #include "FontRender\XGlyphBitmap.h"

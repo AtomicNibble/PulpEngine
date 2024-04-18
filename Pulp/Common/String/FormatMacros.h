@@ -24,4 +24,4 @@
 
 #endif
 
-#endif // !X_FORMAT_MACROS_H_
+#endif // X_FORMAT_MACROS_H_

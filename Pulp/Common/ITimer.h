@@ -43,4 +43,4 @@ struct ITimer
 
 X_NAMESPACE_END
 
-#endif // !_X_TIMER_I_H_
+#endif // _X_TIMER_I_H_

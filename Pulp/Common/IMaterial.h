@@ -5,10 +5,10 @@
 
 #ifdef TRANSPARENT
 #undef TRANSPARENT
-#endif // !TRANSPARENT
+#endif // TRANSPARENT
 #ifdef OPAQUE
 #undef OPAQUE
-#endif // !OPAQUE
+#endif // OPAQUE
 
 #include <IAsyncLoad.h>
 #include <IShader.h>

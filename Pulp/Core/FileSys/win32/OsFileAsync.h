@@ -32,7 +32,7 @@ public:
 
 #if X_ENABLE_FILE_STATS
     static XFileStats& fileStats(void);
-#endif // !X_ENABLE_FILE_STATS
+#endif // X_ENABLE_FILE_STATS
 
 private:
     void seek(int64_t position, IFileSys::SeekMode::Enum origin);
@@ -45,4 +45,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !_X_FILE_SYSTEM_OSFILE_ASYNC_H_
+#endif // _X_FILE_SYSTEM_OSFILE_ASYNC_H_

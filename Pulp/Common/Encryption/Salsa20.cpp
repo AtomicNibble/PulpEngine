@@ -21,12 +21,12 @@ namespace Encryption
     __m128i Salsa20::s_maskHi32;
     Spinlock Salsa20::s_checkLock;
 
-#if SWISS_64
+#if X_64
     // don't check for x64.
     Salsa20::SSECheckState::Enum Salsa20::s_SSEState_ = SSECheckState::SUPPORTED;
-#else
+#else // X_64
     Salsa20::SSECheckState::Enum Salsa20::s_SSEState_ = SSECheckState::NOT_CHECKED;
-#endif // !SWISS_64
+#endif // X_64
 
     Salsa20::Salsa20(void)
     {

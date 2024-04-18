@@ -57,7 +57,7 @@ class XEngineModule_Font : public IEngineModule
 #else
             // we just say ok.
             return true;
-#endif // !X_USE_NULLFONT
+#endif // X_USE_NULLFONT
         }
 
 #if defined(X_USE_NULLFONT)
@@ -70,7 +70,7 @@ class XEngineModule_Font : public IEngineModule
             X_ERROR("Font", "Failed to init FontLib");
             return false;
         }
-#endif // !X_USE_NULLFONT
+#endif // X_USE_NULLFONT
 
         if (!pFontSys) {
             return false;

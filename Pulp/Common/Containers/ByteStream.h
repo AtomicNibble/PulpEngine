@@ -117,4 +117,4 @@ protected:
 
 X_NAMESPACE_END
 
-#endif // !_X_CON_BYTESTREAM_H_
+#endif // _X_CON_BYTESTREAM_H_

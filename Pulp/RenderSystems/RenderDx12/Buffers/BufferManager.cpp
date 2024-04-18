@@ -77,7 +77,7 @@ void BufferManager::shutDown(void)
         X_WARNING("VidMem", "%" PRIu32 " constbuffer(s) are still active", stats_.numConstBuffers);
     }
 
-#endif // !VID_MEMORY_STATS
+#endif // VID_MEMORY_STATS
 }
 
 BufferManager::VertexBufferHandle BufferManager::createVertexBuf(uint32_t numElements, uint32_t elementSize, const void* pInitialData,
@@ -165,7 +165,7 @@ void BufferManager::freeIB(IndexBufferHandle IBHandle)
 #if VID_MEMORY_STATS
     stats_.indexesBytes -= 0; // TODO
     stats_.numIndexBuffers--;
-#endif // !VID_MEMORY_STATS
+#endif // VID_MEMORY_STATS
 
     X_DELETE(pBuf->pBuffer_, &poolArena_);
     X_DELETE(pBuf, &poolArena_);
@@ -180,7 +180,7 @@ void BufferManager::freeVB(VertexBufferHandle VBHandle)
 #if VID_MEMORY_STATS
     stats_.vertexBytes -= 0; // TODO
     stats_.numVertexBuffers--;
-#endif // !VID_MEMORY_STATS
+#endif // VID_MEMORY_STATS
 
     X_DELETE(pBuf->pBuffer_, &poolArena_);
     X_DELETE(pBuf, &poolArena_);
@@ -195,7 +195,7 @@ void BufferManager::freeCB(VertexBufferHandle CBHandle)
 #if VID_MEMORY_STATS
     stats_.constBufferBytes -= 0; // TODO
     stats_.numConstBuffers--;
-#endif // !VID_MEMORY_STATS
+#endif // VID_MEMORY_STATS
 
     X_DELETE(pBuf->pBuffer_, &poolArena_);
     X_DELETE(pBuf, &poolArena_);
@@ -222,7 +222,7 @@ BufferManager::Stats BufferManager::getStats(void) const
 #else
     static Stats stats;
     return stats;
-#endif // !VID_MEMORY_STATS
+#endif // VID_MEMORY_STATS
 }
 
 X3DBuffer* BufferManager::Int_CreateVB(uint32_t size)
@@ -236,7 +236,7 @@ X3DBuffer* BufferManager::Int_CreateVB(uint32_t size)
     stats_.maxVertexBuffers = core::Max(stats_.maxVertexBuffers, stats_.numVertexBuffers);
 #else
     X_UNUSED(size);
-#endif // !VID_MEMORY_STATS
+#endif // VID_MEMORY_STATS
 
     return pBuf;
 }
@@ -252,7 +252,7 @@ X3DBuffer* BufferManager::Int_CreateIB(uint32_t size)
     stats_.maxIndexBuffers = core::Max(stats_.maxIndexBuffers, stats_.numIndexBuffers);
 #else
     X_UNUSED(size);
-#endif // !VID_MEMORY_STATS
+#endif // VID_MEMORY_STATS
 
     return pBuf;
 }
@@ -268,7 +268,7 @@ ConstBuffer* BufferManager::Int_CreateCB(uint32_t size)
     stats_.maxConstBuffers = core::Max(stats_.maxConstBuffers, stats_.numConstBuffers);
 #else
     X_UNUSED(size);
-#endif // !VID_MEMORY_STATS
+#endif // VID_MEMORY_STATS
 
     return pBuf;
 }

@@ -49,4 +49,4 @@ X_NAMESPACE_END
 
 #include "Atomic.inl"
 
-#endif // !_X_THREADING_ATOMIC_H_
+#endif // _X_THREADING_ATOMIC_H_

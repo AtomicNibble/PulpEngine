@@ -691,7 +691,7 @@ struct RaycastHit : public LocationHit
 
 #if X_64 == 0
     uint32_t padTo16Bytes[3];
-#endif // !X_64
+#endif // X_64
 };
 
 struct OverlapHit : public QueryHit
@@ -1287,4 +1287,4 @@ struct IPhysics
 
 X_NAMESPACE_END
 
-#endif // !_X_PHYSICS_I_H_
+#endif // _X_PHYSICS_I_H_

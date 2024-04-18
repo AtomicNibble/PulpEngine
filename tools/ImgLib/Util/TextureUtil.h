@@ -48,4 +48,4 @@ namespace Util
 
 X_NAMESPACE_END
 
-#endif // !X_TEXTURE_UTIL_H_
+#endif // X_TEXTURE_UTIL_H_

@@ -75,4 +75,4 @@ namespace Compression
 
 X_NAMESPACE_END
 
-#endif // !X_COMPRESSION_LZMA2_H_
+#endif // X_COMPRESSION_LZMA2_H_

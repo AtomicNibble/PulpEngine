@@ -71,6 +71,6 @@
 #else
 #define X_PP_EXPAND_ARGS(op, ...) X_PP_JOIN_2(X_PP_EXPAND_ARGS_, X_PP_NUM_ARGS(__VA_ARGS__)) \
 X_PP_PASS_ARGS(op, __VA_ARGS__)
-#endif // !X_COMPILER_CLANG
+#endif // X_COMPILER_CLANG
 
 #endif // X_PREPROCESSOREXPANDARGS_H_

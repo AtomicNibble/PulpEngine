@@ -31,10 +31,10 @@ class ExtendedMemoryTracking
 #if X_ENABLE_MEMORY_HUMAN_IDS
         const char* ID_;
         const char* typeName_;
-#endif // !X_ENABLE_MEMORY_HUMAN_IDS
+#endif // X_ENABLE_MEMORY_HUMAN_IDS
 #if X_ENABLE_MEMORY_SOURCE_INFO
         SourceInfo sourceInfo_;
-#endif // !X_ENABLE_MEMORY_SOURCE_INFO
+#endif // X_ENABLE_MEMORY_SOURCE_INFO
         const char* memoryArenaName_;
 
     private:
@@ -70,6 +70,6 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES_DEFS
+#endif // X_ENABLE_MEMORY_DEBUG_POLICIES_DEFS
 
-#endif // !X_EXTENDEDMEMORYTRACKING_H_
+#endif // X_EXTENDEDMEMORYTRACKING_H_

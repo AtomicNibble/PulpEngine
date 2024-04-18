@@ -176,7 +176,7 @@ namespace profiler
         XProfileData* pData_;
     };
 
-#endif // !#X_ENABLE_PROFILER
+#endif // #X_ENABLE_PROFILER
 
 } // namespace profiler
 
@@ -193,8 +193,8 @@ namespace profiler
 #define X_PROFILE_BEGIN(nickname, sys) X_UNUSED(nickname), X_UNUSED(sys)
 #define X_PROFILE_NO_HISTORY_BEGIN(nickname, sys) X_UNUSED(nickname), X_UNUSED(sys)
 
-#endif // !X_ENABLE_PROFILER
+#endif // X_ENABLE_PROFILER
 
 X_NAMESPACE_END
 
-#endif // !X_PROFILER_TYPES_H_
+#endif // X_PROFILER_TYPES_H_

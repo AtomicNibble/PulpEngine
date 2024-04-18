@@ -38,7 +38,7 @@ GrowingMicroAllocator::GrowingMicroAllocator(uint32_t maxSizeInBytesPerPool, uin
         poolAllocators_[i] = &poolAllocator256_;
     }
 
-#else
+#else // X_USE_FULL_LOOKUP_TABLE
 
     poolAllocators_[0] = &poolAllocator8_;
     poolAllocators_[1] = &poolAllocator8_;
@@ -49,14 +49,14 @@ GrowingMicroAllocator::GrowingMicroAllocator(uint32_t maxSizeInBytesPerPool, uin
     poolAllocators_[6] = &poolAllocator128_;
     poolAllocators_[7] = &poolAllocator256_;
 
-#endif // !X_USE_FULL_LOOKUP_TABLE
+#endif // X_USE_FULL_LOOKUP_TABLE
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
     zero_object(statistics_);
     statistics_.type_ = "MicroPool";
 
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 void* GrowingMicroAllocator::allocate(size_t size, size_t alignment, size_t offset)
@@ -69,7 +69,7 @@ void* GrowingMicroAllocator::allocate(size_t size, size_t alignment, size_t offs
     static_assert(std::numeric_limits<decltype(ChunkHeader::allocatorIndex_)>::max() >= MAX_ALLOCATION_SIZE, "Can't store allocation indexes");
 #else
     static_assert(std::numeric_limits<decltype(ChunkHeader::allocatorIndex_)>::max() >= X_ARRAY_SIZE(poolAllocators_), "Can't store allocation indexes");
-#endif // !X_USE_FULL_LOOKUP_TABLE
+#endif // X_USE_FULL_LOOKUP_TABLE
 
     ChunkHeader chunkHeader;
 
@@ -84,11 +84,11 @@ void* GrowingMicroAllocator::allocate(size_t size, size_t alignment, size_t offs
 
     void* pMem = poolAllocators_[index]->allocate<ChunkHeader>(size, alignment, offset, chunkHeader);
 
-#endif // !X_USE_FULL_LOOKUP_TABLE
+#endif // X_USE_FULL_LOOKUP_TABLE
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     updateStatistics();
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
     return pMem;
 }
@@ -151,17 +151,17 @@ void GrowingMicroAllocator::updateStatistics(void)
     }
 }
 
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
 MemoryAllocatorStatistics GrowingMicroAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     return statistics_;
-#else
+#else // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     static MemoryAllocatorStatistics stats;
     core::zero_object(stats);
     return stats;
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 X_NAMESPACE_END

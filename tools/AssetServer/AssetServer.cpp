@@ -15,7 +15,7 @@ X_ENABLE_WARNING(4244)
 X_LINK_LIB("libprotobufd")
 #else
 X_LINK_LIB("libprotobuf")
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
 // need assetDB.
 X_LINK_ENGINE_LIB("AssetDb")

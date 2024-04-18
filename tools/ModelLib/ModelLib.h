@@ -13,12 +13,12 @@
 #define MODELLIB_EXPORT X_EXPORT
 #else
 #define MODELLIB_EXPORT X_IMPORT
-#endif // !MODEL_LIB_EXPORT
+#endif // MODEL_LIB_EXPORT
 #endif // X_LIB
-#endif // !MODELLIB_EXPORT
+#endif // MODELLIB_EXPORT
 
 #include "Util\ModelUtil.h"
 
 #include "Model\XModel.h"
 
-#endif // !X_MODELLIB_H_
+#endif // X_MODELLIB_H_

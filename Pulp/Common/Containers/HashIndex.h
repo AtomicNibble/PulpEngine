@@ -85,4 +85,4 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_CONTAINER_HASH_INDEX_H_
+#endif // X_CONTAINER_HASH_INDEX_H_

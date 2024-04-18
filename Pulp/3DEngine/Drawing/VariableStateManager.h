@@ -24,7 +24,7 @@ class VariableStateManager
         core::NoBoundsChecking,
         core::NoMemoryTracking,
         core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES
+#endif // X_ENABLE_MEMORY_DEBUG_POLICIES
         >
         PoolArena;
 
@@ -78,7 +78,7 @@ private:
 #if X_ENABLE_VARIABLE_STATE_STATS
     mutable core::Spinlock statsLock_;
     Stats stats_;
-#endif // !X_ENABLE_VARIABLE_STATE_STATS
+#endif // X_ENABLE_VARIABLE_STATE_STATS
 };
 
 X_NAMESPACE_END

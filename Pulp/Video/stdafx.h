@@ -24,7 +24,7 @@ X_LINK_LIB("libogg_staticd");
 X_LINK_LIB("vpxmd");
 X_LINK_LIB("libvorbis_static");
 X_LINK_LIB("libogg_static");
-#endif // !X_DEBUG
+#endif // X_DEBUG
 
 extern core::MemoryArenaBase* g_VideoArena;
 extern core::MemoryArenaBase* g_VideoVpxArena;

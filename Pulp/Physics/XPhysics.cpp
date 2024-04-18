@@ -51,7 +51,7 @@ namespace
 {
 #if PHYSX_DEFAULT_ALLOCATOR
     physx::PxDefaultAllocator gDefaultAllocatorCallback;
-#endif // !PHYSX_DEFAULT_ALLOCATOR
+#endif // PHYSX_DEFAULT_ALLOCATOR
 
     void copyToleranceScale(physx::PxTolerancesScale& pxScale, const ToleranceScale& scale)
     {
@@ -246,7 +246,7 @@ bool XPhysics::init(const ToleranceScale& scale)
         gDefaultAllocatorCallback,
 #else
         allocator_,
-#endif // !PHYSX_DEFAULT_ALLOCATOR
+#endif // PHYSX_DEFAULT_ALLOCATOR
         logger_);
 
     if (!pFoundation_) {
@@ -260,7 +260,7 @@ bool XPhysics::init(const ToleranceScale& scale)
         X_ERROR("Physics", "Failed to create profile zone manager");
         return false;
     }
-#endif // !X_SUPER
+#endif // X_SUPER
 
     copyToleranceScale(scale_, scale);
     if (!scale_.isValid()) {
@@ -383,7 +383,7 @@ void XPhysics::onTickPreRender(core::TimeVal dtime, const AABB& debugVisCullBoun
 #if PHYSX_SCENE_REQUIRES_LOCK
             core::ScopedLock<decltype(outofBoundsCS_)> lock(outofBoundsCS_);
 
-#endif // !PHYSX_SCENE_REQUIRES_LOCK
+#endif // PHYSX_SCENE_REQUIRES_LOCK
             auto handle = pScene->lock(physics::LockAccess::Write);
 
             for (auto* pActor : outOfBoundsObjects_) {
@@ -514,7 +514,7 @@ IScene* XPhysics::createScene(const SceneDesc& desc)
 
 #if PHYSX_SCENE_REQUIRES_LOCK
     sceneDesc.flags |= physx::PxSceneFlag::eREQUIRE_RW_LOCK;
-#endif // !PHYSX_SCENE_REQUIRES_LOCK
+#endif // PHYSX_SCENE_REQUIRES_LOCK
 
     // stuff we allow to be configured.
     // keep in mind it may override what you set above.
@@ -1259,7 +1259,7 @@ void XPhysics::onObjectOutOfBounds(physx::PxShape& shape, physx::PxActor& actor)
 
 #if PHYSX_SCENE_REQUIRES_LOCK
     core::ScopedLock<decltype(outofBoundsCS_)> lock(outofBoundsCS_);
-#endif // !PHYSX_SCENE_REQUIRES_LOCK
+#endif // PHYSX_SCENE_REQUIRES_LOCK
 
     // que it for removal;
     //	if (outOfBoundsObjects_.find(&actor) == ActorsArr::invalid_index) {

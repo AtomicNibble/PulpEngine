@@ -14,7 +14,7 @@ class GrowingStackAllocator
     {
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
         uint32_t AllocationID_;
-#endif
+#endif // X_ENABLE_STACK_ALLOCATOR_CHECK
         uint32_t allocationOffset_;
         uint32_t allocationSize_;
     };
@@ -46,11 +46,11 @@ private:
 
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
     uint32_t allocationID_;
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     MemoryAllocatorStatistics statistics_;
-#endif
+#endif // X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 };
 
 #include "GrowingStackAllocator.inl"

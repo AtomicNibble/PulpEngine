@@ -43,4 +43,4 @@ private:
 
 #include "XViewPort.inl"
 
-#endif // !_X_MATH_VIEWPORT_H_
+#endif // _X_MATH_VIEWPORT_H_

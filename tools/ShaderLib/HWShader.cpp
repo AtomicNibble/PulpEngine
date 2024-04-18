@@ -49,7 +49,7 @@ namespace shader
     {
 #if X_ENABLE_RENDER_SHADER_RELOAD
         compileCount_ = 0;
-#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+#endif // X_ENABLE_RENDER_SHADER_RELOAD
     }
 
     XHWShader::~XHWShader()
@@ -300,7 +300,7 @@ namespace shader
 
 #if X_ENABLE_RENDER_SHADER_RELOAD
         ++compileCount_;
-#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+#endif // X_ENABLE_RENDER_SHADER_RELOAD
 
         const float elapsed = timer.GetMilliSeconds();
         X_LOG0("Shader", "(%" PRIu32 ") Compile complete: ^6%.3fms", id, elapsed);

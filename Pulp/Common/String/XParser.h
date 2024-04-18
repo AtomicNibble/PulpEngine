@@ -188,4 +188,4 @@ X_NAMESPACE_END
 
 #include "XParser.inl"
 
-#endif // !X_STR_PARSER_H_
+#endif // X_STR_PARSER_H_
