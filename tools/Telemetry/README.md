@@ -1,6 +1,6 @@
 ## Synopsis
 
-This is an intrusive performance profiler that is used to profile the game and some of my other tools.
+This is an intrusive performance profiler that is used to profile the engine and some of my other tools.
 
 It has many advantages over your more typical style of profiler like the one included with Visual Studio or Perf.
 
