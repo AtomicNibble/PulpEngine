@@ -41,7 +41,7 @@ Features
 
 Trace with 220 million zones over 10 minutes (about 350k events a second).
 
-![telem-1](docs/img/telem-1.png)
+![telem-1](../../docs/img/telem-1.png)
 
 ## Video
 
