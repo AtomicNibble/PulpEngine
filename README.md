@@ -25,7 +25,7 @@ The Game, Editor, Converter, Linker, ... are all EngineApps as this allows tools
 One of the design goals of the engine was to have zero blocking IO at runtime this includes opening file handles.
 
 So all IO requests (open, read, write, close) go via the IO thread which handles the async reading.
-This means Games can run on top of slow storage or even network backed storage without effecting the frame rate.
+This means Games can run on top of slow storage or even network backed storage without affecting the frame rate.
 
 The filesystem includes some settings for simulating slow IO with artificial delays to help test this.
 
@@ -33,7 +33,7 @@ The filesystem includes some settings for simulating slow IO with artificial del
 
 Another core design goal was multithreaded from the ground up, as many game engines add multithreading at a later date resulting in poor distribution of work and typically one CPU core doing 90% of the work.
 
-To facilitate this the engine has a high throughput job system and core systems are designed with this in mind.
+To facilitate this, the engine has a high throughput job system and core systems are designed with this in mind.
 
 Initially the engine made use of fibres which act like green threads. But I eventually decided the potential for high amounts of cache misses in such a system was not worth it and moved to job system where we have fine grained control on which threads jobs run.
 
@@ -48,7 +48,7 @@ When writing a section of code, if it's obvious what type of allocation strategy
 So the engine provides a collection of allocation strategies and synchronisation policies that can be used to build an allocation arena.
 Combined with a custom c++ [standard library](Pulp/Common) that requires an arena for allocation it makes it trivial to pick the correct allocator for the job.
 
-For developer builds every allocator has a parent and a top level allocator is created for each engine module.  
+For developer builds, every allocator has a parent and a top level allocator is created for each engine module.  
 This gives us a tree of all allocators in the engine that can be traversed for stats collection.
 
 Giving a very fine grained overview of memory usage as a whole, for each module and each section of a given module.
@@ -60,20 +60,20 @@ The only exception to this is strings which use a global allocator specialized f
 Throughout the codebase there is a strong focus on using the stack as much as possible when it makes sense.
 This helps keep allocations fast and keep working data in the CPUs cache.
 
-The engines [standard library](Pulp/Common) provides stack based versions of most containers to make allocation on the stack trivial.
+The engine's [standard library](Pulp/Common) provides stack based versions of most containers to make allocation on the stack trivial.
 
 ### Fast builds
 
-Large c++ codebases are typically plagued with slow build times which is something I wanted to avoid.
+Large C++ codebases are typically plagued with slow build times which is something I wanted to avoid.
 
 To combat this the engine is split into various modules that don't depend on each other allowing them to build in parallel.
 This also means that even though a full rebuild takes about 60 seconds if you are working on a single module build times are typically below 1 second.
 
-One downside of this approach is that all intermodule communication happens via virtual functions, so the interfaces are designed to accept large batches of data to minimize virtual calls.
+One downside of this approach is that all inter-module communication happens via virtual functions, so the interfaces are designed to accept large batches of data to minimize virtual calls.
 
-For shipping builds all the engine modules are static linked into a single binary which allows devirtualization to occur.
+For shipping builds, all the engine modules are static linked into a single binary which allows devirtualization to occur.
 
-But one very nice upside is that some modules can be compiled with optimisations enabled (Eg physics) allowing the game to run at 60fps without issue with everything else compiled as debug.
+But one very nice upside is that some modules can be compiled with optimisations enabled (e.g. physics) allowing the game to run at 60fps without issue with everything else compiled as debug.
 
 ### Fast start times
 
@@ -109,7 +109,7 @@ Allowing the render backend to be simple minimizing duplicate logic across backe
         - Texture Tiling
         - Texture Atlas
         - Values passed to Shaders
-    - Support for dynamic textures (Eg from a video output)
+    - Support for dynamic textures (e.g. from a video output)
 - Shaders
     - Support for includes and preprocessor directives
     - Automatic input layout detection
@@ -194,7 +194,7 @@ Allowing the render backend to be simple minimizing duplicate logic across backe
 <summary>Physics</summary>
 
 - Backends
-    - Physx
+    - PhysX
     - Null
 - Support for variable and fixed stepping    
 - Multithreaded (jobs are run in the engines global job system)
@@ -297,7 +297,7 @@ Allowing the render backend to be simple minimizing duplicate logic across backe
     - Time can be scaled via settings
 - Replay system
     - Can record user inputs and actions for playback to create automated test runs
-        - Eg: load level walk around, switch weapon, fire, ...
+        - E.g: load level walk around, switch weapon, fire, ...
 - FileSystem
     - Directory watcher for hot reloading
     - IO queue
@@ -520,7 +520,7 @@ Some basic images can be seen [here](docs/img/README.md)
 
 ## Name
 
-The engine name has changed over the years so references to the old name appear here and there.
+The engine name has changed over the years, so references to the old name appear here and there.
 
 They do say naming things is the hardest problem in programming, I've now learned that also extends to the name of the project.
 
