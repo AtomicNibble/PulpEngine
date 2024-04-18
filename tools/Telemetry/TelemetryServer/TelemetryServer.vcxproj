@@ -52,11 +52,11 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{035685D3-12DC-4231-A216-3D48D04FA105}</ProjectGuid>
+    <ProjectGuid>{1A6AC758-9EFB-4406-BAC6-7BBCE6CFC194}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>TelemetryTraceImport</RootNamespace>
+    <RootNamespace>TelemetryServer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
-    <ProjectName>TelemetryTraceImport</ProjectName>
+    <ProjectName>TelemetryServer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -146,99 +146,99 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\solutions\_engine.props" />
-    <Import Project="..\..\solutions\_engine_win32_debug.props" />
-    <Import Project="..\..\solutions\_engine_link_common.props" />
-    <Import Project="..\..\solutions\_engine_link_telem.props" />
-    <Import Project="..\..\solutions\_engine_link_dia_sdk.props" />
+    <Import Project="..\..\..\solutions\_engine.props" />
+    <Import Project="..\..\..\solutions\_engine_win32_debug.props" />
+    <Import Project="..\..\..\solutions\_engine_link_common.props" />
+    <Import Project="..\..\..\solutions\_engine_link_telem.props" />
+    <Import Project="..\..\..\solutions\_engine_link_dia_sdk.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\solutions\_engine.props" />
-    <Import Project="..\..\solutions\_engine_win32_debug.props" />
-    <Import Project="..\..\solutions\_engine_dll.props" />
-    <Import Project="..\..\solutions\_engine_link_common.props" />
-    <Import Project="..\..\solutions\_engine_link_telem.props" />
+    <Import Project="..\..\..\solutions\_engine.props" />
+    <Import Project="..\..\..\solutions\_engine_win32_debug.props" />
+    <Import Project="..\..\..\solutions\_engine_dll.props" />
+    <Import Project="..\..\..\solutions\_engine_link_common.props" />
+    <Import Project="..\..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\solutions\_engine.props" />
-    <Import Project="..\..\solutions\_engine_win32_release.props" />
-    <Import Project="..\..\solutions\_engine_link_common.props" />
-    <Import Project="..\..\solutions\_engine_link_telem.props" />
-    <Import Project="..\..\solutions\_engine_link_dia_sdk.props" />
+    <Import Project="..\..\..\solutions\_engine.props" />
+    <Import Project="..\..\..\solutions\_engine_win32_release.props" />
+    <Import Project="..\..\..\solutions\_engine_link_common.props" />
+    <Import Project="..\..\..\solutions\_engine_link_telem.props" />
+    <Import Project="..\..\..\solutions\_engine_link_dia_sdk.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\solutions\_engine.props" />
-    <Import Project="..\..\solutions\_engine_win32_release.props" />
-    <Import Project="..\..\solutions\_engine_dll.props" />
-    <Import Project="..\..\solutions\_engine_link_common.props" />
-    <Import Project="..\..\solutions\_engine_link_telem.props" />
+    <Import Project="..\..\..\solutions\_engine.props" />
+    <Import Project="..\..\..\solutions\_engine_win32_release.props" />
+    <Import Project="..\..\..\solutions\_engine_dll.props" />
+    <Import Project="..\..\..\solutions\_engine_link_common.props" />
+    <Import Project="..\..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\solutions\_engine.props" />
-    <Import Project="..\..\solutions\_engine_win32_super.props" />
-    <Import Project="..\..\solutions\_engine_link_common.props" />
-    <Import Project="..\..\solutions\_engine_link_telem.props" />
-    <Import Project="..\..\solutions\_engine_link_dia_sdk.props" />
+    <Import Project="..\..\..\solutions\_engine.props" />
+    <Import Project="..\..\..\solutions\_engine_win32_super.props" />
+    <Import Project="..\..\..\solutions\_engine_link_common.props" />
+    <Import Project="..\..\..\solutions\_engine_link_telem.props" />
+    <Import Project="..\..\..\solutions\_engine_link_dia_sdk.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\solutions\_engine.props" />
-    <Import Project="..\..\solutions\_engine_win32_super.props" />
-    <Import Project="..\..\solutions\_engine_dll.props" />
-    <Import Project="..\..\solutions\_engine_link_common.props" />
-    <Import Project="..\..\solutions\_engine_link_telem.props" />
+    <Import Project="..\..\..\solutions\_engine.props" />
+    <Import Project="..\..\..\solutions\_engine_win32_super.props" />
+    <Import Project="..\..\..\solutions\_engine_dll.props" />
+    <Import Project="..\..\..\solutions\_engine_link_common.props" />
+    <Import Project="..\..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\solutions\_engine.props" />
-    <Import Project="..\..\solutions\_engine_win64_debug.props" />
-    <Import Project="..\..\solutions\_engine_link_common.props" />
-    <Import Project="..\..\solutions\_engine_link_telem.props" />
-    <Import Project="..\..\solutions\_engine_link_dia_sdk.props" />
+    <Import Project="..\..\..\solutions\_engine.props" />
+    <Import Project="..\..\..\solutions\_engine_win64_debug.props" />
+    <Import Project="..\..\..\solutions\_engine_link_common.props" />
+    <Import Project="..\..\..\solutions\_engine_link_telem.props" />
+    <Import Project="..\..\..\solutions\_engine_link_dia_sdk.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\solutions\_engine.props" />
-    <Import Project="..\..\solutions\_engine_win64_debug.props" />
-    <Import Project="..\..\solutions\_engine_dll.props" />
-    <Import Project="..\..\solutions\_engine_link_common.props" />
-    <Import Project="..\..\solutions\_engine_link_telem.props" />
+    <Import Project="..\..\..\solutions\_engine.props" />
+    <Import Project="..\..\..\solutions\_engine_win64_debug.props" />
+    <Import Project="..\..\..\solutions\_engine_dll.props" />
+    <Import Project="..\..\..\solutions\_engine_link_common.props" />
+    <Import Project="..\..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\solutions\_engine.props" />
-    <Import Project="..\..\solutions\_engine_win64_release.props" />
-    <Import Project="..\..\solutions\_engine_link_common.props" />
-    <Import Project="..\..\solutions\_engine_link_telem.props" />
-    <Import Project="..\..\solutions\_engine_link_dia_sdk.props" />
+    <Import Project="..\..\..\solutions\_engine.props" />
+    <Import Project="..\..\..\solutions\_engine_win64_release.props" />
+    <Import Project="..\..\..\solutions\_engine_link_common.props" />
+    <Import Project="..\..\..\solutions\_engine_link_telem.props" />
+    <Import Project="..\..\..\solutions\_engine_link_dia_sdk.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\solutions\_engine.props" />
-    <Import Project="..\..\solutions\_engine_win64_release.props" />
-    <Import Project="..\..\solutions\_engine_dll.props" />
-    <Import Project="..\..\solutions\_engine_link_common.props" />
-    <Import Project="..\..\solutions\_engine_link_telem.props" />
+    <Import Project="..\..\..\solutions\_engine.props" />
+    <Import Project="..\..\..\solutions\_engine_win64_release.props" />
+    <Import Project="..\..\..\solutions\_engine_dll.props" />
+    <Import Project="..\..\..\solutions\_engine_link_common.props" />
+    <Import Project="..\..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\solutions\_engine.props" />
-    <Import Project="..\..\solutions\_engine_win64_super.props" />
-    <Import Project="..\..\solutions\_engine_link_common.props" />
-    <Import Project="..\..\solutions\_engine_link_telem.props" />
-    <Import Project="..\..\solutions\_engine_link_dia_sdk.props" />
+    <Import Project="..\..\..\solutions\_engine.props" />
+    <Import Project="..\..\..\solutions\_engine_win64_super.props" />
+    <Import Project="..\..\..\solutions\_engine_link_common.props" />
+    <Import Project="..\..\..\solutions\_engine_link_telem.props" />
+    <Import Project="..\..\..\solutions\_engine_link_dia_sdk.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\solutions\_engine.props" />
-    <Import Project="..\..\solutions\_engine_win64_super.props" />
-    <Import Project="..\..\solutions\_engine_dll.props" />
-    <Import Project="..\..\solutions\_engine_link_common.props" />
-    <Import Project="..\..\solutions\_engine_link_telem.props" />
+    <Import Project="..\..\..\solutions\_engine.props" />
+    <Import Project="..\..\..\solutions\_engine_win64_super.props" />
+    <Import Project="..\..\..\solutions\_engine_dll.props" />
+    <Import Project="..\..\..\solutions\_engine_link_common.props" />
+    <Import Project="..\..\..\solutions\_engine_link_telem.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -483,7 +483,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EngineApp.cpp" />
-    <ClCompile Include="TelemetryTraceImport.cpp" />
+    <ClCompile Include="TelemetryServer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Create</PrecompiledHeader>

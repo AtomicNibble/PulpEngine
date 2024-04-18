@@ -23,7 +23,7 @@ TELEM_DISABLE_WARNING(4091)
 #include <DbgHelp.h>
 TELEM_ENABLE_WARNING(4091)
 
-#include <../../3rdparty/source/lz4-1.8.3/lz4_lib.h>
+#include <../../../3rdparty/source/lz4-1.8.3/lz4_lib.h>
 
 TELEM_LINK_LIB("engine_TelemetryCommonLib.lib");
 

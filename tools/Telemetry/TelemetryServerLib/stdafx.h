@@ -6,7 +6,7 @@
 
 #include <../TelemetryCommon/TelemetryCommonLib.h>
 #include <../TelemetrySymbols/TelemetrySymLib.h>
-#include <../SqLite/SqlLib.h>
+#include <../../SqLite/SqlLib.h>
 
 
 typedef core::MemoryArena<
