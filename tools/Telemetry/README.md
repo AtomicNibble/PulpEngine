@@ -125,6 +125,9 @@ int main()
         core::Thread::sleep(16);
     }
 
+    // Resume
+    ttPause(ctx, false);
+
     // Zone some functions
     foo(0);
     foo(1);
@@ -137,7 +140,7 @@ int main()
 
     core::StackString256 name;
     for (int32_t i = 0; i < numThreads; i++) {
-       name.setFmt("Worker %" PRIi32, i);
+        name.setFmt("Worker %" PRIi32, i);
 
         thread[i].create(name.c_str());
         thread[i].start(threadFunc);
