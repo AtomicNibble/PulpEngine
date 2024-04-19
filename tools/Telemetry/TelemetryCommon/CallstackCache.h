@@ -4,6 +4,10 @@
 
 #include <memory.h>
 
+// This is a fixed sized hash table with linear probing
+// That works over an arbitrary block of memory
+// Delete is not supported.
+
 struct CallstackCache
 {
     tt_uint32* pTable;

@@ -22,14 +22,14 @@ using tt_uintptr = unsigned __int64;
 using tt_ptrdiff = __int64;
 using tt_size = unsigned __int64;
 
-#else
+#else // X_64
 
 using tt_intptr = int;
 using tt_uintptr = unsigned int;
 using tt_ptrdiff = int;
 using tt_size = unsigned int;
 
-#endif
+#endif // X_64
 
 static_assert(sizeof(tt_uintptr) == sizeof(void*), "Size mismatch");
 

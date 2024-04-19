@@ -29,7 +29,7 @@ TELEM_LINK_LIB("engine_TelemetryCommonLib.lib");
 
 #if !DBGHLP_DYNAMIC_LOAD
 TELEM_LINK_LIB("dbghelp.lib");
-#endif
+#endif // !DBGHLP_DYNAMIC_LOAD
 
 TELEM_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
 
@@ -66,7 +66,7 @@ namespace
         {
 #if DBGHLP_DYNAMIC_LOAD
             hDbgHelp_ = 0;
-#endif
+#endif // DBGHLP_DYNAMIC_LOAD
         }
 
         bool resovle(void)
@@ -84,11 +84,11 @@ namespace
             symInit_ = (SymInitializeFunc)::GetProcAddress(hDbgHelp_, "SymInitialize");
             symCleanup_ = (SymCleanupFunc)::GetProcAddress(hDbgHelp_, "SymCleanup");
             symGetModuleInfoW_ = (SymGetModuleInfoW64Func)::GetProcAddress(hDbgHelp_, "SymGetModuleInfoW64");
-#else
+#else // DBGHLP_DYNAMIC_LOAD
             symInit_ = ::SymInitialize;
             symCleanup_ = ::SymCleanup;
             symGetModuleInfoW_ = ::SymGetModuleInfoW64;
-#endif
+#endif // DBGHLP_DYNAMIC_LOAD
             return isValid();
         }
 
@@ -103,7 +103,7 @@ namespace
             symInit_ = nullptr;
             symCleanup_ = nullptr;
             symGetModuleInfoW_ = nullptr;
-#endif
+#endif // DBGHLP_DYNAMIC_LOAD
         }
 
         bool isValid(void) const {
@@ -116,7 +116,7 @@ namespace
     private:
 #if DBGHLP_DYNAMIC_LOAD
         HMODULE hDbgHelp_;
-#endif
+#endif // DBGHLP_DYNAMIC_LOAD
     };
 
     SymAPI gSymAPI;
@@ -445,7 +445,7 @@ namespace
                 }
 
                 return index;
-#else
+#else // X_64
                 if (value) {
                     value = (value ^ (value - 1)) >> 1; // Set v's trailing 0s to 1s and zero rest
                     for (index = 0; value; index++) {
@@ -511,7 +511,7 @@ namespace
             return (((const char*)s_aligned) - str) + (size_t)bitUtil::ScanBitsForward(bitmask);
         }
 
-#else
+#else // X_64
 
         static size_t strlen(const char* str)
         {
@@ -532,7 +532,7 @@ namespace
             return (((const char*)s_aligned) - str) + bitUtil::ScanBitsForward(bitmask);
         }
 
-#endif
+#endif // X_64
 
     } // namespace StrUtil
 
@@ -612,9 +612,9 @@ namespace
 #if X_64
         auto val = __readgsqword(0x30) + 0x48;
         return *reinterpret_cast<const tt_uint32*>(val);
-#else
+#else // X_64
         return ::GetCurrentThreadId();
-#endif
+#endif // X_64
     }
 
     TELEM_INLINE tt_uint64 getTicks(void)
@@ -726,7 +726,7 @@ namespace
 
 #if X_64
     #define X86_PAD(bytes)
-#else
+#else // X_64
     #define X86_PAD(bytes) tt_uint8 __TELEMETRY_UNIQUE_NAME(__pad)[bytes];
 #endif // X_64
 
@@ -1002,7 +1002,7 @@ namespace
 
             ::CloseHandle(handle);
         }
-#else
+#else // _WIN32
         TELEM_UNUSED(pCtx);
 #endif // _WIN32
     }
@@ -1670,7 +1670,8 @@ namespace
         return (sizeof(data.numArgs) + sizeof(data)) - bytesLeft;
     }
 
-    // template<typename T>
+    // This function stores printf format args into a buffer which we send to the server.
+    // This is so we don't have to perform any of the string formatting in the hot path.
     tt_int32 BuildArgData(ArgData& data, const char* pFmtString, tt_int32 numArgs, va_list& l)
     {
         data.numArgs = static_cast<tt_int8>(numArgs & 0xFF);
@@ -1900,10 +1901,10 @@ namespace
 #if X_64
     static_assert(48 == sizeof(QueueDataMemFree));
     static_assert(136 == sizeof(QueueDataCallStack));
-#else
+#else // X_64
     static_assert(32 == sizeof(QueueDataMemFree));
     static_assert(72 == sizeof(QueueDataCallStack));
-#endif
+#endif // X_64
     static_assert(64 == GetSizeWithoutArgData<QueueDataMessage>());
     static_assert(64 == GetSizeWithoutArgData<QueueDataPlot>());
     static_assert(48 == sizeof(QueueDataPDBInfo));

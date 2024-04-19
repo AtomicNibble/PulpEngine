@@ -359,7 +359,7 @@ extern "C"
 
     __TELEM_PRAGMA(warning(pop))
 
-#endif
+#endif // __TELEM_WIN32
 
 #ifdef __cplusplus
 } // extern "C"
@@ -368,7 +368,7 @@ extern "C"
 #if TTELEMETRY_LINK
 #define __TELEM_FUNC_NAME(name) name
 #define TELEM_DYNAMIC_POINTERS 
-#else
+#else // TTELEMETRY_LINK
 #define __TELEM_FUNC_NAME(name) __gTelemApi.p##name
 #define TELEM_DYNAMIC_POINTERS TelemetryAPI __gTelemApi;
 

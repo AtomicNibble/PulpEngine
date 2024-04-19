@@ -22,6 +22,11 @@ namespace Internal
     }
 } // namespace Internal
 
+// This is a fixed sized hash table with linear probing
+// That works over an arbitrary block of memory
+// Delete is not supported.
+
+
 // TODO: if this string table is always the same size just make the mask a constant.
 // then can skip some loads.
 struct StringTable
