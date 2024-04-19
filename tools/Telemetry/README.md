@@ -4,6 +4,7 @@ This is an intrusive performance profiler that is used to profile the engine and
 
 It has many advantages over your more typical style of profiler like the one included with Visual Studio or Perf.
 
+
 ### Features
 
 - Allow viewing data for every invocation of a traced function
@@ -14,15 +15,17 @@ It has many advantages over your more typical style of profiler like the one inc
     - Makes it obvious when one thread took much longer than expected because it was waiting on a lock
 - Can be started,paused,resumed without application exit
 - No analysis stage to wait for, profiling data can be viewed live as it's recorded
-- Ability to handle large amounts of tracing data
-    - A single run of an application can be profiled for months
-    - Can handle 100,000's of events a second
 - Stream traces to server over TCP
     - Single server can consume data from multiple sessions
+    - Can handle 100,000's of events a second per session
     - Multiple clients can connect and view live or completed traces
     - Data is compressed with LZ4 to minimize bandwidth requirements
     - Automatic debug symbol submission
         - Runtime sends missing pdb files to the server for storage
+    - Ability to handle large amounts of tracing data
+        - Designed to store billions of events
+        - A single run of an application can be profiled for months
+            - Makes investigating very rare performance bugs in production easy as you simply profile all the time.
 - Event grouping
     - Functions can be grouped to give statistics about each group
 - Counters
