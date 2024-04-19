@@ -13,6 +13,7 @@ It has many advantages over your more typical style of profiler like the one inc
 - Per thread flame graphs which is critical for multithreaded software
 - Lock contention
     - Makes it obvious when one thread took much longer than expected because it was waiting on a lock
+    - See which thread had the lock
 - Can be started,paused,resumed without application exit
 - No analysis stage to wait for, profiling data can be viewed live as it's recorded
 - Stream traces to server over TCP
@@ -33,12 +34,13 @@ It has many advantages over your more typical style of profiler like the one inc
 - Low overhead runtime
      - Zero allocations
         - Host application passes a single buffer at start time.
-    - Self tracing (See how much CPU time is spent tracing)
     - Collection of data is lock free
         - Single InterlockedExchangeAdd
     - Care is taken to make sure no two threads write collected data to the same cache lane
         - Prevents CPU stalls from false sharing
     - Thread local state for stack tracking
+    - Self tracing
+        - Easily see how much of your application CPU time is being used by the profiling runtime
 
 
 ## Architecture
