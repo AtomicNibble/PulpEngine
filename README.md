@@ -516,9 +516,9 @@ Also supports connecting directly to the AssetServer to streamline the export pr
 
 ## Profiler
 
-The engine includes two custom built profilers, one that is part of the [job system](Pulp/Common/Threading/JobSystem2.h) and gives a real-time view of the last 16 frames.
+The engine includes two custom built profilers, one that is part of the [job system](Pulp/Common/Threading/JobSystem2.h) providing a real-time view of the last 16 frames.
 
-While the [other](tools/Telemetry/Telemetry) is an intrusive profiler designed for long profile sessions with fine grained metrics.
+While the [other](tools/Telemetry) is an intrusive profiler designed for long profile sessions with fine grained metrics.
 
 ## Screenshots
 
