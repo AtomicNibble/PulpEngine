@@ -90,7 +90,7 @@ int main()
     // All Telemetry memory usage will take place in this buffer
     // Size requirements of the buffer depend on a number of factors but 2-4MB is typically enough for most scenarios.
     // Larger buffers are useful if latency is high to the reviving server, as too small a buffer can result in stalls.
-    // Since the runtime must wait for the server to acknowledge the data before it can overwrite it.
+    // Large buffers also prevents stalls if the application emits a large burst of data in a short window.
     const size_t telemBufSize = 1024 * 1024 * 4;
     alignas(64) static uint8_t telemBuf[telemBufSize];
 
