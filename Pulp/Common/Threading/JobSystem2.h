@@ -28,6 +28,7 @@ X_NAMESPACE_BEGIN(core)
 namespace V2
 {
     /*
+    Overview:
         Job system that has per thread wait free queues, that support job stealing.
 
         A job is added to the queue of the calling thread, so it's better to not submit all jobs from one thread.
@@ -39,6 +40,14 @@ namespace V2
         The goal of the design is high throughput and low overhead, allowing for lower job granularity.
         The system is currently tuned to assume more work will be added very soon if none currently.
         Making it a bit wasteful if you have a 'burst' of work todo rather than constant stream.
+
+    Profiler:
+
+        The job system has a built in profiler that is enabled at build time with X_ENABLE_JOBSYS_PROFILER
+
+        When enabled the start and end time is recorded for every job on each worker in a fixed ring buffer for JOBSYS_HISTORY_COUNT frames.
+        Each tread gets it's own buffer so the cost of profiling is basically a doubling of memory writes there is no added contention.
+        As we write two cache lanes per job when profiling vs one without.
 
     */
 
