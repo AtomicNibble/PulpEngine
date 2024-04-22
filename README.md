@@ -37,7 +37,7 @@ To facilitate this, the engine has a high throughput job system and core systems
 
 Initially the engine made use of fibres which act like green threads. But I eventually decided the potential for high amounts of cache misses in such a system was not worth it and moved to job system where we have fine grained control on which threads jobs run.
 
-In hindsight I'm not sure heavily leaning in to multithreading was worth it, as it increases the barrier to entry for contributing to the engine.
+One downside of this approach is the increased barrier to entry for contributing to the engine.
 
 ### No Global allocator
 
@@ -514,6 +514,12 @@ Can also be used to train shared compression dictionaries.
 Adds logic for exporting Models and Animations into the engine's intermediate formats.
 Also supports connecting directly to the AssetServer to streamline the export process.
 
+## Profiler
+
+The engine includes two custom built profilers, one that is part of the [job system](Pulp/Common/Threading/JobSystem2.h) and gives a real-time view of the last 16 frames.
+
+While the [other](tools/Telemetry/Telemetry) is an intrusive profiler designed for long profile sessions with fine grained metrics.
+
 ## Screenshots
 
 Some basic images can be seen [here](docs/img/README.md)
@@ -560,7 +566,7 @@ I think this played a major role in being able to stay productive in a large cod
 
 As a general rule of thumb if it took more than 2 seconds to understand a line of code I simplified it.
 On many occasions I would notice a bug when simplifying the code that become obvious in the simplified version.
-I also found simplified code was either faster by default or more easy to optimise, so I don't feel performance critical code has to have poor readability.
+I also found simplified code was either measurably faster by default or more easy to optimise, so I don't feel performance critical code has to have poor readability.
 
 #### Comments
 

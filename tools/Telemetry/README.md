@@ -32,7 +32,7 @@ It has many advantages over your more typical style of profiler like the one inc
 - Counters
 - Memory stats
 - Low overhead runtime
-     - Zero allocations
+     - Zero allocations (excluding TCP system buffers)
         - Host application passes a single buffer at start time.
     - Collection of data is lock free
         - Single InterlockedExchangeAdd
