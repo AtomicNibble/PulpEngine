@@ -252,7 +252,7 @@ namespace V2
     {
 #if !X_ENABLE_JOBSYS_PROFILER
         X_UNUSED(isProfilerPaused);
-#else
+#else // !X_ENABLE_JOBSYS_PROFILER
 
         if (!isProfilerPaused) {
             currentHistoryIdx_ = (currentHistoryIdx_ + 1) & (JOBSYS_HISTORY_COUNT - 1);
@@ -266,7 +266,7 @@ namespace V2
             }
         }
 
-#endif // X_ENABLE_JOBSYS_PROFILER
+#endif // !X_ENABLE_JOBSYS_PROFILER
     }
 
     // ===============================================
@@ -617,9 +617,9 @@ namespace V2
         // as the job may run another job that then runs on this thread.
         // which will mean it will get incorrect index.
         // ..
-        // This reuslts in another problem tho, history entry might not of been written fully
+        // This results in another problem tho, history entry might not of been written fully
         // before it's read in the profiler vis.
-        // to solve this, the profiler must use getMaxreadIdx(), which returns (bottom_ - 1)
+        // to solve this, the profiler visualisation must use getMaxreadIdx(), which returns (bottom_ - 1)
         // and at the end of the frame we bump bottom + 1 allowing the profiler to read
         // the last entry.
         ++history.bottom_;
@@ -641,7 +641,7 @@ namespace V2
         pEntry->id.jobIdx = safe_static_cast<uint16_t>(jobIdx);
 #if X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
         pEntry->subsystem = pJob->subSystem;
-#else
+#else // X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
         pEntry->subsystem = core::profiler::SubSys::UNCLASSIFIED;
 #endif // X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
 
@@ -754,7 +754,7 @@ namespace V2
         ThreadQue_.setValue(&threadQue);
         ThreadAllocator_.setValue(pThreadAlloc);
 
-        int32_t backoff = 0;
+        int32_t backOff = 0;
 
         {
             CriticalSection::ScopedLock lock(condCS_);
@@ -770,19 +770,19 @@ namespace V2
         while (thread.shouldRun()) {
             Job* pJob = GetJob(threadQue);
             if (pJob) {
-                backoff = 0;
+                backOff = 0;
                 Execute(pJob, threadIdx);
             }
             else {
-                ThreadBackOff(backoff);
-                backoff++;
+                ThreadBackOff(backOff);
+                backOff++;
 
-                if (backoff > 25) {
+                if (backOff > 25) {
                     // if we not had a job for a while, ensure all que's are empty
-                    // if so wait on the consition.
+                    // if so wait on the condition.
                     pJob = GetJobCheckAllQues(threadQue);
                     if (pJob) {
-                        backoff = 0;
+                        backOff = 0;
                         Execute(pJob, threadIdx);
                     }
                     else {

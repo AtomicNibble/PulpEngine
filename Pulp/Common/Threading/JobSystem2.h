@@ -80,7 +80,7 @@ namespace V2
 
 #if X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
         profiler::SubSys::Enum subSystem;
-#else
+#else // X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
         uint8_t _subSysPad;
 #endif // X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
 
@@ -102,7 +102,7 @@ namespace V2
 #define JOB_SYS_SUB_PARAM_SINGLE profiler::SubSys::Enum subSystem
 #define JOB_SYS_SUB_PASS(sub) , sub
 
-#else
+#else // X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
 
 #define JOB_SYS_SUB_ARG_SINGLE(sub)
 #define JOB_SYS_SUB_ARG(sub)
@@ -213,10 +213,10 @@ namespace V2
 
         // each queue has it's own rand gen, to prevent thread sharing
         // plus they are not thread safe, so won't behave normally when called with multiple threads.
-        // i've tried padding around this and it makes it worse, so leave it in same cache lane as bottom & top.
+        // I've tried padding around this and it makes it worse, so leave it in same cache lane as bottom & top.
 #if X_64
         core::random::XorShift128 rand_;
-#else
+#else // X_64
         core::random::XorShift rand_;
 #endif // X_64
 

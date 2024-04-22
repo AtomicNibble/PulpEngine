@@ -7,21 +7,7 @@
 
 X_NAMESPACE_BEGIN(core)
 
-//
-// Profile me baby
-// we want to have sexy profiling.
-//
-// we will have a macro that we just place at the top of the function
-// that will be static so that we can collect data over time.
-// but also it will create a non static local
-// that will record the current time on scope enter and log elapsed time on scope leave.
-//
-// we want to be able to tell the time of the function not including sub functions
-//
-// w
-//
-//
-//
+// Note: this is the old profiler logic is not really used anymore.
 
 #define X_PROFILE_HISTORY_SIZE 64
 
@@ -176,7 +162,7 @@ namespace profiler
         XProfileData* pData_;
     };
 
-#endif // #X_ENABLE_PROFILER
+#endif // X_ENABLE_PROFILER
 
 } // namespace profiler
 
@@ -188,7 +174,7 @@ namespace profiler
     static core::profiler::XProfileData __Profiledata(gEnv->pCore, X_SOURCE_INFO, pNickName, sys); \
     core::profiler::XProfileScope __ProfileLogCall(&__Profiledata);
 
-#else
+#else // X_ENABLE_PROFILER
 
 #define X_PROFILE_BEGIN(nickname, sys) X_UNUSED(nickname), X_UNUSED(sys)
 #define X_PROFILE_NO_HISTORY_BEGIN(nickname, sys) X_UNUSED(nickname), X_UNUSED(sys)
