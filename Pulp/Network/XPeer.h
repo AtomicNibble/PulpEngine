@@ -120,12 +120,12 @@ private:
 
 public:
     bool isActive;
-    bool weStartedconnection;
+    bool weStartedConnection;
     SystemHandle systemHandle;
 
     SystemAddressEx systemAddress;           // add remote system
     SystemAddressEx myExternalSystemAddress; // my add from the point of view of remote system
-    SystemAddArr thierInternalSystemAddress; // copy of the peers internal local sys add.
+    SystemAddArr theirInternalSystemAddress; // copy of the peers internal local sys add.
 
     core::TimeVal nextPingTime;
     core::TimeVal lastReliableSend;

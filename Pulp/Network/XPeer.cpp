@@ -59,7 +59,7 @@ RemoteSystem::RemoteSystem(NetVars& vars, core::MemoryArenaBase* arena,
     relLayer(vars, arena, packetDataArena, packetPool)
 {
     isActive = false;
-    weStartedconnection = false;
+    weStartedConnection = false;
     systemHandle = INVALID_SYSTEM_HANDLE;
 
     connectState = ConnectState::NoAction;
@@ -79,7 +79,7 @@ void RemoteSystem::free(void)
 void RemoteSystem::closeConnection(void)
 {
     isActive = false;
-    weStartedconnection = false;
+    weStartedConnection = false;
 
     connectState = ConnectState::NoAction;
     lowestPing = UNDEFINED_PING;
@@ -181,7 +181,7 @@ void RemoteSystem::onConnected(const SystemAddressEx& externalSysId, const Syste
     core::TimeVal sendPingTime, core::TimeVal sendPongTime)
 {
     myExternalSystemAddress = externalSysId;
-    thierInternalSystemAddress = localIps;
+    theirInternalSystemAddress = localIps;
     connectState = ConnectState::Connected;
 
     onPong(sendPingTime, sendPongTime);
@@ -1488,7 +1488,7 @@ size_t XPeer::getNumRemoteInitiatedConnections(void) const
     size_t num = 0;
 
     for (const auto& rc : remoteSystems_) {
-        if (rc.connectState == ConnectState::Connected && rc.isActive && !rc.weStartedconnection) {
+        if (rc.connectState == ConnectState::Connected && rc.isActive && !rc.weStartedConnection) {
             ++num;
         }
     }
@@ -1588,7 +1588,7 @@ void XPeer::processConnectionRequests(UpdateBitStream& updateBS, core::TimeVal t
         constexpr auto digest = HexString<std::array<uint8_t, core::Hash::SHA1Digest::NUM_BYTES>>(X_STRINGIZE(X_ENGINE_BUILD_REF));
         updateBS.write<uint8_t>(digest.data(), digest.size());
 
-        // devide the mtu array by retry count, so that we try mtu index 0 for 1/3 of request if mtusizes is 3.
+        // divide the mtu array by retry count, so that we try mtu index 0 for 1/3 of request if mtusizes is 3.
         size_t mtuIdx = cr.numRequestsMade / (cr.retryCount / MTUSizesArr.size());
         mtuIdx = core::Min(mtuIdx + cr.MTUIdxShift, MTUSizesArr.size() - 1);
 
@@ -2079,7 +2079,7 @@ void XPeer::handleConnectionFailure(UpdateBitStream& bsBuf, RecvData* pData, Rec
 
 void XPeer::handleOpenConnectionRequest(UpdateBitStream& bsOut, RecvData* pData, RecvBitStream& bs)
 {
-    // hello, pleb.
+    // hello.
     uint8_t protoVersionMajor = bs.read<uint8_t>();
     uint8_t protoVersionMinor = bs.read<uint8_t>();
 
@@ -2113,7 +2113,7 @@ void XPeer::handleOpenConnectionRequest(UpdateBitStream& bsOut, RecvData* pData,
     bsOut.write(MessageID::OpenConnectionResponse);
     bsOut.write(OFFLINE_MSG_ID);
     bsOut.write(guid_);
-    bsOut.write<uint16_t>(MAX_MTU_SIZE); // i'll show you mine if you show me your's...
+    bsOut.write<uint16_t>(MAX_MTU_SIZE);
 
     SendParameters sp;
     sp.setData(bsOut);
@@ -2132,7 +2132,6 @@ void XPeer::handleOpenConnectionResponse(UpdateBitStream& bsOut, RecvData* pData
 
     X_LOG0_IF(vars_.debugEnabled(), "Net", "Received open connection response");
 
-    // find this fuck.
     {
         core::CriticalSection::ScopedLock lock(connectionReqsCS_);
 
@@ -2257,12 +2256,12 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
             if (pReq->systemAddress == pData->systemAddress) {
                 RemoteSystem* pSys = getRemoteSystem(bindingAdd, true);
                 if (!pSys) {
-                    // add systen
+                    // add system
                     pSys = addRemoteSystem(pData->systemAddress, clientGuid, mtu, pData->pSrcSocket, bindingAdd, ConnectState::UnverifiedSender);
                 }
                 if (pSys) {
                     pSys->connectState = ConnectState::RequestedConnection;
-                    pSys->weStartedconnection = true;
+                    pSys->weStartedConnection = true;
 
                     core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
@@ -2597,7 +2596,7 @@ RemoteSystem* XPeer::addRemoteSystem(const SystemAddressEx& sysAdd, NetGUID guid
 
             remoteSys.systemAddress = sysAdd;
             remoteSys.myExternalSystemAddress = UNASSIGNED_SYSTEM_ADDRESS;
-            remoteSys.thierInternalSystemAddress.clear();
+            remoteSys.theirInternalSystemAddress.clear();
 
             remoteSys.nextPingTime = core::TimeVal(0ll);
             remoteSys.lastReliableSend = timeNow;

@@ -195,7 +195,6 @@ BindResult::Enum NetSocket::bind(BindParameters& bindParameters)
         }
     }
 
-    // Shieeeeeeeeeeet.
     platform::freeaddrinfo(pResult);
     return BindResult::FailedToBind;
 }
@@ -218,7 +217,6 @@ SendResult NetSocket::send(SendParameters& sendParameters)
 {
     X_ASSERT(sendParameters.length > 0, "Can't send empty buffer")();
 
-    // eat it you slag!
     int32_t oldTtl = -1;
 
     if(vars_.debugSocketsEnabled())
@@ -288,7 +286,7 @@ RecvResult::Enum NetSocket::recv(RecvData& dataOut)
 
     waiting_ = 0;
 
-    // must get eror before we reset it.
+    // must get error before we reset it.
     if (bytesRead < 0) {
         error = lastErrorWSA::Get();
     }
@@ -355,7 +353,7 @@ bool NetSocket::getMyIPs(SystemAddArr& addresses)
 
     for (pPtr = pResult; pPtr != nullptr; pPtr = pPtr->ai_next) {
         if (addresses.size() == addresses.capacity()) {
-            X_WARNING("Net", "Found more local ips that supported ignoring remaning addresses");
+            X_WARNING("Net", "Found more local ips that supported ignoring remaining addresses");
             break;
         }
 

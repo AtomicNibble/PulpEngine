@@ -61,8 +61,8 @@ class XEngineModule_Network : public IEngineModule
 
 X_ENGINE_REGISTER_CLASS(XEngineModule_Network);
 
-XEngineModule_Network::XEngineModule_Network(){};
+XEngineModule_Network::XEngineModule_Network() {};
 
-XEngineModule_Network::~XEngineModule_Network(){
+XEngineModule_Network::~XEngineModule_Network() {
 
 };

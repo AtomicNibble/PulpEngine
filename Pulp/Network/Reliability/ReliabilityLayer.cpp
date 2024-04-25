@@ -549,10 +549,11 @@ void ReliabilityLayer::reset(int32_t MTUSize)
     resendBuf_.fill(nullptr);
 
 #if X_DEBUG && 0
-    // lets overflow soon, aint nobody got time for waiting.
+    // Enable this for quick overflow testing of sequence number.
+    // TODO: just make this the default?
     dagramSeqNumber_ = std::numeric_limits<decltype(dagramSeqNumber_)>::max() - 1024;
     dataGramHistoryPopCnt_ = dagramSeqNumber_;
-#endif // dagramSeqNumber_
+#endif // X_DEBUG
 }
 
 void ReliabilityLayer::clearPacketQueues(void)
@@ -692,11 +693,11 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
         }
 
         for (auto& ackRange : incomingAcks_) {
-            // we want to mark all these messages as received so we don't resend like a pleb.
+            // we want to mark all these messages as received so we don't resend.
             X_LOG0_IF(vars_.debugAckEnabled(), "NetRel", "Act Range: ^5%" PRIu16 " ^7-^5 % " PRIu16, ackRange.min, ackRange.max);
 
             for (DataGramSequenceNumber dataGramIdx = ackRange.min;
-                 // handle wrap by checking above min, saves load of up and down casting
+                 // handle wrap by checking above min, saves a load of up and down casting
                  dataGramIdx >= ackRange.min && dataGramIdx <= ackRange.max;
                  dataGramIdx++) {
                 // get the info for this data gram and mark all the packets it contained as sent.
@@ -768,7 +769,6 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
         }
     }
     else {
-        // I GOT IT !
         // we ack for unreliable also, but never resend if no ack received,
         addAck(dgh.number);
 
@@ -814,7 +814,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
     // if ordered range check channel to prevent a crash.
     if (pPacket->isOrderedOrSequenced()) {
         if (pPacket->orderingChannel >= MAX_ORDERED_STREAMS) {
-            // bitch who you think you are.
+            // bad client..
             X_ERROR("NetRel", "Received packet with invalid channel: %" PRIu16 " ignoring.", pPacket->orderingChannel);
             return ProcessResult::Ignored;
         }
@@ -1006,10 +1006,9 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 {
     ttZone(gEnv->ctx, "(Net) reliability update");
 
-    // delay list, these are packets that have already been sent, but are having artificial latency added.
+    // delay list, these are packets that have already been sent, but are having artificial network latency added.
     if (delayedPackets_.isNotEmpty()) {
         while (delayedPackets_.isNotEmpty() && delayedPackets_.peek().sendTime < time) {
-            // sendy wendy.
             auto& pDelayPacket = delayedPackets_.peek();
 
             SendParameters sp;
@@ -1035,7 +1034,6 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
     const int32_t bitsPerSecondLimit = vars_.connectionBSPLimit();
     X_UNUSED(bitsPerSecondLimit);
 
-    // HELLLLOOOO annnnyboddy.
     if (hasTimedOut(time)) {
         X_ERROR("NetRel", "Connection timed out");
         connectionDead_ = true;
@@ -1070,7 +1068,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
                     break;
                 }
 
-                // will it fit ;) ?
+                // will it fit?
                 const size_t byteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
                 const size_t totalBitSize = pPacket->getHeaderLengthBits() + pPacket->dataBitLength;
 
@@ -1123,7 +1121,6 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
             while (outGoingPackets_.isNotEmpty() && !isResendBufferFull() && currentReliablePackets < MAX_REL_PACKETS_PER_DATAGRAM) {
                 ReliablePacket* pPacket = outGoingPackets_.peek();
 
-                // meow.
                 X_ASSERT_NOT_NULL(pPacket->pData);
                 X_ASSERT(pPacket->dataBitLength > 0, "Invalid data length")();
 
@@ -1382,7 +1379,6 @@ void ReliabilityLayer::sendBitStream(NetSocket& socket, core::FixedBitStreamBase
 
 ReliablePacket* ReliabilityLayer::packetFromBS(core::FixedBitStreamBase& bs, core::TimeVal time)
 {
-    // meow.
     if (bs.isEos()) {
         return nullptr;
     }
@@ -1547,12 +1543,11 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
     X_ASSERT(pChannel->splitId == splitId, "Got incorrect channel.")(splitId);
     X_ASSERT(pChannel->packets[pPacket->splitPacketIndex] == nullptr, "Index is already occupied.")(pPacket->splitPacketIndex);
 
-    // meow.
     ++pChannel->packetsReceived;
     pChannel->lastUpdate = time;
     pChannel->packets[pPacket->splitPacketIndex] = pPacket;
 
-    // are we complete? turing :D
+    // are we complete?
     if (pChannel->haveAllPackets()) {
         // okay now we need to work out total size,
         auto& packets = pChannel->packets;
@@ -1612,7 +1607,7 @@ DataGramHistory* ReliabilityLayer::getDataGramHistory(DataGramSequenceNumber num
 {
     // so we have a sliding window for this.
     // in that we only have history for last sent datagram - REL_DATAGRAM_HISTORY_LENGTH
-    // so if we receive a msg thats more than lastDataGram index - REL_DATAGRAM_HISTORY_LENGTH we have
+    // so if we receive a msg that's more than lastDataGram index - REL_DATAGRAM_HISTORY_LENGTH we have
     // to ignore the ack, and it will get resent.
     // these message indexes can also wrap around.
 
@@ -1722,7 +1717,6 @@ void ReliabilityLayer::freeResendList(void)
 
 size_t ReliabilityLayer::calculateMemoryUsage(void) const
 {
-    // meow meow.
     size_t size = 0;
 
     size += sizeof(*this);

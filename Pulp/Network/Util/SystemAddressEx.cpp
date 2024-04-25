@@ -68,7 +68,7 @@ void SystemAddressEx::setFromSocket(SocketHandle socket)
 #if NET_IPv6_SUPPORT
     const size_t ipv6AddSize = sizeof(address_.addr6.addr);
     uint8_t zeroBuf[core::Max(ipv4AddSize, ipv6AddSize)];
-#else
+#else // NET_IPv6_SUPPORT
     uint8_t zeroBuf[ipv4AddSize];
 #endif // NET_IPv6_SUPPORT
 
@@ -123,7 +123,7 @@ void SystemAddressEx::setFromAddInfo(platform::addrinfo* pAddInfo)
         portPeekVal_ = platform::ntohs(address_.addr6.port);
 #endif // X_DEBUG
     }
-#else
+#else // NET_IPv6_SUPPORT
     {
         X_ASSERT_UNREACHABLE();
     }
@@ -148,7 +148,7 @@ void SystemAddressEx::setFromAddStorage(const platform::sockaddr_storage& addSto
         portPeekVal_ = platform::ntohs(address_.addr6.port);
 #endif // X_DEBUG
     }
-#else
+#else // NET_IPv6_SUPPORT
     {
         X_ASSERT_UNREACHABLE();
     }
@@ -181,7 +181,7 @@ const char* SystemAddressEx::toString(IPStr& strBuf, bool incPort) const
             0,
             NI_NUMERICHOST);
     }
-#else
+#else // NET_IPv6_SUPPORT
     {
         X_ASSERT_UNREACHABLE();
     }
@@ -312,7 +312,7 @@ bool SystemAddressEx::resolve(const HostStr& hostStr, bool isHost, AddressArr& a
             if (servinfo == 0) {
                 // failed still
                 lastErrorWSA::Description Dsc;
-                X_ERROR("Net", "Failed to get addres info. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
+                X_ERROR("Net", "Failed to get address info. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
                 return false;
             }
             else {
@@ -364,7 +364,7 @@ bool SystemAddressEx::resolve(const HostStr& hostStr, bool isHost, AddressArr& a
             addr.address_.addr4.family = AddressFamily::INet6;
             std::memcpy(&addr.address_.addr6, (struct platform::sockaddr_in6*)pCurAddr->ai_addr, sizeof(struct platform::sockaddr_in6));
         }
-#else
+#else // NET_IPv6_SUPPORT
         else {
             X_ASSERT_UNREACHABLE();
         }
