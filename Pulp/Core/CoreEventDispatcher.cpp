@@ -7,7 +7,7 @@ X_NAMESPACE_BEGIN(core)
 
 XCoreEventDispatcher::XCoreEventDispatcher(CoreVars& coreVars, core::MemoryArenaBase* arena) :
     coreVars_(coreVars),
-    listners_(arena)
+    listeners_(arena)
 {
     core::zero_object(resizeEvent_);
     core::zero_object(moveEvent_);
@@ -15,9 +15,9 @@ XCoreEventDispatcher::XCoreEventDispatcher(CoreVars& coreVars, core::MemoryArena
 
 XCoreEventDispatcher::~XCoreEventDispatcher()
 {
-    X_ASSERT(listners_.isEmpty(), "Core listners are still registered")(listners_.size());
+    X_ASSERT(listeners_.isEmpty(), "Core listners are still registered")(listeners_.size());
 
-    listners_.clear();
+    listeners_.clear();
 }
 
 void XCoreEventDispatcher::pumpEvents(void)
@@ -27,7 +27,7 @@ void XCoreEventDispatcher::pumpEvents(void)
             X_LOG0("CoreEvent", "CoreEvent: \"%s\"", CoreEvent::ToString(ed.event));
         }
 
-        for (auto* pList : listners_) {
+        for (auto* pList : listeners_) {
             pList->OnCoreEvent(ed);
         }
     };
@@ -55,14 +55,14 @@ bool XCoreEventDispatcher::RegisterListener(ICoreEventListener* pListener)
 {
     X_ASSERT_NOT_NULL(pListener);
 
-    auto it = std::find(listners_.begin(), listners_.end(), pListener);
+    auto it = std::find(listeners_.begin(), listeners_.end(), pListener);
 
-    if (it != listners_.end()) {
-        X_ERROR("Core", "Event listner registered twice");
+    if (it != listeners_.end()) {
+        X_ERROR("Core", "Event listener registered twice");
         return false;
     }
 
-    listners_.append(pListener);
+    listeners_.append(pListener);
     return true;
 }
 
@@ -70,14 +70,14 @@ bool XCoreEventDispatcher::RemoveListener(ICoreEventListener* pListener)
 {
     X_ASSERT_NOT_NULL(pListener);
 
-    auto idx = listners_.find(pListener);
+    auto idx = listeners_.find(pListener);
 
     if (idx == ListnersArr::invalid_index) {
-        X_ERROR("Core", "Failed to Unregistered Event listner, it is not currently registered");
+        X_ERROR("Core", "Failed to Unregistered Event listener, it is not currently registered");
         return false;
     }
 
-    listners_.removeIndex(idx);
+    listeners_.removeIndex(idx);
     return true;
 }
 

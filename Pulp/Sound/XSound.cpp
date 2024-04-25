@@ -775,9 +775,9 @@ void XSound::registerObjectSndEngine(SoundObject* pObject)
 
 #if X_SOUND_ENABLE_DEBUG_NAMES
     AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pObject->debugName.c_str());
-#else
+#else // X_SOUND_ENABLE_DEBUG_NAMES
     AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject));
-#endif
+#endif // X_SOUND_ENABLE_DEBUG_NAMES
     if (res != AK_Success) {
         AkResult::Description desc;
         X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));
@@ -917,9 +917,9 @@ SndObjectHandle XSound::registerObject(X_SOUND_DEBUG_NAME(const char* pNick))
         pObject->debugName = pNick;
     }
     AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pObject->debugName.c_str());
-#else
+#else // X_SOUND_ENABLE_DEBUG_NAMES
     AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject));
-#endif
+#endif // X_SOUND_ENABLE_DEBUG_NAMES
     if (res != AK_Success) {
         AkResult::Description desc;
         X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));
@@ -938,7 +938,7 @@ SndObjectHandle XSound::registerObject(const Transformf& trans X_SOUND_DEBUG_NAM
     if (pNick) {
         pObject->debugName = pNick;
     }
-#endif
+#endif // X_SOUND_ENABLE_DEBUG_NAMES
 
     // we don't make objects very far away active by default.
     // if you play something on these distant objects, they will get registered automatically.
@@ -951,9 +951,9 @@ SndObjectHandle XSound::registerObject(const Transformf& trans X_SOUND_DEBUG_NAM
 
 #if X_SOUND_ENABLE_DEBUG_NAMES
         AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pObject->debugName.c_str());
-#else
+#else // X_SOUND_ENABLE_DEBUG_NAMES
         AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject));
-#endif
+#endif // X_SOUND_ENABLE_DEBUG_NAMES
         if (res != AK_Success) {
             AkResult::Description desc;
             X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));

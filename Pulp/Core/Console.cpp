@@ -578,7 +578,7 @@ void XConsole::saveChangedVars(void)
         return;
     }
 
-    X_LOG0("Console", "Saving moified vars");
+    X_LOG0("Console", "Saving modified vars");
 
     core::XFileScoped file;
 
@@ -600,7 +600,7 @@ void XConsole::saveChangedVars(void)
             if (size > 0) {
                 buf.resize(size);
                 if (file.read(buf.data(), size) != size) {
-                    X_ERROR("Console", "Failed to read exsisiting config file data");
+                    X_ERROR("Console", "Failed to read existing config file data");
                 }
                 else {
                     core::StringTokenizer<char> tokenizer(buf.begin(), buf.end(), '\n');
@@ -935,7 +935,7 @@ bool XConsole::loadAndExecConfigFile(core::string_view fileName)
     }
 
     // 2 bytes at end so the multiline search can be more simple.
-    // and not have to worrie about reading out of bounds.
+    // and not have to worry about reading out of bounds.
     data[bytes] = '\0';
     data[bytes + 1] = '\0';
 
@@ -946,7 +946,7 @@ bool XConsole::loadAndExecConfigFile(core::string_view fileName)
     char* end = begin + bytes;
     const char* pComment;
 
-    // we support // and /* */ so loook for a '/'
+    // we support // and /* */ so look for a '/'
     while ((pComment = core::strUtil::Find(begin, end, '/')) != nullptr) {
         // wee need atleast 1 more char.
         if (pComment >= (end - 1)) {
@@ -1036,7 +1036,7 @@ void XConsole::registerVar(ICVar* pCVar)
             pCVar->Set(core::string_view(it->second));
         }
 
-        X_LOG2("Console", "Var \"%.*s\" was set by config on registeration", name.length(), name.data());
+        X_LOG2("Console", "Var \"%.*s\" was set by config on registration", name.length(), name.data());
     }
 
     if (auto it = varArchive_.find(name); it != varArchive_.end()) {
@@ -1047,7 +1047,7 @@ void XConsole::registerVar(ICVar* pCVar)
         // mark as archive.
         pCVar->SetFlags(pCVar->GetFlags() | VarFlag::ARCHIVE);
 
-        X_LOG2("Console", "Var \"%.*s\" was set by seta on registeration", name.length(), name.data());
+        X_LOG2("Console", "Var \"%.*s\" was set by seta on registration", name.length(), name.data());
     }
 
     varMap_.emplace(pCVar->GetName(), pCVar);
@@ -1714,7 +1714,7 @@ void XConsole::historyIoRequestCallback(core::IFileSys& fileSys, const core::IoR
 
         historyLoadPending_ = false;
 
-        // if it faild do we care?
+        // if it failed do we care?
         if (!pFile) {
             X_LOG2("Console", "Failed to load history file");
             return;
@@ -1798,7 +1798,7 @@ core::string_view XConsole::getHistory(CmdHistory::Enum direction)
         if (historyPos_ < safe_static_cast<int32_t>(cmdHistory_.size()) - 1) {
             historyPos_++;
 
-            // adds a refrence to the string.
+            // adds a reference to the string.
             refString_ = cmdHistory_[historyPos_];
             return core::string_view(refString_);
         }
@@ -2673,7 +2673,7 @@ void XConsole::Command_Help(IConsoleCmdArgs* pCmd)
 
     X_LOG0("Console", "------- ^8Help^7 -------");
     X_LOG_BULLET;
-    X_LOG0("Console", "listcmds: lists avaliable commands");
+    X_LOG0("Console", "listcmds: lists available commands");
     X_LOG0("Console", "listdvars: lists dvars");
     X_LOG0("Console", "listbinds: lists all the bind");
 }

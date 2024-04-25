@@ -32,7 +32,7 @@ public:
 private:
     CoreVars& coreVars_;
     CoreEventDataQueue events_;
-    ListnersArr listners_;
+    ListnersArr listeners_;
 
     CoreEventData resizeEvent_;
     CoreEventData moveEvent_;
