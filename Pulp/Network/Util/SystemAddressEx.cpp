@@ -337,7 +337,7 @@ bool SystemAddressEx::resolve(const HostStr& hostStr, bool isHost, AddressArr& a
         SystemAddressEx addr;
 
         if (pCurAddr->ai_family == AF_INET) {
-            static_assert(sizeof(address_.addr4) == sizeof(struct platform::sockaddr_in), "Potentiall buffer overrun.");
+            static_assert(sizeof(address_.addr4) == sizeof(struct platform::sockaddr_in), "Potential buffer overrun.");
 
             // offset lignup checks,
             static_assert(X_OFFSETOF(addr4_in, family) == X_OFFSETOF(platform::sockaddr_in, sin_family), "offset mismatch");
@@ -352,7 +352,7 @@ bool SystemAddressEx::resolve(const HostStr& hostStr, bool isHost, AddressArr& a
             X_ASSERT(pCurAddr->ai_family == AF_INET6, "Unexpected familey")(pCurAddr->ai_family);
             X_ASSERT(pCurAddr->ai_addrlen == sizeof(struct platform::sockaddr_in6), "Address length is different than expected")(servinfo->ai_addrlen, sizeof(struct platform::sockaddr_in6));
 
-            static_assert(sizeof(address_.addr6) == sizeof(struct platform::sockaddr_in6), "Potentiall buffer overrun.");
+            static_assert(sizeof(address_.addr6) == sizeof(struct platform::sockaddr_in6), "Potential buffer overrun.");
 
             // offset lignup checks,
             static_assert(X_OFFSETOF(addr6_in, family) == X_OFFSETOF(platform::sockaddr_in6, sin6_family), "offset mismatch");
