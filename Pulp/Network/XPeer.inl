@@ -147,7 +147,7 @@ X_INLINE SendReceipt XPeer::incrementNextSendReceipt(void)
 
 X_INLINE uint16_t XPeer::getMaximumIncomingConnections(void) const
 {
-    return maxIncommingConnections_;
+    return maxIncomingConnections_;
 }
 
 X_INLINE uint32_t XPeer::getMaximunNumberOfPeers(void) const

@@ -98,7 +98,7 @@ public:
     void free(void);
     void closeConnection(void);
 
-    bool canSend(void) const;
+    X_NO_DISCARD bool canSend(void) const;
     ConnectionState::Enum getConnectionState(void) const;
     int32_t getAveragePing(void) const;
     int32_t getLastPing(void) const;
@@ -110,9 +110,9 @@ public:
         core::TimeVal sendPingTime, core::TimeVal sendPongTime);
     void onPong(core::TimeVal sendPingTime, core::TimeVal sendPongTime);
 
-    X_INLINE bool sendReliable(const uint8_t* pData, BitSizeT numberOfBitsToSend, bool ownData, PacketPriority::Enum priority,
+    X_NO_DISCARD X_INLINE bool sendReliable(const uint8_t* pData, BitSizeT numberOfBitsToSend, bool ownData, PacketPriority::Enum priority,
         PacketReliability::Enum reliability, OrderingChannel::Enum orderingChannel, core::TimeVal currentTime, SendReceipt receipt = INVALID_SEND_RECEIPT);
-    X_INLINE bool sendReliable(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
+    X_NO_DISCARD X_INLINE bool sendReliable(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
         PacketReliability::Enum reliability, OrderingChannel::Enum orderingChannel, core::TimeVal currentTime, SendReceipt receipt = INVALID_SEND_RECEIPT);
 
 private:
@@ -169,7 +169,7 @@ struct Ban
     core::TimeVal timeOut; // 0 = never.
 };
 
-// just to keep track of it's size for memory bandwidth consierations
+// just to keep track of it's size for memory bandwidth considerations
 // X_ENSURE_SIZE(BufferdCommand, 40)
 // X_ENSURE_SIZE(RemoteSystem, 520 + sizeof(ReliabilityLayer))
 // X_ENSURE_SIZE(RequestConnection, 72)
@@ -243,7 +243,7 @@ public:
 
     // IPeer
 
-    StartupResult::Enum init(int32_t maxConnections, core::span<const SocketDescriptor> socketDescriptors) X_FINAL;
+    X_NO_DISCARD StartupResult::Enum init(int32_t maxConnections, core::span<const SocketDescriptor> socketDescriptors) X_FINAL;
     void shutdown(core::TimeVal blockDuration, OrderingChannel::Enum orderingChannel,
         PacketPriority::Enum disconnectionNotificationPriority) X_FINAL;
 
@@ -252,29 +252,29 @@ public:
     void setPassword(const PasswordStr& pass) X_FINAL;
 
     // connection api
-    ConnectionAttemptResult::Enum connect(const HostStr& host, Port remotePort, const PasswordStr& password, uint32_t retryCount = 12,
+    X_NO_DISCARD ConnectionAttemptResult::Enum connect(const HostStr& host, Port remotePort, const PasswordStr& password, uint32_t retryCount = 12,
         core::TimeVal retryDelay = core::TimeVal(0.5f), core::TimeVal timeoutTime = core::TimeVal()) X_FINAL;
-    ConnectionAttemptResult::Enum connect(const IPStr& ip, Port remotePort, const PasswordStr& password, uint32_t retryCount = 12,
+    X_NO_DISCARD ConnectionAttemptResult::Enum connect(const IPStr& ip, Port remotePort, const PasswordStr& password, uint32_t retryCount = 12,
         core::TimeVal retryDelay = core::TimeVal(0.5f), core::TimeVal timeoutTime = core::TimeVal()) X_FINAL;
-    ConnectionAttemptResult::Enum connect(const SystemAddress& systemAddress, const PasswordStr& password, uint32_t retryCount = 12,
+    X_NO_DISCARD ConnectionAttemptResult::Enum connect(const SystemAddress& systemAddress, const PasswordStr& password, uint32_t retryCount = 12,
         core::TimeVal retryDelay = core::TimeVal(0.5f), core::TimeVal timeoutTime = core::TimeVal()) X_FINAL;
 
     void closeConnection(SystemHandle systemHandle, bool sendDisconnectionNotification,
         OrderingChannel::Enum orderingChannel, PacketPriority::Enum notificationPriority) X_FINAL;
 
     // connection util
-    SystemHandle getSystemHandleForAddress(const SystemAddress& systemAddress) const X_FINAL;
-    ConnectionState::Enum getConnectionState(SystemHandle systemHandle) const X_FINAL;
-    ConnectionState::Enum getConnectionState(const SystemAddress& systemAddress) X_FINAL;
+    X_NO_DISCARD SystemHandle getSystemHandleForAddress(const SystemAddress& systemAddress) const X_FINAL;
+    X_NO_DISCARD ConnectionState::Enum getConnectionState(SystemHandle systemHandle) const X_FINAL;
+    X_NO_DISCARD ConnectionState::Enum getConnectionState(const SystemAddress& systemAddress) X_FINAL;
     void cancelConnectionAttempt(const SystemAddress& target) X_FINAL;
 
-    SendReceipt send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
+    X_NO_DISCARD SendReceipt send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
         PacketReliability::Enum reliability, SystemHandle systemHandle, OrderingChannel::Enum orderingChannel,
         bool broadcast, SendReceipt forceReceiptNumber = INVALID_SEND_RECEIPT) X_FINAL;
 
     void sendLoopback(const uint8_t* pData, size_t lengthBytes) X_FINAL;
 
-    Packet* receive(void) X_FINAL;
+    X_NO_DISCARD Packet* receive(void) X_FINAL;
     void clearPackets(void) X_FINAL; // free's any packets in the receive que.
 
     // drain me
@@ -302,7 +302,7 @@ public:
     void listBans(void) const;
     void listLocalAddress(void) const;
 
-    bool getPingInfo(SystemHandle systemHandle, PingInfo& info) const X_FINAL;
+    X_NO_DISCARD bool getPingInfo(SystemHandle systemHandle, PingInfo& info) const X_FINAL;
 
     X_INLINE const NetGUID& getMyGUID(void) const X_FINAL;
     SystemAddress getMyBoundAddress(void) const X_FINAL;
@@ -312,7 +312,7 @@ public:
     SystemAddress getAddressForHandle(SystemHandle systemHandle) const X_FINAL;
     NetGUID getGuidForHandle(SystemHandle systemHandle) const X_FINAL;
 
-    bool getStatistics(const NetGUID guid, NetStatistics& stats) X_FINAL;
+    X_NO_DISCARD bool getStatistics(const NetGUID guid, NetStatistics& stats) X_FINAL;
 
     NetBandwidthStatistics getBandwidthStatistics(void) const X_FINAL;
 
@@ -356,19 +356,19 @@ private:
     X_INLINE void pushPacket(MessageID::Enum msgId, const SystemAddressEx& sysAdd, const NetGUID& guid);
     X_INLINE void pushPacket(MessageID::Enum msgId, const RemoteSystem& rs);
 
-    Packet* allocPacket(size_t lengthBits);
+    X_NO_DISCARD Packet* allocPacket(size_t lengthBits);
     void freePacket(Packet* pPacket) X_FINAL;
 
-    BufferdCommand* allocBufferdCmd(BufferdCommand::Cmd::Enum type, size_t lengthBits);
-    void freeBufferdCmd(BufferdCommand* pBufCmd);
+    X_NO_DISCARD BufferdCommand* allocBufferedCmd(BufferdCommand::Cmd::Enum type, size_t lengthBits);
+    void freeBufferedCmd(BufferdCommand* pBufCmd);
 
-    uint8_t* allocPacketData(size_t lengthBytes);
+    X_NO_DISCARD uint8_t* allocPacketData(size_t lengthBytes);
     void freePacketData(uint8_t* pPacketData);
 
-    RecvData* allocRecvData(void);
+    X_NO_DISCARD RecvData* allocRecvData(void);
     void freeRecvData(RecvData* pRecvData);
 
-    RequestConnection* allocConnectionRequest(void);
+    X_NO_DISCARD RequestConnection* allocConnectionRequest(void);
     void freeConnectionRequest(RequestConnection* pConReq);
 
     X_INLINE SendReceipt nextSendReceipt(void);
@@ -382,7 +382,7 @@ private:
 private:
     void processRecvData(UpdateBitStream& updateBS, core::TimeVal timeNow);
     void processConnectionRequests(UpdateBitStream& updateBS, core::TimeVal timeNow);
-    void processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal timeNow);
+    void processBufferedCommands(UpdateBitStream& updateBS, core::TimeVal timeNow);
     void remoteReliabilityTick(UpdateBitStream& updateBS, core::TimeVal timeNow);
     void remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, core::TimeVal timeNow);
 
@@ -413,7 +413,7 @@ private:
 
     // ------
 
-    RemoteSystem* addRemoteSystem(const SystemAddressEx& sysAdd, NetGUID guid, int32_t remoteMTU,
+    X_NO_DISCARD RemoteSystem* addRemoteSystem(const SystemAddressEx& sysAdd, NetGUID guid, int32_t remoteMTU,
         NetSocket* pSrcSocket, const SystemAddressEx& bindingAdd, ConnectState::Enum state);
     void disconnectRemote(RemoteSystem& rs);
     bool isIpConnectSpamming(const SystemAddressEx& sysAdd, core::TimeVal* pDeltaOut = nullptr);
@@ -421,11 +421,11 @@ private:
     // ------
 
     X_INLINE void onSocketRecv(RecvData* pData);
-    core::Thread::ReturnValue socketRecvThreadProc(const core::Thread& thread);
+    X_NO_DISCARD core::Thread::ReturnValue socketRecvThreadProc(const core::Thread& thread);
 
     // ------
 
-    NonceHash::Digest generateNonce(void);
+    X_NO_DISCARD NonceHash::Digest generateNonce(void);
 
 private:
     NetVars& vars_;
@@ -435,7 +435,7 @@ private:
 
     core::TimeVal unreliableTimeOut_;
     int32_t defaultMTU_;
-    int32_t maxIncommingConnections_;
+    int32_t maxIncomingConnections_;
     int32_t maxPeers_;
     bool drainSockets_;
     core::AtomicInt sendReceiptSerial_;
@@ -445,7 +445,7 @@ private:
     ThreadArr socketThreads_;
 
     // ques.
-    BufferdCommandQue bufferdCmds_;
+    BufferdCommandQue bufferedCmds_;
     PacketQue packetQue_;
     RecvDataQue recvDataQue_;
 
@@ -454,7 +454,7 @@ private:
 
     BanArr bans_;
 
-    // rmeote systems
+    // remote systems
     RemoteSystemArr remoteSystems_;
     RemoteSystemPtrArr activeRemoteSystems_;
     RemoteSystemLookupArr remoteSystemLookup_;

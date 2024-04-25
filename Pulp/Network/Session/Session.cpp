@@ -111,12 +111,21 @@ void Session::update(void)
     pPeer_->runUpdate();
 
     // potentially we have now received packets.
-    readPackets();
+    if (!readPackets()) {
 
-    lobbys_[LobbyType::Party].handleState();
-    lobbys_[LobbyType::Game].handleState();
+    }
 
-    handleState();
+    if (!lobbys_[LobbyType::Party].handleState()) {
+        X_ERROR("Session", "Error updating party lobby");
+    }
+
+    if (!lobbys_[LobbyType::Game].handleState()) {
+        X_ERROR("Session", "Error updating game lobby");
+    }
+
+    if (!handleState()) {
+
+    }
 
     processPendingPeers();
 }
@@ -153,7 +162,7 @@ void Session::handleSnapShots(core::FrameTimeData& timeInfo)
     auto bufferedTime = calculateSnapShotBufferTime();
 
     // work out what our effective rate should be.
-    // so if the server is sending 100ms of data but we get it over 110ms we strech the buffer locally.
+    // so if the server is sending 100ms of data but we get it over 110ms we stretch the buffer locally.
     // so our effective rate would be 1.1f;
     auto effectiveSnapRate = static_cast<float>(bufferedTime.totalTimeMS) / static_cast<float>(bufferedTime.totalRecvTimeMS);
 
@@ -251,7 +260,6 @@ void Session::processSnapShot(void)
 
 void Session::connect(SystemAddress address)
 {
-    // biiiiitcooooonnneeeecttt!!!!
     quitToMenu();
 
     // we always try to connect to party lobby.
@@ -480,7 +488,7 @@ void Session::sendSnapShot(core::FrameTimeData& timeInfo)
 void Session::sendSnapShot(SnapShot&& snap)
 {
     X_ASSERT(state_ == SessionState::InGame, "Should only send snapshot if in game")(state_);
-    X_ASSERT(snap.getTimeMS() >= 0, "Shapshot time is not valid")(snap.getTimeMS());
+    X_ASSERT(snap.getTimeMS() >= 0, "Snapshot time is not valid")(snap.getTimeMS());
 
     // to all peers.
     lobbys_[LobbyType::Game].sendSnapShot(snap);
@@ -524,7 +532,6 @@ ConnectionAttemptResult::Enum Session::connectToPeer(LobbyType::Enum type, Syste
     }
 
     // new connection.
-    // Bittttttcoooonnneeeeeeeeectt!!!!
     auto delay = core::TimeVal::fromMS(vars_.connectionRetryDelayMs());
 
     auto res = pPeer_->connect(sa, PasswordStr(), vars_.connectionAttemps(), delay);
@@ -549,14 +556,13 @@ ConnectionAttemptResult::Enum Session::connectToPeer(LobbyType::Enum type, Syste
 
 void Session::closeConnection(LobbyType::Enum type, SystemHandle systemHandle)
 {
-    for (size_t i = 0; i < peers_.size(); i++)
-    {
+    for (size_t i = 0; i < peers_.size(); i++) {
         auto& p = peers_[i];
 
         if (p.sysHandle == systemHandle) {
-        
             auto flag = ConnectedPeer::typeToFlag(type);
-            X_ASSERT(p.flags.IsSet(flag), "Peer is not in lobby")(type);
+            X_ASSERT(p.flags.IsSet(flag), "Peer is not in lobby")
+            (type);
 
             p.flags.Remove(flag);
             if (!p.flags.IsAnySet()) {
@@ -583,8 +589,8 @@ void Session::onLostConnectionToHost(LobbyType::Enum type)
 
 void Session::onReceiveSnapShot(SnapShot&& snap)
 {
-    X_ASSERT(snap.getTimeMS() >= 0, "Shapshot time is not valid")(snap.getTimeMS(), snap.getRecvTimeMS());
-    X_ASSERT(snap.getRecvTimeMS() < 0, "Shapshot recvtime should not be set")(snap.getTimeMS(), snap.getRecvTimeMS());
+    X_ASSERT(snap.getTimeMS() >= 0, "Snapshot time is not valid")(snap.getTimeMS(), snap.getRecvTimeMS());
+    X_ASSERT(snap.getRecvTimeMS() < 0, "Snapshot recvtime should not be set")(snap.getTimeMS(), snap.getRecvTimeMS());
 
     if (receivedSnaps_.freeSpace() == 0)
     {
@@ -666,7 +672,7 @@ void Session::peerJoinedLobby(LobbyType::Enum type, SystemHandle handle)
 
     auto flag = ConnectedPeer::typeToFlag(type);
 
-    // they should be a exsiting peer, that has joined another lobby.
+    // they should be a existing peer, that has joined another lobby.
     for (auto& p : peers_)
     {
         if (p.sysHandle == handle) {
@@ -780,6 +786,7 @@ bool Session::handleState(void)
         default:
             X_NO_SWITCH_DEFAULT_ASSERT;
     }
+
     return false;
 }
 
@@ -1239,7 +1246,7 @@ void Session::getSessionInfo(SessionInfo& info) const
 
 bool Session::isHost(void) const
 {
-    // not sure what states I will allowthis to be caleld form yet.
+    // not sure what states I will allow this to be called from yet.
     //X_ASSERT(getStatus() == SessionStatus::InGame, "Unexpected status")(getStatus());
 
     return lobbys_[LobbyType::Game].isHost();

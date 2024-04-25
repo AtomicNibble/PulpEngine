@@ -77,24 +77,24 @@ X_INLINE int32_t NetVars::connectionBSPLimit(void) const
     return connectionBSPLimit_;
 }
 
-X_INLINE bool NetVars::artificalNetworkEnabled(void) const
+X_INLINE bool NetVars::artificialNetworkEnabled(void) const
 {
-    return artificalNetwork_ != 0;
+    return artificialNetwork_ != 0;
 }
 
-X_INLINE float32_t NetVars::artificalPacketLoss(void) const
+X_INLINE float32_t NetVars::artificialPacketLoss(void) const
 {
-    return artificalPacketLoss_;
+    return artificialPacketLoss_;
 }
 
-X_INLINE int32_t NetVars::artificalPing(void) const
+X_INLINE int32_t NetVars::artificialPing(void) const
 {
-    return artificalPing_;
+    return artificialPing_;
 }
 
-X_INLINE int32_t NetVars::artificalPingVariance(void) const
+X_INLINE int32_t NetVars::artificialPingVariance(void) const
 {
-    return artificalPingVariance_;
+    return artificialPingVariance_;
 }
 
 X_INLINE core::Compression::Algo::Enum NetVars::ackCompAlgo(void) const

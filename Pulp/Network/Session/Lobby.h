@@ -167,8 +167,8 @@ public:
 
     void reset(void);
 
-    bool handleState(void);
-    bool handlePacket(Packet* pPacket);
+    X_NO_DISCARD bool handleState(void);
+    void handlePacket(Packet* pPacket);
 
     void connectTo(SystemAddress address);
     void startHosting(const MatchParameters& params);
@@ -214,8 +214,8 @@ public:
     X_INLINE int32_t getNumFreeUserSlots(void) const X_FINAL;
 
     void getUserInfoForIdx(int32_t idx, UserInfo& info) const X_FINAL;
-    bool getUserInfoForGuid(NetGUID guid, UserInfo& info) const X_FINAL;
-    core::string_view getUserNameForGuid(NetGUID guid) const X_FINAL;
+    X_NO_DISCARD bool getUserInfoForGuid(NetGUID guid, UserInfo& info) const X_FINAL;
+    X_NO_DISCARD core::string_view getUserNameForGuid(NetGUID guid) const X_FINAL;
 
     // Misc
     X_INLINE bool isActive(void) const X_FINAL;
@@ -230,7 +230,7 @@ public:
     X_INLINE void beganLoading(void);
     X_INLINE bool hasFinishedLoading(void) const;
 
-    bool tryPopChatMsg(ChatMsg& msg) X_FINAL;
+    X_NO_DISCARD bool tryPopChatMsg(ChatMsg& msg) X_FINAL;
 
     Vec2f drawDebug(Vec2f base, engine::IPrimitiveContext* pPrim) const;
 
@@ -286,10 +286,10 @@ private:
     void sendJoinRequestToHost(void);
 
 private:
-    bool stateIdle(void);
-    bool stateCreating(void);
-    bool stateConnecting(void);
-    bool stateJoining(void);
+    X_NO_DISCARD bool stateIdle(void);
+    X_NO_DISCARD bool stateCreating(void);
+    X_NO_DISCARD bool stateConnecting(void);
+    X_NO_DISCARD bool stateJoining(void);
 
 private:
     void initStateLobbyHost(void);

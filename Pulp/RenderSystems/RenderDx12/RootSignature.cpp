@@ -230,7 +230,7 @@ RootSignatureDeviceCache::HashVal RootSignature::gethashAndPopulateDescriptorTab
 
             if (descriptorTableSize_[param] > 32) {
                 // this is due to 32bit flags in DecriptorCache
-                X_ERROR("Dx12", "RootSig param %" PRIu32 " table size %" PRIu32 " > 32, which exceeds the artifical limit",
+                X_ERROR("Dx12", "RootSig param %" PRIu32 " table size %" PRIu32 " > 32, which exceeds the artificial limit",
                     param, descriptorTableSize_[param]);
             }
 

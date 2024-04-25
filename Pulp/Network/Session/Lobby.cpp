@@ -208,7 +208,7 @@ bool Lobby::handleState(void)
     return false;
 }
 
-bool Lobby::handlePacket(Packet* pPacket)
+void Lobby::handlePacket(Packet* pPacket)
 {
     auto id = pPacket->getID();
 
@@ -287,10 +287,9 @@ bool Lobby::handlePacket(Packet* pPacket)
             handleLobbyChatMsg(pPacket);
             break;
         default:
+            X_ERROR("Lobby", "Unhandled messageID: \"%s\"", MessageID::ToString(id));
             break;
     }
-
-    return false;
 }
 
 // -------------------------------------------

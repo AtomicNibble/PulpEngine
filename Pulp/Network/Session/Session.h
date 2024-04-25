@@ -166,7 +166,7 @@ public:
     bool hasFinishedLoading(void) const X_FINAL;
 
     void quitToMenu(void) X_FINAL;
-    void quitMatch(void) X_FINAL;        // gracefull quit of match, will tell peers we left etc.
+    void quitMatch(void) X_FINAL;        // graceful quit of match, will tell peers we left etc.
     void createPartyLobby(const MatchParameters& parms) X_FINAL;
     void createMatch(const MatchParameters& parms) X_FINAL;
     void startMatch(void) X_FINAL;
@@ -219,25 +219,25 @@ private:
 
 private:
 
-    bool stateIdle(void);
-    bool stateCreateAndMoveToPartyLobby(void);
-    bool stateCreateAndMoveToGameLobby(void);
-    bool statePartyLobbyHost(void);
-    bool statePartyLobbyPeer(void);
-    bool stateGameLobbyHost(void);
-    bool stateGameLobbyPeer(void);
-    bool stateConnectAndMoveToParty(void);
-    bool stateConnectAndMoveToGame(void);
-    bool stateLoading(void);
-    bool stateInGame(void);
+    X_NO_DISCARD bool stateIdle(void);
+    X_NO_DISCARD bool stateCreateAndMoveToPartyLobby(void);
+    X_NO_DISCARD bool stateCreateAndMoveToGameLobby(void);
+    X_NO_DISCARD bool statePartyLobbyHost(void);
+    X_NO_DISCARD bool statePartyLobbyPeer(void);
+    X_NO_DISCARD bool stateGameLobbyHost(void);
+    X_NO_DISCARD bool stateGameLobbyPeer(void);
+    X_NO_DISCARD bool stateConnectAndMoveToParty(void);
+    X_NO_DISCARD bool stateConnectAndMoveToGame(void);
+    X_NO_DISCARD bool stateLoading(void);
+    X_NO_DISCARD bool stateInGame(void);
 
-    bool hasLobbyCreateCompleted(Lobby& lobby);
-    bool handleConnectAndMoveToLobby(Lobby& lobby);
+    X_NO_DISCARD bool hasLobbyCreateCompleted(Lobby& lobby);
+    X_NO_DISCARD bool handleConnectAndMoveToLobby(Lobby& lobby);
     void handleConnectionFailed(Lobby& lobby);
 
     void startLoading(void);
 
-    bool readPackets(void);
+    X_NO_DISCARD bool readPackets(void);
 
 
 private:

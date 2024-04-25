@@ -34,10 +34,10 @@ public:
     X_INLINE int32_t unexpectedMsgBanTime(void) const;
     X_INLINE int32_t connectionBSPLimit(void) const;
 
-    X_INLINE bool artificalNetworkEnabled(void) const;
-    X_INLINE float32_t artificalPacketLoss(void) const;
-    X_INLINE int32_t artificalPing(void) const;
-    X_INLINE int32_t artificalPingVariance(void) const;
+    X_INLINE bool artificialNetworkEnabled(void) const;
+    X_INLINE float32_t artificialPacketLoss(void) const;
+    X_INLINE int32_t artificialPing(void) const;
+    X_INLINE int32_t artificialPingVariance(void) const;
 
     X_INLINE core::Compression::Algo::Enum ackCompAlgo(void) const;
     X_INLINE core::Compression::Algo::Enum compAlgo(void) const;
@@ -45,7 +45,7 @@ public:
 private:
     void Var_OnDefaultTimeoutChanged(core::ICVar* pVar);
     void Var_OnPingTimeChanged(core::ICVar* pVar);
-    void Var_OnArtificalNetworkChanged(core::ICVar* pVar);
+    void Var_OnArtificialNetworkChanged(core::ICVar* pVar);
 
 private:
     int32_t port_;
@@ -65,10 +65,10 @@ private:
     int32_t unexpectedMsgBanTime_;
     int32_t connectionBSPLimit_;
 
-    int32_t artificalNetwork_;
-    float32_t artificalPacketLoss_;
-    int32_t artificalPing_;
-    int32_t artificalPingVariance_;
+    int32_t artificialNetwork_;
+    float32_t artificialPacketLoss_;
+    int32_t artificialPing_;
+    int32_t artificialPingVariance_;
 
     int32_t ackCompAlgo_;
     int32_t compAlgo_;

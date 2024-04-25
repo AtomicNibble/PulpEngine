@@ -62,23 +62,23 @@ void NetVars::registerVars(void)
         "Time in MS to ban a client that sends a unexpected msg. eg: sending post connection msg before connecting. 0=never");
 
     ADD_CVAR_REF("net_connection_bandwidth_limit", connectionBSPLimit_, 0, 0, std::numeric_limits<int32_t>::max(), core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-        "Limits outgoing bandwidth(BPS) per connection, once the limit is reached traffic is qeued. 0=unlimited");
+        "Limits outgoing bandwidth(BPS) per connection, once the limit is reached traffic is queued. 0=unlimited");
 
-    del.Bind<NetVars, &NetVars::Var_OnArtificalNetworkChanged>(this);
+    del.Bind<NetVars, &NetVars::Var_OnArtificialNetworkChanged>(this);
 
-    // artifical ping / packet loss.
-    ADD_CVAR_REF("net_art", artificalNetwork_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-        "Enable artifical network. This just enabled vars like 'net_art_packet_loss'")
+    // artificial ping / packet loss.
+    ADD_CVAR_REF("net_art", artificialNetwork_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Enable artificial network. This just enabled vars like 'net_art_packet_loss'")
         ->SetOnChangeCallback(del);
 
-    ADD_CVAR_REF("net_art_packet_loss", artificalPacketLoss_, 0.f, 0.f, 100.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-        "Introduce artifical outgoing packet loss, percentage chance.");
+    ADD_CVAR_REF("net_art_packet_loss", artificialPacketLoss_, 0.f, 0.f, 100.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Introduce artificial outgoing packet loss, percentage chance.");
 
-    ADD_CVAR_REF("net_art_ping", artificalPing_, 0, 0, 999, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-        "Introduce artifical ping, all messages will have a ping of atleast this value. 0=disabled");
+    ADD_CVAR_REF("net_art_ping", artificialPing_, 0, 0, 999, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Introduce artificial ping, all messages will have a ping of atleast this value. 0=disabled");
 
-    ADD_CVAR_REF("net_art_ping_variance", artificalPingVariance_, 0, 0, 999, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-        "Introduce artifical ping variance");
+    ADD_CVAR_REF("net_art_ping_variance", artificialPingVariance_, 0, 0, 999, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Introduce artificial ping variance");
 
     // how to add algo names to var desc.
     // needs to be compile time str.
@@ -120,13 +120,13 @@ void NetVars::Var_OnPingTimeChanged(core::ICVar* pVar)
     }
 }
 
-void NetVars::Var_OnArtificalNetworkChanged(core::ICVar* pVar)
+void NetVars::Var_OnArtificialNetworkChanged(core::ICVar* pVar)
 {
     int32_t val = pVar->GetInteger();
     if (val) {
         // warn that's it's enabled, hopefully it stops someone spending ages trying to debug some network issue.
-        // to find artifical network is enabled hehhe.
-        X_WARNING("Net", "Artifical network is enabled");
+        // to find artificial network is enabled hehhe.
+        X_WARNING("Net", "Artificial network is enabled");
     }
 }
 

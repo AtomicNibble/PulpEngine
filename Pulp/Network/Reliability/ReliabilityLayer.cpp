@@ -1331,8 +1331,8 @@ void ReliabilityLayer::sendNAKs(NetSocket& socket, core::FixedBitStreamBase& bs,
 
 void ReliabilityLayer::sendBitStream(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAddressEx& systemAddress, core::TimeVal time)
 {
-    if (vars_.artificalNetworkEnabled()) {
-        float percent = vars_.artificalPacketLoss();
+    if (vars_.artificialNetworkEnabled()) {
+        float percent = vars_.artificialPacketLoss();
         float randVal = gEnv->xorShift.randRange(0.f, 100.f);
 
         if (randVal < percent) {
@@ -1341,12 +1341,12 @@ void ReliabilityLayer::sendBitStream(NetSocket& socket, core::FixedBitStreamBase
         }
 
         // pingy.
-        if (vars_.artificalPing() || vars_.artificalPingVariance()) {
-            uint32_t totalMsDelay = vars_.artificalPing();
+        if (vars_.artificialPing() || vars_.artificialPingVariance()) {
+            uint32_t totalMsDelay = vars_.artificialPing();
 
             // dash of spice!
-            if (vars_.artificalPingVariance()) {
-                uint32_t randomVariance = gEnv->xorShift.randRange(0u, vars_.artificalPingVariance());
+            if (vars_.artificialPingVariance()) {
+                uint32_t randomVariance = gEnv->xorShift.randRange(0u, vars_.artificialPingVariance());
                 totalMsDelay += randomVariance;
             }
 
@@ -1404,7 +1404,7 @@ void ReliabilityLayer::freePacket(ReliablePacket* pPacket)
     X_DELETE(pPacket, packetPool_);
 }
 
-SplitPacketChannel* ReliabilityLayer::allocSplicPacketChannel(void)
+SplitPacketChannel* ReliabilityLayer::allocSplitPacketChannel(void)
 {
     return X_NEW(SplitPacketChannel, arena_, "PacketChannel")(arena_);
 }
@@ -1527,7 +1527,7 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
     SplitPacketChannel* pChannel = nullptr;
 
     if (channelIt == splitPacketChannels_.end()) {
-        pChannel = allocSplicPacketChannel();
+        pChannel = allocSplitPacketChannel();
         pChannel->splitId = splitId;
         pChannel->packets.resize(pPacket->splitPacketCount); // we know how many we gonna get.
 

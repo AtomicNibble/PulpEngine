@@ -228,7 +228,7 @@ XPeer::XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaB
     remoteSystems_(arena),
     activeRemoteSystems_(arena),
     remoteSystemLookup_(arena),
-    bufferdCmds_(arena),
+    bufferedCmds_(arena),
     packetQue_(arena),
     recvDataQue_(arena),
     connectionReqs_(arena),
@@ -267,13 +267,13 @@ XPeer::XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaB
     unreliableTimeOut_ = core::TimeVal::fromMS(1000 * 10);
 
     defaultMTU_ = MAX_MTU_SIZE;
-    maxIncommingConnections_ = 0;
+    maxIncomingConnections_ = 0;
     maxPeers_ = 0;
     drainSockets_ = false;
 
     pJobSys_ = gEnv->pJobSys;
 
-    bufferdCmds_.reserve(256);
+    bufferedCmds_.reserve(256);
     packetQue_.reserve(256);
     recvDataQue_.reserve(256);
 
@@ -356,8 +356,8 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketD
 
     maxPeers_ = maxConnections;
 
-    if (maxIncommingConnections_ > maxConnections) {
-        maxIncommingConnections_ = maxConnections;
+    if (maxIncomingConnections_ > maxConnections) {
+        maxIncomingConnections_ = maxConnections;
     }
 
     {
@@ -401,7 +401,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketD
         NetGuidStr guidStr;
         X_LOG0("Net", "ProtoVersion: ^5%" PRIu8 ".%" PRIu8, PROTO_VERSION_MAJOR, PROTO_VERSION_MINOR);
         X_LOG0("Net", "Max peers: ^5%" PRIi32, maxPeers_);
-        X_LOG0("Net", "Max incoming connections: ^5%" PRIi32, maxIncommingConnections_);
+        X_LOG0("Net", "Max incoming connections: ^5%" PRIi32, maxIncomingConnections_);
         X_LOG0("Net", "GUID: ^5%s", guid_.toString(guidStr));
         {
             X_LOG0("Net", "Listening on ^5%" PRIuS " endpoints", sockets_.size());
@@ -509,8 +509,8 @@ void XPeer::shutdown(core::TimeVal blockDuration, OrderingChannel::Enum ordering
     activeRemoteSystems_.clear();
     remoteSystemLookup_.clear();
 
-    bufferdCmds_.popAll([this](BufferdCommand* pCmd) {
-        freeBufferdCmd(pCmd);
+    bufferedCmds_.popAll([this](BufferdCommand* pCmd) {
+        freeBufferedCmd(pCmd);
     });
 
     packetQue_.popAll([this](Packet* pPacket) {
@@ -538,7 +538,7 @@ void XPeer::runUpdate(void)
     // then once that's been done jobs can be created to pass the data to the reliability layers where the processing is actually done.
     processRecvData(updateBS, timeNow);
     processConnectionRequests(updateBS, timeNow);
-    processBufferdCommands(updateBS, timeNow);
+    processBufferedCommands(updateBS, timeNow);
 
     // if just one remote better to not make jobs.
     // as we can reuse current updateBS which should be hot in cache.
@@ -669,13 +669,13 @@ void XPeer::closeConnection(SystemHandle systemHandle, bool sendDisconnectionNot
 
     X_LOG0_IF(vars_.debugEnabled(), "Net", "Queued CloseConnection, send notification: %" PRIi32, static_cast<int32_t>(sendDisconnectionNotification));
 
-    BufferdCommand* pCmd = allocBufferdCmd(BufferdCommand::Cmd::CloseConnection, 0);
+    BufferdCommand* pCmd = allocBufferedCmd(BufferdCommand::Cmd::CloseConnection, 0);
     pCmd->priority = notificationPriority;
     pCmd->orderingChannel = orderingChannel;
     pCmd->systemHandle = systemHandle;
     pCmd->systemAddress = UNASSIGNED_SYSTEM_ADDRESS;
     pCmd->sendDisconnectionNotification = sendDisconnectionNotification;
-    bufferdCmds_.push(pCmd);
+    bufferedCmds_.push(pCmd);
 }
 
 // connection util
@@ -803,7 +803,7 @@ void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pack
     X_ASSERT(numberOfBitsToSend > 0, "Null request should not reach here")(numberOfBitsToSend);
     X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 
-    BufferdCommand* pCmd = allocBufferdCmd(BufferdCommand::Cmd::Send, numberOfBitsToSend);
+    BufferdCommand* pCmd = allocBufferedCmd(BufferdCommand::Cmd::Send, numberOfBitsToSend);
     std::memcpy(pCmd->pData, pData, core::bitUtil::bitsToBytes(numberOfBitsToSend));
     pCmd->priority = priority;
     pCmd->reliability = reliability;
@@ -812,7 +812,7 @@ void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pack
     pCmd->systemHandle = systemHandle;
     pCmd->receipt = receipt;
 
-    bufferdCmds_.push(pCmd);
+    bufferedCmds_.push(pCmd);
 }
 
 void XPeer::notifyAndFlagForShutdown(RemoteSystem& rs, OrderingChannel::Enum orderingChannel, PacketPriority::Enum notificationPriority)
@@ -825,12 +825,9 @@ void XPeer::notifyAndFlagForShutdown(RemoteSystem& rs, OrderingChannel::Enum ord
 
     core::TimeVal now = gEnv->pTimer->GetTimeNowReal();
 
-    rs.sendReliable(
-        bsOut,
-        PacketPriority::Immediate,
-        PacketReliability::ReliableOrdered,
-        orderingChannel,
-        now);
+    if (!rs.sendReliable(bsOut, PacketPriority::Immediate, PacketReliability::ReliableOrdered, orderingChannel, now)) {
+        X_ERROR("Net", "Failed to send disconnect notification");
+    }
 
     rs.connectState = ConnectState::DisconnectAsap;
 }
@@ -1042,7 +1039,7 @@ void XPeer::freePacket(Packet* pPacket)
     X_DELETE(pPacket, &poolArena_);
 }
 
-BufferdCommand* XPeer::allocBufferdCmd(BufferdCommand::Cmd::Enum type, size_t lengthBits)
+BufferdCommand* XPeer::allocBufferedCmd(BufferdCommand::Cmd::Enum type, size_t lengthBits)
 {
     BufferdCommand* pCmd = X_NEW(BufferdCommand, &poolArena_, "BufferedCmd");
     pCmd->cmd = type;
@@ -1057,7 +1054,7 @@ BufferdCommand* XPeer::allocBufferdCmd(BufferdCommand::Cmd::Enum type, size_t le
     return pCmd;
 }
 
-void XPeer::freeBufferdCmd(BufferdCommand* pBufCmd)
+void XPeer::freeBufferedCmd(BufferdCommand* pBufCmd)
 {
     if (pBufCmd->pData) {
         freePacketData(pBufCmd->pData);
@@ -1124,11 +1121,11 @@ void XPeer::setDrainSockets(bool drainSocket)
 // connection limits
 void XPeer::setMaximumIncomingConnections(uint16_t numberAllowed)
 {
-    maxIncommingConnections_ = numberAllowed;
+    maxIncomingConnections_ = numberAllowed;
 
-    if (maxIncommingConnections_ > maxPeers_) {
+    if (maxIncomingConnections_ > maxPeers_) {
         X_ERROR("Net", "Tried to set max incoming connections(%" PRIu16 ") above max peers(%" PRIi32 "), capping", numberAllowed, maxPeers_);
-        maxIncommingConnections_ = maxPeers_;
+        maxIncomingConnections_ = maxPeers_;
     }
 
     X_LOG0_IF(vars_.debugEnabled() > 1, "Net", "Set maxIncomingConnections to: ^5%" PRIu16, numberAllowed);
@@ -1198,7 +1195,7 @@ bool XPeer::ping(const HostStr& host, Port remotePort, bool onlyReplyOnAccepting
     return result > 0;
 }
 
-void XPeer::sendPing(RemoteSystem& rs, PacketReliability::Enum rel)
+void  XPeer::sendPing(RemoteSystem& rs, PacketReliability::Enum rel)
 {
     core::FixedBitStreamStack<64> bsOut;
 
@@ -1206,12 +1203,14 @@ void XPeer::sendPing(RemoteSystem& rs, PacketReliability::Enum rel)
     bsOut.write(MessageID::ConnectedPing);
     bsOut.write(now.GetValue());
 
-    rs.sendReliable(
+    if (!rs.sendReliable(
         bsOut,
         PacketPriority::Immediate,
         rel,
         OrderingChannel::Default,
-        now);
+        now)) {
+        X_WARNING("Net", "Failed to send packet for ping");
+    }
 }
 
 // bans at connection level.
@@ -1624,14 +1623,14 @@ void XPeer::processConnectionRequests(UpdateBitStream& updateBS, core::TimeVal t
     }
 }
 
-void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal timeNow)
+void XPeer::processBufferedCommands(UpdateBitStream& updateBS, core::TimeVal timeNow)
 {
-    if (bufferdCmds_.isEmpty()) {
+    if (bufferedCmds_.isEmpty()) {
         return;
     }
 
     BufferdCommand* pBufCmd;
-    while (bufferdCmds_.tryPop(pBufCmd)) {
+    while (bufferedCmds_.tryPop(pBufCmd)) {
         X_ASSERT_NOT_NULL(pBufCmd); // no null ref plz!
         auto& cmd = *pBufCmd;
 
@@ -1672,13 +1671,13 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
             else {
                 RemoteSystem* pRemoteSystem = getRemoteSystem(cmd.systemHandle, true);
                 if (!pRemoteSystem) {
-                    freeBufferdCmd(pBufCmd);
+                    freeBufferedCmd(pBufCmd);
                     continue;
                 }
 
                 if (!pRemoteSystem->canSend()) {
                     X_WARNING_IF(vars_.debugEnabled(), "Net", "Tried to send data to remote, where sending is currently disabled");
-                    freeBufferdCmd(pBufCmd);
+                    freeBufferedCmd(pBufCmd);
                     continue;
                 }
 
@@ -1728,14 +1727,14 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 
             if (!pRemoteSystem) {
                 X_WARNING("Net", "Failed to find system for connection close");
-                freeBufferdCmd(pBufCmd);
+                freeBufferedCmd(pBufCmd);
                 continue;
             }
 
             if (!pRemoteSystem->isActive || pRemoteSystem->connectState != ConnectState::Connected) {
                 X_LOG0_IF(vars_.debugEnabled(), "Net", "Skipping closeConnection request, the remote is already disconnecting/disconnected. state: \"%s\"",
                     ConnectState::ToString(pRemoteSystem->connectState));
-                freeBufferdCmd(pBufCmd);
+                freeBufferedCmd(pBufCmd);
                 continue;
             }
 
@@ -1759,7 +1758,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
             X_ASSERT_UNREACHABLE();
         }
 
-        freeBufferdCmd(pBufCmd);
+        freeBufferedCmd(pBufCmd);
     }
 }
 
@@ -2284,12 +2283,14 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
                     }
 
                     // send the request to the remote.
-                    pSys->sendReliable(
+                    if (!pSys->sendReliable(
                         bsOut,
                         PacketPriority::Immediate,
                         PacketReliability::Reliable,
                         OrderingChannel::Default,
-                        timeNow);
+                        timeNow)) {
+                        X_ERROR("Net", "Failed to send reliable packet for connection request");
+                    }
                 }
                 else {
                     // failed to add remote sys.
@@ -2389,9 +2390,9 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
     // optional don't allow clients that give us a password when one not required.
     const bool clientMustNotSendPassword = false;
     // if this is true will force the hash check, which will fail.
-    const bool invalidPassord = (passwordInc && clientMustNotSendPassword);
+    const bool invalidPassword = (passwordInc && clientMustNotSendPassword);
 
-    if (password_.isNotEmpty() || invalidPassord) {
+    if (password_.isNotEmpty() || invalidPassword) {
         PasswdHash hash;
         hash.update(cnonce);
         hash.update(rs.nonce);
@@ -2402,12 +2403,14 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
             bsOut.write(MessageID::InvalidPassword);
             bsOut.write(guid_);
 
-            rs.sendReliable(
+            if (!rs.sendReliable(
                 bsOut,
                 PacketPriority::Immediate,
                 PacketReliability::Reliable,
                 OrderingChannel::Default,
-                timeNow);
+                timeNow)) {
+                X_ERROR("Net", "Failed to send reliable packet for invalid password");
+            }
 
             rs.connectState = ConnectState::DisconnectAsapSilent;
             return;
@@ -2426,12 +2429,14 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
     bsOut.write(timeStamp);
     bsOut.write(timeNow.GetValue());
 
-    rs.sendReliable(
+    if (!rs.sendReliable(
         bsOut,
         PacketPriority::Immediate,
         PacketReliability::Reliable,
         OrderingChannel::Default,
-        timeNow);
+        timeNow)) {
+        X_ERROR("Net", "Failed to send reliable packet for accepting connection request");
+    }
 }
 
 void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs, core::TimeVal timeNow)
@@ -2475,12 +2480,9 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
     bsOut.write(sendPongTime);
     bsOut.write(timeNow.GetValue());
 
-    rs.sendReliable(
-        bsOut,
-        PacketPriority::Immediate,
-        PacketReliability::Reliable,
-        OrderingChannel::Default,
-        timeNow);
+    if (!rs.sendReliable(bsOut, PacketPriority::Immediate, PacketReliability::Reliable, OrderingChannel::Default, timeNow)) {
+        X_ERROR("Net", "Failed to send connection request handshake");
+    }
 
     sendPing(rs, PacketReliability::UnReliable);
 
@@ -2537,12 +2539,14 @@ void XPeer::handleConnectedPing(UpdateBitStream& bsOut, RecvBitStream& bs, Remot
     bsOut.write(timeStamp);
     bsOut.write(timeNow);
 
-    rs.sendReliable(
+    if (!rs.sendReliable(
         bsOut,
         PacketPriority::Immediate,
         PacketReliability::UnReliable,
         OrderingChannel::Default,
-        timeNow);
+        timeNow)) {
+        X_WARNING("Net", "Failed to send reliable packet for pong");
+    }
 }
 
 void XPeer::handleConnectedPong(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
@@ -2698,11 +2702,11 @@ core::Thread::ReturnValue XPeer::socketRecvThreadProc(const core::Thread& thread
         else if (res == RecvResult::ConnectionReset) {
             // okay so we know a socket has been closed we don't need to wait for timeout.
             // we send buffered as we on different thread.
-            BufferdCommand* pCmd = allocBufferdCmd(BufferdCommand::Cmd::CloseConnection, 0);
+            BufferdCommand* pCmd = allocBufferedCmd(BufferdCommand::Cmd::CloseConnection, 0);
             pCmd->systemHandle = INVALID_SYSTEM_HANDLE;
             pCmd->systemAddress = pData->systemAddress;
             pCmd->sendDisconnectionNotification = false;
-            bufferdCmds_.push(pCmd);
+            bufferedCmds_.push(pCmd);
         }
         else if (res == RecvResult::Error) {
             // ...

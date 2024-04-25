@@ -78,7 +78,7 @@ public:
     size_t getHeaderLengthBits(void) const; // returns number of bits needed to store this header. it's different depending on priority types etc.
 
     void writeToBitStream(core::FixedBitStreamBase& bs) const;
-    bool fromBitStream(core::FixedBitStreamBase& bs);
+    X_NO_DISCARD bool fromBitStream(core::FixedBitStreamBase& bs);
 
     // cops values of fields excluding data ones.
     void assignPropertiesExcData(const ReliablePacket* pOth);
@@ -252,11 +252,11 @@ public:
     void reset(int32_t MTUSize);
 
     // que some data for sending, reliability is handled.
-    bool send(const uint8_t* pData, const BitSizeT lengthBits, core::TimeVal time, uint32_t mtuSize,
+    X_NO_DISCARD bool send(const uint8_t* pData, const BitSizeT lengthBits, core::TimeVal time, uint32_t mtuSize,
         PacketPriority::Enum priority, PacketReliability::Enum reliability, OrderingChannelIdx orderingChannel, SendReceipt receipt, bool ownData);
 
     // pass data from socket for processing
-    bool recv(uint8_t* pData, const size_t lengt, NetSocket& socket,
+    X_NO_DISCARD bool recv(uint8_t* pData, const size_t lengt, NetSocket& socket,
         SystemAddressEx& systemAddress, core::TimeVal time, uint32_t mtuSize);
 
     // update internal logic, re-send packets / other reliability actions.
@@ -264,7 +264,7 @@ public:
         core::TimeVal time);
 
     // pop any packets that have arrived.
-    bool receive(PacketData& dataOut);
+    X_NO_DISCARD bool receive(PacketData& dataOut);
 
     void getStatistics(NetStatistics& stats);
     void getStatistics(NetStatistics& stats) const;
@@ -280,7 +280,7 @@ private:
     size_t calculateMemoryUsage(void) const;
 
 private:
-    ProcessResult::Enum prcoessIncomingPacket(ReliablePacket*& pPacketInOut, core::TimeVal time);
+    X_NO_DISCARD ProcessResult::Enum prcoessIncomingPacket(ReliablePacket*& pPacketInOut, core::TimeVal time);
     void ignorePacket(ReliablePacket* pPacket, core::TimeVal time);
     void addPacketToReceivedQueue(ReliablePacket* pPacket, core::TimeVal time);
 
@@ -295,28 +295,28 @@ private:
     X_INLINE BitSizeT maxDataGramSizeExcHdrBits(void) const;
 
 private:
-    bool hasTimedOut(core::TimeVal time);
+    X_NO_DISCARD bool hasTimedOut(core::TimeVal time);
 
     void sendACKs(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAddressEx& systemAddress, core::TimeVal time);
     void sendNAKs(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAddressEx& systemAddress, core::TimeVal time);
     void sendBitStream(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAddressEx& systemAddress, core::TimeVal time);
 
-    ReliablePacket* packetFromBS(core::FixedBitStreamBase& bs, core::TimeVal time);
-    ReliablePacket* allocPacket(void);
-    SplitPacketChannel* allocSplicPacketChannel(void);
+    X_NO_DISCARD ReliablePacket* packetFromBS(core::FixedBitStreamBase& bs, core::TimeVal time);
+    X_NO_DISCARD ReliablePacket* allocPacket(void);
+    X_NO_DISCARD SplitPacketChannel* allocSplitPacketChannel(void);
     void freePacket(ReliablePacket* pPacket);
-    bool splitPacket(ReliablePacket* pPacket);
+    X_NO_DISCARD bool splitPacket(ReliablePacket* pPacket);
     void freeSplitPacketChannel(SplitPacketChannel* pSPC);
 
     // received split packets.
-    ReliablePacket* addIncomingSplitPacket(ReliablePacket* pPacket, core::TimeVal time);
+    X_NO_DISCARD ReliablePacket* addIncomingSplitPacket(ReliablePacket* pPacket, core::TimeVal time);
 
 private:
     // these are created each time a data gram is sent.
     // so if a packet gets resent a new one of these will be made.
-    DataGramHistory* createDataGramHistory(DataGramSequenceNumber number, core::TimeVal time);
-    DataGramHistory* getDataGramHistory(DataGramSequenceNumber number);
-    bool clearDataGramHistory(DataGramSequenceNumber number);
+    X_NO_DISCARD DataGramHistory* createDataGramHistory(DataGramSequenceNumber number, core::TimeVal time);
+    X_NO_DISCARD DataGramHistory* getDataGramHistory(DataGramSequenceNumber number);
+    X_NO_DISCARD bool clearDataGramHistory(DataGramSequenceNumber number);
 
 private:
     X_INLINE size_t resendBufferIdxForMsgNum(MessageNumber msgNum) const;
@@ -332,7 +332,7 @@ private:
 
     INTRUSIVE_LIST_DECLARE(ReliablePacket, reliableLink) resendList_;
 
-    X_INLINE bool isOlderPacket(OrderingIndex packetIdx, OrderingIndex currentIdx);
+    X_NO_DISCARD X_INLINE bool isOlderPacket(OrderingIndex packetIdx, OrderingIndex currentIdx);
 
 private:
     NetVars& vars_;
@@ -349,7 +349,7 @@ private:
     OrdereIndexArr orderedWriteIndex_;         // inc for every ordered msg sent
     OrdereIndexArr sequencedWriteIndex_;       // inc for every sequenced msg sent, reset if orderedWriteIndex_ changes.
     OrdereIndexArr orderedReadIndex_;          // next 'expected' ordered index
-    OrdereIndexArr highestSequencedReadIndex_; // higest value received for sequencedWriteIndex, for current orderedReadIndex_.
+    OrdereIndexArr highestSequencedReadIndex_; // highest value received for sequencedWriteIndex, for current orderedReadIndex_.
     OrdereIndexArr orderingQueueIndexOffset_;  // used to make relative weights.
     OrderedPacketQueues orderingQueues_;       // used for storing out of order packets.
 
@@ -369,7 +369,7 @@ private:
     SplitPacketId splitPacketId_;
     SplitPacketChannelArr splitPacketChannels_;
 
-    // per udate buffers, here to keep bufferes around.
+    // per update buffers, here to keep buffers around between updates.
     RelPacketArr packetsThisFrame_;
     FrameboundaryArr packetsThisFrameBoundaries_;
 
@@ -383,7 +383,7 @@ private:
     size_t bytesInReSendBuffers_;
     size_t msgInReSendBuffers_;
 
-    // for artifical ping only.
+    // for artificial ping only.
     OrderedDelaysPacketQueue delayedPackets_;
 
     // this is quite fat, so left on end
