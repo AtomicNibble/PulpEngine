@@ -19,8 +19,9 @@ X_NAMESPACE_BEGIN(net)
 
 class NetVars;
 
+// We hash the password with a nonce on the client so you can't simply snif it from the traffic.
+// The server also creates a per connection nonce to prevent replay.
 typedef core::Hash::SHA1 NonceHash;
-// Change sha1 for something much stronger / salted if this code is used for something other than game server passwords.
 typedef core::Hash::SHA1 PasswdHash;
 
 X_DECLARE_ENUM(ConnectState)
@@ -74,8 +75,8 @@ struct PingAndClockDifferential
     X_INLINE bool isValid(void) const;
 
     uint16_t pingTime;
-    // this is a rougth guess about how to translate a remotes systems relative time to our relative time
-    // this may be possitive or negative.
+    // this is a rough guess about how to translate a remotes systems relative time to our relative time
+    // this may be positive or negative.
     core::TimeVal clockDifferential;
 };
 
