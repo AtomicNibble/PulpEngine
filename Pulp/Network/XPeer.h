@@ -19,8 +19,9 @@ X_NAMESPACE_BEGIN(net)
 
 class NetVars;
 
-// We hash the password with a nonce on the client so you can't simply snif it from the traffic.
+// We hash the password with a nonce on the client so you can't simply sniff it from the traffic.
 // The server also creates a per connection nonce to prevent replay.
+// This is just for transport of the password over the network it's never stored.
 typedef core::Hash::SHA1 NonceHash;
 typedef core::Hash::SHA1 PasswdHash;
 
@@ -44,13 +45,13 @@ struct BufferdCommand
 
     uint8_t* pData;
 
-    // 4
+    // 4 bytes
     Cmd::Enum cmd;
 
-    // 4
+    // 4 bytes
     BitSizeT numberOfBitsToSend;
 
-    // 4
+    // 4 bytes
     PacketPriority::Enum priority;
     PacketReliability::Enum reliability;
     OrderingChannel::Enum orderingChannel;
@@ -60,7 +61,7 @@ struct BufferdCommand
     SystemAddressEx systemAddress;
     SystemHandle systemHandle;
 
-    // 4
+    // 4 bytes
     union
     {
         SendReceipt receipt;
@@ -276,7 +277,7 @@ public:
     void sendLoopback(const uint8_t* pData, size_t lengthBytes) X_FINAL;
 
     X_NO_DISCARD Packet* receive(void) X_FINAL;
-    void clearPackets(void) X_FINAL; // free's any packets in the receive que.
+    void clearPackets(void) X_FINAL; // free any packets in the receive que.
 
     // drain me
     void setDrainSockets(bool drainSocket) X_FINAL;
@@ -401,7 +402,7 @@ private:
     void handleUnConnectedPing(UpdateBitStream& bsBuf, RecvData* pData, RecvBitStream& bs, bool openConnectionsRequired);
     void handleUnConnectedPong(UpdateBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
 
-    // conencted handlers
+    // connected handlers
     void handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs, core::TimeVal timeNow);
     void handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs, core::TimeVal timeNow);
     void handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);

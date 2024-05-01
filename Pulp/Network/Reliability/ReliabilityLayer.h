@@ -27,7 +27,7 @@ typedef uint8_t OrderingChannelIdx;
 
 struct ReliablePacket;
 
-// a channel for a split pack to reassembler itself into.
+// a channel for a split pack to reassemble itself into.
 struct SplitPacketChannel
 {
     typedef core::Array<ReliablePacket*> PacketArr;
@@ -55,7 +55,7 @@ struct ReliablePacket
     X_DECLARE_ENUM(DataType)
     (
         Normal,
-        Ref // the data is refrenced, this is so we can split large blocks into multiple packets without copyies.
+        Ref // the data is referenced, this is so we can split large blocks into multiple packets without copies.
     );
 
     X_NO_COPY(ReliablePacket);
@@ -120,9 +120,6 @@ private:
     core::MemoryArenaBase* arena; // arena this memory is from.
 };
 
-static const size_t goat = sizeof(ReliablePacket);
-// static_assert(core::compileTime::IsPOD<RelPacket>::Value, "Packet header should be POD");
-
 struct DelayedPacket
 {
     DelayedPacket(NetSocket* pSocket, core::TimeVal sendTime, size_t sizeInBytes, uint8_t* pData, core::MemoryArenaBase* arena) :
@@ -152,21 +149,28 @@ struct DataGramHistory
 {
     typedef core::FixedArray<MessageNumber, MAX_REL_PACKETS_PER_DATAGRAM> MesgNumberArr;
 
+    static inline uint32_t MAGIC = 0x12345678;
+
 public:
     DataGramHistory(core::TimeVal timesent) :
         timeSent(timesent)
     {
 #if X_DEBUG
-        magic = 0x12345678;
+        magic = MAGIC;
 #endif // X_DEBUG
     }
 
 #if X_DEBUG
+    // Used as a sanity checking in debug builds.
+    bool isMagicValid(void) const {
+        return magic == MAGIC;
+    }
+
     uint32_t magic;
 #endif // X_DEBUG
 
     core::TimeVal timeSent;
-    MesgNumberArr messagenumbers;
+    MesgNumberArr messageNumbers;
 };
 
 struct PacketData
@@ -249,6 +253,9 @@ public:
     ReliabilityLayer& operator=(ReliabilityLayer&& rhs) = default;
 
     void free(void);
+
+    // reset() allows efficient reuse of an existing instance for a new connection.
+    // As we keep all the buffers around so we can skip a lot of reallocations.
     void reset(int32_t MTUSize);
 
     // que some data for sending, reliability is handled.
@@ -256,7 +263,7 @@ public:
         PacketPriority::Enum priority, PacketReliability::Enum reliability, OrderingChannelIdx orderingChannel, SendReceipt receipt, bool ownData);
 
     // pass data from socket for processing
-    X_NO_DISCARD bool recv(uint8_t* pData, const size_t lengt, NetSocket& socket,
+    X_NO_DISCARD bool recv(uint8_t* pData, const size_t length, NetSocket& socket,
         SystemAddressEx& systemAddress, core::TimeVal time, uint32_t mtuSize);
 
     // update internal logic, re-send packets / other reliability actions.
@@ -266,7 +273,7 @@ public:
     // pop any packets that have arrived.
     X_NO_DISCARD bool receive(PacketData& dataOut);
 
-    void getStatistics(NetStatistics& stats);
+    void getStatisticsWithBPSUpdate(NetStatistics& stats);
     void getStatistics(NetStatistics& stats) const;
 
     X_INLINE size_t numMsgInResendBuffer(void) const;
@@ -280,7 +287,7 @@ private:
     size_t calculateMemoryUsage(void) const;
 
 private:
-    X_NO_DISCARD ProcessResult::Enum prcoessIncomingPacket(ReliablePacket*& pPacketInOut, core::TimeVal time);
+    X_NO_DISCARD ProcessResult::Enum processIncomingPacket(ReliablePacket*& pPacketInOut, core::TimeVal time);
     void ignorePacket(ReliablePacket* pPacket, core::TimeVal time);
     void addPacketToReceivedQueue(ReliablePacket* pPacket, core::TimeVal time);
 
@@ -365,7 +372,7 @@ private:
     DataGramNumberRangeList acks_;
 
     MessageNumber reliableMessageNumberIdx_; // current rel msg number index.
-    MessageNumber dagramSeqNumber_;
+    MessageNumber datagramSeqNumber_;
     SplitPacketId splitPacketId_;
     SplitPacketChannelArr splitPacketChannels_;
 

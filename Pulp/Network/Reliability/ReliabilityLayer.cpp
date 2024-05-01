@@ -435,7 +435,7 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars,
     naks_(arena),
     acks_(arena),
     reliableMessageNumberIdx_(0),
-    dagramSeqNumber_(0),
+    datagramSeqNumber_(0),
 
     splitPacketId_(0),
     splitPacketChannels_(arena),
@@ -528,7 +528,7 @@ void ReliabilityLayer::reset(int32_t MTUSize)
     }
     splitPacketChannels_.clear();
     reliableMessageNumberIdx_ = 0;
-    dagramSeqNumber_ = 0;
+    datagramSeqNumber_ = 0;
     splitPacketId_ = 0;
 
     connectionDead_ = false;
@@ -666,7 +666,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 {
     ttZone(gEnv->ctx, "(Net) reliability recv");
 
-    X_LOG0_IF(vars_.debugDatagramEnabled(), "NetRel", "Received datagram size: ^5%" PRIuS "^7 numbits: ^5%" PRIuS, length, core::bitUtil::bytesToBits(length));
+    X_LOG0_IF(vars_.debugDatagramEnabled(), "NetRel", "Received datagram size: ^5%" PRIuS "^7 numBits: ^5%" PRIuS, length, core::bitUtil::bytesToBits(length));
 
     // last time we got data.
     timeLastDatagramArrived_ = gEnv->pTimer->GetTimeNowReal();
@@ -708,11 +708,11 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
                 }
 
                 // mark each as sent.
-                for (auto msgNum : pHistory->messagenumbers) {
+                for (auto msgNum : pHistory->messageNumbers) {
                     removePacketFromResendList(msgNum);
                 }
 
-                pHistory->messagenumbers.clear();
+                pHistory->messageNumbers.clear();
             }
         }
     }
@@ -751,7 +751,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
                 }
 
                 // mark each as sent.
-                for (auto msgNum : pHistory->messagenumbers) {
+                for (auto msgNum : pHistory->messageNumbers) {
                     const auto resendBufIdx = resendBufferIdxForMsgNum(msgNum);
                     ReliablePacket* pPacket = resendBuf_[resendBufIdx];
 
@@ -764,7 +764,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
                     }
                 }
 
-                pHistory->messagenumbers.clear();
+                pHistory->messageNumbers.clear();
             }
         }
     }
@@ -777,7 +777,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 
         ReliablePacket* pPacket = packetFromBS(bs, time);
         while (pPacket) {
-            auto result = prcoessIncomingPacket(pPacket, time);
+            auto result = processIncomingPacket(pPacket, time);
             if (result == ProcessResult::Ok) {
                 // do nothing..
                 // it was either pushed to the que for us
@@ -805,7 +805,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
     return true;
 }
 
-ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(ReliablePacket*& pPacketInOut, core::TimeVal time)
+ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::processIncomingPacket(ReliablePacket*& pPacketInOut, core::TimeVal time)
 {
     ReliablePacket* pPacket = pPacketInOut;
 
@@ -1210,7 +1210,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
         bs.reset();
 
         DatagramHdr dgh;
-        dgh.number = dagramSeqNumber_++;
+        dgh.number = datagramSeqNumber_++;
         dgh.flags.Clear();
         dgh.writeToBitStream(bs);
 
@@ -1230,7 +1230,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 
             // only if reliable add to history.
             if (pPacket->isReliable()) {
-                pHistory->messagenumbers.append(pPacket->reliableMessageNumber);
+                pHistory->messageNumbers.append(pPacket->reliableMessageNumber);
             }
 
             ++begin;
@@ -1593,7 +1593,7 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
 DataGramHistory* ReliabilityLayer::createDataGramHistory(DataGramSequenceNumber number, core::TimeVal time)
 {
     if (dataGramHistory_.size() == REL_DATAGRAM_HISTORY_LENGTH) {
-        dataGramHistory_.peek().messagenumbers.clear();
+        dataGramHistory_.peek().messageNumbers.clear();
         dataGramHistory_.pop();
         ++dataGramHistoryPopCnt_;
     }
@@ -1614,8 +1614,8 @@ DataGramHistory* ReliabilityLayer::getDataGramHistory(DataGramSequenceNumber num
     if (number != dataGramHistoryPopCnt_) {
         // work out if lower that popcnt taking into account overflow.
         const DataGramSequenceNumber test = dataGramHistoryPopCnt_ - number;
-        const DataGramSequenceNumber dataGramhalf = std::numeric_limits<DataGramSequenceNumber>::max() / 2;
-        if (test < dataGramhalf) {
+        const DataGramSequenceNumber dataGramHalf = std::numeric_limits<DataGramSequenceNumber>::max() / 2;
+        if (test < dataGramHalf) {
             return nullptr;
         }
     }
@@ -1627,7 +1627,7 @@ DataGramHistory* ReliabilityLayer::getDataGramHistory(DataGramSequenceNumber num
 
     DataGramHistory* pHistory = &dataGramHistory_[offset];
 #if X_DEBUG
-    X_ASSERT(pHistory->magic == 0x12345678, "Magic not match, corrupt item?")();
+    X_ASSERT(pHistory->isMagicValid(), "Magic not match, corrupt item?")();
 #endif // X_DEBUG
     return pHistory;
 }
@@ -1639,7 +1639,7 @@ bool ReliabilityLayer::clearDataGramHistory(DataGramSequenceNumber number)
         return false;
     }
 
-    dataGramHistory_[offset].messagenumbers.clear();
+    dataGramHistory_[offset].messageNumbers.clear();
     return true;
 }
 
@@ -1743,7 +1743,7 @@ size_t ReliabilityLayer::calculateMemoryUsage(void) const
     return size;
 }
 
-void ReliabilityLayer::getStatistics(NetStatistics& stats)
+void ReliabilityLayer::getStatisticsWithBPSUpdate(NetStatistics& stats)
 {
     core::TimeVal time = gEnv->pTimer->GetTimeNowReal();
 
