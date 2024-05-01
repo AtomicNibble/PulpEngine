@@ -12,7 +12,7 @@ X_INLINE PacketData::~PacketData()
 {
 }
 
-X_INLINE void PacketData::setdata(uint8_t* pData, BitSizeT numBits, core::MemoryArenaBase* arena)
+X_INLINE void PacketData::setData(uint8_t* pData, BitSizeT numBits, core::MemoryArenaBase* arena)
 {
     numBits_ = numBits;
     data_ = core::UniquePointer<uint8_t[]>(arena, pData);
@@ -67,7 +67,7 @@ X_INLINE size_t ReliabilityLayer::numMsgInResendBuffer(void) const
 
 X_INLINE bool ReliabilityLayer::pendingOutgoingData(void) const
 {
-    return outGoingPackets_.isNotEmpty();
+    return outgoingPackets_.isNotEmpty();
 }
 
 
@@ -124,8 +124,8 @@ X_INLINE bool ReliabilityLayer::isOlderPacket(OrderingIndex packetIdx, OrderingI
     const OrderingIndex rangeHalf = std::numeric_limits<OrderingIndex>::max() / 2;
 
     // takes into account wrap around.
-    // so once current is above hald type range.
-    // packetIdx must be higer than current in order to be older.
+    // so once current is above half type range.
+    // packetIdx must be higher than current in order to be older.
 
     if (currentIdx > rangeHalf) {
         const OrderingIndex shiftedCurrent = currentIdx - (rangeHalf + 1);

@@ -425,7 +425,7 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars,
     packetPool_(packetPool),
     MTUSize_(0),
     orderingQueues_{{X_PP_REPEAT_COMMA_SEP(8, arena)}},
-    outGoingPackets_(arena),
+    outgoingPackets_(arena),
     receivedPackets_(arena),
     dataGramHistory_(arena),
     dataGramHistoryPopCnt_(0),
@@ -448,7 +448,7 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars,
     msgInReSendBuffers_(0),
     delayedPackets_(arena)
 {
-    outGoingPackets_.reserve(128);
+    outgoingPackets_.reserve(128);
     receivedPackets_.reserve(128);
 
     // fifo doubles in size, so if we allocate one more than size we limit to.
@@ -470,7 +470,7 @@ void ReliabilityLayer::free(void)
 {
     reset(MTUSize_);
 
-    outGoingPackets_.free();
+    outgoingPackets_.free();
     receivedPackets_.free();
     dataGramHistory_.free();
 
@@ -513,7 +513,7 @@ void ReliabilityLayer::reset(int32_t MTUSize)
         orderQue.clear();
     }
 
-    outGoingPackets_.clear();
+    outgoingPackets_.clear();
     receivedPackets_.clear();
     dataGramHistory_.clear();
     dataGramHistoryPopCnt_ = 0;
@@ -558,9 +558,9 @@ void ReliabilityLayer::reset(int32_t MTUSize)
 
 void ReliabilityLayer::clearPacketQueues(void)
 {
-    while (outGoingPackets_.isNotEmpty()) {
-        freePacket(outGoingPackets_.peek());
-        outGoingPackets_.pop();
+    while (outgoingPackets_.isNotEmpty()) {
+        freePacket(outgoingPackets_.peek());
+        outgoingPackets_.pop();
     }
 
     while (receivedPackets_.isNotEmpty()) {
@@ -654,7 +654,7 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
         return splitPacket(pPacket);
     }
 
-    outGoingPackets_.push(pPacket);
+    outgoingPackets_.push(pPacket);
 
     ++msgInSendBuffers_[priority];
     bytesInSendBuffers_[priority] += lengthBytes;
@@ -1111,15 +1111,15 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
     }
 
     // send new packets.
-    if (!outGoingPackets_.isEmpty()) {
+    if (!outgoingPackets_.isEmpty()) {
         while (!isResendBufferFull()) {
             // fill a packet.
             size_t currentReliablePackets = 0;
             size_t currentDataGramSizeBits = 0;
             const size_t maxDataGramSizeBits = maxDataGramSizeExcHdrBits();
 
-            while (outGoingPackets_.isNotEmpty() && !isResendBufferFull() && currentReliablePackets < MAX_REL_PACKETS_PER_DATAGRAM) {
-                ReliablePacket* pPacket = outGoingPackets_.peek();
+            while (outgoingPackets_.isNotEmpty() && !isResendBufferFull() && currentReliablePackets < MAX_REL_PACKETS_PER_DATAGRAM) {
+                ReliablePacket* pPacket = outgoingPackets_.peek();
 
                 X_ASSERT_NOT_NULL(pPacket->pData);
                 X_ASSERT(pPacket->dataBitLength > 0, "Invalid data length")();
@@ -1133,7 +1133,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
                     break;
                 }
 
-                outGoingPackets_.pop();
+                outgoingPackets_.pop();
 
                 // add packet.
                 currentDataGramSizeBits += totalBitSize;
@@ -1183,8 +1183,8 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
             }
         }
 
-        if (outGoingPackets_.isNotEmpty() && isResendBufferFull()) {
-            X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Resend buffer is full, postponing send of %" PRIuS " packets", outGoingPackets_.size());
+        if (outgoingPackets_.isNotEmpty() && isResendBufferFull()) {
+            X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Resend buffer is full, postponing send of %" PRIuS " packets", outgoingPackets_.size());
         }
     }
 
@@ -1259,7 +1259,7 @@ bool ReliabilityLayer::receive(PacketData& dataOut)
     }
 
     ReliablePacket* pPacket = receivedPackets_.peek();
-    dataOut.setdata(pPacket->pData, pPacket->dataBitLength, pPacket->getArena());
+    dataOut.setData(pPacket->pData, pPacket->dataBitLength, pPacket->getArena());
     receivedPackets_.pop();
 
     // release ownership...
@@ -1493,7 +1493,7 @@ bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
     // push them all.
     const auto priority = pPacket->priority;
     for (auto* pSplitPacket : packets) {
-        outGoingPackets_.push(pSplitPacket);
+        outgoingPackets_.push(pSplitPacket);
 
         ++msgInSendBuffers_[priority];
         bytesInSendBuffers_[priority] += core::bitUtil::bitsToBytes(pSplitPacket->dataBitLength);
@@ -1720,7 +1720,7 @@ size_t ReliabilityLayer::calculateMemoryUsage(void) const
     size_t size = 0;
 
     size += sizeof(*this);
-    size += outGoingPackets_.capacity() * sizeof(decltype(outGoingPackets_)::Type);
+    size += outgoingPackets_.capacity() * sizeof(decltype(outgoingPackets_)::Type);
     size += receivedPackets_.capacity() * sizeof(decltype(receivedPackets_)::Type);
     size += dataGramHistory_.capacity() * sizeof(decltype(dataGramHistory_)::Type);
     size += receivedPacketQueue_.capacity() * sizeof(decltype(receivedPacketQueue_)::Type);

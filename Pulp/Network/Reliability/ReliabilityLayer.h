@@ -178,7 +178,7 @@ struct PacketData
     X_INLINE PacketData(core::MemoryArenaBase* arena);
     X_INLINE ~PacketData();
 
-    X_INLINE void setdata(uint8_t* pData, BitSizeT numBits, core::MemoryArenaBase* arena);
+    X_INLINE void setData(uint8_t* pData, BitSizeT numBits, core::MemoryArenaBase* arena);
     X_INLINE core::UniquePointer<uint8_t[]>& getUP(void);
 
     X_INLINE BitSizeT getNumbBits(void) const;
@@ -192,7 +192,7 @@ struct PacketData
 
 private:
     BitSizeT numBits_;
-    core::UniquePointer<uint8_t[]> data_;
+    core::UniquePointer<uint8_t[]> data_; // is pointer + arena
 };
 
 class ReliabilityLayer
@@ -360,7 +360,7 @@ private:
     OrdereIndexArr orderingQueueIndexOffset_;  // used to make relative weights.
     OrderedPacketQueues orderingQueues_;       // used for storing out of order packets.
 
-    PacketQeue outGoingPackets_;
+    PacketQeue outgoingPackets_;
     PacketQeue receivedPackets_;
     DataGramHistoryQeue dataGramHistory_;
     DataGramSequenceNumber dataGramHistoryPopCnt_;
