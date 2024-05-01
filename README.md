@@ -57,7 +57,7 @@ Giving a very fine grained overview of memory usage as a whole, for each module 
 
 ![memory tree example](docs/img/arean-tree-example.png)
 
-The only exception to this is strings which use a global allocator specialized for strings.
+The only exception to this is strings which use a global allocator specialized for strings, but we still get statistics for them as part of the allocator tree.
 
 ### Stack is king
 
