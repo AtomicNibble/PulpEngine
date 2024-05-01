@@ -63,7 +63,7 @@ void CoreVars::registerVars(void)
     ADD_CVAR_REF("win_fullscreen", fullscreen_, fullscreen_, -1, 2,
         VarFlag::SYSTEM | VarFlag::ARCHIVE, "0 = windowed 1 = fullscreen");
     ADD_CVAR_REF("win_monitor", monitor_, monitor_, -1, 64,
-        VarFlag::SYSTEM | VarFlag::ARCHIVE, "-1 = detech default, >= 0 specific");
+        VarFlag::SYSTEM | VarFlag::ARCHIVE, "-1 = detect default, >= 0 specific");
     ADD_CVAR_REF("win_mode", videoMode_, videoMode_, -1, -2,
         VarFlag::SYSTEM | VarFlag::ARCHIVE, "Game window video mode");
 

@@ -74,7 +74,7 @@ void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
 
     if (maxFps_ != 0) 
     {
-        // sleep the diffrence.
+        // sleep the difference.
         const int64_t targetTicks = (ticksPerSec_ / maxFps_);
 
         if (realFrameDelta < targetTicks) {
@@ -117,7 +117,7 @@ void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
         frameTime.deltas[Timer::UI].SetValue(uiTime);
     }
 
-    // i want the accumalated scaled time.
+    // i want the accumulated scaled time.
     frameTime.ellapsed[Timer::GAME].SetValue(accumulatedTime_[Timer::GAME]);
     frameTime.ellapsed[Timer::UI].SetValue(accumulatedTime_[Timer::UI]);
 
