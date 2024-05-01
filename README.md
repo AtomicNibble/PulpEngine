@@ -18,7 +18,7 @@ There is a central runtime that handles startup, loads required engine modules a
 The central runtime is called `core` and can be found under [Pulp](Pulp)
 Any application that uses this runtime is referred to as an **EngineApp**.  
 
-The Game, Editor, Converter, Linker, ... are all EngineApps as this allows tools to make use of useful engine features and share code with ease. Each app passes `CoreInitParams` on startup which defines what systems should be enabled so things like loading the render module is skipped for engine tools.
+The Game, Editor, Converter, Linker, ... are all EngineApps as this allows tools to make use of useful engine features and share code with ease. Each app passes `CoreInitParams` on startup which defines what systems should be enabled so things like loading the render module is skipped for CLI tools.
 
 ### No blocking IO
 
@@ -28,6 +28,8 @@ So all IO requests (open, read, write, close) go via the IO thread which handles
 This means Games can run on top of slow storage or even network backed storage without affecting the frame rate.
 
 The filesystem includes some settings for simulating slow IO with artificial delays to help test this.
+
+The exception to this rule is code only used in offline tools.
 
 ### Multithreaded
 
@@ -52,6 +54,8 @@ For developer builds, every allocator has a parent and a top level allocator is 
 This gives us a tree of all allocators in the engine that can be traversed for stats collection.
 
 Giving a very fine grained overview of memory usage as a whole, for each module and each section of a given module.
+
+![memory tree example](docs/img/arean-tree-example.png)
 
 The only exception to this is strings which use a global allocator specialized for strings.
 
