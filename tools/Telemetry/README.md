@@ -89,14 +89,15 @@ int main()
 {
     // All Telemetry memory usage will take place in this buffer
     // Size requirements of the buffer depend on a number of factors but 2-4MB is typically enough for most scenarios.
-    // Larger buffers are useful if latency is high to the reviving server, as too small a buffer can result in stalls.
-    // Large buffers also prevents stalls if the application emits a large burst of data in a short window.
+    // A large buffer is useful if latency is high to the receiving server, as too small a buffer can result in stalls.
+    // it can also prevents stalls if the application emits an abnormally large burst of data in a short window.
     const size_t telemBufSize = 1024 * 1024 * 4;
     alignas(64) static uint8_t telemBuf[telemBufSize];
 
     ttInitializeContext(&ctx, telemBuf, sizeof(telemBuf));
 
     // Connect to server
+    // Send some meta like app name and build version that is stored with the trace.
     auto res = ttOpen(
         ctx,
         "My app name",
@@ -150,6 +151,7 @@ int main()
         thread[i].create(name.c_str());
         thread[i].start(threadFunc);
 
+        // Give the threads names and place all in the workers thread group.
         ttSetThreadName(ctx, thread[i].getID(), "%s", name.c_str());
         ttSetThreadGroup(ctx, thread[i].getID(), 1);
     }
