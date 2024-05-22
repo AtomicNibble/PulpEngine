@@ -41,7 +41,8 @@ It has many advantages over your more typical style of profiler like the one inc
     - Thread local state for stack tracking
     - Self tracing
         - Easily see how much of your application CPU time is being used by the profiling runtime
-
+- C API
+    - Internally the code is C++ but a C API is exposed for greater portability
 
 ## Architecture
 
