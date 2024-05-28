@@ -406,7 +406,6 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\code\3rdparty\$(PlatformName)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">
@@ -631,7 +630,6 @@
     <ClCompile Include="UT_GrowingStringTable.cpp" />
     <ClCompile Include="UT_Hash.cpp" />
     <ClCompile Include="UT_JobList.cpp" />
-    <ClCompile Include="UT_JobSystem.cpp" />
     <ClCompile Include="UT_JobSystemV2.cpp" />
     <ClCompile Include="UT_Lexer.cpp" />
     <ClCompile Include="UT_LZ4.cpp" />

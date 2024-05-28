@@ -946,9 +946,6 @@
     <ClInclude Include="Threading\JobList.h">
       <Filter>Headers\Threading</Filter>
     </ClInclude>
-    <ClInclude Include="Threading\JobSystem.h">
-      <Filter>Headers\Threading</Filter>
-    </ClInclude>
     <ClInclude Include="IJobSystem.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
@@ -1954,9 +1951,6 @@
       <Filter>SourceFiles\Compression</Filter>
     </ClCompile>
     <ClCompile Include="Threading\JobList.cpp">
-      <Filter>SourceFiles\Threading</Filter>
-    </ClCompile>
-    <ClCompile Include="Threading\JobSystem.cpp">
       <Filter>SourceFiles\Threading</Filter>
     </ClCompile>
     <ClCompile Include="Hashing\SHA512.cpp">

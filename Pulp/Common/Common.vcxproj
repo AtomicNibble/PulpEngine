@@ -358,7 +358,6 @@
     <ClInclude Include="Threading\FiberScheduler.h" />
     <ClInclude Include="Threading\FixedThreadQue.h" />
     <ClInclude Include="Threading\JobList.h" />
-    <ClInclude Include="Threading\JobSystem.h" />
     <ClInclude Include="Threading\JobSystem2.h" />
     <ClInclude Include="Threading\ScopedLock.h" />
     <ClInclude Include="Threading\Semaphore.h" />
@@ -1162,7 +1161,6 @@
     <ClCompile Include="String\XParser.cpp" />
     <ClCompile Include="Threading\FiberScheduler.cpp" />
     <ClCompile Include="Threading\JobList.cpp" />
-    <ClCompile Include="Threading\JobSystem.cpp" />
     <ClCompile Include="Threading\JobSystem2.cpp" />
     <ClCompile Include="Threading\win32\ConditionVariable.cpp" />
     <ClCompile Include="Threading\win32\CriticalSection.cpp" />
