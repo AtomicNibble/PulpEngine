@@ -920,8 +920,8 @@ namespace profiler
             }
 
             core::StackString512 txt;
-            txt.appendFmt("JobsRun: %" PRIi32 " JobsStolen: %" PRIi32 " JobsAssited: %" PRIi32,
-                int32_t(frameStats.jobsRun), int32_t(frameStats.jobsStolen), int32_t(frameStats.jobsAssited));
+            txt.appendFmt("JobsRun: %" PRIi32 " JobsStolen: %" PRIi32 " JobsAssisted: %" PRIi32,
+                int32_t(frameStats.jobsRun), int32_t(frameStats.jobsStolen), int32_t(frameStats.jobsAssisted));
 
             ctx.SetColor(Col_Mintcream);
             ctx.flags.Set(font::DrawTextFlag::CENTER);
@@ -1008,11 +1008,11 @@ namespace profiler
         // i want to draw the history of this thread at correct based on start time relative to
         // start time, so that I can visualize 'bubbles'.
         // this means i need to know when the frame started.
-        const auto frameStartTime = history.start;
+        const auto frameStartTime = history.start_;
 
-        const int32_t num = history.getMaxreadIdx();
+        const int32_t num = history.getMaxReadIdx();
         for (int32_t idx = 0; idx < num; idx++) {
-            const auto& entry = history.entryes_[idx];
+            const auto& entry = history.entries_[idx];
             const auto timeOffset = entry.start - frameStartTime;
             const auto elapsed = (entry.end - entry.start);
 

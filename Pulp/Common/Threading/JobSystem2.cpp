@@ -23,7 +23,7 @@ namespace V2
     {
         jobsStolen = 0;
         jobsRun = 0;
-        jobsAssited = 0;
+        jobsAssisted = 0;
         workerUsedMask = 0;
         workerAwokenMask = 0;
     }
@@ -45,13 +45,13 @@ namespace V2
     {
     }
 
-    void JobQueueHistory::sethistoryIndex(int32_t historyIdx)
+    void JobQueueHistory::setHistoryIndex(int32_t historyIdx)
     {
         int32_t newIdx = (historyIdx) & (JOBSYS_HISTORY_COUNT - 1);
         auto start = core::StopWatch::GetTimeNow();
 
         auto& history = frameHistory_[newIdx];
-        history.start = start;
+        history.start_ = start;
         atomic::Exchange<long>(&history.bottom_, 0);
         atomic::Exchange<long>(&history.top_, 0);
 
@@ -261,8 +261,8 @@ namespace V2
         stats_[currentHistoryIdx_].clear();
 
         for (uint32_t i = 0; i < HW_THREAD_MAX; i++) {
-            if (pTimeLines_[i]) {
-                pTimeLines_[i]->sethistoryIndex(currentHistoryIdx_);
+            if (pTimeLines_[i] != nullptr) {
+                pTimeLines_[i]->setHistoryIndex(currentHistoryIdx_);
             }
         }
 
@@ -434,7 +434,7 @@ namespace V2
             Job* nextJob = GetJob(threadQue);
             if (nextJob) {
 #if X_ENABLE_JOBSYS_PROFILER
-                ++stats_[currentHistoryIdx_].jobsAssited;
+                ++stats_[currentHistoryIdx_].jobsAssisted;
 #endif // X_ENABLE_JOBSYS_PROFILER
 
                 Execute(nextJob, threadIdx);
@@ -459,7 +459,7 @@ namespace V2
         Job* nextJob = GetJob(threadQue);
         if (nextJob) {
 #if X_ENABLE_JOBSYS_PROFILER
-            ++stats_[currentHistoryIdx_].jobsAssited;
+            ++stats_[currentHistoryIdx_].jobsAssisted;
 #endif // X_ENABLE_JOBSYS_PROFILER
 
             Execute(nextJob, threadIdx);
@@ -611,7 +611,7 @@ namespace V2
         auto* pTimeLine = pTimeLines_[threadIdx];
         const int32_t currentHistoryIdx = currentHistoryIdx_;
         auto& history = pTimeLine->getCurFrameHistory();
-        auto* pEntry = &history.entryes_[history.bottom_ & JobQueueHistory::MASK];
+        auto* pEntry = &history.entries_[history.bottom_ & JobQueueHistory::MASK];
 
         // we must write this before running the job.
         // as the job may run another job that then runs on this thread.

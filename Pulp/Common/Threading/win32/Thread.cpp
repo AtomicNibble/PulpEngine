@@ -134,6 +134,8 @@ bool Thread::setThreadAffinity(const AffinityFlags flags)
 {
     DWORD_PTR mask = flags.ToInt();
 
+    static_assert(sizeof(mask) == 8, "expect 64 bits");
+
     if (SetThreadAffinityMask(handle_, mask) == 0) {
         lastError::Description Dsc;
         X_ERROR("Thread", "Failed to set thread affinity. Error: %s", lastError::ToString(Dsc));

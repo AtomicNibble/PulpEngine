@@ -47,8 +47,7 @@ namespace V2
 
         When enabled the start and end time is recorded for every job on each worker in a fixed ring buffer for JOBSYS_HISTORY_COUNT frames.
         Each tread gets it's own buffer so the cost of profiling is basically a doubling of memory writes there is no added contention.
-        As we write two cache lanes per job when profiling vs one without.
-
+        Since when enabled we write to an additional cache lane.
     */
 
     class JobSystem;
@@ -76,7 +75,7 @@ namespace V2
         static const size_t PAD_SIZE = (128 - (sizeof(JobFunction::Pointer) + sizeof(Job*) + sizeof(void*) + (sizeof(core::AtomicInt) * 2) + (sizeof(JobId) * MAX_CONTINUATIONS) + sizeof(profiler::SubSys::Enum) + sizeof(uint8_t) + sizeof(uint8_t)));
 
     public:
-        int32_t unfinishedJobs; // not using AtomicInt so Job is pod bitches.
+        int32_t unfinishedJobs; // not using AtomicInt so Job is pod.
         int32_t continuationCount;
         JobFunction::Pointer pFunction;
         Job* pParent;
@@ -134,9 +133,9 @@ namespace V2
 
         core::AtomicInt jobsStolen;       // total jobs stolen
         core::AtomicInt jobsRun;          // total jobs run
-        core::AtomicInt jobsAssited;      // total jobs run via WaitWithHelp
+        core::AtomicInt jobsAssisted;      // total jobs run via WaitWithHelp
         core::AtomicInt workerUsedMask;   // mask of which workers ran jobs
-        core::AtomicInt workerAwokenMask; // mask of which works where awoken
+        core::AtomicInt workerAwokenMask; // mask of which workers awoken
     };
 
     X_DISABLE_WARNING(4324)
@@ -167,13 +166,13 @@ namespace V2
         X_ALIGNED_SYMBOL(struct FrameHistory, 64)
         {
             FrameHistory();
-            X_INLINE const int32_t getMaxreadIdx(void) const;
+            X_INLINE const int32_t getMaxReadIdx(void) const;
 
             long bottom_;
             long top_;
 
-            core::TimeVal start;
-            Entry entryes_[MAX_NUMBER_OF_JOBS];
+            core::TimeVal start_;
+            Entry entries_[MAX_NUMBER_OF_JOBS];
         };
 
         typedef std::array<FrameHistory, JOBSYS_HISTORY_COUNT> FrameHistoryArr;
@@ -182,7 +181,7 @@ namespace V2
         JobQueueHistory();
         ~JobQueueHistory();
 
-        void sethistoryIndex(int32_t historyIdx);
+        void setHistoryIndex(int32_t historyIdx);
         X_INLINE const FrameHistoryArr& getHistory(void) const;
 
         // called from one thread.

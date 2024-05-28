@@ -331,7 +331,7 @@ namespace V2
 
 #if X_ENABLE_JOBSYS_PROFILER
 
-    X_INLINE const int32_t JobQueueHistory::FrameHistory::getMaxreadIdx(void) const
+    X_INLINE const int32_t JobQueueHistory::FrameHistory::getMaxReadIdx(void) const
     {
         return top_;
     }

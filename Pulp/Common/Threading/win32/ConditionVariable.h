@@ -18,11 +18,11 @@ public:
     // notify all threads that are sleeping on the condition to wake up.
     void NotifyAll(void);
 
-    // releease the critical section lock, and puts thread to sleep until it is notified.
+    // release the critical section lock, and puts thread to sleep until it is notified.
     void Wait(CriticalSection& criticalSection);
 
-    // releease the shared lock, and puts thread to sleep until it is notified.
-    // it's up to you to know if a exlusive or shared lock was taken in the contex of this call.
+    // release the shared lock, and puts thread to sleep until it is notified.
+    // it's up to you to know if an exclusive or shared lock was taken in the context of this call.
     // if the lock has been taken with 'EnterShared' you must set exclusive to false.
     void Wait(SharedLock& sharedLock, bool isExclusive);
 
