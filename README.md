@@ -73,7 +73,10 @@ Large C++ codebases are typically plagued with slow build times which is somethi
 To combat this the engine is split into various modules that don't depend on each other allowing them to build in parallel.
 This also means that even though a full rebuild takes about 60 seconds if you are working on a single module build times are typically below 1 second.
 
-One downside of this approach is that all inter-module communication happens via virtual functions, so the interfaces are designed to accept large batches of data to minimize virtual calls.
+All inter-module communication happens via virtual functions which helps prevent changes in one module resulting in other modules rebuilding.
+As a result the interfaces are designed to accept large batches of data to minimize virtual call overhead.
+
+One nice benefit is that it's trivial to have multiple implementations of a given engine module and swap them out (different render backend, ..).
 
 For shipping builds, all the engine modules are static linked into a single binary which allows devirtualization to occur.
 
